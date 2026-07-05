@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Allow real files and directories to be served directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Send everything else through MyBB
+RewriteRule ^(.*)$ index.php [QSA,L]
