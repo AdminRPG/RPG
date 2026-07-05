@@ -1,0 +1,3 @@
+RewriteEngine On
+RewriteRule ^install/ - [L]
+RewriteRule ^(.*)$ index.php [QSA,L]

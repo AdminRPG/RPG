@@ -1,0 +1,2 @@
+# Apache configuration for MyBB
+Options -Indexes
