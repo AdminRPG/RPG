@@ -91,17 +91,33 @@ const ROADMAP = [
       { id: 'i7', label: '.gitignore + deploy.yml ajustados para multi-entorno', tag: 'infra', done: true },
       { id: 'i8', label: 'Skill frontend-design de Anthropic instalado', tag: 'infra', done: true },
       { id: 'i9', label: 'Plugin puente mybb-plugin-rol/ creado con estructura fuente', tag: 'plugin', done: true },
-      { id: 'i10', label: 'rolbridge.php y rol-widgets.js desplegados en inc/plugins/ y jscripts/', tag: 'plugin', done: true },
     ]
   },
   {
-    title: '2. Identidad Visual y Tema MyBB',
+    title: '2. Fase 0 — Arquitectura Character-Driven',
+    metaTpl: '{done}/{total}',
+    tasks: [
+      { id: 'a1', label: 'Decisión: foro regido por personajes (cuenta → slots → personajes → posts)', tag: 'back', done: true },
+      { id: 'a2', label: 'SQL migration: rol_cuentas + rol_personajes (con cuenta_id, slot_index, activo)', tag: 'back', done: true },
+      { id: 'a3', label: 'SQL migration: rol_post_personaje (post ↔ personaje mapping)', tag: 'back', done: true },
+      { id: 'a4', label: 'Models: Cuenta.php, Personaje.php (reemplaza Ficha.php), FichaAtributo.php, PostPersonaje.php', tag: 'back', done: true },
+      { id: 'a5', label: 'Controllers: CuentaController.php (mi-cuenta, establecer-activo, personaje-activo)', tag: 'back', done: true },
+      { id: 'a6', label: 'Controllers: PostController.php (vincular post ↔ personaje)', tag: 'back', done: true },
+      { id: 'a7', label: 'Routes: api.php con endpoints de cuenta + post mapping', tag: 'back', done: true },
+      { id: 'a8', label: 'Plugin rolbridge.php: login ensureAccount + character selector en newreply/newthread', tag: 'plugin', done: true },
+      { id: 'a9', label: 'Plugin rol-widgets.js: hydratacion de widgets postbit, selector, perfil', tag: 'plugin', done: true },
+      { id: 'a10', label: 'Arquitectura doc actualizada: jerarquia account → personajes → posts', tag: 'back', done: true },
+      { id: 'a11', label: 'Roadmap y todo actualizados', tag: 'infra', done: true },
+    ]
+  },
+  {
+    title: '3. Identidad Visual y Tema MyBB',
     metaTpl: '{done}/{total}',
     tasks: [
       { id: 'v1', label: 'Rellenar docs/frontend/identidad-visual-front.md con valores concretos (nombre, ambientacion, tono, adjetivos)', tag: 'front' },
-      { id: 'v2', label: 'Definir paleta de color completa con funcion asignada a cada色', tag: 'front' },
+      { id: 'v2', label: 'Definir paleta de color completa con funcion asignada a cada 色', tag: 'front' },
       { id: 'v3', label: 'Elegir tipografia (display, cuerpo, datos, utilitaria)', tag: 'front' },
-      { id: 'v4', label: 'Definir layouts clave (ficha, inventario, economia, postbit)', tag: 'front' },
+      { id: 'v4', label: 'Definir layouts clave (ficha, inventario, economia, postbit, selector de personaje)', tag: 'front' },
       { id: 'v5', label: 'Crear elemento firma (marca de agua del foro)', tag: 'front' },
       { id: 'v6', label: 'Elegir iconografia y animaciones', tag: 'front' },
       { id: 'v7', label: 'Diseñar el tema MyBB desde el XML base en docs/themes/', tag: 'front' },
@@ -112,39 +128,30 @@ const ROADMAP = [
     ]
   },
   {
-    title: '3. Plugin Puente MyBB — JWT y Autenticación (Fase 1)',
+    title: '4. Plugin Puente MyBB — JWT y Autenticación (Fase 1)',
     metaTpl: '{done}/{total}',
     tasks: [
-      { id: 'p1', label: 'Completar hook member_do_login_end: generar JWT y guardar en cookie rol_token', tag: 'plugin' },
-      { id: 'p2', label: 'Completar hook member_do_logout_end: eliminar cookie rol_token', tag: 'plugin' },
-      { id: 'p3', label: 'Completar hook global_end: inyectar jscripts/rol-widgets.js en todas las paginas', tag: 'plugin' },
-      { id: 'p4', label: 'Completar hook member_profile_end: contenedor de ficha completa en perfil', tag: 'plugin' },
-      { id: 'p5', label: 'Implementar endpoint POST /api/v1/auth/refresh en la API', tag: 'back' },
-      { id: 'p6', label: 'JWTService.php: metodos encode/decode con HS256 y secreto desde .env', tag: 'back' },
-      { id: 'p7', label: 'AuthMiddleware.php: extraer Bearer token, validar JWT, inyectar user_id en request', tag: 'back' },
-      { id: 'p8', label: 'CorsMiddleware.php: configurar CORS (Access-Control-Allow-Origin exacto)', tag: 'back' },
-      { id: 'p9', label: 'Activar plugin rolbridge desde ACP de MyBB y verificar login flow', tag: 'plugin' },
+      { id: 'p1', label: 'JWTService.php: metodos encode/decode con HS256 y secreto desde .env', tag: 'back' },
+      { id: 'p2', label: 'AuthMiddleware.php: extraer Bearer token, validar JWT, inyectar user_id en request', tag: 'back' },
+      { id: 'p3', label: 'CorsMiddleware.php: configurar CORS (Access-Control-Allow-Origin exacto)', tag: 'back' },
+      { id: 'p4', label: 'Implementar endpoint POST /api/v1/auth/refresh en la API', tag: 'back' },
+      { id: 'p5', label: 'Activar plugin rolbridge desde ACP de MyBB y verificar login flow', tag: 'plugin' },
     ]
   },
   {
-    title: '4. API — Sistema de Fichas y Personajes (Fase 2)',
+    title: '5. API — Sistema de Fichas y Personajes (Fase 2)',
     metaTpl: '{done}/{total}',
     tasks: [
-      { id: 'f1', label: 'Ejecutar migracion SQL: crear tablas rol_personajes + rol_ficha_atributos', tag: 'back' },
-      { id: 'f2', label: 'Models/Ficha.php: propiedades, validacion, relacion con atributos', tag: 'back' },
-      { id: 'f3', label: 'Repositories/PersonajeRepository.php: CRUD contra BD', tag: 'back' },
-      { id: 'f4', label: 'FichaController.php: GET /personajes/mios, GET /personajes/{id}', tag: 'back' },
-      { id: 'f5', label: 'FichaController.php: POST /personajes (crear borrador)', tag: 'back' },
-      { id: 'f6', label: 'FichaController.php: PUT /personajes/{id} (editar si no aprobado)', tag: 'back' },
-      { id: 'f7', label: 'FichaController.php: POST /personajes/{id}/enviar (borrador → pendiente)', tag: 'back' },
-      { id: 'f8', label: 'FichaController.php: POST /personajes/{id}/aprobar y /rechazar (staff)', tag: 'back' },
-      { id: 'f9', label: 'ApprovalService.php: logica de flujo de aprobacion', tag: 'back' },
-      { id: 'f10', label: 'Widget postbit: fetch a /personajes/activo/{userId} y renderizar ficha resumida', tag: 'front' },
-      { id: 'f11', label: 'Widget perfil: fetch a /personajes/activo/{userId} y renderizar ficha completa', tag: 'front' },
+      { id: 'f1', label: 'Ejecutar migracion SQL: migracion completa 001_cuentas_personajes.sql', tag: 'back' },
+      { id: 'f2', label: 'Repositories/PersonajeRepository.php: CRUD contra BD', tag: 'back' },
+      { id: 'f3', label: 'FichaController.php: metodos listar, obtener, crear, actualizar, enviar, aprobar, rechazar', tag: 'back' },
+      { id: 'f4', label: 'ApprovalService.php: logica de flujo de aprobacion', tag: 'back' },
+      { id: 'f5', label: 'Widget postbit: fetch a /personajes/activo/{userId} y renderizar ficha resumida', tag: 'front' },
+      { id: 'f6', label: 'Widget perfil: fetch a /personajes/activo/{userId} y renderizar ficha completa', tag: 'front' },
     ]
   },
   {
-    title: '5. API — Inventario y Items (Fase 3)',
+    title: '6. API — Inventario y Items (Fase 3)',
     metaTpl: '{done}/{total}',
     tasks: [
       { id: 'inv1', label: 'Ejecutar migracion SQL: crear tablas rol_items + rol_inventario', tag: 'back' },
@@ -157,7 +164,7 @@ const ROADMAP = [
     ]
   },
   {
-    title: '6. API — Economía (Fase 4)',
+    title: '7. API — Economía (Fase 4)',
     metaTpl: '{done}/{total}',
     tasks: [
       { id: 'e1', label: 'Ejecutar migracion SQL: crear tablas rol_economia_saldo + rol_economia_transacciones', tag: 'back' },
@@ -170,7 +177,7 @@ const ROADMAP = [
     ]
   },
   {
-    title: '7. API — Dados Server-Side (Fase 5)',
+    title: '8. API — Dados Server-Side (Fase 5)',
     metaTpl: '{done}/{total}',
     tasks: [
       { id: 'd1', label: 'Ejecutar migracion SQL: crear tabla rol_tiradas', tag: 'back' },
@@ -183,7 +190,7 @@ const ROADMAP = [
     ]
   },
   {
-    title: '8. Panel de Staff y Moderación (Fase 6)',
+    title: '9. Panel de Staff y Moderación (Fase 6)',
     metaTpl: '{done}/{total}',
     tasks: [
       { id: 's1', label: 'Pagina de aprobacion de fichas en ACP o como pagina propia', tag: 'front' },
@@ -193,11 +200,11 @@ const ROADMAP = [
     ]
   },
   {
-    title: '9. Endurecimiento y Producción (Fase 7)',
+    title: '10. Endurecimiento y Producción (Fase 7)',
     metaTpl: '{done}/{total}',
     tasks: [
       { id: 'h1', label: 'Rate limiting en /dados/tirar y /economia/transferir (Redis o APCu)', tag: 'back' },
-      { id: 'h2', label: 'Validacion de pertenencia (personaje.mybb_user_id === token.mybb_user_id)', tag: 'back' },
+      { id: 'h2', label: 'Validacion de pertenencia (personaje → cuenta → mybb_user_id)', tag: 'back' },
       { id: 'h3', label: 'Sanitizacion de HTML en campos de texto libre (XSS)', tag: 'back' },
       { id: 'h4', label: 'Pruebas unitarias de servicios (Dice, Economy, Approval)', tag: 'back' },
       { id: 'h5', label: 'Pruebas de integracion de endpoints API', tag: 'back' },
