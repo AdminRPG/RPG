@@ -16,9 +16,9 @@ Este proyecto es un foro de rol basado en MyBB con una API propia para lógica d
 ### Antes de generar o modificar cualquier componente:
 
 1. **Lee los contratos primero:**
-   - `rol-backend/arquitectura-backend-rol-mybb.md` — si el componente consume datos de la API o toca lógica de juego
-   - `docs/identidad-visual-front.md` — si el componente es UI (frontend, widgets, pantallas)
-   - `docs/mybb-directory-structure.md` — si trabajas con archivos de MyBB
+   - `docs/backend/arquitectura-backend-rol-mybb.md` — si el componente consume datos de la API o toca lógica de juego
+   - `docs/frontend/identidad-visual-front.md` — si el componente es UI (frontend, widgets, pantallas)
+   - `docs/estructura/mybb-directory-structure.md` — si trabajas con archivos de MyBB
 
 2. **Backend:**
    - MyBB es fuente de verdad de identidad y contenido narrativo. Nunca escribir directamente sobre tablas `mybb_*`.

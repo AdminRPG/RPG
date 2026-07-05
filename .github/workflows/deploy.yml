@@ -19,10 +19,21 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./back/forum/
+        local-dir: ./
         server-dir: /htdocs/
+        dangerous-clean-slate: true
         exclude: |
           .git/
           .gitattributes
+          .github/
           .gitignore
+          .agents/
+          .htaccess.disabled
+          .DS_Store
+          docs/
+          front/
+          mybb-plugin-rol/
+          README.md
+          agent.md
+          skills-lock.json
           install/
