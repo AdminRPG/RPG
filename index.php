@@ -465,6 +465,12 @@ $forums = $forum_list['forum_list'];
 
 $plugins->run_hooks('index_end');
 
+// I-Forge: Register link for guests
+$iforge_register_link = '';
+if ($mybb->user['uid'] == 0) {
+    $iforge_register_link = '<a href="'.$mybb->settings['bburl'].'/member.php?action=register" class="iforge-nav-link" style="color:var(--color-accent)">Registrarse</a>';
+}
+
 // I-Forge navbar: Zona Privada link visibility
 $iforge_zona_privada_link = '';
 if ($mybb->usergroup['cancp'] == 1 || $mybb->usergroup['issupermod'] == 1) {
@@ -486,7 +492,9 @@ if ($mybb->user['uid']) {
       </div>
     </div>';
 } else {
-    $iforge_user_menu = '<a href="'.$mybb->settings['bburl'].'/member.php?action=login" class="iforge-nav-link">Iniciar sesión</a>';
+    $iforge_user_menu = '
+    <a href="'.$mybb->settings['bburl'].'/member.php?action=login" class="iforge-nav-link">Iniciar sesión</a>
+    '.$iforge_register_link;
 }
 
 // I-Forge: Random banner
@@ -534,7 +542,7 @@ $iforge_active_searches = '
 // I-Forge: News (static placeholder)
 $iforge_news = '
     <div class="iforge-card-item">
-        <img src="'.$mybb->settings['bburl'].'/images/icons/sword.svg" class="icon" alt=""> Torneo de combate — Inscripciones abiertas
+        <img src="'.$mybb->settings['bburl'].'/images/icons/newspaper.svg" class="icon" alt=""> Torneo de combate — Inscripciones abiertas
         <div class="iforge-card-item-meta">hasta el D&iacute;a 60</div>
     </div>
     <div class="iforge-card-item">
@@ -578,6 +586,18 @@ while ($staff = $db->fetch_array($staffQuery)) {
 
 // I-Forge: Visual category cards (replace $forums)
 $iforge_categories = '';
+$catAliasMap = [
+    'rol' => 'shield',
+    'personaje' => 'shield',
+    'tramite' => 'newspaper',
+    'guia' => 'idea',
+    'busqueda' => 'search',
+    'noticia' => 'newspaper',
+    'offtopic' => 'speech',
+    'general' => 'speech',
+    'staff' => 'seal',
+    'admin' => 'seal',
+];
 $catQuery = $db->query("
     SELECT fid, name, description
     FROM ".TABLE_PREFIX."forums
@@ -585,13 +605,32 @@ $catQuery = $db->query("
     ORDER BY disporder ASC
 ");
 while ($cat = $db->fetch_array($catQuery)) {
-    $icon = '<img src="'.$mybb->settings['bburl'].'/images/icons/sword.svg" class="icon" alt="">';
+    $catName = htmlspecialchars_uni($cat['name']);
+    $catNameLower = mb_strtolower($catName);
+    $iconFile = '';
+    foreach ($catAliasMap as $keyword => $icon) {
+        if (mb_strpos($catNameLower, $keyword) !== false) {
+            $iconFile = $icon . '.svg';
+            break;
+        }
+    }
+    if ($iconFile) {
+        $iconHtml = '<img src="'.$mybb->settings['bburl'].'/images/icons/'.$iconFile.'" class="iforge-category-icon" alt="">';
+    } else {
+        $initial = mb_strtoupper(mb_substr($catName, 0, 1));
+        $iconHtml = '<span class="iforge-category-icon" style="font-family:var(--font-display);font-size:1rem;font-weight:700;">'.$initial.'</span>';
+    }
     $iforge_categories .= '
-    <a href="'.$mybb->settings['bburl'].'/forumdisplay.php?fid='.$cat['fid'].'" class="iforge-category-card" style="background: linear-gradient(135deg, #0d1117 0%, #1c2128 100%);">
+    <a href="'.$mybb->settings['bburl'].'/forumdisplay.php?fid='.$cat['fid'].'" class="iforge-category-card">
         <div class="iforge-category-content">
-            <div class="iforge-category-icon">'.$icon.'</div>
-            <h2 class="iforge-category-title">'.htmlspecialchars_uni($cat['name']).'</h2>
-            <p class="iforge-category-desc">'.htmlspecialchars_uni($cat['description']).'</p>
+            <div class="iforge-category-icon-wrap">
+                '.$iconHtml.'
+            </div>
+            <div class="iforge-category-text">
+                <h2 class="iforge-category-title">'.$catName.'</h2>
+                <p class="iforge-category-desc">'.htmlspecialchars_uni($cat['description']).'</p>
+            </div>
+            <svg class="iforge-category-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
         </div>
     </a>';
 }

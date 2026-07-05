@@ -38,6 +38,9 @@
       const userId = el.dataset.user;
       if (!userId) continue;
 
+      // Loading state
+      el.innerHTML = '<span class="rol-loading" style="opacity:0.5;font-size:0.78rem;">cargando...</span>';
+
       try {
         const res = await fetch(ROL_API_URL + '/personajes/activo/' + userId, {
           headers: apiHeaders(),
@@ -55,16 +58,19 @@
           if (pj.atributos && pj.atributos.length) {
             html += '<div class="rol-mini-stats">';
             for (const attr of pj.atributos) {
-              html += '<span>' + escapeHtml(attr.clave) + ': ' + escapeHtml(attr.valor) + '</span> ';
+              var v = attr.valor;
+              if (v === null || v === undefined || v === '?' || v === '') v = '—';
+              html += '<span>' + escapeHtml(attr.clave) + ': ' + escapeHtml(v) + '</span> ';
             }
             html += '</div>';
           }
 
           html += '</div>';
           el.innerHTML = html;
+        } else {
+          el.innerHTML = '';
         }
       } catch (e) {
-        // Fallback silencioso: no romper la carga del foro
         el.innerHTML = '';
       }
     }
