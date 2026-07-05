@@ -1,167 +1,308 @@
+/* ─── I-Forge Theme — "Archivo del Cazador" ─── */
+/* Token system: docs/frontend/token-system.md      */
+
+/* ─── Tokens ─── */
+:root {
+  --color-bg: #f2efe8;
+  --color-surface: #e8e3d8;
+  --color-surface-hover: #ddd8cb;
+  --color-accent: #4a7c59;
+  --color-accent-hover: #5d9e6e;
+  --color-gold: #c4a951;
+  --color-gold-hover: #d4be6a;
+  --color-text: #2c2420;
+  --color-text-secondary: #6b5e53;
+  --color-text-on-accent: #f2efe8;
+  --color-border: #d1cabc;
+  --color-border-strong: #b8ac9e;
+  --color-danger: #c44a4a;
+  --color-success: #4a7c59;
+  --color-t1: #2c5f7e;
+  --color-t2: #6b4a8e;
+  --color-t3: #b85a3e;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --navbar-height: 60px;
+  --content-max: 1200px;
+  --shadow-sm: 0 1px 3px rgba(44, 36, 32, 0.08);
+  --shadow-md: 0 4px 12px rgba(44, 36, 32, 0.1);
+  --shadow-lg: 0 8px 24px rgba(44, 36, 32, 0.12);
+}
+img.icon { width: 16px; height: 16px; vertical-align: middle; }
+
+/* ─── Reset & Base ─── */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-  background: #0d1117;
-  color: #f0f6fc;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  padding-top: 56px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  padding-top: var(--navbar-height);
   min-height: 100vh;
+  line-height: 1.6;
 }
-a { color: #e2b714; text-decoration: none; }
-a:hover { color: #f0c940; }
+a { color: var(--color-accent); text-decoration: none; transition: color 0.15s; }
+a:hover { color: var(--color-accent-hover); }
+img { max-width: 100%; height: auto; }
 
+/* ─── Floating Navbar ─── */
 #iforge-navbar {
   position: fixed; top: 0; left: 0; right: 0;
   z-index: 1000;
-  background: #161b22;
-  border-bottom: 1px solid #30363d;
-  height: 56px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  height: var(--navbar-height);
 }
 .iforge-nav {
-  max-width: 1200px; margin: 0 auto;
+  max-width: var(--content-max); margin: 0 auto;
   display: flex; align-items: center;
   justify-content: space-between;
-  height: 100%; padding: 0 20px;
+  height: 100%; padding: 0 var(--space-lg);
 }
-.iforge-nav-left { display: flex; align-items: center; gap: 24px; }
+.iforge-nav-left { display: flex; align-items: center; gap: var(--space-lg); }
 .iforge-nav-right { display: flex; align-items: center; }
+
 .iforge-nav-logo {
-  font-family: Georgia, serif;
-  font-size: 1.3rem; font-weight: bold;
-  color: #e2b714; letter-spacing: 1px;
+  font-family: var(--font-display);
+  font-size: 1.4rem; font-weight: 700;
+  color: var(--color-accent); letter-spacing: 2px;
+  border-right: 1px solid var(--color-border);
+  padding-right: var(--space-lg);
 }
 .iforge-nav-link {
-  color: #8b949e; font-size: 0.9rem;
-  padding: 6px 0; transition: color 0.15s;
+  color: var(--color-text-secondary); font-size: 0.88rem;
+  font-weight: 500; padding: 6px 0;
+  letter-spacing: 0.3px; transition: color 0.15s;
 }
-.iforge-nav-link:hover { color: #f0f6fc; }
+.iforge-nav-link:hover { color: var(--color-text); }
 
 .iforge-user-menu { position: relative; }
 .iforge-user-btn {
-  background: none; border: 2px solid #30363d;
-  border-radius: 50%; width: 36px; height: 36px;
+  background: none; border: 2px solid var(--color-border);
+  border-radius: 50%; width: 38px; height: 38px;
   cursor: pointer; display: flex; align-items: center;
-  justify-content: center; color: #8b949e;
+  justify-content: center; color: var(--color-text-secondary);
+  transition: border-color 0.15s, color 0.15s;
 }
-.iforge-user-btn:hover { border-color: #e2b714; color: #e2b714; }
+.iforge-user-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
 .iforge-dropdown {
-  display: none; position: absolute; right: 0; top: 44px;
-  background: #161b22; border: 1px solid #30363d;
-  border-radius: 8px; min-width: 180px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  overflow: hidden;
+  display: none; position: absolute; right: 0; top: 48px;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); min-width: 180px;
+  box-shadow: var(--shadow-lg); overflow: hidden;
 }
 .iforge-dropdown.open { display: block; }
 .iforge-dropdown-item {
-  display: block; padding: 10px 16px;
-  color: #f0f6fc; font-size: 0.88rem;
+  display: block; padding: 10px var(--space-md);
+  color: var(--color-text); font-size: 0.88rem;
+  transition: background 0.15s;
 }
-.iforge-dropdown-item:hover { background: #1c2128; }
-.iforge-dropdown-divider { border: none; border-top: 1px solid #30363d; margin: 4px 0; }
+.iforge-dropdown-item:hover { background: var(--color-surface-hover); }
+.iforge-dropdown-divider { border: none; border-top: 1px solid var(--color-border); margin: 4px 0; }
 
+/* ─── Banner ─── */
 #iforge-banner {
   position: relative; width: 100%;
   height: 420px; overflow: hidden;
   background-size: cover; background-position: center;
   display: flex; align-items: center; justify-content: center;
 }
-#iforge-banner::before {
-  content: ''; position: absolute; inset: 0;
-  background: rgba(0,0,0,0.55);
+#iforge-banner::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(44,36,32,0.5) 0%, rgba(44,36,32,0.25) 100%);
 }
-.iforge-banner-content { position: relative; z-index: 1; text-align: center; }
+.iforge-banner-seal {
+  position: absolute; z-index: 1;
+  color: rgba(242,239,232,0.08); font-size: 320px;
+  pointer-events: none;
+}
+.iforge-banner-content { position: relative; z-index: 2; text-align: center; }
 .iforge-banner-title {
-  font-family: Georgia, serif; font-size: 3.2rem;
-  color: #ffffff; letter-spacing: 2px;
-  margin-bottom: 8px; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  font-family: var(--font-display); font-size: 3.5rem;
+  font-weight: 700; color: #ffffff;
+  letter-spacing: 4px; margin-bottom: var(--space-sm);
+  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
 }
 .iforge-banner-subtitle {
-  font-size: 1.05rem; color: rgba(255,255,255,0.75); letter-spacing: 1px;
+  font-size: 1.1rem; color: rgba(255,255,255,0.8);
+  letter-spacing: 2px; font-weight: 400;
 }
 
+/* ─── Calendar Bar ─── */
 #iforge-calendar-bar {
   display: flex; align-items: center; justify-content: center;
-  gap: 12px; padding: 12px 20px;
-  background: #161b22; border-bottom: 1px solid #30363d;
-  font-size: 0.88rem; color: #8b949e; cursor: pointer;
+  gap: var(--space-sm); padding: 10px var(--space-lg);
+  background: var(--color-surface); border-bottom: 1px solid var(--color-border);
+  font-size: 0.85rem; color: var(--color-text-secondary); cursor: pointer;
+  transition: background 0.15s;
 }
-#iforge-calendar-bar:hover { background: #1c2128; }
-#iforge-calendar-bar strong { color: #f0f6fc; }
+#iforge-calendar-bar:hover { background: var(--color-surface-hover); }
+#iforge-calendar-bar strong { color: var(--color-text); font-weight: 600; }
 
+/* ─── Tablón Grid ─── */
 .iforge-tablon {
-  max-width: 1200px; margin: 0 auto;
-  padding: 24px 20px;
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
+  max-width: var(--content-max); margin: 0 auto;
+  padding: var(--space-lg) var(--space-lg) 0;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
 }
 .iforge-card {
-  background: #161b22; border: 1px solid #30363d;
-  border-radius: 8px; overflow: hidden;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 .iforge-card-header {
-  padding: 12px 16px;
-  font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 1px; color: #8b949e;
-  border-bottom: 1px solid #30363d;
+  padding: 10px var(--space-md);
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  display: flex; align-items: center; gap: var(--space-sm);
 }
-.iforge-card-body { padding: 8px 0; }
+.iforge-card-header .icon {
+  width: 16px; height: 16px;
+  color: var(--color-text-secondary); flex-shrink: 0;
+}
+.iforge-card-body { padding: var(--space-sm) 0; }
 .iforge-card-item {
-  display: block; padding: 8px 16px;
-  color: #f0f6fc; font-size: 0.88rem;
+  display: block; padding: 8px var(--space-md);
+  color: var(--color-text); font-size: 0.88rem;
+  transition: background 0.15s;
 }
-.iforge-card-item:hover { background: #1c2128; }
-.iforge-card-item-meta { font-size: 0.78rem; color: #8b949e; margin-top: 2px; }
+.iforge-card-item:hover { background: var(--color-surface-hover); }
+.iforge-card-item-meta {
+  font-size: 0.78rem; color: var(--color-text-secondary); margin-top: 2px;
+}
 .iforge-card-more {
-  display: block; padding: 10px 16px;
-  text-align: center; font-size: 0.82rem;
-  border-top: 1px solid #30363d; color: #8b949e;
+  display: block; padding: 8px var(--space-md);
+  text-align: center; font-size: 0.8rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-secondary); letter-spacing: 0.5px;
 }
-.iforge-card-more:hover { background: #1c2128; color: #e2b714; }
+.iforge-card-more:hover { background: var(--color-surface); color: var(--color-accent); }
 
-.iforge-staff-section { grid-column: 1 / -1; }
-.iforge-staff-list { display: flex; flex-wrap: wrap; gap: 12px; padding: 12px 16px; }
+.iforge-staff-section {
+  grid-column: 1 / -1;
+}
+.iforge-staff-list {
+  display: flex; flex-wrap: wrap; gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+}
 .iforge-staff-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 12px; background: #0d1117;
-  border-radius: 6px; font-size: 0.85rem;
+  display: flex; align-items: center; gap: var(--space-sm);
+  padding: 6px 12px; background: var(--color-surface);
+  border-radius: var(--radius-sm); font-size: 0.85rem;
 }
-.iforge-staff-icon { font-size: 1rem; }
-.iforge-staff-name { color: #f0f6fc; }
-.iforge-staff-mp { color: #58a6ff; font-size: 0.78rem; margin-left: 4px; }
+.iforge-staff-item .icon { width: 14px; height: 14px; color: var(--color-text-secondary); }
+.iforge-staff-name { color: var(--color-text); font-weight: 500; }
+.iforge-staff-mp {
+  color: var(--color-accent); font-size: 0.75rem;
+  margin-left: var(--space-xs); font-weight: 500;
+}
+.iforge-staff-mp:hover { color: var(--color-accent-hover); }
 
+/* ─── Categories ─── */
 .iforge-categories {
-  max-width: 1200px; margin: 0 auto;
-  padding: 0 20px 40px;
-  display: flex; flex-direction: column; gap: 20px;
+  max-width: var(--content-max); margin: 0 auto;
+  padding: var(--space-lg);
+  display: flex; flex-direction: column; gap: var(--space-md);
 }
 .iforge-category-card {
-  position: relative; border-radius: 10px;
+  position: relative; border-radius: var(--radius-lg);
   overflow: hidden; cursor: pointer;
-  min-height: 180px; background-size: cover; background-position: center;
+  min-height: 160px; background-size: cover; background-position: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
 }
-.iforge-category-card:hover { transform: scale(1.01); }
+.iforge-category-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
 .iforge-category-card::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(242,239,232,0.92) 0%, rgba(242,239,232,0.7) 100%);
 }
-.iforge-category-content { position: relative; z-index: 1; padding: 40px 32px; }
-.iforge-category-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.iforge-category-seal {
+  position: absolute; right: var(--space-lg); top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-border); font-size: 120px;
+  pointer-events: none;
+  opacity: 0.4;
+}
+.iforge-category-content {
+  position: relative; z-index: 1;
+  padding: var(--space-xl);
+}
+.iforge-category-icon {
+  width: 28px; height: 28px;
+  color: var(--color-accent); margin-bottom: var(--space-sm);
+}
 .iforge-category-title {
-  font-family: Georgia, serif; font-size: 1.5rem;
-  color: #ffffff; margin-bottom: 6px;
+  font-family: var(--font-display); font-size: 1.4rem;
+  font-weight: 700; color: var(--color-text); margin-bottom: var(--space-xs);
 }
-.iforge-category-desc { color: rgba(255,255,255,0.7); font-size: 0.9rem; max-width: 500px; }
+.iforge-category-desc {
+  color: var(--color-text-secondary); font-size: 0.9rem;
+  max-width: 500px; line-height: 1.5;
+}
 
+/* ─── Footer ─── */
 #iforge-footer {
-  background: #161b22; border-top: 1px solid #30363d;
-  padding: 24px 20px; text-align: center;
-  color: #8b949e; font-size: 0.82rem;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-lg) var(--space-lg);
+  text-align: center;
+  color: var(--color-text-secondary); font-size: 0.8rem;
+  display: flex; align-items: center; justify-content: center;
+  gap: var(--space-md);
+}
+#iforge-footer .seal {
+  width: 24px; height: 24px;
+  color: var(--color-border-strong);
 }
 
+/* ─── Badges ─── */
 .iforge-badge {
-  display: inline-block; padding: 1px 7px;
-  border-radius: 10px; font-size: 0.7rem;
-  font-weight: 600; margin-right: 4px;
+  display: inline-block; padding: 2px 8px;
+  border-radius: 10px; font-size: 0.68rem;
+  font-weight: 600; margin-right: var(--space-xs);
+  letter-spacing: 0.3px;
 }
-.iforge-badge-t1 { background: #1c2e4a; color: #58a6ff; }
-.iforge-badge-t2 { background: #2d1c4a; color: #a371f7; }
-.iforge-badge-t3 { background: #3a2a1c; color: #f0883e; }
+.iforge-badge-t1 { background: #e2eaf0; color: var(--color-t1); }
+.iforge-badge-t2 { background: #ede6f3; color: var(--color-t2); }
+.iforge-badge-t3 { background: #f2e4dc; color: var(--color-t3); }
+
+/* ─── Curiosidades ─── */
+#iforge-curiosidad {
+  padding: var(--space-md);
+  font-size: 0.9rem; color: var(--color-text);
+  font-style: italic; line-height: 1.6;
+  min-height: 60px;
+}
+#iforge-next-curiosidad { cursor: pointer; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .iforge-tablon { grid-template-columns: 1fr; }
+  .iforge-nav-logo { font-size: 1.1rem; padding-right: var(--space-md); }
+  .iforge-nav-left { gap: var(--space-md); }
+  .iforge-nav-link { font-size: 0.82rem; }
+  .iforge-banner-title { font-size: 2rem; }
+  #iforge-banner { height: 280px; }
+  .iforge-category-card { min-height: 120px; }
+  .iforge-category-content { padding: var(--space-lg); }
+  .iforge-category-title { font-size: 1.2rem; }
+}

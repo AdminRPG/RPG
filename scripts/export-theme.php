@@ -5,8 +5,8 @@
  * Ouput: docs/themes/iforge-child-theme.xml
  */
 
-define('THEME_TID', 3);
-define('TEMPLATESET_SID', 2);
+define('THEME_TID', 4);
+define('TEMPLATESET_SID', 3);
 define('OUTPUT', __DIR__ . '/../docs/themes/iforge-child-theme.xml');
 
 $db = new mysqli('127.0.0.1', 'root', '', 'mybb_foro');

@@ -534,11 +534,11 @@ $iforge_active_searches = '
 // I-Forge: News (static placeholder)
 $iforge_news = '
     <div class="iforge-card-item">
-        ⚔️ Torneo de combate — Inscripciones abiertas
+        <img src="'.$mybb->settings['bburl'].'/images/icons/sword.svg" class="icon" alt=""> Torneo de combate — Inscripciones abiertas
         <div class="iforge-card-item-meta">hasta el D&iacute;a 60</div>
     </div>
     <div class="iforge-card-item">
-        📌 Parche 1.2 — Nuevo sistema de clima
+        <img src="'.$mybb->settings['bburl'].'/images/icons/newspaper.svg" class="icon" alt=""> Parche 1.2 — Nuevo sistema de clima
         <div class="iforge-card-item-meta">05/07/2026</div>
     </div>';
 
@@ -562,12 +562,15 @@ $staffQuery = $db->query("
        OR u.additionalgroups LIKE '%4%'
     LIMIT 10
 ");
-$roleIcons = ['Administrator' => '👑', 'Super Moderators' => '🛡️'];
+$roleIcons = [
+    'Administrator' => '<img src="'.$mybb->settings['bburl'].'/images/icons/seal.svg" class="icon" alt="">',
+    'Super Moderators' => '<img src="'.$mybb->settings['bburl'].'/images/icons/shield.svg" class="icon" alt="">',
+];
 while ($staff = $db->fetch_array($staffQuery)) {
-    $icon = $roleIcons[$staff['grouptitle']] ?? '👤';
+    $icon = $roleIcons[$staff['grouptitle']] ?? '<img src="'.$mybb->settings['bburl'].'/images/icons/users.svg" class="icon" alt="">';
     $iforge_staff_list .= '
     <div class="iforge-staff-item">
-        <span class="iforge-staff-icon">'.$icon.'</span>
+        '.$icon.'
         <span class="iforge-staff-name">'.htmlspecialchars_uni($staff['username']).'</span>
         <a href="'.$mybb->settings['bburl'].'/private.php?action=send&uid='.$staff['uid'].'" class="iforge-staff-mp">[MP]</a>
     </div>';
@@ -582,7 +585,7 @@ $catQuery = $db->query("
     ORDER BY disporder ASC
 ");
 while ($cat = $db->fetch_array($catQuery)) {
-    $icon = '🏝️'; // static placeholder icon
+    $icon = '<img src="'.$mybb->settings['bburl'].'/images/icons/sword.svg" class="icon" alt="">';
     $iforge_categories .= '
     <a href="'.$mybb->settings['bburl'].'/forumdisplay.php?fid='.$cat['fid'].'" class="iforge-category-card" style="background: linear-gradient(135deg, #0d1117 0%, #1c2128 100%);">
         <div class="iforge-category-content">
