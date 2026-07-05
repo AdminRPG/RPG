@@ -467,7 +467,7 @@ $plugins->run_hooks('index_end');
 
 // I-Forge navbar: Zona Privada link visibility
 $iforge_zona_privada_link = '';
-if ($mybb->usergroup['cancp'] == 1 || $mybb->usergroup['issupermod'] == 1 || my_is_admin()) {
+if ($mybb->usergroup['cancp'] == 1 || $mybb->usergroup['issupermod'] == 1) {
     $iforge_zona_privada_link = '<a href="'.$mybb->settings['bburl'].'/private.php" class="iforge-nav-link">Zona Privada</a>';
 }
 
