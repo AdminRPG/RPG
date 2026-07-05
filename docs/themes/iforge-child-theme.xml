@@ -183,6 +183,11 @@ a:hover { color: #f0c940; }
 ]]></stylesheet>
   </stylesheets>
   <templates>
+    <template name="footer" version="1823"><![CDATA[<!-- I-Forge Footer -->
+<div id="iforge-footer">
+  {$mybb->settings['bbname']} &mdash; {$lang->powered_by} <a href="https://mybb.com" target="_blank" rel="noopener">MyBB</a>
+  {$themecopyright}
+</div>]]></template>
     <template name="header" version="1823"><![CDATA[<div id="iforge-navbar">
   <nav class="iforge-nav">
     <div class="iforge-nav-left">
@@ -202,5 +207,93 @@ a:hover { color: #f0c940; }
 {$bannedwarning}
 {$privwarning}
 </div>]]></template>
+    <template name="headerinclude" version="1823"><![CDATA[<meta http-equiv="Content-Type" content="text/html; charset={$charset}" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{$stylesheets}
+<script src="{$mybb->settings['bburl']}/jscripts/jquery.js?ver=1823"></script>
+<script src="{$mybb->settings['bburl']}/jscripts/general.js?ver=1823"></script>
+<script src="{$mybb->settings['bburl']}/jscripts/rol-widgets.js?ver=1"></script>]]></template>
+    <template name="index" version="1823"><![CDATA[<!DOCTYPE html>
+<html lang="es">
+<head>
+<title>{$mybb->settings['bbname']}</title>
+{$headerinclude}
+</head>
+<body>
+{$header}
+
+<div id="iforge-banner" style="background-image: url('{$banner_url}');">
+  <div class="iforge-banner-content">
+    <h1 class="iforge-banner-title">I-FORGE</h1>
+    <p class="iforge-banner-subtitle">Un mundo de Cazadores</p>
+  </div>
+</div>
+
+<div id="iforge-calendar-bar" onclick="window.location.href='{$mybb->settings['bburl']}/calendario.php'">
+  ???? <strong>{$calendario_texto}</strong>
+  &nbsp;???&nbsp; ??? 1 d??a real = 2 d??as on-rol
+</div>
+
+<div class="iforge-tablon">
+  <div class="iforge-card">
+    <div class="iforge-card-header">??????? ??ltimos Mensajes</div>
+    <div class="iforge-card-body">{$iforge_latest_posts}</div>
+    <a href="{$mybb->settings['bburl']}/search.php?action=latest" class="iforge-card-more">??? Ver m??s ???</a>
+  </div>
+  <div class="iforge-card">
+    <div class="iforge-card-header">???? B??squedas Activas</div>
+    <div class="iforge-card-body">{$iforge_active_searches}</div>
+    <a href="#" class="iforge-card-more">+ Publicar b??squeda</a>
+  </div>
+  <div class="iforge-card">
+    <div class="iforge-card-header">???? Noticias</div>
+    <div class="iforge-card-body">{$iforge_news}</div>
+    <a href="{$mybb->settings['bburl']}/forumdisplay.php?fid=1" class="iforge-card-more">??? Archivo ???</a>
+  </div>
+  <div class="iforge-card">
+    <div class="iforge-card-header">???? Curiosidades</div>
+    <div class="iforge-card-body" id="iforge-curiosidad">{$iforge_curiosidad}</div>
+    <a href="#" class="iforge-card-more" id="iforge-next-curiosidad">??? Otra curiosidad ???</a>
+  </div>
+  <div class="iforge-card iforge-staff-section">
+    <div class="iforge-card-header">???? Staff</div>
+    <div class="iforge-staff-list">{$iforge_staff_list}</div>
+  </div>
+</div>
+
+<div class="iforge-categories">
+  {$forums}
+</div>
+
+<div id="iforge-footer">
+  {$mybb->settings['bbname']} &mdash; {$lang->powered_by} <a href="https://mybb.com" target="_blank">MyBB</a>
+  {$themecopyright}
+</div>
+
+<script>
+var iforge_curiosidades = {$curiosidades_json};
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('iforge-user-btn');
+  var dd = document.getElementById('iforge-dropdown');
+  if (btn && dd) {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); dd.classList.toggle('open'); });
+    document.addEventListener('click', function() { dd.classList.remove('open'); });
+    dd.addEventListener('click', function(e) { e.stopPropagation(); });
+  }
+  var cBtn = document.getElementById('iforge-next-curiosidad');
+  var cEl = document.getElementById('iforge-curiosidad');
+  if (cBtn && cEl && iforge_curiosidades.length) {
+    var cIdx = 0;
+    cBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      cIdx = (cIdx + 1) % iforge_curiosidades.length;
+      cEl.textContent = iforge_curiosidades[cIdx];
+    });
+  }
+});
+</script>
+</body>
+</html>
+]]></template>
   </templates>
 </theme>

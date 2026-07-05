@@ -22,3 +22,6 @@ Desktop.ini
 *.log
 error.log
 admin/error.log
+
+# MyBB runtime cache
+cache/

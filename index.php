@@ -489,5 +489,110 @@ if ($mybb->user['uid']) {
     $iforge_user_menu = '<a href="'.$mybb->settings['bburl'].'/member.php?action=login" class="iforge-nav-link">Iniciar sesión</a>';
 }
 
+// I-Forge: Random banner
+$banner_url = $mybb->settings['bburl'] . '/images/banners/default-banner.svg';
+$bannerDir = MYBB_ROOT . 'images/banners/';
+$banners = glob($bannerDir . '*.{svg,jpg,jpeg,png,gif,webp}', GLOB_BRACE);
+if (!empty($banners)) {
+    $randomBanner = $banners[array_rand($banners)];
+    $banner_url = $mybb->settings['bburl'] . '/images/banners/' . basename($randomBanner);
+}
+
+// I-Forge: Calendario (placeholder until real calendar is built)
+$calendario_texto = 'DÍA 1 · PRIMAVERA · AÑO 925';
+
+// I-Forge: Latest posts
+$iforge_latest_posts = '';
+$q = $db->query("
+    SELECT p.pid, p.subject, p.tid, p.uid, p.dateline, u.username
+    FROM ".TABLE_PREFIX."posts p
+    LEFT JOIN ".TABLE_PREFIX."users u ON (u.uid = p.uid)
+    WHERE p.visible = 1
+    ORDER BY p.dateline DESC
+    LIMIT 5
+");
+while ($post = $db->fetch_array($q)) {
+    $date = date('d/m', $post['dateline']);
+    $iforge_latest_posts .= '
+    <a href="'.$mybb->settings['bburl'].'/showthread.php?tid='.$post['tid'].'&pid='.$post['pid'].'" class="iforge-card-item">
+        '.htmlspecialchars_uni($post['subject']).'
+        <div class="iforge-card-item-meta">'.$post['username'].' · '.$date.'</div>
+    </a>';
+}
+
+// I-Forge: Active searches (static placeholder)
+$iforge_active_searches = '
+    <div class="iforge-card-item">
+        Busco compa&ntilde;ero para T3
+        <div class="iforge-card-item-meta">Kael · Zona Candelaria</div>
+    </div>
+    <div class="iforge-card-item">
+        Mazmorra busca DPS
+        <div class="iforge-card-item-meta">Lyra · Continente Oscuro</div>
+    </div>';
+
+// I-Forge: News (static placeholder)
+$iforge_news = '
+    <div class="iforge-card-item">
+        ⚔️ Torneo de combate — Inscripciones abiertas
+        <div class="iforge-card-item-meta">hasta el D&iacute;a 60</div>
+    </div>
+    <div class="iforge-card-item">
+        📌 Parche 1.2 — Nuevo sistema de clima
+        <div class="iforge-card-item-meta">05/07/2026</div>
+    </div>';
+
+// I-Forge: Curiosidades
+$curiosidades = [
+    '¿Sab&iacute;as que los bosques del sur cambian de color seg&uacute;n la estaci&oacute;n?',
+    'Antes de la Gran Tormenta, el Archipi&eacute;lago Candelaria era una sola isla.',
+    'Se dice que en las monta&ntilde;as del norte vive un anciano que conoce el futuro.',
+    'Hay caminos subterr&aacute;neos que conectan continentes — pero nadie vuelve igual.',
+];
+$iforge_curiosidad = $curiosidades[0];
+$curiosidades_json = json_encode($curiosidades);
+
+// I-Forge: Staff list
+$iforge_staff_list = '';
+$staffQuery = $db->query("
+    SELECT u.uid, u.username, u.usergroup, g.title AS grouptitle
+    FROM ".TABLE_PREFIX."users u
+    LEFT JOIN ".TABLE_PREFIX."usergroups g ON (g.gid = u.usergroup)
+    WHERE u.usergroup IN (SELECT gid FROM ".TABLE_PREFIX."usergroups WHERE issupermod = 1 OR cancp = 1)
+       OR u.additionalgroups LIKE '%4%'
+    LIMIT 10
+");
+$roleIcons = ['Administrator' => '👑', 'Super Moderators' => '🛡️'];
+while ($staff = $db->fetch_array($staffQuery)) {
+    $icon = $roleIcons[$staff['grouptitle']] ?? '👤';
+    $iforge_staff_list .= '
+    <div class="iforge-staff-item">
+        <span class="iforge-staff-icon">'.$icon.'</span>
+        <span class="iforge-staff-name">'.htmlspecialchars_uni($staff['username']).'</span>
+        <a href="'.$mybb->settings['bburl'].'/private.php?action=send&uid='.$staff['uid'].'" class="iforge-staff-mp">[MP]</a>
+    </div>';
+}
+
+// I-Forge: Visual category cards (replace $forums)
+$iforge_categories = '';
+$catQuery = $db->query("
+    SELECT fid, name, description
+    FROM ".TABLE_PREFIX."forums
+    WHERE type = 'c'
+    ORDER BY disporder ASC
+");
+while ($cat = $db->fetch_array($catQuery)) {
+    $icon = '🏝️'; // static placeholder icon
+    $iforge_categories .= '
+    <a href="'.$mybb->settings['bburl'].'/forumdisplay.php?fid='.$cat['fid'].'" class="iforge-category-card" style="background: linear-gradient(135deg, #0d1117 0%, #1c2128 100%);">
+        <div class="iforge-category-content">
+            <div class="iforge-category-icon">'.$icon.'</div>
+            <h2 class="iforge-category-title">'.htmlspecialchars_uni($cat['name']).'</h2>
+            <p class="iforge-category-desc">'.htmlspecialchars_uni($cat['description']).'</p>
+        </div>
+    </a>';
+}
+$forums = $iforge_categories;
+
 eval('$index = "'.$templates->get('index').'";');
 output_page($index);
