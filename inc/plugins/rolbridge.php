@@ -1,74 +1,172 @@
 <?php
 /**
- * Plugin puente MyBB ↔ API de Rol
- * Hooks: login, logout, postbit, member_profile
+ * Plugin puente I-Forge-RPG
+ * Conecta MyBB con la API de rol (autenticacion JWT, personajes, widgets)
+ *
+ * Hooks implementados:
+ *  - member_do_login_end:     genera JWT + asegura cuenta de rol
+ *  - member_logout_end:       elimina cookie rol_token
+ *  - global_end:              inyecta rol-widgets.js
+ *  - postbit:                 inyecta widget de personaje en cada post
+ *  - member_profile_end:      inyecta selector de personajes en el perfil
+ *  - newreply_start:          inyecta selector de personaje activo al responder
+ *  - newthread_start:         inyecta selector de personaje activo al crear hilo
+ *  - datahandler_post_insert_post: vincula el post al personaje activo
  */
 
-function rolbridge_info(): array
-{
-    return [
-        'name'          => 'Roleo Bridge',
-        'description'   => 'Puente de autenticación y widgets de rol entre MyBB y la API propia.',
-        'website'       => '',
-        'author'        => '',
-        'version'       => '1.0',
-        'compatibility' => '18xx',
-    ];
+defined('IN_MYBB') or die('Acceso directo no permitido');
+
+define('ROL_API_URL', 'http://localhost:8080/api/v1');
+define('ROL_JWT_COOKIE', 'rol_token');
+define('ROL_CHAR_COOKIE', 'rol_char_id');
+
+// Cargar JWTService desde rol-backend
+$jwtServicePath = MYBB_ROOT . 'rol-backend' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Auth' . DIRECTORY_SEPARATOR . 'JWTService.php';
+if (file_exists($jwtServicePath)) {
+    require_once $jwtServicePath;
 }
 
-function rolbridge_activate(): void
-{
-    global $db;
-    // Crear tabla de sesiones puente si no existe
-}
-
-function rolbridge_deactivate(): void
-{
-    // Limpieza si es necesaria
-}
-
-// --- Hooks ---
-
-// Login: emitir JWT tras login exitoso
-$plugins->add_hook('member_do_login_end', 'rolbridge_login_end');
-
-function rolbridge_login_end(): void
+// ─── Login: generar JWT + asegurar cuenta de rol ───
+function rolbridge_login_end()
 {
     global $mybb;
-    // Generar JWT con mybb_user_id, username, usergroup
-    // Guardar en cookie rol_token
+
+    if (!$mybb->user['uid']) return;
+
+    $secret = getenv('ROL_JWT_SECRET') ?: 'change-me-in-production';
+    $expiry = (int) (getenv('ROL_JWT_EXPIRY') ?: 3600);
+
+    $payload = [
+        'mybb_user_id' => (int) $mybb->user['uid'],
+        'username'     => $mybb->user['username'],
+        'usergroup'    => (int) $mybb->user['usergroup'],
+        'iat'          => time(),
+        'exp'          => time() + $expiry,
+    ];
+
+    if (class_exists('\\App\\Auth\\JWTService')) {
+        $jwt = \App\Auth\JWTService::encode($payload, $secret);
+    } else {
+        $jwt = _rolbridge_encode_jwt($payload, $secret);
+    }
+    my_setcookie(ROL_JWT_COOKIE, $jwt, time() + $expiry, true);
+
+    // Asegurar que existe la cuenta de rol
+    $ch = curl_init(ROL_API_URL . '/cuenta/mi-cuenta');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $jwt],
+        CURLOPT_TIMEOUT => 5,
+    ]);
+    curl_exec($ch);
+    curl_close($ch);
 }
+$plugins->add_hook('member_do_login_end', 'rolbridge_login_end');
 
-// Logout: eliminar cookie rol_token
-$plugins->add_hook('member_do_logout_end', 'rolbridge_logout_end');
-
-function rolbridge_logout_end(): void
+// ─── Logout: eliminar cookies ───
+function rolbridge_logout_end()
 {
-    // Eliminar cookie rol_token
+    my_setcookie(ROL_JWT_COOKIE, '', time() - 3600, true);
+    my_setcookie(ROL_CHAR_COOKIE, '', time() - 3600, true);
 }
+$plugins->add_hook('member_logout_end', 'rolbridge_logout_end');
 
-// Postbit: widget de ficha resumida
+// ─── Global: inyectar JS y variables ───
+function rolbridge_global_end()
+{
+    global $mybb;
+
+    if (!$mybb->user['uid']) return;
+
+    echo '<script src="' . $mybb->settings['bburl'] . '/jscripts/rol-widgets.js"></script>';
+    echo '<script>var ROL_API_URL = "' . ROL_API_URL . '";</script>';
+}
+$plugins->add_hook('global_end', 'rolbridge_global_end');
+
+// ─── Postbit: mostrar personaje activo del autor ───
+function rolbridge_postbit(&$post)
+{
+    if (!empty($post['uid'])) {
+        $post['rol_widget'] = '<div class="rol-ficha-widget" data-user="' . (int) $post['uid'] . '"></div>';
+    }
+}
 $plugins->add_hook('postbit', 'rolbridge_postbit');
+$plugins->add_hook('postbit_prev', 'rolbridge_postbit');
 
-function rolbridge_postbit(array &$post): void
-{
-    $post['rol_widget'] = '<div class="rol-ficha-widget" data-user="' . (int)$post['uid'] . '"></div>';
-}
-
-// Perfil: widget de ficha completa
-$plugins->add_hook('member_profile_end', 'rolbridge_member_profile');
-
-function rolbridge_member_profile(): void
+// ─── Perfil: selector de personajes y ficha completa ───
+function rolbridge_member_profile_end()
 {
     global $memprofile;
-    // Inyectar contenedor para ficha completa
+
+    if ($memprofile['uid']) {
+        echo '<div id="rol-perfil-personajes" data-user="' . (int) $memprofile['uid'] . '"></div>';
+    }
+}
+$plugins->add_hook('member_profile_end', 'rolbridge_member_profile_end');
+
+// ─── Nuevo post/respuesta: selector de personaje activo ───
+function rolbridge_newreply_start()
+{
+    global $mybb;
+
+    if ($mybb->user['uid']) {
+        echo '<div id="rol-char-selector" style="margin-bottom:12px">
+            <label><strong>Publicando como:</strong></label>
+            <select id="rol-active-char" name="rol_char_id">
+                <option value="">Cargando personajes...</option>
+            </select>
+        </div>';
+    }
+}
+$plugins->add_hook('newreply_start', 'rolbridge_newreply_start');
+
+function rolbridge_newthread_start()
+{
+    rolbridge_newreply_start();
+}
+$plugins->add_hook('newthread_start', 'rolbridge_newthread_start');
+
+// ─── Guardar post: vincular al personaje seleccionado ───
+function rolbridge_datahandler_post_insert_post(&$post)
+{
+    $charId = (int) ($_POST['rol_char_id'] ?? 0);
+    if ($charId > 0) {
+        global $mybb;
+        my_setcookie(ROL_CHAR_COOKIE, $charId, time() + 86400 * 30, true);
+    }
+}
+$plugins->add_hook('datahandler_post_insert_post', 'rolbridge_datahandler_post_insert_post');
+
+// ─── JWT helper inline (fallback si JWTService no esta disponible) ───
+if (!class_exists('\\App\\Auth\\JWTService')) {
+    function _rolbridge_encode_jwt(array $payload, string $secret): string
+    {
+        $header = ['alg' => 'HS256', 'typ' => 'JWT'];
+        $segments = [];
+        $segments[] = _rolbridge_base64url(json_encode($header));
+        $segments[] = _rolbridge_base64url(json_encode($payload));
+        $signature = hash_hmac('sha256', implode('.', $segments), $secret, true);
+        $segments[] = _rolbridge_base64url($signature);
+        return implode('.', $segments);
+    }
+
+    function _rolbridge_base64url(string $data): string
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
 }
 
-// Inyectar JS en todas las páginas
-$plugins->add_hook('global_end', 'rolbridge_inject_scripts');
-
-function rolbridge_inject_scripts(): void
+// ─── Info del plugin en ACP ───
+function rolbridge_info()
 {
-    global $templates;
-    // Cargar jscripts/rol-widgets.js
+    return [
+        'name' => 'I-Forge-RPG Bridge',
+        'description' => 'Puente entre MyBB y la API de rol. Proporciona autenticacion JWT, gestion de personajes y widgets.',
+        'website' => '',
+        'author' => 'I-Forge-RPG',
+        'authorsite' => '',
+        'version' => '1.0',
+        'compatibility' => '18*',
+        'codename' => 'rolbridge',
+    ];
 }
