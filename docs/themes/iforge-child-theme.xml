@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<theme name="RPG" version="1839">
+<theme name="I-Forge RPG" version="1839">
   <properties>
-    <templateset>7</templateset>
+    <templateset>12</templateset>
     <imgdir>images</imgdir>
     <logo>images/logo.png</logo>
     <tablespace>5</tablespace>
@@ -19,472 +19,758 @@
     </disporder>
   </properties>
   <stylesheets>
-    <stylesheet name="iforge.css" version="1839"><![CDATA[/* ─── I-Forge Theme — Dark Variant ─── */
+    <stylesheet name="iforge.css" version="1839"><![CDATA[/* ===== I-Forge RPG - Brutalist Manga Theme ===== */
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+
 :root {
-  --color-bg: #0d1117;
-  --color-surface: #161b22;
-  --color-surface-hover: #1c2128;
-  --color-accent: #e2b714;
-  --color-accent-hover: #f0c940;
-  --color-text: #f0f6fc;
-  --color-text-secondary: #8b949e;
-  --color-border: #30363d;
-  --color-divider: #21262d;
-  --color-danger: #f85149;
-  --color-success: #3fb950;
-  --color-t1: #58a6ff;
-  --color-t2: #a371f7;
-  --color-t3: #f0883e;
-  --font-display: Georgia, 'Palatino Linotype', serif;
-  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  --font-mono: 'Menlo', 'Consolas', 'Monaco', monospace;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --navbar-height: 60px;
-  --content-max: 1200px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+  --bg: #f4f0e6;
+  --bg-dark: #ebe6d6;
+  --panel: #2d5a27;
+  --panel-hover: #3d7a35;
+  --gold: #c9a84c;
+  --gold-hover: #e2c96b;
+  --ink: #1a1a1a;
+  --ink-secondary: #5a5a4a;
+  --border: #1e3d1a;
+  --shadow: 3px 3px 0 #1e3d1a;
+  --shadow-hover: 4px 4px 0 #1e3d1a;
+  --radius: 3px;
+  --font-brush: 'Permanent Marker', 'Comic Sans MS', 'Chalkboard SE', cursive;
+  --font-serif: Georgia, 'Palatino Linotype', 'Times New Roman', serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
 }
-img.icon { width: 16px; height: 16px; vertical-align: middle; }
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-/* ─── Force override MyBB defaults ─── */
+
 html, body {
-  background: #0d1117 !important;
-  background-image:
-    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(226, 183, 20, 0.03) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(48, 54, 61, 0.08) 0%, transparent 50%),
-    url('https://i.imgur.com/9lVReZ1.jpeg') !important;
-  background-size: auto, auto, cover !important;
-  background-position: 0 0, 0 0, center !important;
-  background-repeat: repeat, repeat, no-repeat !important;
-  background-attachment: fixed !important;
-  color: var(--color-text) !important;
-  font-family: var(--font-body) !important;
+  background: var(--bg) url('https://i.imgur.com/9lVReZ1.jpeg') center top fixed !important;
+  background-size: cover !important;
+  color: var(--ink) !important;
+  font-family: var(--font-serif) !important;
+  font-size: 15px;
+  line-height: 1.5;
 }
-body {
-  padding-top: var(--navbar-height);
-  min-height: 100vh;
-  line-height: 1.6;
-  position: relative;
-}
-a { color: var(--color-accent) !important; text-decoration: none; transition: color 0.15s; }
-a:hover { color: var(--color-accent-hover) !important; }
+body { padding-top: 56px; }
+
+img.icon { width: 14px; height: 14px; vertical-align: middle; }
 img { max-width: 100%; height: auto; }
 
-/* ─── Override MyBB default backgrounds ─── */
-#content, .content, #container, .container, .tborder, .tcat, .thead, .trow1, .trow2, tbody, .panel, .post, .post_content, .postbit, #posts, .pagination, .forumdisplay, .threadlist, .wrapper, #main, #wrapper {
+a { color: var(--gold); text-decoration: none; font-weight: 600; transition: color 0.15s; }
+a:hover { color: var(--gold-hover); }
+
+/* Hide MyBB clutter */
+#header, #logo, #panel, .welcomeblock, .upper, .modal,
+.navigation, #footer, .bottom_links, .theme, #theme_select,
+#copyright, .lower, #debug {
+  display: none !important;
+}
+
+#container, #content, .content, .container, .wrapper, #wrapper, #main {
   background: transparent !important;
-  background-color: transparent !important;
-  border-color: var(--color-border) !important;
+  max-width: none !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* MyBB table defaults */
+.tborder, .tcat, .thead, .trow1, .trow2, tbody, .panel, .post, .post_content, .postbit, #posts, .pagination, .forumdisplay, .threadlist {
+  background: transparent !important;
+  border-color: var(--border) !important;
 }
 .tcat, .thead {
-  background: rgba(22, 27, 34, 0.8) !important;
-  color: var(--color-accent) !important;
-  border-bottom: 1px solid var(--color-border) !important;
+  background: var(--panel) !important;
+  color: var(--gold) !important;
+  border: 3px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
 }
-.tborder {
-  border: 1px solid var(--color-border) !important;
-}
+.tborder { border: 3px solid var(--border) !important; }
+
+/* Navbar fixed - outside container */
 #iforge-navbar {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 1000;
-  background: rgba(22, 27, 34, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--color-border);
-  height: var(--navbar-height);
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 10000 !important;
+  background: var(--panel);
+  border-bottom: 3px solid var(--border);
+  box-shadow: var(--shadow);
 }
 .iforge-nav {
-  max-width: var(--content-max); margin: 0 auto;
-  display: flex; align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  height: 100%; padding: 0 var(--space-lg);
+  height: 56px;
+  padding: 0 16px;
   position: relative;
 }
-.iforge-nav-left {
-  display: flex; align-items: center;
-  gap: var(--space-xl);
-}
+.iforge-nav-left { display: flex; align-items: center; gap: 24px; }
 .iforge-nav-logo {
   position: absolute;
-  left: var(--space-lg);
-  font-family: var(--font-display);
-  font-size: 1.3rem; font-weight: 700;
-  color: var(--color-accent); letter-spacing: 3px;
+  left: 16px;
+  font-family: var(--font-brush);
+  font-size: 1.4rem;
+  color: var(--gold);
+  letter-spacing: 2px;
   text-transform: uppercase;
-  border: none;
-  padding: 0;
+  text-shadow: 2px 2px 0 var(--border);
 }
-.iforge-nav-logo:hover { color: var(--color-accent-hover); }
+.iforge-nav-logo:hover { color: var(--gold-hover); }
 .iforge-nav-link {
-  color: var(--color-text-secondary); font-size: 0.88rem;
-  font-weight: 500; padding: 6px 0;
-  letter-spacing: 0.5px; transition: color 0.15s;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 0;
   position: relative;
 }
-.iforge-nav-link:hover { color: var(--color-text); }
+.iforge-nav-link:hover { color: var(--gold-hover); }
 .iforge-nav-link::after {
   content: '';
-  position: absolute; bottom: -2px; left: 0; right: 0;
-  height: 2px; background: var(--color-accent);
-  transform: scaleX(0); transition: transform 0.2s;
+  position: absolute;
+  bottom: -4px; left: 0; right: 0;
+  height: 3px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform 0.2s;
 }
 .iforge-nav-link:hover::after { transform: scaleX(1); }
-.iforge-nav-right {
-  position: absolute;
-  right: var(--space-lg);
-}
-.iforge-user-menu { position: relative; }
+.iforge-nav-right { position: absolute; right: 16px; }
 .iforge-user-btn {
-  background: none; border: 2px solid var(--color-border);
-  border-radius: 50%; width: 38px; height: 38px;
-  cursor: pointer; display: flex; align-items: center;
-  justify-content: center; color: var(--color-text-secondary);
-  transition: border-color 0.15s, color 0.15s;
+  background: var(--panel-hover);
+  border: 3px solid var(--border);
+  border-radius: 50%;
+  width: 36px; height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-weight: 700;
+  box-shadow: 2px 2px 0 var(--border);
 }
-.iforge-user-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.iforge-user-btn:hover { background: var(--gold); color: var(--panel); }
 .iforge-dropdown {
-  display: none; position: absolute; right: 0; top: 48px;
-  background: var(--color-surface); border: 1px solid var(--color-border);
-  border-radius: var(--radius-md); min-width: 200px;
-  box-shadow: var(--shadow-lg); overflow: hidden;
+  display: none;
+  position: absolute;
+  right: 0; top: 46px;
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  min-width: 180px;
+  overflow: hidden;
 }
 .iforge-dropdown.open { display: block; }
 .iforge-dropdown-item {
-  display: block; padding: 10px var(--space-md);
-  color: var(--color-text-secondary); font-size: 0.88rem;
-  transition: background 0.15s, color 0.15s;
+  display: block;
+  padding: 8px 14px;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-bottom: 2px solid var(--border);
+  transition: background 0.15s;
 }
-.iforge-dropdown-item:hover { background: var(--color-surface-hover); color: var(--color-text); }
-.iforge-dropdown-divider { border: none; border-top: 1px solid var(--color-border); margin: 4px 0; }
+.iforge-dropdown-item:last-child { border-bottom: none; }
+.iforge-dropdown-item:hover { background: var(--gold); color: var(--panel); }
+.iforge-dropdown-divider { border: none; border-top: 2px solid var(--border); margin: 0; }
+
+/* Banner */
 #iforge-banner {
-  position: relative; width: 100%;
-  height: 400px; overflow: hidden;
-  background-size: cover; background-position: center;
-  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 #iforge-banner::after {
   content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(13,17,23,0.3) 0%, rgba(13,17,23,0.7) 100%);
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(244,240,230,0.25) 0%, rgba(30,61,26,0.6) 100%);
 }
 .iforge-banner-seal {
-  position: absolute; z-index: 1;
-  color: rgba(226,183,20,0.06); font-size: 280px;
+  position: absolute;
+  z-index: 1;
+  color: rgba(30,61,26,0.14);
+  font-size: 200px;
   pointer-events: none;
-  font-family: var(--font-display);
+  font-family: var(--font-brush);
   user-select: none;
+  letter-spacing: 4px;
 }
-
 .iforge-banner-content { position: relative; z-index: 2; text-align: center; }
 .iforge-banner-title {
-  font-family: var(--font-display); font-size: 3.5rem;
-  font-weight: 700; color: var(--color-text);
-  letter-spacing: 8px; margin-bottom: var(--space-sm);
-  text-shadow: 0 2px 16px rgba(0,0,0,0.5);
+  font-family: var(--font-brush);
+  font-size: 3rem;
+  color: var(--gold);
+  letter-spacing: 5px;
   text-transform: uppercase;
+  text-shadow: 3px 3px 0 var(--border), -1px -1px 0 rgba(255,255,255,0.3);
+  margin-bottom: 6px;
 }
 .iforge-banner-subtitle {
-  font-size: 1.1rem; color: var(--color-accent);
-  letter-spacing: 4px; font-weight: 400;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: #fff;
+  letter-spacing: 3px;
+  font-weight: 700;
+  text-shadow: 2px 2px 0 var(--border);
 }
+
+/* Calendar bar */
 #iforge-calendar-bar {
-  display: flex; align-items: center; justify-content: center;
-  gap: var(--space-sm); padding: 12px var(--space-lg);
-  background: rgba(22, 27, 34, 0.9);
-  border-bottom: 1px solid var(--color-border);
-  font-size: 0.85rem; color: var(--color-text-secondary);
-  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: #fff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
 }
-#iforge-calendar-bar .icon { width: 14px; height: 14px; opacity: 0.6; }
-#iforge-calendar-bar strong { color: var(--color-text); }
+#iforge-calendar-bar:hover { background: var(--panel-hover); }
+#iforge-calendar-bar .icon { width: 14px; height: 14px; filter: brightness(0) invert(1); }
+#iforge-calendar-bar strong { color: var(--gold); }
+
+/* ===== TABLON ===== */
 .iforge-tablon {
-  max-width: var(--content-max); margin: 0 auto;
-  padding: var(--space-xl) var(--space-lg) 0;
+  max-width: 1200px;
+  margin: 16px auto 0;
+  padding: 0 16px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-md);
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 12px;
+  align-items: start;
 }
-.iforge-card {
-  background: rgba(22, 27, 34, 0.6);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  backdrop-filter: blur(4px);
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+.iforge-tablon-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
-.iforge-card:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 16px rgba(226, 183, 20, 0.06);
-  background: rgba(22, 27, 34, 0.8);
+.iforge-tablon-title {
+  font-family: var(--font-brush);
+  font-size: 2rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 0;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 var(--gold);
 }
-.iforge-card-header {
-  padding: 10px var(--space-md);
-  font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1.8px; color: var(--color-accent);
-  border-bottom: 1px solid var(--color-border);
-  background: rgba(226, 183, 20, 0.04);
-  display: flex; align-items: center; gap: var(--space-sm);
-}
-.iforge-card-header .icon {
-  width: 14px; height: 14px;
-  color: var(--color-accent); opacity: 0.7; flex-shrink: 0;
-}
-.iforge-card-body {
-  padding: var(--space-sm) 0;
-  min-height: 60px;
-  display: flex; flex-direction: column;
-}
-.iforge-card-body:empty::after {
-  content: 'Aún no hay mensajes — el mundo espera tu historia.';
+.iforge-tablon-title span {
   display: block;
-  padding: var(--space-lg) var(--space-md);
-  color: var(--color-text-secondary);
-  font-size: 0.85rem;
+  color: var(--gold);
+  text-shadow: 2px 2px 0 var(--panel);
+}
+.iforge-tablon-box {
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.iforge-tablon-box-header {
+  padding: 8px 12px;
+  font-family: var(--font-brush);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gold);
+  background: var(--panel);
+  border-bottom: 3px solid var(--border);
+}
+.iforge-tablon-box-body {
+  padding: 10px;
+  min-height: 80px;
+}
+.iforge-tablon-box-body:empty::after {
+  content: 'Vacío por ahora...';
+  display: block;
+  color: var(--ink-secondary);
   font-style: italic;
   text-align: center;
+  padding: 16px 0;
 }
-.iforge-card-item {
-  display: block; padding: 10px var(--space-md);
-  color: var(--color-text); font-size: 0.88rem;
+.iforge-tablon-item {
+  padding: 6px 0;
+  border-bottom: 2px dashed var(--border);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.iforge-tablon-item:last-child { border-bottom: none; }
+.iforge-tablon-item-meta {
+  font-size: 0.72rem;
+  color: var(--ink-secondary);
+  font-family: var(--font-sans);
+  margin-top: 2px;
+}
+.iforge-ambientacion {
+  background: var(--panel);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 14px;
+  color: #fff;
+}
+.iforge-ambientacion-label {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 2px;
+}
+.iforge-ambientacion-title {
+  font-family: var(--font-brush);
+  font-size: 1.5rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 var(--border);
+}
+.iforge-ambientacion-text {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #fff !important;
+}
+.iforge-quick-links {
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 10px;
+}
+.iforge-quick-links-title {
+  font-family: var(--font-brush);
+  font-size: 0.9rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.iforge-quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+.iforge-quick-link {
+  display: block;
+  padding: 5px 8px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--panel);
+  text-transform: uppercase;
   transition: background 0.15s;
-  border-bottom: 1px solid var(--color-divider);
 }
-.iforge-card-item:last-child { border-bottom: none; }
-.iforge-card-item:hover { background: rgba(255,255,255,0.03); }
-.iforge-card-item-meta {
-  font-size: 0.75rem; color: var(--color-text-secondary); margin-top: 3px;
-  display: flex; align-items: center; gap: var(--space-xs);
+.iforge-quick-link:hover { background: var(--gold); color: var(--panel); }
+
+/* Tabs */
+.iforge-tabs {
+  display: flex;
+  gap: 6px;
 }
-.iforge-card-more {
-  display: block; padding: 8px var(--space-md);
-  text-align: center; font-size: 0.78rem;
-  border-top: 1px solid var(--color-divider);
-  color: var(--color-text-secondary); letter-spacing: 0.5px;
-  transition: background 0.15s, color 0.15s;
-  margin-top: auto;
+.iforge-tab {
+  flex: 1;
+  padding: 8px 4px;
+  background: var(--panel);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  color: #fff;
+  font-family: var(--font-brush);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.15s;
 }
-.iforge-card-more:hover { background: rgba(255,255,255,0.03); color: var(--color-accent); }
-.iforge-staff-section {
-  grid-column: 1 / -1;
-  background: rgba(22, 27, 34, 0.6);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  backdrop-filter: blur(4px);
+.iforge-tab:hover, .iforge-tab.active {
+  background: var(--gold);
+  color: var(--panel);
 }
-.iforge-staff-section:hover {
-  border-color: var(--color-accent);
+
+#iforge-next-curiosidad {
+  cursor: pointer;
+  color: var(--panel);
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  transition: background 0.15s;
 }
+#iforge-next-curiosidad:hover { background: var(--gold); color: var(--panel); }
+
+/* Staff */
 .iforge-staff-list {
-  display: flex; flex-wrap: wrap; gap: var(--space-sm);
-  padding: var(--space-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
 }
 .iforge-staff-item {
-  display: flex; align-items: center; gap: var(--space-sm);
-  padding: 8px 14px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--color-divider);
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-  transition: border-color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: var(--bg);
+  border: 3px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
 }
-.iforge-staff-item:hover {
-  border-color: var(--color-border);
-  background: var(--color-surface-hover);
-}
-.iforge-staff-item .icon { width: 18px; height: 18px; }
-.iforge-staff-name { color: var(--color-text); font-weight: 500; }
 .iforge-staff-mp {
-  color: var(--color-text-secondary); font-size: 0.72rem;
-  margin-left: var(--space-xs); padding: 2px 8px;
-  border: 1px solid var(--color-divider);
-  border-radius: var(--radius-sm);
-  transition: color 0.15s, border-color 0.15s;
+  color: var(--ink-secondary);
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-weight: 700;
 }
-.iforge-staff-mp:hover { color: var(--color-accent); border-color: var(--color-accent); }
+.iforge-staff-mp:hover { background: var(--gold); color: var(--panel); }
+
+/* ===== CATEGORIES WITH FORUMS ===== */
 .iforge-categories {
-  max-width: var(--content-max); margin: 0 auto;
-  padding: var(--space-lg);
-  display: flex; flex-direction: column; gap: var(--space-md);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
-.iforge-category-card {
-  position: relative; border-radius: var(--radius-lg);
-  overflow: hidden; cursor: pointer;
-  min-height: 120px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+.iforge-categories > table {
+  width: 100% !important;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--bg-dark) !important;
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.iforge-categories > table > thead,
+.iforge-categories > table > tbody,
+.iforge-categories > table > tfoot,
+.iforge-categories > table tr,
+.iforge-categories > table td {
   display: block;
+  width: 100%;
 }
-.iforge-category-card:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 24px rgba(226,183,20,0.08);
-  transform: translateY(-2px);
+.iforge-categories .tcat,
+.iforge-categories .thead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--panel) !important;
+  color: var(--gold) !important;
+  font-family: var(--font-brush);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 3px solid var(--border) !important;
+  box-shadow: none !important;
 }
-.iforge-category-card::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(13,17,23,0.88) 0%, rgba(13,17,23,0.55) 100%);
-  z-index: 0;
+.iforge-categories .tcat::before {
+  content: '▶';
+  color: var(--gold);
+  font-size: 0.7rem;
 }
-.iforge-category-card:hover::before {
-  background: linear-gradient(135deg, rgba(13,17,23,0.72) 0%, rgba(13,17,23,0.4) 100%);
+.iforge-categories .trow1,
+.iforge-categories .trow2 {
+  background: var(--bg) !important;
+  border-bottom: 2px dashed var(--border) !important;
+  padding: 10px 14px;
+  transition: background 0.15s;
 }
-.iforge-category-seal {
-  position: absolute; right: var(--space-lg); top: 50%;
-  transform: translateY(-50%);
-  color: rgba(226,183,20,0.06); font-size: 100px;
-  pointer-events: none;
-  z-index: 0;
-  font-family: var(--font-display);
-  user-select: none;
+.iforge-categories .trow1:last-child,
+.iforge-categories .trow2:last-child {
+  border-bottom: none !important;
+}
+.iforge-categories .trow1:hover,
+.iforge-categories .trow2:hover {
+  background: rgba(201,168,76,0.12) !important;
+}
+.iforge-categories .trow1 a,
+.iforge-categories .trow2 a {
+  color: var(--panel) !important;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.iforge-categories .trow1 .smalltext,
+.iforge-categories .trow2 .smalltext {
+  color: var(--ink-secondary);
+  font-size: 0.75rem;
+  margin-top: 3px;
 }
 
-.iforge-category-content {
-  position: relative; z-index: 1;
-  padding: var(--space-xl) var(--space-xl);
-  display: flex; align-items: center; gap: var(--space-lg);
-}
-.iforge-category-icon-wrap {
-  width: 44px; height: 44px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-divider);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  background: rgba(255,255,255,0.02);
-}
-.iforge-category-icon {
-  width: 22px; height: 22px;
-  color: var(--color-accent);
-}
-.iforge-category-text { flex: 1; }
-.iforge-category-title {
-  font-family: var(--font-display); font-size: 1.3rem;
-  font-weight: 700; color: var(--color-text); margin-bottom: var(--space-xs);
-  letter-spacing: 0.5px;
-}
-.iforge-category-desc {
-  color: var(--color-text-secondary); font-size: 0.85rem;
-  max-width: 500px; line-height: 1.5;
-}
-.iforge-category-arrow {
-  color: var(--color-border);
-  width: 20px; height: 20px;
-  transition: color 0.2s, transform 0.2s;
-  flex-shrink: 0;
-}
-.iforge-category-card:hover .iforge-category-arrow {
-  color: var(--color-accent);
-  transform: translateX(4px);
-}
-#iforge-curiosidad {
-  padding: var(--space-md);
-  font-size: 0.88rem; color: var(--color-text-secondary);
-  font-style: italic; line-height: 1.7;
-  min-height: 50px;
-}
-#iforge-curiosidad::before {
-  content: '✦';
-  color: var(--color-accent);
-  margin-right: var(--space-sm);
-  font-style: normal;
-}
-#iforge-next-curiosidad {
-  cursor: pointer; color: var(--color-accent);
-  display: inline-block; margin-top: var(--space-sm);
-  font-size: 0.78rem; font-style: normal;
-  letter-spacing: 0.5px; opacity: 0.7;
-  transition: opacity 0.15s;
-}
-#iforge-next-curiosidad:hover { opacity: 1; }
+/* Footer */
 #iforge-footer {
-  background: rgba(22, 27, 34, 0.9);
-  border-top: 1px solid var(--color-border);
-  padding: var(--space-xl) var(--space-lg);
+  background: var(--panel);
+  border-top: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 16px;
   text-align: center;
-  color: var(--color-text-secondary); font-size: 0.78rem;
-  display: flex; align-items: center; justify-content: center;
-  gap: var(--space-md);
-  margin-top: var(--space-xl);
+  color: #fff;
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 }
-#iforge-footer .seal {
-  width: 20px; height: 20px;
-  opacity: 0.4;
-}
+#iforge-footer .seal { width: 18px; height: 18px; opacity: 0.6; filter: brightness(0) invert(1); }
+#iforge-footer a { color: var(--gold); }
+#iforge-footer a:hover { color: var(--gold-hover); }
+
+/* Badges */
 .iforge-badge {
-  display: inline-block; padding: 2px 8px;
-  border-radius: 10px; font-size: 0.65rem;
-  font-weight: 600; margin-right: var(--space-xs);
-  letter-spacing: 0.3px;
-}
-.iforge-badge-t1 { background: rgba(88,166,255,0.15); color: #58a6ff; }
-.iforge-badge-t2 { background: rgba(163,113,247,0.15); color: #a371f7; }
-.iforge-badge-t3 { background: rgba(240,136,62,0.15); color: #f0883e; }
-/* ─── Decorative Elements ─── */
-.iforge-card, .iforge-category-card, .iforge-staff-section {
-  position: relative;
-}
-.iforge-card::before, .iforge-category-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(226,183,20,0.15) 0%, transparent 30%, transparent 70%, rgba(226,183,20,0.1) 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.iforge-card:hover::before, .iforge-category-card:hover::before {
-  opacity: 1;
-}
-.iforge-card-header::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: var(--space-md); right: var(--space-md);
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, var(--color-accent) 50%, transparent 100%);
-  opacity: 0.3;
-}
-.iforge-card-header {
-  position: relative;
-}
-#index {
-  background: transparent !important;
-}
-#container, .container, #content {
-  background: transparent !important;
-}
-.trow1, .trow2, tbody tr {
-  background: transparent !important;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  margin-right: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
 }
 
-@media (max-width: 768px) {
+/* Responsive */
+@media (max-width: 900px) {
   .iforge-tablon { grid-template-columns: 1fr; }
-  .iforge-nav-logo { font-size: 1.1rem; letter-spacing: 2px; }
-  .iforge-nav-left { gap: var(--space-md); }
-  .iforge-nav-link { font-size: 0.8rem; }
-  .iforge-banner-title { font-size: 2rem; letter-spacing: 4px; }
-  #iforge-banner { height: 260px; }
-  .iforge-banner-seal { font-size: 160px; }
-  .iforge-category-card { min-height: 100px; }
-  .iforge-category-content { padding: var(--space-lg); flex-direction: column; align-items: flex-start; gap: var(--space-sm); }
-  .iforge-category-title { font-size: 1.1rem; }
-  .iforge-category-icon-wrap { width: 36px; height: 36px; }
-  .iforge-category-icon { width: 18px; height: 18px; }
+  .iforge-banner-title { font-size: 2.2rem; }
+  #iforge-banner { height: 220px; }
+  .iforge-nav-left { gap: 14px; }
+  .iforge-nav-link { font-size: 0.72rem; }
 }
-]]></stylesheet>
+@media (max-width: 600px) {
+  .iforge-banner-title { font-size: 1.8rem; }
+  .iforge-tablon-title { font-size: 1.6rem; }
+  .iforge-nav { padding: 0 10px; }
+  .iforge-nav-logo { font-size: 1.1rem; left: 10px; }
+  .iforge-nav-right { right: 10px; }
+  .iforge-quick-links-grid { grid-template-columns: 1fr; }
+}]]></stylesheet>
   </stylesheets>
-  <templates/>
+  <templates>
+    <template name="headerinclude" version="1827"><![CDATA[<link rel="stylesheet" type="text/css" href="css.php?stylesheet%5B%5D=31" />
+<link rel="alternate" type="application/rss+xml" title="{$lang->latest_threads} (RSS 2.0)" href="{$mybb->settings['bburl']}/syndication.php" />
+<link rel="alternate" type="application/atom+xml" title="{$lang->latest_threads} (Atom 1.0)" href="{$mybb->settings['bburl']}/syndication.php?type=atom1.0" />
+<meta http-equiv="Content-Type" content="text/html; charset={$charset}" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/jquery.js?ver=1823"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/jquery.plugins.min.js?ver=1821"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/general.js?ver=1827"></script>
+
+{$stylesheets}
+<script type="text/javascript">
+<!--
+	lang.unknown_error = "{$lang->unknown_error}";
+	lang.confirm_title = "{$lang->confirm_title}";
+	lang.expcol_collapse = "{$lang->expcol_collapse}";
+	lang.expcol_expand = "{$lang->expcol_expand}";
+	lang.select2_match = "{$lang->select2_match}";
+	lang.select2_matches = "{$lang->select2_matches}";
+	lang.select2_nomatches = "{$lang->select2_nomatches}";
+	lang.select2_inputtooshort_single = "{$lang->select2_inputtooshort_single}";
+	lang.select2_inputtooshort_plural = "{$lang->select2_inputtooshort_plural}";
+	lang.select2_inputtoolong_single = "{$lang->select2_inputtoolong_single}";
+	lang.select2_inputtoolong_plural = "{$lang->select2_inputtoolong_plural}";
+	lang.select2_selectiontoobig_single = "{$lang->select2_selectiontoobig_single}";
+	lang.select2_selectiontoobig_plural = "{$lang->select2_selectiontoobig_plural}";
+	lang.select2_loadmore = "{$lang->select2_loadmore}";
+	lang.select2_searching = "{$lang->select2_searching}";
+
+	var templates = {
+		modal: '{$jsTemplates['modal']}',
+		modal_button: '{$jsTemplates['modal_button']}'
+	};
+
+	var cookieDomain = "{$mybb->settings['cookiedomain']}";
+	var cookiePath = "{$mybb->settings['cookiepath']}";
+	var cookiePrefix = "{$mybb->settings['cookieprefix']}";
+	var cookieSecureFlag = "{$mybb->settings['cookiesecureflag']}";
+	var deleteevent_confirm = "{$lang->deleteevent_confirm}";
+	var removeattach_confirm = "{$lang->removeattach_confirm}";
+	var loading_text = '{$lang->ajax_loading}';
+	var saving_changes = '{$lang->saving_changes}';
+	var use_xmlhttprequest = "{$mybb->settings['use_xmlhttprequest']}";
+	var my_post_key = "{$mybb->post_code}";
+	var rootpath = "{$mybb->settings['bburl']}";
+	var imagepath = "{$theme['imgdir']}";
+  	var yes_confirm = "{$lang->yes}";
+	var no_confirm = "{$lang->no}";
+	var MyBBEditor = null;
+	var spinner_image = "{$theme['imgdir']}/spinner.gif";
+	var spinner = "<img src='" + spinner_image +"' alt='' />";
+	var modal_zindex = 9999;
+// -->
+</script>]]></template>
+    <template name="index" version="1839"><![CDATA[{$headerinclude}
+
+<nav id="iforge-navbar">
+  <div class="iforge-nav">
+    <a href="{$mybb->settings['bburl']}/index.php" class="iforge-nav-logo">I-FORGE</a>
+    <div class="iforge-nav-left">
+      <a href="{$mybb->settings['bburl']}/personajes.php" class="iforge-nav-link">Personaje</a>
+      <a href="{$mybb->settings['bburl']}/tramites.php" class="iforge-nav-link">Trámites</a>
+      <a href="{$mybb->settings['bburl']}/guias.php" class="iforge-nav-link">Guías</a>
+      {$iforge_zona_privada_link}
+    </div>
+    <div class="iforge-nav-right">
+      {$iforge_user_menu}
+    </div>
+  </div>
+</nav>
+
+{$header}
+
+<div id="iforge-banner" style="background-image: url('{$banner_url}')">
+  <div class="iforge-banner-seal" aria-hidden="true">I-FORGE</div>
+  <div class="iforge-banner-content">
+    <h1 class="iforge-banner-title">I-FORGE</h1>
+    <p class="iforge-banner-subtitle">Un mundo de Cazadores</p>
+  </div>
+</div>
+
+<div id="iforge-calendar-bar" onclick="window.location.href='{$mybb->settings['bburl']}/calendario.php'">
+  <img src="{$mybb->settings['bburl']}/images/icons/calendar.svg" class="icon" alt="Calendario">
+  <strong>{$calendario_texto}</strong>
+</div>
+
+<div class="iforge-tablon">
+  <!-- LEFT COLUMN -->
+  <div class="iforge-tablon-col">
+    <div class="iforge-tablon-title">Tablón <span>de Anuncios</span></div>
+    <div class="iforge-tablon-box">
+      <div class="iforge-tablon-box-header">Últimos Temas</div>
+      <div class="iforge-tablon-box-body">
+        {$iforge_latest_posts}
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER COLUMN -->
+  <div class="iforge-tablon-col">
+    <div class="iforge-ambientacion">
+      <div class="iforge-ambientacion-label">Ambientación</div>
+      <div class="iforge-ambientacion-title">Capítulo I: Origen</div>
+      <div class="iforge-ambientacion-text" id="iforge-curiosidad">{$iforge_curiosidad}</div>
+      <div style="margin-top: 8px;">
+        <a id="iforge-next-curiosidad" onclick="nextCuriosidad()">&#9734; Otra curiosidad</a>
+      </div>
+    </div>
+    <div class="iforge-quick-links">
+      <div class="iforge-quick-links-title">Enlaces Rápidos</div>
+      <div class="iforge-quick-links-grid">
+        <a href="{$mybb->settings['bburl']}/showthread.php?tid=1" class="iforge-quick-link">Reglamento</a>
+        <a href="{$mybb->settings['bburl']}/personajes.php" class="iforge-quick-link">Ficha</a>
+        <a href="{$mybb->settings['bburl']}/guias.php" class="iforge-quick-link">Guías</a>
+        <a href="{$mybb->settings['bburl']}/memberlist.php" class="iforge-quick-link">Miembros</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="iforge-tablon-col">
+    <div class="iforge-tabs">
+      <button class="iforge-tab active" onclick="showTab('novedades')">Novedades</button>
+      <button class="iforge-tab" onclick="showTab('busquedas')">Búsquedas</button>
+      <button class="iforge-tab" onclick="showTab('staff')">Staff</button>
+    </div>
+    <div id="tab-novedades" class="iforge-tablon-box">
+      <div class="iforge-tablon-box-header">Anuncios Importantes</div>
+      <div class="iforge-tablon-box-body">
+        {$iforge_news}
+      </div>
+    </div>
+    <div id="tab-busquedas" class="iforge-tablon-box" style="display:none;">
+      <div class="iforge-tablon-box-header">Búsquedas Activas</div>
+      <div class="iforge-tablon-box-body">
+        {$iforge_active_searches}
+      </div>
+    </div>
+    <div id="tab-staff" class="iforge-tablon-box" style="display:none;">
+      <div class="iforge-tablon-box-header">Staff</div>
+      <div class="iforge-tablon-box-body">
+        <div class="iforge-staff-list">
+          {$iforge_staff_list}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var curiosidades = {$curiosidades_json};
+var cIdx = 0;
+function nextCuriosidad() {
+  cIdx = (cIdx + 1) % curiosidades.length;
+  document.getElementById('iforge-curiosidad').innerHTML = curiosidades[cIdx];
+}
+function showTab(name) {
+  ['novedades','busquedas','staff'].forEach(function(t){
+    document.getElementById('tab-' + t).style.display = (t === name) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.iforge-tab').forEach(function(btn, i){
+    var tabs = ['novedades','busquedas','staff'];
+    btn.classList.toggle('active', tabs[i] === name);
+  });
+}
+</script>
+
+<div class="iforge-categories">
+  {$forums}
+</div>
+
+<div id="iforge-footer">
+  <img src="{$mybb->settings['bburl']}/images/icons/seal.svg" class="seal" alt="">
+  {$mybb->settings['bbname']} — <a href="https://mybb.com" target="_blank">MyBB</a>
+  <img src="{$mybb->settings['bburl']}/images/icons/seal.svg" class="seal" alt="">
+</div>
+
+{$footer}]]></template>
+  </templates>
 </theme>
