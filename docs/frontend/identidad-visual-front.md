@@ -1,4 +1,4 @@
-# Guía de Identidad Visual — [NOMBRE DEL FORO]
+# Guía de Identidad Visual — I-Forge
 ### Documento de referencia para agentes de IA (OpenCode / Antigravity / Cursor)
 
 > **Instrucción para agentes de IA:** este documento es la fuente de verdad del diseño visual del proyecto. Antes de generar, modificar o revisar cualquier componente de UI, lee este archivo completo. Si una decisión de diseño no está aquí especificada, elige la opción más coherente con los valores ya definidos abajo y **anótala en la sección 10 (Registro de decisiones)** en vez de inventar silenciosamente. Nunca sustituyas un valor definido aquí por un default genérico (fuente del sistema, azul #3B82F6, sombras Tailwind por defecto, etc.) sin justificarlo explícitamente.
@@ -17,13 +17,13 @@
 ## 1. Identidad del proyecto
 
 | Campo | Valor |
-|---|---|
-| Nombre del foro | [ej. "Grand Line RP", "Ashen Court"...] |
-| Ambientación / universo | [propio, fantasía, piratas, cyberpunk, histórico...] |
-| Una frase que resuma el tono | [ej. "Aventura marítima oscura con toques de honor y traición"] |
-| Público objetivo | [edad aproximada, nivel de "hardcore" del rol, comunidad hispana/internacional...] |
-| 3 adjetivos que NUNCA debe transmitir el diseño | [ej. "infantil", "corporativo", "genérico de bootstrap"] |
-| 3 adjetivos que SÍ debe transmitir | [ej. "épico", "artesanal", "peligroso"] |
+|---|---|---|
+| Nombre del foro | I-Forge |
+| Ambientación / universo | Hunter x Hunter (mundo propio, lore original) |
+| Una frase que resuma el tono | "Un mundo de Cazadores" |
+| Público objetivo | Comunidad hispana de rol, 18+ |
+| 3 adjetivos que NUNCA debe transmitir | "infantil", "corporativo", "genérico" |
+| 3 adjetivos que SÍ debe transmitir | "oscuro", "artesanal", "misterioso" |
 | Referencias visuales de inspiración (no a copiar, sí a entender por qué funcionan) | [enlaces o descripciones — anota qué elemento concreto de cada referencia te gusta, no solo "que se vea así"] |
 
 **Nota para agentes:** los adjetivos de esta tabla son la brújula para cualquier decisión ambigua de color, tipografía o copy. Si dudas entre dos opciones, elige la que refuerce los adjetivos "SÍ" y evite los "NUNCA".
@@ -36,18 +36,21 @@ Define 4-6 colores con **función**, no solo hex. Un color sin función se conve
 
 | Rol | Hex | Uso |
 |---|---|---|
-| Fondo base | `[#______]` | [ej. fondo general de la app] |
-| Fondo elevado / tarjetas | `[#______]` | [paneles, modales, ficha] |
-| Acento primario | `[#______]` | [CTA, elementos interactivos principales] |
-| Acento secundario / facción | `[#______]` | [ej. color que cambia según facción/bando del personaje] |
-| Texto principal | `[#______]` | |
-| Texto secundario / muted | `[#______]` | |
-| Estado peligro/alerta | `[#______]` | [ej. HP bajo, ficha rechazada] |
-| Estado éxito/positivo | `[#______]` | [ej. ficha aprobada, transacción exitosa] |
+| Fondo base | `#0d1117` | Fondo general del foro |
+| Fondo elevado | `#161b22` | Navbar, tarjetas, paneles |
+| Borde | `#30363d` | Bordes de componentes |
+| Acento primario | `#e2b714` | Enlaces, hover, elementos interactivos (oro) |
+| Texto principal | `#f0f6fc` | Texto body |
+| Texto muted | `#8b949e` | Metadatos, fechas |
+| Éxito | `#3fb950` | Aprobado, positivo |
+| Peligro | `#f85149` | Rechazado, alerta |
+| Rango T1 | `#58a6ff` | Badge de rango T1 |
+| Rango T2 | `#a371f7` | Badge de rango T2 |
+| Rango T3 | `#f0883e` | Badge de rango T3 |
 
 **Reglas de contraste:** [ej. "mínimo AA en texto sobre fondo", "el acento de facción nunca se usa para texto de body, solo para bordes/acentos"]
 
-**Prohibido:** [ej. "no usar gradientes morado-rosa genéricos de SaaS", "no usar el terracota #D97757 (es el acento de Claude, se nota que es IA)"]
+**Prohibido:** no usar glassmorphism, no usar azules brillantes tipo bootstrap, no usar fondos blancos
 
 ---
 
@@ -55,9 +58,9 @@ Define 4-6 colores con **función**, no solo hex. Un color sin función se conve
 
 | Rol | Familia | Peso/uso | Dónde se usa |
 |---|---|---|---|
-| Display / títulos | [ej. una serif con carácter, una display condensada...] | | Nombres de personaje, títulos de sección |
-| Cuerpo | [ej. sans legible] | | Biografía, descripciones |
-| Datos / stats (tabular) | [ej. mono o sans con números tabulares] | | Estadísticas, cantidades, fechas |
+| Display / títulos | Georgia, serif | | Nombre foro, títulos categoría |
+| Cuerpo | -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif | | Texto general |
+| Datos / stats | Menlo, Consolas, monospace | | Estadísticas, cantidades |
 | Utilitaria / etiquetas | [opcional] | | Badges, eyebrows, metadatos |
 
 **Escala tipográfica:** [define tamaños concretos si ya los tienes, ej. 12/14/16/20/28/40px, o deja que el agente proponga una escala modular y la documente aquí tras decidirla]
@@ -72,16 +75,7 @@ Describe la estructura real de las pantallas clave (no genérico "header + conte
 
 ### 4.1 Ficha de personaje
 ```
-[Dibuja o describe el wireframe ASCII de tu ficha ideal, ej:]
-
-┌─────────────────────────────┐
-│ [Tabs: Portada|Bio|Bélico|...] │
-├─────────────────────────────┤
-│  [Nombre + título]            │
-│  [Datos básicos]  [Rueda stats]│
-│  [Reputación]     [Retrato]    │
-│  [Rasgos/virtudes-defectos]    │
-└─────────────────────────────┘
+Pendiente de definir en fase de personajes
 ```
 
 ### 4.2 Otras pantallas clave
