@@ -465,5 +465,29 @@ $forums = $forum_list['forum_list'];
 
 $plugins->run_hooks('index_end');
 
+// I-Forge navbar: Zona Privada link visibility
+$iforge_zona_privada_link = '';
+if ($mybb->usergroup['cancp'] == 1 || $mybb->usergroup['issupermod'] == 1 || my_is_admin()) {
+    $iforge_zona_privada_link = '<a href="'.$mybb->settings['bburl'].'/private.php" class="iforge-nav-link">Zona Privada</a>';
+}
+
+// I-Forge navbar: User menu
+if ($mybb->user['uid']) {
+    $iforge_user_menu = '
+    <div class="iforge-user-menu">
+      <button class="iforge-user-btn" id="iforge-user-btn">
+        <img src="'.$mybb->settings['bburl'].'/images/nav-icon.svg" width="28" height="28" alt="Personaje">
+      </button>
+      <div class="iforge-dropdown" id="iforge-dropdown">
+        <a href="'.$mybb->settings['bburl'].'/mensajes.php" class="iforge-dropdown-item">Mensajería</a>
+        <a href="'.$mybb->settings['bburl'].'/configuracion.php" class="iforge-dropdown-item">Configuración</a>
+        <hr class="iforge-dropdown-divider">
+        <a href="'.$mybb->settings['bburl'].'/member.php?action=logout&amp;logoutkey='.$mybb->user['logoutkey'].'" class="iforge-dropdown-item">Cerrar sesión</a>
+      </div>
+    </div>';
+} else {
+    $iforge_user_menu = '<a href="'.$mybb->settings['bburl'].'/member.php?action=login" class="iforge-nav-link">Iniciar sesión</a>';
+}
+
 eval('$index = "'.$templates->get('index').'";');
 output_page($index);
