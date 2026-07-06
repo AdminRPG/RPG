@@ -584,20 +584,8 @@ while ($staff = $db->fetch_array($staffQuery)) {
     </div>';
 }
 
-// I-Forge: Visual category cards (replace $forums)
+// I-Forge: Category sections with forum grids (One Piece Gaiden style)
 $iforge_categories = '';
-$catAliasMap = [
-    'rol' => 'shield',
-    'personaje' => 'shield',
-    'tramite' => 'newspaper',
-    'guia' => 'idea',
-    'busqueda' => 'search',
-    'noticia' => 'newspaper',
-    'offtopic' => 'speech',
-    'general' => 'speech',
-    'staff' => 'seal',
-    'admin' => 'seal',
-];
 $catQuery = $db->query("
     SELECT fid, name, description
     FROM ".TABLE_PREFIX."forums
@@ -606,33 +594,69 @@ $catQuery = $db->query("
 ");
 while ($cat = $db->fetch_array($catQuery)) {
     $catName = htmlspecialchars_uni($cat['name']);
-    $catNameLower = mb_strtolower($catName);
-    $iconFile = '';
-    foreach ($catAliasMap as $keyword => $icon) {
-        if (mb_strpos($catNameLower, $keyword) !== false) {
-            $iconFile = $icon . '.svg';
-            break;
+    $catDesc = htmlspecialchars_uni($cat['description']);
+
+    $forumQuery = $db->query("
+        SELECT f.fid, f.name, f.description, f.threads, f.posts, f.lastpost, f.lastpostsubject, f.lastposter, f.lastposteruid,
+               t.tid AS lastpost_tid
+        FROM ".TABLE_PREFIX."forums f
+        LEFT JOIN ".TABLE_PREFIX."threads t ON (t.fid = f.fid AND t.lastpost = f.lastpost)
+        WHERE f.type = 'f' AND f.pid = '{$cat['fid']}' AND f.active = 1
+        ORDER BY f.disporder ASC
+    ");
+
+    $forumsHtml = '';
+    $hasForums = false;
+    while ($forum = $db->fetch_array($forumQuery)) {
+        if (isset($forumpermissions[$forum['fid']]) && $forumpermissions[$forum['fid']]['canview'] != 1) {
+            continue;
         }
-    }
-    if ($iconFile) {
-        $iconHtml = '<img src="'.$mybb->settings['bburl'].'/images/icons/'.$iconFile.'" class="iforge-category-icon" alt="">';
-    } else {
-        $initial = mb_strtoupper(mb_substr($catName, 0, 1));
-        $iconHtml = '<span class="iforge-category-icon" style="font-family:var(--font-display);font-size:1rem;font-weight:700;">'.$initial.'</span>';
-    }
-    $iforge_categories .= '
-    <a href="'.$mybb->settings['bburl'].'/forumdisplay.php?fid='.$cat['fid'].'" class="iforge-category-card">
-        <div class="iforge-category-content">
-            <div class="iforge-category-icon-wrap">
-                '.$iconHtml.'
+        $hasForums = true;
+
+        $forumName = htmlspecialchars_uni($forum['name']);
+        $forumDesc = htmlspecialchars_uni($forum['description']);
+        $threads = my_number_format($forum['threads']);
+        $posts = my_number_format($forum['posts']);
+
+        $lastPostHtml = '';
+        if ($forum['lastpost'] != 0 && trim($forum['lastposter']) != '') {
+            $lastDate = date('d/m/Y', $forum['lastpost']);
+            $lastSubject = htmlspecialchars_uni($forum['lastpostsubject']);
+            $lastPoster = htmlspecialchars_uni($forum['lastposter']);
+            $lastPostUrl = !empty($forum['lastpost_tid'])
+                ? $mybb->settings['bburl'].'/showthread.php?tid='.(int)$forum['lastpost_tid']
+                : $mybb->settings['bburl'].'/forumdisplay.php?fid='.$forum['fid'];
+            $lastPostHtml = '<div class="iforge-forum-last"><span class="iforge-forum-last-label">Último:</span> <a href="'.$lastPostUrl.'">'.$lastSubject.'</a> por '.$lastPoster.' · '.$lastDate.'</div>';
+        } elseif ($forum['lastpost'] == 0) {
+            $lastPostHtml = '<div class="iforge-forum-last">Sin posts aún</div>';
+        }
+
+        $forumsHtml .= '
+        <div class="iforge-forum-card">
+            <div class="iforge-forum-card-body">
+                <a href="'.$mybb->settings['bburl'].'/forumdisplay.php?fid='.$forum['fid'].'" class="iforge-forum-card-title-link"><h3 class="iforge-forum-card-title">'.$forumName.'</h3></a>
+                <p class="iforge-forum-card-desc">'.$forumDesc.'</p>
+                '.$lastPostHtml.'
             </div>
-            <div class="iforge-category-text">
-                <h2 class="iforge-category-title">'.$catName.'</h2>
-                <p class="iforge-category-desc">'.htmlspecialchars_uni($cat['description']).'</p>
+            <div class="iforge-forum-card-stats">
+                <span class="iforge-forum-stat"><strong>'.$threads.'</strong> temas</span>
+                <span class="iforge-forum-stat"><strong>'.$posts.'</strong> posts</span>
             </div>
-            <svg class="iforge-category-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-    </a>';
+        </div>';
+    }
+
+    if ($hasForums) {
+        $iforge_categories .= '
+        <section class="iforge-category-section">
+            <header class="iforge-category-section-header">
+                <h2 class="iforge-category-section-title">'.$catName.'</h2>
+                '.($catDesc ? '<p class="iforge-category-section-desc">'.$catDesc.'</p>' : '').'
+            </header>
+            <div class="iforge-forums-grid">
+                '.$forumsHtml.'
+            </div>
+        </section>';
+    }
 }
 $forums = $iforge_categories;
 

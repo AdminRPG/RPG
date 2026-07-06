@@ -1,0 +1,1595 @@
+=== TEMPLATES ===
+<template name="forumdisplay" version="1839"><![CDATA[<html>
+<head>
+<title>{$mybb->settings['bbname']} - {$foruminfo['name']}</title>
+{$headerinclude}
+{$rssdiscovery}
+<script type="text/javascript">
+<!--
+	lang.no_new_posts = "{$lang->no_new_posts}";
+	lang.click_mark_read = "{$lang->click_mark_read}";
+	lang.inline_edit_description = "{$lang->inline_edit_description}";
+	lang.post_fetch_error = "{$lang->post_fetch_error}";
+// -->
+</script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/jeditable/jeditable.min.js"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/inline_edit.js?ver=1821"></script>
+</head>
+<body>
+<nav id="iforge-navbar">
+  <div class="iforge-nav">
+    <a href="{$mybb->settings['bburl']}/index.php" class="iforge-nav-logo">I-FORGE</a>
+    <div class="iforge-nav-left">
+      <a href="{$mybb->settings['bburl']}/personajes.php" class="iforge-nav-link">Personaje</a>
+      <a href="{$mybb->settings['bburl']}/tramites.php" class="iforge-nav-link">Tramites</a>
+      <a href="{$mybb->settings['bburl']}/guias.php" class="iforge-nav-link">Guias</a>
+    </div>
+    <div class="iforge-nav-right">
+      <button class="iforge-user-btn" onclick="document.getElementById('iforge-drop-fd').classList.toggle('open')">U</button>
+      <div class="iforge-dropdown" id="iforge-drop-fd">
+        <a href="{$mybb->settings['bburl']}/member.php?action=profile" class="iforge-dropdown-item">Perfil</a>
+        <a href="{$mybb->settings['bburl']}/usercp.php" class="iforge-dropdown-item">Panel</a>
+        <hr class="iforge-dropdown-divider">
+        <a href="{$mybb->settings['bburl']}/member.php?action=logout&amp;logoutkey={$mybb->user['logoutkey']}" class="iforge-dropdown-item">Salir</a>
+      </div>
+    </div>
+  </div>
+</nav>
+{$header}
+{$iforge_banner}
+<div class="iforge-forum-container">
+{$moderatedby}
+{$rules}
+{$usersbrowsing}
+{$subforums}
+{$threadslist}
+</div>
+{$footer}
+</body>
+</html>]]></template>
+
+<template name="forumdisplay_threadlist" version="1839"><![CDATA[<div class="iforge-threadlist">
+  <div class="iforge-threadlist-toolbar">
+    <div class="iforge-threadlist-sort">{$forumsort} {$orderarrow}</div>
+    <a href="newthread.php?fid={$fid}" class="iforge-newthread-btn">+ Nuevo Tema</a>
+  </div>
+  <div class="iforge-threadlist-pagination-top">{$multipage}</div>
+  <div class="iforge-threads">
+    {$announcementlist}
+    {$threads}
+  </div>
+  <div class="iforge-threadlist-pagination-bottom">{$multipage}</div>
+  <div class="iforge-threadlist-toolbar-bottom">
+    {$newthread}
+    {$searchforum}
+    {$inlinemod}
+    {$forumjump}
+  </div>
+</div>]]></template>
+
+<template name="forumdisplay_thread" version="1839"><![CDATA[<div class="iforge-thread-row {$thread_type_class}">
+  <div class="iforge-thread-main">
+    <span class="iforge-thread-icon iforge-thread-icon-{$folder}">{$icon}</span>
+    <div class="iforge-thread-info">
+      <div class="iforge-thread-title-row">{$prefix} {$gotounread}<a href="{$thread['threadlink']}" class="iforge-thread-title">{$thread['subject']}</a>{$thread['multipage']}{$attachment_count}{$unapproved_posts}</div>
+      <span class="iforge-thread-meta">{$thread['profilelink']} · {$thread['start_datetime']} · {$thread['views']} {$lang->views}</span>
+    </div>
+  </div>
+  <div class="iforge-thread-stats">
+    <span class="iforge-thread-replies"><strong>{$thread['replies']}</strong> {$lang->replies}</span>
+    <span class="iforge-thread-lastpost">
+      <span class="iforge-thread-last-label">{$lang->lastpost}:</span>
+      <a href="{$thread['lastpostlink']}">{$lastposterlink} — {$lastpostdate}</a>
+    </span>
+    {$rating}
+  </div>
+  {$modbit}
+</div>]]></template>
+
+<template name="forumdisplay_subforums" version="1839"><![CDATA[<div class="iforge-subforums">
+  <span class="iforge-subforums-label">{$lang->sub_forums_in}:</span>
+  <div class="iforge-subforums-grid">
+    {$forums}
+  </div>
+</div>]]></template>
+
+<template name="forumdisplay_announcements" version="1839"><![CDATA[<div class="iforge-announcements">
+  <div class="iforge-announcements-header">{$lang->forum_announcements}</div>
+  {$announcements}
+</div>]]></template>
+
+<template name="forumdisplay_announcements_announcement" version="1839"><![CDATA[<div class="iforge-announcement-row">
+  <div class="iforge-announcement-icon"><span class="iforge-thread-icon-char iforge-thread-icon-dot">&#9679;</span></div>
+  <div class="iforge-announcement-info">
+    <a href="{$announcement['announcementlink']}"{$new_class}>{$announcement['subject']}</a>
+    <span class="iforge-thread-meta">{$announcement['profilelink']} · {$postdate}</span>
+  </div>
+</div>]]></template>
+
+<template name="forumdisplay_forumsort" version="1839"><![CDATA[<div class="iforge-sort-bar">
+  <form action="forumdisplay.php" method="get">
+    <input type="hidden" name="fid" value="{$fid}" />
+    <select name="sortby">
+      <option value="subject"{$sortsel['subject']}>{$lang->sort_by_subject}</option>
+      <option value="lastpost"{$sortsel['lastpost']}>{$lang->sort_by_lastpost}</option>
+      <option value="starter"{$sortsel['starter']}>{$lang->sort_by_starter}</option>
+      <option value="started"{$sortsel['started']}>{$lang->sort_by_started}</option>
+      {$ratingsort}
+      <option value="replies"{$sortsel['replies']}>{$lang->sort_by_replies}</option>
+      <option value="views"{$sortsel['views']}>{$lang->sort_by_views}</option>
+    </select>
+    <select name="order">
+      <option value="asc"{$ordersel['asc']}>{$lang->sort_order_asc}</option>
+      <option value="desc"{$ordersel['desc']}>{$lang->sort_order_desc}</option>
+    </select>
+    <select name="datecut">
+      <option value="1"{$datecutsel['1']}>{$lang->datelimit_1day}</option>
+      <option value="5"{$datecutsel['5']}>{$lang->datelimit_5days}</option>
+      <option value="10"{$datecutsel['10']}>{$lang->datelimit_10days}</option>
+      <option value="20"{$datecutsel['20']}>{$lang->datelimit_20days}</option>
+      <option value="50"{$datecutsel['50']}>{$lang->datelimit_50days}</option>
+      <option value="75"{$datecutsel['75']}>{$lang->datelimit_75days}</option>
+      <option value="100"{$datecutsel['100']}>{$lang->datelimit_100days}</option>
+      <option value="365"{$datecutsel['365']}>{$lang->datelimit_lastyear}</option>
+      <option value="9999"{$datecutsel['9999']}>{$lang->datelimit_beginning}</option>
+    </select>
+    {$prefixselect}
+    <input type="submit" class="iforge-go-btn" value="{$lang->go}" />
+  </form>
+</div>]]></template>
+
+<template name="forumdisplay_searchforum" version="1839"><![CDATA[<form action="search.php" class="iforge-search-form">
+  <span class="iforge-search-label">{$lang->search_forum}</span>
+  <input type="text" class="iforge-search-input" name="keywords" />
+  <input type="submit" class="iforge-search-submit" value="{$lang->go}" />
+  <input type="hidden" name="action" value="do_search" />
+  <input type="hidden" name="forums[]" value="{$fid}" />
+  <input type="hidden" name="postthread" value="1" />
+</form>]]></template>
+
+<template name="forumdisplay_orderarrow" version="1839"><![CDATA[<span class="iforge-order-arrow"><a href="{$sorturl}&amp;sortby={$sortby}&amp;order={$oppsortnext}">{$oppsort}</a></span>]]></template>
+
+<template name="forumdisplay_thread_icon" version="1839"><![CDATA[<span class="iforge-thread-icon-char iforge-thread-icon-{$folder}state">&#9679;</span>]]></template>
+
+<template name="forumdisplay_thread_attachment_count" version="1839"><![CDATA[<span class="iforge-attach-badge" title="{$attachment_count}">&#128206; {$attachment_count}</span>]]></template>
+
+<template name="forumdisplay_thread_multipage" version="1839"><![CDATA[ <span class="iforge-thread-pages">{$threadpages}{$morelink}</span>]]></template>
+
+<template name="forumdisplay_thread_multipage_page" version="1839"><![CDATA[<a href="{$page_link}">{$i}</a>]]></template>
+
+<template name="forumdisplay_thread_multipage_more" version="1839"><![CDATA[<span class="iforge-thread-pages-ellipsis">...</span><a href="{$page_link}">{$thread['pages']}</a>]]></template>
+
+<template name="forumdisplay_inlinemoderation" version="1838"><![CDATA[<script type="text/javascript" src="{$mybb->asset_url}/jscripts/inline_moderation.js?ver=1838"></script>
+<div class="iforge-mod-bar">
+<form id="inlinemoderation_options" action="moderation.php" method="post">
+<input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+<input type="hidden" name="fid" value="{$fid}" />
+<input type="hidden" name="modtype" value="inlinethread" />
+<span class="iforge-mod-bar-label">{$lang->inline_thread_moderation}</span>
+<select name="action" id="inlinemoderation_options_selector">
+	<option value="" style="display: none;" selected="selected">{$lang->select_a_tool}</option>
+	<option value="delayedmoderation">{$lang->delayed_moderation}</option>
+	{$standardthreadtools}
+	{$customthreadtools}
+</select>
+<input type="submit" class="iforge-mod-go" name="go" value="{$lang->inline_go} ({$inlinecount})" id="inline_go" />
+<input type="button" class="iforge-mod-clear" onclick="inlineModeration.clearChecked();" value="{$lang->clear}" />
+</form>
+<div class="iforge-mod-selectall">{$selectall_rows}</div>
+</div>
+<script type="text/javascript">
+<!--
+	var go_text = "{$lang->inline_go}";
+	var all_text = "{$threadcount}";
+	var inlineType = "forum";
+	var inlineId = {$fid};
+	lang.select_tool = "{$lang->inline_no_tool_selected}";
+	lang.selected_nil = "{$lang->inline_no_post_selected}";
+// -->
+</script>]]></template>
+
+<template name="forumdisplay_inlinemoderation_standard" version="1839"><![CDATA[<optgroup label="{$lang->standard_mod_tools}">
+{$inlinemodopenclose}
+{$inlinemodstickunstick}
+{$inlinemodsoftdelete}
+{$inlinemodrestore}
+{$inlinemoddelete}
+{$inlinemodmanage}
+{$inlinemodapproveunapprove}
+</optgroup>]]></template>
+
+<template name="forumdisplay_inlinemoderation_custom" version="1839"><![CDATA[<optgroup label="{$lang->custom_mod_tools}">{$customthreadtools}</optgroup>]]></template>
+
+<template name="forumdisplay_inlinemoderation_custom_tool" version="1839"><![CDATA[<option value="{$tool['tid']}">{$tool['name']}</option>]]></template>
+
+<template name="forumdisplay_inlinemoderation_openclose" version="1839"><![CDATA[<option value="multiclosethreads">{$lang->close_threads}</option>
+<option value="multiopenthreads">{$lang->open_threads}</option>]]></template>
+
+<template name="forumdisplay_inlinemoderation_stickunstick" version="1839"><![CDATA[<option value="multistickthreads">{$lang->stick_threads}</option>
+<option value="multiunstickthreads">{$lang->unstick_threads}</option>]]></template>
+
+<template name="forumdisplay_inlinemoderation_softdelete" version="1839"><![CDATA[<option value="multisoftdeletethreads">{$lang->soft_delete_threads}</option>]]></template>
+
+<template name="forumdisplay_inlinemoderation_restore" version="1839"><![CDATA[<option value="multirestorethreads">{$lang->restore_threads}</option>]]></template>
+
+<template name="forumdisplay_inlinemoderation_delete" version="1839"><![CDATA[<option value="multideletethreads">{$lang->delete_threads}</option>]]></template>
+
+<template name="forumdisplay_inlinemoderation_manage" version="1839"><![CDATA[<option value="multimovethreads">{$lang->move_threads}</option>]]></template>
+
+<template name="forumdisplay_inlinemoderation_approveunapprove" version="1839"><![CDATA[<option value="multiapprovethreads">{$lang->approve_threads}</option>
+<option value="multiunapprovethreads">{$lang->unapprove_threads}</option>]]></template>
+
+<template name="forumdisplay_inlinemoderation_col" version="1839"><![CDATA[<span class="iforge-mod-selectall"><input type="checkbox" name="allbox" onclick="inlineModeration.checkAll(this)" /></span>]]></template>
+
+<template name="forumdisplay_inlinemoderation_selectall" version="1839"><![CDATA[<div id="selectAllrow" class="iforge-mod-selectall-msg" style="display:none;">{$lang->page_selected} <a href="javascript:void(0)" onclick='inlineModeration.selectAll(); return false;'>{$lang->select_all}</a></div>
+<div id="allSelectedrow" class="iforge-mod-selectall-msg" style="display:none;">{$lang->all_selected} <a href="javascript:void(0)" onclick='inlineModeration.clearChecked(); return false;'>{$lang->clear_selection}</a></div>]]></template>
+
+<template name="forumdisplay_threadlist_prefixes" version="1839"><![CDATA[<div class="iforge-prefix-pills">
+<select name="prefix">
+<option value="-2"{$default_selected['any']}>{$lang->prefix_any}</option>
+<option value="-1"{$default_selected['none']}>{$lang->prefix_none}</option>
+<option value="0"{$default_selected['all']}>{$lang->prefix_all}</option>
+{$prefixselect_prefix}
+</select>
+</div>]]></template>
+
+<template name="forumdisplay_threadlist_prefixes_prefix" version="1839"><![CDATA[<option value="{$prefix['pid']}"{$selected}>{$lang->prefix} {$prefix['prefix']}</option>]]></template>
+
+<template name="forumdisplay_threadlist_clearpass" version="1839"><![CDATA[<a href="misc.php?action=clearpass&amp;fid={$fid}&amp;my_post_key={$mybb->post_code}" class="iforge-clear-link">{$lang->clear_stored_password}</a>]]></template>
+
+<template name="forumdisplay_threadlist_subscription" version="1839"><![CDATA[<a href="usercp.php?action={$add_remove_subscription}subscription&amp;type=forum&amp;fid={$fid}&amp;my_post_key={$mybb->post_code}" class="iforge-clear-link">{$add_remove_subscription_text}</a>]]></template>
+
+<template name="forumdisplay_threadlist_sortrating" version="1839"><![CDATA[<option value="rating" {$sortsel['rating']}>{$lang->sort_by_rating}</option>]]></template>
+
+<template name="forumdisplay_moderatedby" version="1839"><![CDATA[<div class="iforge-mod-badges">
+  <span class="iforge-mod-badges-label">{$lang->moderated_by}</span>
+  {$moderators}
+</div>]]></template>
+
+<template name="forumdisplay_usersbrowsing" version="1839"><![CDATA[<div class="iforge-users-browsing">{$lang->users_browsing_forum} {$onlinemembers}{$onlinesep}{$invisonline}{$onlinesep2}{$guestsonline}</div>]]></template>
+
+<template name="forumdisplay_usersbrowsing_user" version="1839"><![CDATA[{$comma}{$user['profilelink']}{$invisiblemark}]]></template>
+
+<template name="forumdisplay_nothreads" version="1839"><![CDATA[<div class="iforge-empty-card">
+  <div class="iforge-empty-card-title">{$lang->nothreads}</div>
+  <div class="iforge-empty-card-text">{$lang->nothreads_desc}</div>
+  <a href="newthread.php?fid={$fid}" class="iforge-empty-card-btn">{$lang->post_thread} &#10142;</a>
+</div>]]></template>
+
+<template name="forumdisplay_nopermission" version="1839"><![CDATA[<div class="iforge-empty-card">
+  <div class="iforge-error-nopermission-icon">&#128274;</div>
+  <div class="iforge-empty-card-title">{$lang->nopermission}</div>
+</div>]]></template>
+
+<template name="forumdisplay_thread_deleted" version="1839"><![CDATA[<div class="iforge-thread-row iforge-thread-deleted">
+  <div class="iforge-thread-main">
+    <span class="iforge-thread-icon-char iforge-thread-icon-locked">&#128274;</span>
+    <div class="iforge-thread-info">
+      <span class="iforge-thread-deleted-text">{$lang->deleted_thread}</span>
+    </div>
+  </div>
+  <div class="iforge-thread-stats">
+    <span class="iforge-thread-replies"><strong>-</strong></span>
+    <span class="iforge-thread-lastpost">-</span>
+  </div>
+  {$modbit}
+</div>]]></template>
+
+<template name="forumdisplay_thread_rating" version="1839"><![CDATA[<div class="iforge-thread-rating" id="rating_table_{$thread['tid']}">
+  <ul class="star_rating{$not_rated}" id="rating_thread_{$thread['tid']}">
+    <li style="width: {$thread['width']}%" class="current_rating" id="current_rating_{$thread['tid']}">{$ratingvotesav}</li>
+  </ul>
+  <script type="text/javascript">
+  <!--
+    Rating.build_forumdisplay({$thread['tid']}, { width: '{$thread['width']}', extra_class: '{$not_rated}', current_average: '{$ratingvotesav}' });
+  // -->
+  </script>
+</div>]]></template>
+
+<template name="forumdisplay_thread_rating_moved" version="1839"><![CDATA[<div class="iforge-thread-rating">-</div>]]></template>
+
+<template name="forumdisplay_thread_modbit" version="1839"><![CDATA[<div class="iforge-thread-modbit"><input type="checkbox" class="checkbox" name="inlinemod_{$multitid}" id="inlinemod_{$multitid}" value="1" {$inlinecheck} /></div>]]></template>
+
+<template name="forumdisplay_thread_unapproved_posts" version="1839"><![CDATA[<span class="iforge-unapproved-badge" title="{$unapproved_posts_count}">{$thread['unapprovedposts']} {$lang->unapproved_posts}</span>]]></template>
+
+<template name="forumdisplay_rules" version="1839"><![CDATA[<div class="iforge-rules-card">
+  <div class="iforge-rules-card-header">{$foruminfo['rulestitle']}</div>
+  <div class="iforge-rules-card-body">{$foruminfo['rules']}</div>
+</div>]]></template>
+
+<template name="forumdisplay_rules_link" version="1839"><![CDATA[<div class="iforge-rules-card">
+  <div class="iforge-rules-card-body">
+    <a href="misc.php?action=rules&amp;fid={$fid}" class="iforge-rules-link">{$foruminfo['rulestitle']}</a>
+  </div>
+</div>]]></template>
+
+<template name="forumdisplay_password" version="1839"><![CDATA[<html>
+<head>
+<title>{$mybb->settings['bbname']} - {$lang->password_required}</title>
+{$headerinclude}
+</head>
+<body>
+{$header}
+{$iforge_banner}
+<div class="iforge-password-card">
+  <div class="iforge-password-card-header">{$lang->password_required}</div>
+  <div class="iforge-password-card-body">
+    <p class="iforge-password-note">{$lang->forum_password_note}</p>
+    <form action="{$_SERVER['REQUEST_URI']}" method="post">
+      {$pwnote}
+      <input type="password" class="iforge-password-input" name="pwverify" size="50" value="" />
+      <input type="submit" class="iforge-password-submit" name="submit" value="{$lang->verify_forum_password}" />
+    </form>
+  </div>
+</div>
+{$footer}
+</body>
+</html>]]></template>
+
+<template name="forumdisplay_password_wrongpass" version="1839"><![CDATA[<div class="iforge-password-error">{$lang->wrong_forum_password}</div>]]></template>
+
+<template name="forumdisplay_thread_gotounread" version="1839"><![CDATA[<a href="{$thread['newpostlink']}" class="iforge-gotounread" title="{$lang->goto_first_unread}">&#10140;</a>]]></template>
+
+<template name="forumdisplay_threads_sep" version="1839"><![CDATA[<div class="iforge-sticky-sep"><span class="iforge-sticky-sep-label">{$lang->normal_threads}</span></div>]]></template>
+
+<template name="forumdisplay_sticky_sep" version="1839"><![CDATA[<div class="iforge-sticky-sep"><span class="iforge-sticky-sep-label">{$lang->sticky_threads}</span></div>]]></template>
+
+<template name="forumdisplay_announcement_rating" version="1839"><![CDATA[<span class="iforge-thread-rating">-</span>]]></template>
+
+<template name="forumdisplay_announcements_announcement_modbit" version="1839"><![CDATA[<div class="iforge-thread-modbit">-</div>]]></template>
+
+<template name="forumdisplay_threadlist_rating" version="1839"><![CDATA[<script type="text/javascript" src="{$mybb->asset_url}/jscripts/rating.js?ver=1821"></script>
+<script type="text/javascript">
+<!--
+	lang.stars = new Array();
+	lang.stars[1] = "{$lang->one_star}";
+	lang.stars[2] = "{$lang->two_stars}";
+	lang.stars[3] = "{$lang->three_stars}";
+	lang.stars[4] = "{$lang->four_stars}";
+	lang.stars[5] = "{$lang->five_stars}";
+	lang.ratings_update_error = "{$lang->ratings_update_error}";
+// -->
+</script>]]></template>
+
+<template name="multipage" version="1839"><![CDATA[<div class="iforge-multipage">
+<span class="iforge-multipage-pages">{$multipage_pages}</span>
+{$prevpage}{$start}{$mppage}{$end}{$nextpage}{$jumptopage}
+</div>]]></template>
+
+<template name="multipage_breadcrumb" version="1839"><![CDATA[<div id="breadcrumb_multipage_popup" class="iforge-multipage iforge-multipage-breadcrumb" style="display: none;">
+{$prevpage}{$start}{$mppage}{$end}{$nextpage}
+</div>
+<script type="text/javascript">
+// <!--
+	if(use_xmlhttprequest == "1")
+	{
+		$("#breadcrumb_multipage").popupMenu();
+	}
+// -->
+</script>]]></template>
+
+<template name="multipage_start" version="1839"><![CDATA[<a href="{$page_url}" class="iforge-multipage-page">1</a> <span class="iforge-multipage-ellipsis">{$lang->multipage_link_start}</span>]]></template>
+
+<template name="multipage_end" version="1839"><![CDATA[<span class="iforge-multipage-ellipsis">{$lang->multipage_link_end}</span> <a href="{$page_url}" class="iforge-multipage-page">{$pages}</a>]]></template>
+
+<template name="multipage_page" version="1839"><![CDATA[<a href="{$page_url}" class="iforge-multipage-page">{$i}</a>]]></template>
+
+<template name="multipage_page_current" version="1839"><![CDATA[<span class="iforge-multipage-current">{$i}</span>]]></template>
+
+<template name="multipage_page_link_current" version="1839"><![CDATA[<a href="{$page_url}" class="iforge-multipage-current">{$i}</a>]]></template>
+
+<template name="multipage_prevpage" version="1839"><![CDATA[<a href="{$page_url}" class="iforge-multipage-prev">{$lang->previous}</a>]]></template>
+
+<template name="multipage_nextpage" version="1839"><![CDATA[<a href="{$page_url}" class="iforge-multipage-next">{$lang->next}</a>]]></template>
+
+<template name="multipage_jump_page" version="1839"><![CDATA[<div class="iforge-multipage-jump" style="display: none;">
+  <form action="{$jump_url}" method="post">
+    <label for="page">{$lang->multipage_jump}:</label> <input type="number" class="textbox" name="page" value="{$page}" size="4" min="1" max="{$pages}" />
+    <input type="submit" class="iforge-mp-jump-btn" value="{$lang->go}" />
+  </form>
+</div>
+<a href="javascript:void(0)" class="iforge-mp-jump-link" title="{$lang->multipage_jump}">&#9660;</a>&nbsp;
+<script type="text/javascript">
+  var go_page = 'go_page_' + $(".iforge-mp-jump-link").length;
+  $(".iforge-mp-jump-link").last().attr('id', go_page);
+  $(".iforge-multipage-jump").last().attr('id', go_page + '_popup');
+  $('#' + go_page).popupMenu(false).on('click', function() {
+    var drop = $(this).prev('.iforge-multipage-jump');
+    if (drop.is(':visible')) {
+      drop.find('.textbox').trigger('focus');
+    }
+  });
+</script>]]></template>
+
+<template name="forumjump_advanced" version="1839"><![CDATA[<div class="iforge-forumjump">
+<form action="forumdisplay.php" method="get">
+<span class="iforge-forumjump-label">{$lang->forumjump}</span>
+<select name="{$name}" class="iforge-forumjump-select">
+<option value="-4">{$lang->forumjump_pms}</option>
+<option value="-3">{$lang->forumjump_usercp}</option>
+<option value="-5">{$lang->forumjump_wol}</option>
+<option value="-2">{$lang->forumjump_search}</option>
+<option value="-1">{$lang->forumjump_home}</option>
+{$forumjumpbits}
+</select>
+<input type="submit" class="iforge-go-btn" value="{$lang->go}" />
+</form>
+</div>
+<script type="text/javascript">
+$(".iforge-forumjump-select").on('change', function() {
+	var option = $(this).val();
+	if(option < 0)
+	{
+		window.location = 'forumdisplay.php?fid='+option;
+	}
+	else
+	{
+		window.location = {$forum_link};
+	}
+});
+</script>]]></template>
+
+<template name="forumjump_special" version="1839"><![CDATA[<select name="{$name}">
+{$forumjumpbits}
+</select>]]></template>
+
+<template name="forumjump_bit" version="1839"><![CDATA[<option value="{$forum['fid']}" {$optionselected}>{$depth} {$forum['name']}</option>]]></template>
+
+<template name="forumbit_depth3" version="1839"><![CDATA[{$comma}{$statusicon}<a href="{$forum_url}" class="iforge-sub-link" title="{$forum_viewers_text_plain}">{$forum['name']}</a>]]></template>
+
+<template name="forumbit_depth3_statusicon" version="1839"><![CDATA[<span class="iforge-sub-icon iforge-sub-icon-{$lightbulb['folder']}" title="{$lightbulb['altonoff']}">&bullet;</span>]]></template>
+
+<template name="forumdisplay_rssdiscovery" version="1839"><![CDATA[<link rel="alternate" type="application/rss+xml" title="{$lang->rss_discovery_forum} (RSS 2.0)" href="{$mybb->settings['bburl']}/syndication.php?fid={$fid}" />
+<link rel="alternate" type="application/atom+xml" title="{$lang->rss_discovery_forum} (Atom 1.0)" href="{$mybb->settings['bburl']}/syndication.php?type=atom1.0&amp;fid={$fid}" />]]></template>
+
+<template name="forumdisplay_newthread" version="1839"><![CDATA[<a href="newthread.php?fid={$fid}" class="iforge-newthread-btn">{$lang->post_thread}</a>]]></template>
+
+=== CSS ===
+/* ===== I-Forge RPG - ForumDisplay Brutalist Manga Theme ===== */
+/* NO <table>/<tr>/<td>. NO tborder/tcat/thead/trow1/trow2/tfoot/smalltext classes. */
+/* Permanent Marker for headings, serif for body, sans for UI. 3px solid borders, hard shadows, gold accents. */
+
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+
+:root {
+  --bg: #f4f0e6;
+  --bg-dark: #ebe6d6;
+  --panel: #2d5a27;
+  --panel-hover: #3d7a35;
+  --gold: #c9a84c;
+  --gold-hover: #e2c96b;
+  --ink: #1a1a1a;
+  --ink-secondary: #5a5a4a;
+  --border: #1e3d1a;
+  --shadow: 3px 3px 0 #1e3d1a;
+  --shadow-hover: 4px 4px 0 #1e3d1a;
+  --radius: 3px;
+  --font-brush: 'Permanent Marker', 'Comic Sans MS', 'Chalkboard SE', cursive;
+  --font-serif: Georgia, 'Palatino Linotype', 'Times New Roman', serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+/* ===== NAVBAR ===== */
+#iforge-navbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 10000 !important;
+  background: var(--panel);
+  border-bottom: 3px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.iforge-nav {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  padding: 0 16px;
+  position: relative;
+}
+.iforge-nav-left { display: flex; align-items: center; gap: 24px; }
+.iforge-nav-logo {
+  position: absolute;
+  left: 16px;
+  font-family: var(--font-brush);
+  font-size: 1.4rem;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 var(--border);
+}
+.iforge-nav-logo:hover { color: var(--gold-hover); }
+.iforge-nav-link {
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 0;
+  position: relative;
+}
+.iforge-nav-link:hover { color: var(--gold-hover); }
+.iforge-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0; right: 0;
+  height: 3px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+.iforge-nav-link:hover::after { transform: scaleX(1); }
+.iforge-nav-right { position: absolute; right: 16px; }
+.iforge-user-btn {
+  background: var(--panel-hover);
+  border: 3px solid var(--border);
+  border-radius: 50%;
+  width: 36px; height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-weight: 700;
+  box-shadow: 2px 2px 0 var(--border);
+}
+.iforge-user-btn:hover { background: var(--gold); color: var(--panel); }
+.iforge-dropdown {
+  display: none;
+  position: absolute;
+  right: 0; top: 46px;
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  min-width: 180px;
+  overflow: hidden;
+}
+.iforge-dropdown.open { display: block; }
+.iforge-dropdown-item {
+  display: block;
+  padding: 8px 14px;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-bottom: 2px solid var(--border);
+  transition: background 0.15s;
+}
+.iforge-dropdown-item:last-child { border-bottom: none; }
+.iforge-dropdown-item:hover { background: var(--gold); color: var(--panel); }
+.iforge-dropdown-divider { border: none; border-top: 2px solid var(--border); margin: 0; }
+
+/* ===== BANNER ===== */
+#iforge-banner {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#iforge-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(244,240,230,0.25) 0%, rgba(30,61,26,0.6) 100%);
+}
+.iforge-banner-seal {
+  position: absolute;
+  z-index: 1;
+  color: rgba(30,61,26,0.14);
+  font-size: 200px;
+  pointer-events: none;
+  font-family: var(--font-brush);
+  user-select: none;
+  letter-spacing: 4px;
+}
+.iforge-banner-content { position: relative; z-index: 2; text-align: center; }
+.iforge-banner-title {
+  font-family: var(--font-brush);
+  font-size: 3rem;
+  color: var(--gold);
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  text-shadow: 3px 3px 0 var(--border), -1px -1px 0 rgba(255,255,255,0.3);
+  margin-bottom: 6px;
+}
+.iforge-banner-subtitle {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: #fff;
+  letter-spacing: 3px;
+  font-weight: 700;
+  text-shadow: 2px 2px 0 var(--border);
+}
+
+/* ===== CALENDAR BAR ===== */
+#iforge-calendar-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: #fff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+}
+#iforge-calendar-bar:hover { background: var(--panel-hover); }
+#iforge-calendar-bar .icon { width: 14px; height: 14px; filter: brightness(0) invert(1); }
+#iforge-calendar-bar strong { color: var(--gold); }
+
+/* ===== FORUM CONTAINER ===== */
+.iforge-forum-container {
+  max-width: 1200px;
+  margin: 16px auto 0;
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: var(--font-serif);
+}
+
+/* ===== THREADLIST ===== */
+.iforge-threadlist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.iforge-threadlist-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--panel);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+}
+.iforge-threadlist-sort {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.iforge-threadlist-sort a { color: #fff; font-weight: 700; }
+
+.iforge-newthread-btn {
+  display: inline-block;
+  padding: 6px 14px;
+  background: var(--gold);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-brush);
+  font-size: 0.85rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.15s;
+}
+.iforge-newthread-btn:hover { background: var(--gold-hover); transform: translateY(-1px); }
+
+.iforge-threadlist-pagination-top,
+.iforge-threadlist-pagination-bottom {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.iforge-threads {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ===== THREAD ROW ===== */
+.iforge-thread-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  transition: transform 0.15s, border-color 0.15s;
+}
+.iforge-thread-row:hover { transform: translateY(-1px); border-color: var(--gold); }
+
+.iforge-thread-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.iforge-thread-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+.iforge-thread-icon img { width: 20px; height: 20px; }
+
+.iforge-thread-info { min-width: 0; flex: 1; }
+
+.iforge-thread-title-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.iforge-thread-title {
+  display: inline;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--panel);
+  font-weight: 700;
+  text-decoration: none;
+}
+.iforge-thread-title:hover { color: var(--gold); }
+
+.iforge-thread-meta {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  color: var(--ink-secondary);
+  margin-top: 2px;
+}
+
+.iforge-thread-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.iforge-thread-replies strong { color: var(--panel); font-size: 0.85rem; }
+
+.iforge-thread-lastpost {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 0.7rem;
+}
+.iforge-thread-lastpost a { color: var(--gold); font-weight: 600; }
+.iforge-thread-lastpost a:hover { color: var(--gold-hover); }
+.iforge-thread-last-label { color: var(--ink); font-weight: 700; font-size: 0.65rem; }
+
+.iforge-threadlist-toolbar-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  flex-wrap: wrap;
+}
+
+/* ===== SUBFORUMS ===== */
+.iforge-subforums {
+  padding: 4px 14px 8px;
+}
+.iforge-subforums-label {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.iforge-subforums-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.iforge-sub-link {
+  display: inline-block;
+  padding: 1px 8px;
+  background: var(--panel);
+  color: var(--gold);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.15s;
+}
+.iforge-sub-link:hover { background: var(--panel-hover); transform: translateY(-1px); }
+.iforge-sub-icon {
+  font-size: 0.75rem;
+  color: var(--gold);
+  margin-right: 1px;
+  vertical-align: middle;
+}
+.iforge-sub-icon-on { color: var(--gold); }
+.iforge-sub-icon-off { color: var(--ink-secondary); }
+.iforge-sub-icon-offlock { color: var(--ink-secondary); }
+
+/* ===== ANNOUNCEMENTS ===== */
+.iforge-announcements {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.iforge-announcements-header {
+  font-family: var(--font-brush);
+  font-size: 0.85rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 6px 14px;
+  background: var(--panel);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+}
+
+.iforge-announcement-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(201,168,76,0.1);
+  border: 3px solid var(--gold);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+}
+.iforge-announcement-icon { flex-shrink: 0; }
+.iforge-announcement-info { min-width: 0; }
+.iforge-announcement-row a {
+  color: var(--gold);
+  font-weight: 700;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+}
+.iforge-announcement-row .iforge-thread-meta { color: rgba(255,255,255,0.7); display: block; }
+
+/* ===== SORT BAR ===== */
+.iforge-sort-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 0;
+}
+.iforge-sort-bar form {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.iforge-sort-bar select {
+  padding: 4px 8px;
+  background: var(--panel-hover);
+  color: #fff;
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.iforge-go-btn {
+  padding: 4px 10px;
+  background: var(--gold);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-brush);
+  font-size: 0.7rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.iforge-go-btn:hover { background: var(--gold-hover); transform: translateY(-1px); }
+
+/* ===== ORDER ARROW ===== */
+.iforge-order-arrow {
+  font-size: 0.78rem;
+  margin-left: 2px;
+  font-weight: 700;
+}
+.iforge-order-arrow a { color: var(--gold); font-weight: 700; text-decoration: none; }
+.iforge-order-arrow a:hover { color: var(--gold-hover); }
+
+/* ===== SEARCH FORM ===== */
+.iforge-search-form {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.iforge-search-label {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  color: var(--ink);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.iforge-search-input {
+  padding: 4px 8px;
+  background: var(--bg-dark);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  color: var(--ink);
+}
+.iforge-search-submit {
+  padding: 4px 10px;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-brush);
+  font-size: 0.68rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.iforge-search-submit:hover { background: var(--panel-hover); transform: translateY(-1px); }
+
+/* ===== THREAD ICON CHARS ===== */
+.iforge-thread-icon-char {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  font-size: 1rem;
+  line-height: 1;
+  text-align: center;
+  flex-shrink: 0;
+}
+.iforge-thread-icon-newfolder .iforge-thread-icon-char,
+.iforge-thread-icon-newfolderstate { color: var(--panel); }
+.iforge-thread-icon-newhotfolder .iforge-thread-icon-char,
+.iforge-thread-icon-newhotfolderstate { color: var(--gold); }
+.iforge-thread-icon-hotfolder .iforge-thread-icon-char,
+.iforge-thread-icon-hotfolderstate { color: var(--gold-hover); }
+.iforge-thread-icon-folder .iforge-thread-icon-char,
+.iforge-thread-icon-folderstate { color: var(--ink-secondary); }
+.iforge-thread-icon-closefolder .iforge-thread-icon-char,
+.iforge-thread-icon-closefolderstate { color: var(--ink-secondary); }
+.iforge-thread-icon-dot_folder .iforge-thread-icon-char,
+.iforge-thread-icon-dot_folderstate { color: var(--gold); }
+
+.iforge-thread-icon-unread { color: var(--panel); }
+.iforge-thread-icon-read { color: var(--ink-secondary); }
+.iforge-thread-icon-hot { color: var(--gold); }
+.iforge-thread-icon-locked { color: var(--ink-secondary); }
+.iforge-thread-icon-dot { color: var(--gold); }
+
+/* ===== ATTACHMENT BADGE ===== */
+.iforge-attach-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  background: var(--panel);
+  color: var(--gold);
+  border: 2px solid var(--border);
+  box-shadow: 1px 1px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+/* ===== THREAD MULTIPAGE IN ROW ===== */
+.iforge-thread-pages {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.iforge-thread-pages a, .iforge-thread-pages span {
+  display: inline-block;
+  padding: 1px 5px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+.iforge-thread-pages a:hover { background: var(--gold); color: var(--panel); }
+.iforge-thread-pages-ellipsis {
+  background: transparent !important;
+  border: none !important;
+  color: var(--ink-secondary);
+}
+
+/* ===== MODERATION BAR ===== */
+.iforge-mod-bar {
+  background: var(--panel);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+}
+.iforge-mod-bar form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.iforge-mod-bar-label {
+  font-family: var(--font-brush);
+  font-size: 0.72rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.iforge-mod-bar select {
+  padding: 3px 6px;
+  background: var(--panel-hover);
+  color: #fff;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.iforge-mod-go, .iforge-mod-clear {
+  padding: 3px 10px;
+  background: var(--gold);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-brush);
+  font-size: 0.65rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.iforge-mod-go:hover, .iforge-mod-clear:hover {
+  background: var(--gold-hover);
+  transform: translateY(-1px);
+}
+.iforge-mod-selectall {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  color: #fff;
+  padding: 4px 8px;
+}
+.iforge-mod-selectall a { color: var(--gold); font-weight: 700; }
+.iforge-mod-selectall a:hover { color: var(--gold-hover); }
+.iforge-mod-selectall-msg {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  color: #fff;
+  padding: 2px 0;
+}
+.iforge-mod-selectall-msg a { color: var(--gold); font-weight: 700; }
+.iforge-mod-selectall-msg a:hover { color: var(--gold-hover); }
+
+/* ===== PREFIX PILLS / FILTERS ===== */
+.iforge-prefix-pills {
+  display: inline-flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.iforge-prefix-pills select {
+  padding: 3px 6px;
+  background: var(--panel-hover);
+  color: #fff;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ===== CLEAR / SUBSCRIPTION LINKS ===== */
+.iforge-clear-link {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--panel);
+  text-decoration: none;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-dark);
+  display: inline-block;
+  transition: background 0.15s, transform 0.15s;
+}
+.iforge-clear-link:hover { background: var(--gold); color: var(--panel); transform: translateY(-1px); }
+
+/* ===== MODERATED BY ===== */
+.iforge-mod-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  color: var(--ink-secondary);
+  padding: 4px 0;
+}
+.iforge-mod-badges-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  color: var(--ink);
+}
+.iforge-mod-badges a {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--panel);
+  color: var(--gold);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.iforge-mod-badges a:hover { transform: translateY(-1px); border-color: var(--gold); color: var(--gold-hover); }
+
+/* ===== USERS BROWSING ===== */
+.iforge-users-browsing {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  color: var(--ink-secondary);
+  padding: 6px 0;
+  line-height: 1.6;
+}
+.iforge-users-browsing a { color: var(--panel); font-weight: 600; }
+.iforge-users-browsing a:hover { color: var(--gold); }
+
+/* ===== EMPTY / NO THREADS ===== */
+.iforge-empty-card {
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 24px 16px;
+  text-align: center;
+  font-family: var(--font-sans);
+}
+.iforge-empty-card-title {
+  font-family: var(--font-brush);
+  font-size: 1.1rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.iforge-empty-card-text {
+  font-size: 0.85rem;
+  color: var(--ink-secondary);
+  margin-bottom: 12px;
+}
+.iforge-empty-card-btn {
+  display: inline-block;
+  padding: 6px 14px;
+  background: var(--gold);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-brush);
+  font-size: 0.8rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.15s;
+}
+.iforge-empty-card-btn:hover { background: var(--gold-hover); transform: translateY(-1px); }
+
+/* ===== DELETED THREAD ===== */
+.iforge-thread-deleted {
+  opacity: 0.7;
+}
+.iforge-thread-deleted-text {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--ink-secondary);
+  font-style: italic;
+}
+
+/* ===== THREAD RATING ===== */
+.iforge-thread-rating {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.iforge-thread-rating .star_rating {
+  list-style: none;
+  height: 12px;
+  position: relative;
+  width: 60px;
+}
+.iforge-thread-rating .star_rating .current_rating {
+  height: 12px;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* ===== THREAD MODBIT ===== */
+.iforge-thread-modbit {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+}
+.iforge-thread-modbit input.checkbox {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+/* ===== UNAPPROVED BADGE ===== */
+.iforge-unapproved-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  background: #b42828;
+  color: #fff;
+  border: 1px solid #7a1a1a;
+  border-radius: 2px;
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 700;
+  margin-left: 3px;
+  vertical-align: middle;
+}
+
+/* ===== RULES CARD ===== */
+.iforge-rules-card {
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.iforge-rules-card-header {
+  padding: 10px 14px;
+  background: var(--panel);
+  border-bottom: 3px solid var(--border);
+  font-family: var(--font-brush);
+  font-size: 0.95rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.iforge-rules-card-body {
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  color: var(--ink);
+  line-height: 1.6;
+}
+.iforge-rules-link {
+  display: inline-block;
+  padding: 3px 10px;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-brush);
+  font-size: 0.7rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.15s;
+}
+.iforge-rules-link:hover { background: var(--panel-hover); transform: translateY(-1px); }
+
+/* ===== PASSWORD CARD ===== */
+.iforge-password-card {
+  max-width: 500px;
+  margin: 40px auto;
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.iforge-password-card-header {
+  padding: 12px 16px;
+  background: var(--panel);
+  border-bottom: 3px solid var(--border);
+  font-family: var(--font-brush);
+  font-size: 1.05rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.iforge-password-card-body {
+  padding: 16px;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+.iforge-password-note {
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.iforge-password-card-body form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.iforge-password-input {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 3px solid var(--border);
+  box-shadow: 3px 3px 0 var(--border) inset;
+  border-radius: var(--radius);
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.iforge-password-input:focus { outline: none; border-color: var(--gold); }
+.iforge-password-submit {
+  display: block;
+  margin: 12px auto 0;
+  padding: 8px 20px;
+  background: var(--gold);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-brush);
+  font-size: 0.85rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  align-self: center;
+}
+.iforge-password-submit:hover { background: var(--gold-hover); transform: translateY(-1px); }
+.iforge-password-error {
+  padding: 8px 14px;
+  background: rgba(180,40,40,0.1);
+  border-bottom: 2px solid #b42828;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: #b42828;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ===== GOTO UNREAD ===== */
+.iforge-gotounread {
+  font-size: 0.75rem;
+  color: var(--gold);
+  font-weight: 700;
+  text-decoration: none;
+  margin-right: 2px;
+  font-family: var(--font-sans);
+}
+.iforge-gotounread:hover { color: var(--gold-hover); }
+
+/* ===== STICKY SEP ===== */
+.iforge-sticky-sep {
+  border-top: 2px dashed var(--gold);
+  padding: 4px 0;
+  display: flex;
+  justify-content: center;
+}
+.iforge-sticky-sep-label {
+  font-family: var(--font-brush);
+  font-size: 0.72rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: var(--bg);
+  padding: 2px 10px;
+  border-radius: var(--radius);
+  border: 2px solid var(--gold);
+}
+
+/* ===== MULTIPAGE ===== */
+.iforge-multipage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+}
+.iforge-multipage-page, .iforge-multipage-prev, .iforge-multipage-next {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  transition: background 0.15s, transform 0.15s, border-color 0.15s;
+}
+.iforge-multipage-page:hover, .iforge-multipage-prev:hover, .iforge-multipage-next:hover {
+  background: var(--gold);
+  color: var(--panel);
+  transform: translateY(-1px);
+  border-color: var(--gold);
+}
+.iforge-multipage-current {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--gold);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  color: var(--panel);
+  font-weight: 700;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.iforge-multipage-ellipsis {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--ink-secondary);
+  padding: 4px 4px;
+}
+.iforge-multipage-pages {
+  font-size: 0.68rem;
+  color: var(--ink-secondary);
+  margin-right: 4px;
+}
+.iforge-multipage-breadcrumb {
+  justify-content: flex-start;
+}
+
+.iforge-multipage-jump {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.iforge-multipage-jump input[type="number"] {
+  width: 42px;
+  padding: 3px 4px;
+  background: var(--bg-dark);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+}
+.iforge-mp-jump-btn {
+  padding: 3px 8px;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-brush);
+  font-size: 0.62rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.iforge-mp-jump-btn:hover { background: var(--gold); color: var(--panel); }
+.iforge-mp-jump-link {
+  font-size: 0.6rem;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  text-decoration: none;
+}
+.iforge-mp-jump-link:hover { color: var(--gold); }
+
+/* ===== FORUM JUMP ===== */
+.iforge-forumjump {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.iforge-forumjump form { display: flex; align-items: center; gap: 4px; }
+.iforge-forumjump-label {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  color: var(--ink);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.iforge-forumjump-select {
+  padding: 4px 8px;
+  background: var(--panel-hover);
+  color: #fff;
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  max-width: 220px;
+}
+
+/* ===== ERROR NO PERMISSION ===== */
+.iforge-error-nopermission-icon {
+  font-size: 2.5rem;
+  color: var(--gold);
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 700px) {
+  .iforge-thread-row { flex-direction: column; align-items: flex-start; }
+  .iforge-thread-stats { width: 100%; justify-content: space-between; }
+  .iforge-threadlist-toolbar { flex-direction: column; gap: 8px; }
+  .iforge-threadlist-toolbar-bottom { flex-direction: column; gap: 8px; }
+  .iforge-mod-bar, .iforge-mod-bar form { flex-direction: column; align-items: flex-start; }
+  .iforge-sort-bar form { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 900px) {
+  .iforge-banner-title { font-size: 2.2rem; }
+  #iforge-banner { height: 220px; }
+  .iforge-nav-left { gap: 14px; }
+  .iforge-nav-link { font-size: 0.72rem; }
+}
+@media (max-width: 600px) {
+  .iforge-banner-title { font-size: 1.8rem; }
+  .iforge-nav { padding: 0 10px; }
+  .iforge-nav-logo { font-size: 1.1rem; left: 10px; }
+  .iforge-nav-right { right: 10px; }
+}

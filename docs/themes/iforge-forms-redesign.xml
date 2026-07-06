@@ -1,0 +1,1103 @@
+=== TEMPLATES ===
+<template name="newthread" version="1839"><![CDATA[<html>
+<head>
+<title>{$lang->newthread_in}</title>
+{$headerinclude}
+{$post_javascript}
+</head>
+<body>
+{$header}
+{$iforge_banner}
+{$preview}
+{$thread_errors}
+{$attacherror}
+{$moderation_notice}
+<div class="iforge-form-container">
+<h1 class="iforge-form-title">Nuevo Tema</h1>
+<form action="newthread.php?fid={$fid}&amp;processed=1" method="post" enctype="multipart/form-data" name="input">
+<input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+<div class="iforge-form-card">
+<div class="iforge-form-field"><label class="iforge-form-label">Asunto</label><div class="iforge-form-subject-row">{$prefixselect}<input type="text" class="iforge-form-input" name="subject" size="40" maxlength="85" value="{$subject}" tabindex="1" /></div></div>
+{$posticons}
+<div class="iforge-form-field"><label class="iforge-form-label">Mensaje</label><div class="iforge-form-editor"><textarea name="message" id="message" rows="20" cols="70" tabindex="2">{$message}</textarea>{$codebuttons}{$multiquote_external}</div></div>
+{$postoptions}
+{$modoptions}
+{$subscriptionmethod}
+{$pollbox}
+{$captcha}
+</div>
+{$attachbox}
+<div class="iforge-form-actions">
+<input type="submit" class="iforge-form-submit" name="submit" value="Publicar" tabindex="4" accesskey="s" />
+<input type="submit" class="iforge-form-submit-secondary" name="previewpost" value="{$lang->preview_post}" tabindex="5" />
+{$savedraftbutton}
+</div>
+<input type="hidden" name="action" value="do_newthread" />
+<input type="hidden" name="posthash" value="{$posthash}" />
+<input type="hidden" name="attachmentaid" value="" />
+<input type="hidden" name="attachmentact" value="" />
+<input type="hidden" name="quoted_ids" value="{$quoted_ids}" />
+<input type="hidden" name="tid" value="{$tid}" />
+{$editdraftpid}
+</form>
+{$forumrules}
+</div>
+{$footer}
+</body>
+</html>]]></template>
+
+<template name="newreply" version="1839"><![CDATA[<html>
+<head>
+<title>{$lang->post_reply_to}</title>
+{$headerinclude}
+{$post_javascript}
+</head>
+<body>
+{$header}
+{$iforge_banner}
+{$preview}
+{$maximageserror}
+{$attacherror}
+{$reply_errors}
+{$moderation_notice}
+<div class="iforge-form-container">
+<h1 class="iforge-form-title">Responder</h1>
+<form action="newreply.php?tid={$tid}&amp;processed=1" method="post" enctype="multipart/form-data" name="input">
+<input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+<div class="iforge-form-card">
+<div class="iforge-form-field"><label class="iforge-form-label">Asunto</label><input type="text" class="iforge-form-input" name="subject" size="40" maxlength="85" value="{$subject}" tabindex="1" /></div>
+{$posticons}
+<div class="iforge-form-field"><label class="iforge-form-label">Mensaje</label><div class="iforge-form-editor"><textarea id="message" name="message" rows="20" cols="70" tabindex="2">{$message}</textarea>{$codebuttons}{$multiquote_external}</div></div>
+{$postoptions}
+{$modoptions}
+{$subscriptionmethod}
+{$captcha}
+</div>
+{$attachbox}
+<div class="iforge-form-actions">
+<input type="submit" class="iforge-form-submit" name="submit" value="Publicar" tabindex="3" accesskey="s" />
+<input type="submit" class="iforge-form-submit-secondary" name="previewpost" value="{$lang->preview_post}" tabindex="4" />
+{$savedraftbutton}
+</div>
+<input type="hidden" name="action" value="do_newreply" />
+<input type="hidden" name="replyto" value="{$replyto}" />
+<input type="hidden" name="posthash" value="{$posthash}" />
+<input type="hidden" name="attachmentaid" value="" />
+<input type="hidden" name="attachmentact" value="" />
+<input type="hidden" name="quoted_ids" value="{$quoted_ids}" />
+<input type="hidden" name="tid" value="{$tid}" />
+{$editdraftpid}
+</form>
+{$forumrules}
+{$threadreview}
+</div>
+{$footer}
+</body>
+</html>]]></template>
+
+<template name="headerinclude" version="1839"><![CDATA[<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="css.php?stylesheet%5B%5D=31" />
+<link rel="alternate" type="application/rss+xml" title="{$lang->latest_threads} (RSS 2.0)" href="{$mybb->settings['bburl']}/syndication.php" />
+<link rel="alternate" type="application/atom+xml" title="{$lang->latest_threads} (Atom 1.0)" href="{$mybb->settings['bburl']}/syndication.php?type=atom1.0" />
+<meta http-equiv="Content-Type" content="text/html; charset={$charset}" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/jquery.js?ver=1823"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/jquery.plugins.min.js?ver=1821"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/general.js?ver=1827"></script>
+
+{$stylesheets}
+<script type="text/javascript">
+<!--
+	lang.unknown_error = "{$lang->unknown_error}";
+	lang.confirm_title = "{$lang->confirm_title}";
+	lang.expcol_collapse = "{$lang->expcol_collapse}";
+	lang.expcol_expand = "{$lang->expcol_expand}";
+	lang.select2_match = "{$lang->select2_match}";
+	lang.select2_matches = "{$lang->select2_matches}";
+	lang.select2_nomatches = "{$lang->select2_nomatches}";
+	lang.select2_inputtooshort_single = "{$lang->select2_inputtooshort_single}";
+	lang.select2_inputtooshort_plural = "{$lang->select2_inputtooshort_plural}";
+	lang.select2_inputtoolong_single = "{$lang->select2_inputtoolong_single}";
+	lang.select2_inputtoolong_plural = "{$lang->select2_inputtoolong_plural}";
+	lang.select2_selectiontoobig_single = "{$lang->select2_selectiontoobig_single}";
+	lang.select2_selectiontoobig_plural = "{$lang->select2_selectiontoobig_plural}";
+	lang.select2_loadmore = "{$lang->select2_loadmore}";
+	lang.select2_searching = "{$lang->select2_searching}";
+
+	var templates = {
+		modal: '{$jsTemplates['modal']}',
+		modal_button: '{$jsTemplates['modal_button']}'
+	};
+
+	var cookieDomain = "{$mybb->settings['cookiedomain']}";
+	var cookiePath = "{$mybb->settings['cookiepath']}";
+	var cookiePrefix = "{$mybb->settings['cookieprefix']}";
+	var cookieSecureFlag = "{$mybb->settings['cookiesecureflag']}";
+	var deleteevent_confirm = "{$lang->deleteevent_confirm}";
+	var removeattach_confirm = "{$lang->removeattach_confirm}";
+	var loading_text = '{$lang->ajax_loading}';
+	var saving_changes = '{$lang->saving_changes}';
+	var use_xmlhttprequest = "{$mybb->settings['use_xmlhttprequest']}";
+	var my_post_key = "{$mybb->post_code}";
+	var rootpath = "{$mybb->settings['bburl']}";
+	var imagepath = "{$theme['imgdir']}";
+  	var yes_confirm = "{$lang->yes}";
+	var no_confirm = "{$lang->no}";
+	var MyBBEditor = null;
+	var spinner_image = "{$theme['imgdir']}/spinner.gif";
+	var spinner = "<img src='" + spinner_image +"' alt='' />";
+	var modal_zindex = 9999;
+// -->
+</script>]]></template>
+
+<template name="htmldoctype" version="1839"><![CDATA[<!DOCTYPE html>]]></template>
+
+<template name="newthread_postpoll" version="1839"><![CDATA[<div class="iforge-poll-card">
+  <strong class="iforge-postoptions-label">{$lang->poll}</strong>
+  <span class="iforge-poll-desc">{$lang->poll_desc}</span>
+  <label class="iforge-poll-check"><input type="checkbox" name="postpoll" value="1" {$postpollchecked} /> {$lang->poll_check}</label>
+  <div class="iforge-poll-options">
+    <span class="iforge-poll-options-label">{$lang->num_options}</span>
+    <input type="text" name="numpolloptions" value="{$numpolloptions}" size="5" maxlength="2" class="iforge-poll-input" />
+    <span class="iforge-poll-max">{$lang->max_options}</span>
+  </div>
+</div>]]></template>
+
+<template name="newthread_signature" version="1839"><![CDATA[<label><input type="checkbox" name="postoptions[signature]" value="1" tabindex="7"{$postoptionschecked['signature']} /> {$lang->options_sig}</label>]]></template>
+
+<template name="newthread_disablesmilies" version="1839"><![CDATA[<label><input type="checkbox" name="postoptions[disablesmilies]" value="1" tabindex="9"{$postoptionschecked['disablesmilies']} /> {$lang->options_disablesmilies}</label>]]></template>
+
+<template name="newthread_draftinput" version="1839"><![CDATA[<input type="hidden" name="pid" value="{$pid}" />]]></template>
+
+<template name="newthread_multiquote_external" version="1839"><![CDATA[<div id="multiquote_unloaded" class="iforge-multiquote"><span>{$multiquote_text} <a href="./newthread.php?fid={$fid}&amp;load_all_quotes=1" onclick="return Post.loadMultiQuotedAll();">{$multiquote_quote}</a>, <a href="javascript:void(0)" onclick="Post.clearMultiQuoted(); return false;">{$multiquote_deselect}</a></span></div>]]></template>
+
+<template name="newreply_signature" version="1839"><![CDATA[<label><input type="checkbox" name="postoptions[signature]" value="1" tabindex="6"{$postoptionschecked['signature']} /> {$lang->options_sig}</label>]]></template>
+
+<template name="newreply_disablesmilies" version="1839"><![CDATA[<label><input type="checkbox" name="postoptions[disablesmilies]" value="1" tabindex="9"{$postoptionschecked['disablesmilies']} /> {$lang->options_disablesmilies}</label>]]></template>
+
+<template name="newreply_draftinput" version="1839"><![CDATA[<input type="hidden" name="pid" value="{$pid}" />]]></template>
+
+<template name="newreply_multiquote_external" version="1839"><![CDATA[<div id="multiquote_unloaded" class="iforge-multiquote"><span>{$multiquote_text} <a href="./newreply.php?tid={$tid}" onclick="return Post.loadMultiQuoted();">{$multiquote_quote}</a>, <a href="javascript:void(0)" onclick="Post.clearMultiQuoted(); return false;">{$multiquote_deselect}</a></span></div>]]></template>
+
+<template name="newreply_modoptions" version="1839"><![CDATA[<div class="iforge-postoptions-card">
+  <strong class="iforge-postoptions-label">{$lang->mod_options}</strong>
+  {$closeoption}
+  {$stickoption}
+</div>]]></template>
+
+<template name="newreply_modoptions_close" version="1839"><![CDATA[<label><input type="checkbox" name="modoptions[closethread]" value="1"{$closecheck} /> {$lang->close_thread}</label>]]></template>
+
+<template name="newreply_modoptions_stick" version="1839"><![CDATA[<label><input type="checkbox" name="modoptions[stickthread]" value="1"{$stickycheck} /> {$lang->stick_thread}</label>]]></template>
+
+<template name="posticons" version="1839"><![CDATA[<div class="iforge-form-field">
+  <label class="iforge-form-label">{$lang->post_icon}</label>
+  <div class="iforge-posticons-grid">
+    <label class="iforge-posticon-item"><input type="radio" name="icon" value="-1"{$no_icons_checked} /><span class="iforge-posticon-label">{$lang->no_post_icon}</span></label>
+    {$iconlist}
+  </div>
+</div>]]></template>
+
+<template name="posticons_icon" version="1839"><![CDATA[<label class="iforge-posticon-item"><input type="radio" name="icon" value="{$dbicon['iid']}"{$checked} /><img src="{$dbicon['path']}" alt="{$dbicon['name']}" title="{$dbicon['name']}" /></label>]]></template>
+
+<template name="codebuttons" version="1839"><![CDATA[<div class="iforge-codebuttons">
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/sceditor/jquery.sceditor.bbcode.min.js?ver=1832"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/bbcodes_sceditor.js?ver=1837"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/sceditor/plugins/undo.js?ver=1832"></script>
+<script type="text/javascript">
+var partialmode = {$mybb->settings['partialmode']},
+opt_editor = {
+	plugins: "undo",
+	format: "bbcode",
+	bbcodeTrim: false,
+	style: "{$mybb->asset_url}/jscripts/sceditor/styles/jquery.sceditor.{$theme['editortheme']}?ver=1832",
+	rtl: {$lang->settings['rtl']},
+	locale: "mybblang",
+	width: "100%",
+	enablePasteFiltering: true,
+	autoUpdate: true,
+	emoticonsEnabled: {$emoticons_enabled},
+	emoticons: {
+		dropdown: {
+			{$dropdownsmilies}
+		},
+		more: {
+			{$moresmilies}
+		},
+		hidden: {
+			{$hiddensmilies}
+		}
+	},
+	emoticonsCompat: true,
+	toolbar: "{$basic1}{$align}{$font}{$size}{$color}{$removeformat}{$basic2}image,{$email}{$link}|video{$emoticon}|{$list}{$code}quote|maximize,source",
+};
+{$editor_language}
+$(function() {
+	$("#{$bind}").sceditor(opt_editor);
+	MyBBEditor = $("#{$bind}").sceditor("instance");
+	{$sourcemode}
+});
+</script>
+</div>]]></template>
+
+<template name="redirect" version="1839"><![CDATA[<!DOCTYPE html>
+<html lang="{$lang->htmllang}" dir="{$lang->htmldir}">
+<head>
+<title>{$title}</title>
+<meta http-equiv="refresh" content="2;URL={$url}" />
+{$headerinclude}
+<style>body{padding-top:56px;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}</style>
+</head>
+<body>
+{$header}
+{$iforge_banner}
+<div class="iforge-redirect">
+  <div class="iforge-redirect-inner">
+    <div class="iforge-redirect-icon">&#9876;</div>
+    <h1 class="iforge-redirect-title">{$title}</h1>
+    <p class="iforge-redirect-message">{$message}</p>
+    <a href="{$url}" class="iforge-redirect-link">{$lang->click_no_wait} &#10142;</a>
+  </div>
+</div>
+{$footer}
+</body>
+</html>]]></template>
+
+<template name="error" version="1839"><![CDATA[<!DOCTYPE html>
+<html lang="{$lang->htmllang}" dir="{$lang->htmldir}">
+<head>
+<title>{$title}</title>
+{$headerinclude}
+<style>body{padding-top:56px}</style>
+</head>
+<body>
+{$header}
+{$iforge_banner}
+<div class="iforge-error-container">
+  <div class="iforge-error-card">
+    <div class="iforge-error-icon">&#9888;</div>
+    <h1 class="iforge-error-title">{$title}</h1>
+    <div class="iforge-error-body">{$error}</div>
+  </div>
+</div>
+{$footer}
+</body>
+</html>]]></template>
+
+<template name="error_inline" version="1839"><![CDATA[<div class="iforge-error-inline">
+  <div class="iforge-error-inline-banner">{$title}</div>
+  <div class="iforge-error-inline-body"><ul>{$errorlist}</ul></div>
+</div>]]></template>
+
+<template name="error_inline_item" version="1839"><![CDATA[<li>{$error}</li>]]></template>
+
+<template name="error_nopermission" version="1839"><![CDATA[<div class="iforge-error-nopermission">
+  <div class="iforge-error-nopermission-icon">&#128274;</div>
+  <p>{$lang->error_nopermission_guest_1}</p>
+  <ol>
+    <li>{$lang->error_nopermission_guest_2} <a href="member.php?action=login">{$lang->login}</a> | <a href="member.php?action=register">{$lang->need_reg}</a></li>
+    <li>{$lang->error_nopermission_guest_3}</li>
+    <li>{$lang->error_nopermission_guest_4}</li>
+    <li>{$lang->error_nopermission_guest_5}</li>
+  </ol>
+</div>]]></template>
+
+<template name="error_nopermission_loggedin" version="1839"><![CDATA[<div class="iforge-error-nopermission">
+  <div class="iforge-error-nopermission-icon">&#128683;</div>
+  <p>{$lang->error_nopermission_user_1}</p>
+  <ol>
+    <li>{$lang->error_nopermission_user_2}</li>
+    <li>{$lang->error_nopermission_user_3}</li>
+    <li>{$lang->error_nopermission_user_4} (<a href="member.php?action=resendactivation">{$lang->error_nopermission_user_resendactivation}</a>)</li>
+    <li>{$lang->error_nopermission_user_5}</li>
+  </ol>
+  <p class="iforge-error-username">{$lang->error_nopermission_user_username}</p>
+</div>]]></template>
+
+<template name="error_nopermission_loggedout" version="1839"><![CDATA[<div class="iforge-error-nopermission-loggedout">
+  <div class="iforge-error-nopermission-loggedout-icon">&#128274;</div>
+  <p>{$lang->error_nopermission_guest_1}</p>
+  <ol>
+    <li>{$lang->error_nopermission_guest_2} <a href="member.php?action=login">{$lang->login}</a> | <a href="member.php?action=register">{$lang->need_reg}</a></li>
+    <li>{$lang->error_nopermission_guest_3}</li>
+    <li>{$lang->error_nopermission_guest_4}</li>
+    <li>{$lang->error_nopermission_guest_5}</li>
+  </ol>
+</div>]]></template>
+
+<template name="header" version="1839"><![CDATA[<div id="container"><div id="content"><div class="wrapper">{$pm_notice}{$remote_avatar_notice}{$bannedwarning}{$bbclosedwarning}{$modnotice}{$pending_joinrequests}{$awaitingusers}<navigation><br />]]></template>
+
+<template name="footer" version="1839"><![CDATA[</div></div></div><debugstuff>{$task_image}{$auto_dst_detection}]]></template>
+
+=== CSS ===
+/* ===== I-Forge RPG - Brutalist Manga Theme ===== */
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+
+:root {
+  --bg: #f4f0e6;
+  --bg-dark: #ebe6d6;
+  --panel: #2d5a27;
+  --panel-hover: #3d7a35;
+  --gold: #c9a84c;
+  --gold-hover: #e2c96b;
+  --ink: #1a1a1a;
+  --ink-secondary: #5a5a4a;
+  --border: #1e3d1a;
+  --shadow: 3px 3px 0 #1e3d1a;
+  --shadow-hover: 4px 4px 0 #1e3d1a;
+  --radius: 3px;
+  --font-brush: 'Permanent Marker', 'Comic Sans MS', 'Chalkboard SE', cursive;
+  --font-serif: Georgia, 'Palatino Linotype', 'Times New Roman', serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+  font-family: var(--font-serif) !important;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ===== POSTING FORMS ===== */
+.iforge-form-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: var(--font-serif);
+}
+.iforge-form-title {
+  font-family: var(--font-brush);
+  font-size: 1.6rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 2px 2px 0 var(--gold);
+  margin: 0;
+}
+.iforge-form-card {
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.iforge-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.iforge-form-label {
+  font-family: var(--font-brush);
+  font-size: 0.9rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.iforge-form-subject-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.iforge-form-input,
+.iforge-form-card input[type="text"] {
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 3px solid var(--border);
+  box-shadow: 3px 3px 0 var(--border) inset;
+  border-radius: var(--radius);
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  color: var(--ink);
+  width: 100%;
+}
+.iforge-form-input:focus,
+.iforge-form-card input[type="text"]:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(201,168,76,0.3) inset;
+}
+
+/* ===== EDITOR ===== */
+.iforge-form-editor textarea#message {
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 3px solid var(--border);
+  box-shadow: 3px 3px 0 var(--border) inset;
+  border-radius: var(--radius);
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  color: var(--ink);
+  width: 100%;
+  max-width: 100%;
+  resize: vertical;
+}
+.iforge-form-editor textarea#message:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(201,168,76,0.3) inset;
+}
+
+/* ===== CODEBUTTONS / SCEDITOR ===== */
+.iforge-codebuttons {
+  margin-top: 6px;
+}
+.iforge-codebuttons .sceditor-container {
+  border: 3px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.iforge-codebuttons .sceditor-container .sceditor-toolbar {
+  background: var(--panel) !important;
+  border-bottom: 3px solid var(--border) !important;
+  padding: 4px;
+}
+.iforge-codebuttons .sceditor-container .sceditor-toolbar .sceditor-button {
+  background: var(--panel-hover) !important;
+  border: 2px solid var(--border) !important;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.2) !important;
+  border-radius: var(--radius) !important;
+  margin: 2px !important;
+}
+.iforge-codebuttons .sceditor-container .sceditor-toolbar .sceditor-button:hover,
+.iforge-codebuttons .sceditor-container .sceditor-toolbar .sceditor-button.active {
+  background: var(--gold) !important;
+}
+.iforge-codebuttons .sceditor-container textarea,
+.iforge-codebuttons .sceditor-container .sceditor-textarea {
+  background: var(--bg) !important;
+  font-family: var(--font-serif) !important;
+  font-size: 0.9rem !important;
+  color: var(--ink) !important;
+}
+
+/* ===== POST OPTIONS ===== */
+.iforge-postoptions-card {
+  background: var(--bg);
+  border: 3px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: var(--ink);
+}
+.iforge-postoptions-label {
+  font-family: var(--font-brush);
+  font-size: 0.8rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.iforge-postoptions-card label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.iforge-postoptions-card input[type="checkbox"] {
+  accent-color: var(--gold);
+}
+
+/* ===== FORM ACTIONS ===== */
+.iforge-form-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.iforge-form-submit {
+  padding: 8px 20px;
+  background: var(--gold);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-brush);
+  font-size: 1rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.iforge-form-submit:hover {
+  background: var(--gold-hover);
+  transform: translateY(-1px);
+}
+.iforge-form-submit-secondary {
+  padding: 8px 16px;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.iforge-form-submit-secondary:hover {
+  background: var(--panel-hover);
+}
+
+/* ===== MULTIQUOTE ===== */
+.iforge-multiquote {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 2px dashed var(--gold);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  color: var(--ink);
+  font-weight: 600;
+}
+.iforge-multiquote a {
+  color: var(--panel);
+  font-weight: 700;
+}
+.iforge-multiquote a:hover {
+  color: var(--gold);
+}
+
+/* ===== THREAD REVIEW ===== */
+.iforge-threadreview {
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.iforge-threadreview .iforge-threadreview-title {
+  font-family: var(--font-brush);
+  font-size: 1rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin: 0;
+  text-shadow: 2px 2px 0 var(--panel);
+}
+.iforge-threadreview-posts {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.iforge-threadreview-post {
+  padding: 10px 0;
+  border-bottom: 2px dashed var(--border);
+}
+.iforge-threadreview-post:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.iforge-threadreview-post-author {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.iforge-threadreview-post-body {
+  font-size: 0.82rem;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.iforge-threadreview-more {
+  padding-top: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-top: 2px dashed var(--border);
+}
+
+/* ===== POLL FORM ===== */
+.iforge-poll-card {
+  background: var(--bg);
+  border: 3px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+.iforge-poll-desc {
+  color: var(--ink-secondary);
+  font-size: 0.72rem;
+}
+.iforge-poll-check {
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.iforge-poll-options {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.iforge-poll-options-label {
+  font-weight: 700;
+  color: var(--panel);
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+.iforge-poll-max {
+  color: var(--ink-secondary);
+  font-size: 0.7rem;
+  font-style: italic;
+}
+.iforge-poll-input {
+  width: 52px;
+  padding: 6px 8px;
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--ink);
+  text-align: center;
+  outline: none;
+}
+.iforge-poll-input:focus {
+  border-color: var(--gold);
+}
+
+/* ===== POST ICONS ===== */
+.iforge-posticons-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.iforge-posticon-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+}
+.iforge-posticon-item:hover {
+  border-color: var(--gold);
+}
+.iforge-posticon-item input[type="radio"] {
+  margin: 0;
+  accent-color: var(--gold);
+}
+.iforge-posticon-item img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+.iforge-posticon-label {
+  color: var(--ink-secondary);
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+
+/* ===== REDIRECT ===== */
+.iforge-redirect {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  padding: 32px 16px;
+}
+.iforge-redirect-inner {
+  text-align: center;
+  max-width: 520px;
+  width: 100%;
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 40px 32px;
+}
+.iforge-redirect-icon {
+  font-size: 3rem;
+  color: var(--panel);
+  margin-bottom: 12px;
+  text-shadow: 2px 2px 0 var(--gold);
+}
+.iforge-redirect-title {
+  font-family: var(--font-brush);
+  font-size: 1.75rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 2px 2px 0 var(--gold);
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+.iforge-redirect-message {
+  font-size: 0.9rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.iforge-redirect-link {
+  display: inline-block;
+  padding: 8px 22px;
+  background: var(--gold);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-brush);
+  font-size: 1rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.15s;
+}
+.iforge-redirect-link:hover {
+  background: var(--gold-hover);
+  transform: translateY(-1px);
+  color: var(--panel);
+}
+
+/* ===== ERROR PAGES ===== */
+.iforge-error-container {
+  max-width: 680px;
+  margin: 32px auto;
+  padding: 0 16px;
+}
+.iforge-error-card {
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  text-align: center;
+}
+.iforge-error-icon {
+  font-size: 3.5rem;
+  color: var(--gold);
+  margin-bottom: 12px;
+  text-shadow: 2px 2px 0 var(--panel);
+}
+.iforge-error-title {
+  font-family: var(--font-brush);
+  font-size: 1.6rem;
+  color: var(--panel);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 var(--gold);
+  margin: 0 0 16px;
+  line-height: 1.2;
+}
+.iforge-error-body {
+  font-size: 0.9rem;
+  color: var(--ink);
+  line-height: 1.6;
+  text-align: left;
+}
+.iforge-error-body ul,
+.iforge-error-body ol {
+  padding-left: 20px;
+}
+
+/* ===== ERROR INLINE ===== */
+.iforge-error-inline {
+  background: var(--bg);
+  border: 3px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  margin: 8px 0;
+  overflow: hidden;
+}
+.iforge-error-inline-banner {
+  background: var(--panel);
+  color: var(--gold);
+  padding: 8px 14px;
+  font-family: var(--font-brush);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 3px solid var(--border);
+}
+.iforge-error-inline-body {
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: var(--ink);
+  line-height: 1.6;
+}
+.iforge-error-inline-body ul {
+  padding-left: 20px;
+  list-style: square;
+}
+.iforge-error-inline-body ul li {
+  margin-bottom: 4px;
+}
+
+/* ===== ERROR NOPERMISSION ===== */
+.iforge-error-nopermission {
+  padding: 20px 24px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--ink);
+  line-height: 1.7;
+  text-align: left;
+}
+.iforge-error-nopermission-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  display: block;
+}
+.iforge-error-nopermission ol {
+  padding-left: 20px;
+  margin: 10px 0;
+}
+.iforge-error-nopermission ol li {
+  margin-bottom: 4px;
+}
+.iforge-error-nopermission a {
+  color: var(--panel);
+  font-weight: 700;
+}
+.iforge-error-nopermission a:hover {
+  color: var(--gold);
+}
+.iforge-error-username {
+  margin-top: 12px;
+  font-weight: 700;
+  color: var(--panel);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.iforge-error-nopermission-loggedout {
+  padding: 20px 24px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--ink);
+  line-height: 1.7;
+  text-align: left;
+}
+.iforge-error-nopermission-loggedout-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  display: block;
+}
+.iforge-error-nopermission-loggedout ol {
+  padding-left: 20px;
+  margin: 10px 0;
+}
+.iforge-error-nopermission-loggedout ol li {
+  margin-bottom: 4px;
+}
+.iforge-error-nopermission-loggedout a {
+  color: var(--panel);
+  font-weight: 700;
+}
+.iforge-error-nopermission-loggedout a:hover {
+  color: var(--gold);
+}
+
+/* ===== GLOBAL FORM INPUTS ===== */
+select,
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+textarea {
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 3px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+select:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.2);
+}
+input[type="submit"],
+input[type="button"],
+button {
+  padding: 8px 16px;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+input[type="submit"]:hover,
+input[type="button"]:hover,
+button:hover {
+  background: var(--panel-hover);
+  transform: translateY(-1px);
+}
+input[type="checkbox"] {
+  accent-color: var(--gold);
+}
+input[type="radio"] {
+  accent-color: var(--gold);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .iforge-form-title {
+    font-size: 1.3rem;
+  }
+  .iforge-postoptions-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .iforge-form-actions {
+    flex-direction: column;
+  }
+  .iforge-form-submit,
+  .iforge-form-submit-secondary {
+    width: 100%;
+    text-align: center;
+    padding: 10px 16px;
+  }
+  .iforge-redirect-inner {
+    padding: 28px 18px;
+  }
+  .iforge-redirect-title {
+    font-size: 1.3rem;
+  }
+  .iforge-error-card {
+    padding: 24px 18px;
+  }
+  .iforge-error-title {
+    font-size: 1.3rem;
+  }
+  .iforge-posticons-grid {
+    justify-content: center;
+  }
+}
+
+/* ===== MYBB LEGACY OVERRIDES in form context ===== */
+.iforge-form-card .pollbox,
+.iforge-form-card form[style] {
+  background: var(--bg);
+  border: 3px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+.iforge-form-card .posticons,
+.iforge-form-card tr,
+.iforge-form-card td {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.iforge-form-card .posticons label {
+  cursor: pointer;
+}
+.iforge-form-card tr,
+.iforge-form-card td,
+.iforge-form-card .trow1,
+.iforge-form-card .trow2,
+.iforge-form-card .tcat {
+  background: transparent !important;
+  border: none !important;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: var(--ink);
+}
+.iforge-form-container .attachbox,
+.iforge-form-container .tborder {
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+.iforge-form-container .tborder td,
+.iforge-form-container .tborder tr {
+  background: transparent !important;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+.iforge-form-container .thead,
+.iforge-form-container .tcat {
+  background: var(--panel) !important;
+  color: var(--gold) !important;
+  border: 3px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
+  font-family: var(--font-brush);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.iforge-form-container .tfoot {
+  background: var(--panel) !important;
+  color: #fff !important;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.iforge-form-container .forumrules {
+  background: var(--bg-dark);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 14px;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
