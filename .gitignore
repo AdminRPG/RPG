@@ -25,3 +25,15 @@ admin/error.log
 
 # MyBB runtime cache
 cache/
+
+# OpenCode config (claves locales)
+opencode.json
+
+# Dependencies
+node_modules/
+
+# Referencias externas
+references/
+
+# Test results
+test-results/
