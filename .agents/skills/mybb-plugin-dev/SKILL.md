@@ -1,0 +1,13 @@
+---
+name: mybb-plugin-dev
+description: Convenciones para crear o modificar plugins de MyBB (hooks, estructura de archivos, prefijo de BD)
+---
+
+# Desarrollo de plugins MyBB
+
+- Los plugins viven en inc/plugins/<nombre>.php
+- Toda función debe empezar con el prefijo del plugin para evitar colisiones de nombres
+- Función obligatoria: <nombre>_info() devuelve name, description, website, author, version, compatibility
+- Registrar hooks con: $plugins->add_hook('nombre_del_hook', 'funcion_callback');
+- El prefijo de tablas por defecto es mybb_, pero no lo asumas: confírmalo con $db->table_prefix
+- Antes de tocar el esquema de una tabla, usa el MCP de mysql para verificar la estructura real, no la des por supuesta

@@ -17,14 +17,14 @@
 ## 1. Identidad del proyecto
 
 | Campo | Valor |
-|---|---|---|
+|---|---|
 | Nombre del foro | I-Forge |
 | Ambientación / universo | Hunter x Hunter (mundo propio, lore original) |
-| Una frase que resuma el tono | "Un mundo de Cazadores" |
+| Una frase que resuma el tono | "Archivo del Cazador" |
 | Público objetivo | Comunidad hispana de rol, 18+ |
 | 3 adjetivos que NUNCA debe transmitir | "infantil", "corporativo", "genérico" |
-| 3 adjetivos que SÍ debe transmitir | "oscuro", "artesanal", "misterioso" |
-| Referencias visuales de inspiración (no a copiar, sí a entender por qué funcionan) | [enlaces o descripciones — anota qué elemento concreto de cada referencia te gusta, no solo "que se vea así"] |
+| 3 adjetivos que SÍ debe transmitir | "artesanal", "brutalista", "misterioso" |
+| Referencias visuales de inspiración | OnePieceGaiden (densidad de información, no estilo visual) |
 
 **Nota para agentes:** los adjetivos de esta tabla son la brújula para cualquier decisión ambigua de color, tipografía o copy. Si dudas entre dos opciones, elige la que refuerce los adjetivos "SÍ" y evite los "NUNCA".
 
@@ -36,21 +36,28 @@ Define 4-6 colores con **función**, no solo hex. Un color sin función se conve
 
 | Rol | Hex | Uso |
 |---|---|---|
-| Fondo base | `#0d1117` | Fondo general del foro |
-| Fondo elevado | `#161b22` | Navbar, tarjetas, paneles |
-| Borde | `#30363d` | Bordes de componentes |
-| Acento primario | `#e2b714` | Enlaces, hover, elementos interactivos (oro) |
-| Texto principal | `#f0f6fc` | Texto body |
-| Texto muted | `#8b949e` | Metadatos, fechas |
+| Fondo base | `#f4f0e6` | Fondo general del foro (pergamino) |
+| Fondo oscuro | `#ebe6d6` | Tarjetas, paneles interiores |
+| Panel | `#2d5a27` | Navbar, headers, botones primarios (verde bosque) |
+| Panel hover | `#3d7a35` | Hover de paneles verdes |
+| Acento primario | `#c9a84c` | Títulos, enlaces, hover, badges (tinta dorada) |
+| Acento hover | `#e2c96b` | Hover del acento dorado |
+| Texto principal | `#1a1a1a` | Texto body (negro tinta) |
+| Texto secundario | `#5a5a4a` | Metadatos, fechas (marrón apagado) |
+| Borde | `#1e3d1a` | Todos los bordes (verde casi negro) |
+| Sombra | `3px 3px 0 #1e3d1a` | Sombra sólida sin blur |
 | Éxito | `#3fb950` | Aprobado, positivo |
 | Peligro | `#f85149` | Rechazado, alerta |
-| Rango T1 | `#58a6ff` | Badge de rango T1 |
-| Rango T2 | `#a371f7` | Badge de rango T2 |
-| Rango T3 | `#f0883e` | Badge de rango T3 |
+| Rango E | `#8b949e` | Badge de rango E |
+| Rango D | `#6e7681` | Badge de rango D |
+| Rango C | `#58a6ff` | Badge de rango C |
+| Rango B | `#a371f7` | Badge de rango B |
+| Rango A | `#f0883e` | Badge de rango A |
+| Rango S | `#c9a84c` | Badge de rango S (dorado) |
 
-**Reglas de contraste:** [ej. "mínimo AA en texto sobre fondo", "el acento de facción nunca se usa para texto de body, solo para bordes/acentos"]
+**Reglas de contraste:** mínimo AA en texto sobre fondo. El acento dorado nunca se usa para texto body, solo para títulos, enlaces y acentos.
 
-**Prohibido:** no usar glassmorphism, no usar azules brillantes tipo bootstrap, no usar fondos blancos
+**Prohibido:** no usar glassmorphism, no usar azules brillantes tipo bootstrap, no usar fondos blancos, no usar sombras con blur (solo sombras sólidas `Xpx Xpx 0`).
 
 ---
 
@@ -58,35 +65,50 @@ Define 4-6 colores con **función**, no solo hex. Un color sin función se conve
 
 | Rol | Familia | Peso/uso | Dónde se usa |
 |---|---|---|---|
-| Display / títulos | Georgia, serif | | Nombre foro, títulos categoría |
-| Cuerpo | -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif | | Texto general |
-| Datos / stats | Menlo, Consolas, monospace | | Estadísticas, cantidades |
-| Utilitaria / etiquetas | [opcional] | | Badges, eyebrows, metadatos |
+| Display / títulos | Permanent Marker, cursive | 400 | Nombre foro, títulos categoría, headers de tarjeta, tabs |
+| Cuerpo | Georgia, 'Palatino Linotype', serif | 400 | Texto general, posts, descripciones |
+| UI / etiquetas | -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif | 400-800 | Navegación, botones, badges, metadatos |
+| Datos / stats | Menlo, Consolas, monospace | 400-700 | Estadísticas, cantidades, valores numéricos |
 
-**Escala tipográfica:** [define tamaños concretos si ya los tienes, ej. 12/14/16/20/28/40px, o deja que el agente proponga una escala modular y la documente aquí tras decidirla]
+**Escala tipográfica:** 10/11/12/13/14/15/16/18/20/24/28/32/48px
 
-**Regla de personalidad:** la tipografía de display debe sentirse específica de esta ambientación, no una fuente que usarías igual en un SaaS de facturación. Justifica la elección en una frase.
+**Regla de personalidad:** Permanent Marker simula escritura a mano de un cazador tomando notas de campo. Georgia refuerza la estética de libro/documento antiguo. Nunca usar Permanent Marker para body text — solo para títulos.
 
 ---
 
 ## 4. Layout y estructura
 
-Describe la estructura real de las pantallas clave (no genérico "header + content + footer").
+Describe la estructura real de las pantallas clave.
 
-### 4.1 Ficha de personaje
-```
-Pendiente de definir en fase de personajes
-```
+### 4.1 Índice (home)
+- Navbar fija superior (56px, verde panel)
+- Banner hero (300-320px, verde panel) con sello decorativo en Permanent Marker enorme al 14% opacidad + título brush dorado
+- Barra de calendario (verde panel con texto blanco, indica estación/año actual)
+- Tablón 3 columnas: Guías | Zonas | Gremio (tarjetas bg-dark con borde 3px + sombra sólida)
+- Categorías con subforos: header panel verde + grid de tarjetas panel verde con hover dorado
+- Actividad reciente: tabla con bordes dashed entre filas
+- Sidebar inferior: login, online, tareas
 
-### 4.2 Otras pantallas clave
+### 4.2 Ficha de personaje
+- Header con avatar, nombre en brush, badges de rango/Nen
+- Tabs estilo botón (fondo verde, hover/focus dorado)
+- Portada: 3 columnas de stats (Cuerpo/Mente/Espíritu) con badges de rango letra + barras
+- Estadísticas derivadas en grid de tarjetas pequeñas
+- Rasgos en grid con coste numérico
+- Biografía con sub-tabs (Historia/Apariencia/Personalidad/Extras)
+- Bélico: pilares Nen + disciplinas + stats de combate
+- Técnicas Nen: filtros por tier y tipo
+- Inventario: grid de items + sidebar de equipamiento
+
+### 4.3 Otras pantallas clave
 | Pantalla | Elementos imprescindibles | Elementos que sobran (evitar) |
 |---|---|---|
-| Inventario | [ej. grid de items con rareza por color de borde] | |
+| Inventario | Grid de items con categorías, slots de equipo | |
 | Panel de economía | | |
 | Panel de moderación/aprobación | | |
 | Widget de postbit (dentro de MyBB) | | |
 
-**Regla de densidad:** [ej. "la ficha debe sentirse densa en información como un dashboard de simulador, no minimalista tipo landing page"]
+**Regla de densidad:** la ficha debe sentirse densa en información como un dashboard de simulador, no minimalista tipo landing page.
 
 ---
 
@@ -94,9 +116,9 @@ Pendiente de definir en fase de personajes
 
 > El único elemento que hará que alguien reconozca tu foro sin ver el logo.
 
-**Elemento elegido:** [ej. "la rueda circular de estadísticas con aguja tipo reloj", "el marco de cartel de búsqueda con esquinas dobladas y sello de cera"]
+**Elemento elegido:** el sello decorativo enorme (Permanent Marker, 200px, 14% opacidad) que actúa como marca de agua en banners y categorías. Evoca un blasón de cazador grabado en el pergamino.
 
-**Por qué encaja con la ambientación:** [1-2 frases]
+**Por qué encaja con la ambientación:** los cazadores firman sus archivos con un sello personal. El sello fantasmal de fondo transmite pertenencia al Gremio sin ser literal ni obvio.
 
 **Regla para agentes:** este elemento es donde se permite complejidad/riesgo visual. El resto del diseño debe mantenerse disciplinado alrededor de él — no repartir el "protagonismo visual" en cinco sitios a la vez.
 
@@ -104,18 +126,14 @@ Pendiente de definir en fase de personajes
 
 ## 6. Iconografía y estilo de imagen generada por IA
 
-Esta sección es el prompt-base para cualquier MCP de generación de imágenes (fal.ai, ComfyUI, etc.). Cuanto más específica, más consistencia entre todos los retratos/iconos del foro.
-
 | Campo | Valor |
 |---|---|
-| Estilo artístico | [ej. "anime seinen, línea limpia, sombreado por celdas (cel-shading)", "grabado antiguo sepia", "pixel art 32-bit"] |
-| Paleta de la ilustración | [puede diferir de la paleta UI — ej. "tonos tierra + un acento de color de facción"] |
-| Encuadre estándar para retratos | [ej. "busto, 3/4 de perfil, fondo neutro degradado"] |
-| Prompt base (a reutilizar/completar por personaje) | `[ej. "retrato estilo anime seinen, cel-shading, iluminación dramática lateral, fondo degradado oscuro, sin texto, sin marco --ar 3:4"]` |
-| Negative prompt / a evitar | `[ej. "sin manos deformes, sin texto, sin marcas de agua, sin estilo 3D render"]` |
-| Iconos de sistema (items, stats) | [ej. "línea fina monocromo, mismo grosor de trazo que el logo"] |
+| Estilo artístico | [POR DEFINIR] |
+| Paleta de la ilustración | tonos tierra + acento dorado |
+| Encuadre estándar para retratos | busto, 3/4 de perfil, fondo neutro degradado |
+| Iconos de sistema (items, stats) | línea fina monocromo |
 
-**Regla de derechos:** todo el arte se **genera**, no se extrae de webs o series con copyright (ni siquiera "en el estilo de X serie" pidiendo que se parezca a personajes concretos existentes). Los agentes deben generar arte original a partir de esta guía de estilo, nunca reproducir ilustraciones ya existentes.
+**Regla de derechos:** todo el arte se **genera**, no se extrae de webs o series con copyright.
 
 ---
 
@@ -123,12 +141,12 @@ Esta sección es el prompt-base para cualquier MCP de generación de imágenes (
 
 | Momento | Comportamiento |
 |---|---|
-| Carga de la ficha | [ej. "fade + rueda de stats se dibuja progresivamente", o "ninguna animación, carga instantánea"] |
-| Hover en tarjetas/botones | |
-| Transición entre tabs | |
-| Feedback de acción (tirada de dados, transferencia) | [ej. "el número de la tirada aparece con un pequeño impacto/rebote"] |
+| Hover en tarjetas | translateY(-2px) + borde cambia a dorado + sombra crece 1px |
+| Hover en botones | cambio de color de fondo, 0.15s transition |
+| Transición entre tabs | instantánea (show/hide) |
+| Feedback de acción | [POR DEFINIR] |
 
-**Regla:** [ej. "una sola animación orquestada por pantalla, cero animaciones decorativas sueltas", "respetar prefers-reduced-motion siempre"]
+**Regla:** respetar `prefers-reduced-motion` siempre. Sin animaciones decorativas sueltas.
 
 ---
 
@@ -136,54 +154,54 @@ Esta sección es el prompt-base para cualquier MCP de generación de imágenes (
 
 | Situación | Cómo debe sonar |
 |---|---|
-| Botones de acción | [ej. verbos activos: "Enviar ficha", no "Submit"] |
-| Estado vacío (sin personajes, sin items) | [ej. tono narrativo/diegético vs. tono neutro de sistema] |
-| Errores | [ej. explican qué pasó y cómo arreglarlo, sin disculparse, en la voz del "narrador" del foro o en voz neutra de sistema — elige una] |
-| Confirmaciones | [ej. "Ficha aprobada" no "Success"] |
+| Botones de acción | Verbos activos en español: "Ingresar", "Confirmar", "Registrar" |
+| Estado vacío (sin personajes, sin items) | Tono narrativo: "Sin equipo registrado." |
+| Errores | Explican qué pasó sin disculparse |
+| Confirmaciones | Directas: "Ficha aprobada", "Cambios guardados" |
 
 ---
 
 ## 9. Componentes y reglas de consistencia
 
-- [ ] Botones: [radios de borde, estados hover/active/disabled definidos aquí o delegados a shadcn con tema propio]
-- [ ] Badges de rareza/estado (ficha pendiente/aprobada/rechazada, rareza de item): [sistema de color consistente]
-- [ ] Formularios: [validación inline vs. al enviar]
-- [ ] Accesibilidad mínima: foco visible por teclado, contraste AA, `prefers-reduced-motion` respetado — no negociable independientemente del resto de decisiones estéticas.
+- [x] Botones: 3px de borde sólido, sombra 2-3px sólida, border-radius 3px, transition 0.15s
+- [x] Badges de rango: píldoras con borde 2px + sombra 2px. Fondo semitransparente del color de rango
+- [x] Tarjetas: borde 3px + sombra 3px sólida. Hover: translateY(-2px), borde dorado
+- [x] Formularios: inputs con borde 3px + sombra 2px sólida. Focus: borde dorado
+- [x] Tabs: botones verdes con borde 3px + sombra. Activo: fondo dorado + texto verde
+- [x] Accesibilidad mínima: foco visible por teclado, contraste AA, `prefers-reduced-motion` respetado
 
 ---
 
-## 10. Registro de decisiones (lo rellenan los agentes, no el usuario)
-
-> Cada vez que un agente tome una decisión de diseño no cubierta explícitamente arriba, la documenta aquí en una línea: fecha, decisión, motivo. Esto evita que dos sesiones de agente distintas contradigan el estilo ya establecido.
+## 10. Registro de decisiones
 
 | Fecha | Decisión | Motivo |
 |---|---|---|
-| | | |
+| 2026-07-06 | Tema neobrutalista beige/verde/dorado adoptado como definitivo | Coincide con el CSS real en `iforge-child-theme.xml` y las preferencias del usuario |
+| 2026-07-06 | Permanent Marker como display, Georgia como body, monospace para datos | Refuerza la estética de "archivo de cazador" artesanal |
+| 2026-07-06 | Sombras sólidas sin blur (`3px 3px 0`) en vez de sombras difuminadas | Coherente con neobrutalismo — simula capas de papel |
+| 2026-07-06 | Border-radius 3px universal | Consistencia neobrutalista |
 
 ---
 
 ## 11. Checklist antes de dar por bueno cualquier pantalla nueva
 
 - [ ] ¿Usa los colores de la tabla de la sección 2 (no colores nuevos improvisados)?
-- [ ] ¿Usa las 2-3 familias tipográficas definidas, no una fuente de sistema por defecto?
+- [ ] ¿Usa las 4 familias tipográficas definidas, no una fuente de sistema por defecto?
 - [ ] ¿El elemento firma (sección 5) sigue siendo el único punto de máximo protagonismo visual?
 - [ ] ¿El copy sigue el tono de la sección 8?
 - [ ] ¿Se ha probado responsive (móvil) y con foco de teclado visible?
-- [ ] ¿Cualquier imagen generada sigue el prompt-base de la sección 6, y es arte original (no copia de IP existente)?
-- [ ] ¿Se ha hecho captura de pantalla (Playwright MCP u otro) y comparado contra esta guía antes de considerarlo terminado?
+- [ ] ¿Cualquier imagen generada es arte original (no copia de IP existente)?
+- [ ] ¿Los bordes son 3px + sombras sólidas (sin blur)?
 
 ---
 
 ## 12. Referencia rápida para `agent.md`
 
-Añade en tu `agent.md` (o equivalente en OpenCode/Antigravity/Cursor) algo como:
-
 ```
 Antes de generar o modificar cualquier UI:
 1. Lee identidad-visual-front.md completo.
-2. Lee arquitectura-backend-rol-mybb.md si el componente consume datos de la API.
-3. Sigue estrictamente la paleta, tipografía y elemento firma definidos.
-4. Si una decisión no está cubierta, elige la opción más coherente con los adjetivos
+2. Sigue estrictamente la paleta, tipografía y elemento firma definidos.
+3. Si una decisión no está cubierta, elige la opción más coherente con los adjetivos
    "SÍ/NUNCA" de la sección 1 y regístrala en la sección 10 del documento.
-5. Antes de marcar la tarea como terminada, pasa el checklist de la sección 11.
+4. Antes de marcar la tarea como terminada, pasa el checklist de la sección 11.
 ```
