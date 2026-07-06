@@ -33,7 +33,7 @@ opencode.json
 node_modules/
 
 # Referencias externas
-references/
+/references/
 
 # Test results
 test-results/

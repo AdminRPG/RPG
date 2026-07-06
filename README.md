@@ -5,14 +5,18 @@ Foro de rol play-by-post sobre MyBB con backend propio de mecánicas de juego.
 ## Estructura
 
 ```
-├── back/
-│   ├── forum/           ← Instalación MyBB (docroot desplegable)
-│   ├── plugin/          ← Plugin puente MyBB (código fuente)
-│   └── sql/             ← Migraciones de base de datos
+├── admin/               ← Panel de administración MyBB
+├── inc/                 ← Core de MyBB (clases, plugins, idiomas)
+├── images/              ← Recursos gráficos del foro
+├── jscripts/            ← JavaScript del foro
+├── cache/               ← Temas compilados
+├── uploads/             ← Archivos subidos por usuarios
+├── install/             ← Instalador MyBB
+├── archive/             ← Modo archivo
 ├── rol-backend/         ← API REST de lógica de juego (Slim 4 + JWT)
-├── front/               ← Fuentes del tema y plantillas
-├── docs/                ← Documentación y contratos
-├── agent.md             ← Configuración para agentes de IA
+├── mybb-plugin-rol/     ← Plugin puente MyBB (código fuente)
+├── docs/                ← Documentación, prototipos y referencias
+├── scripts/             ← Scripts utilitarios
 └── .github/workflows/   ← CI/CD (despliegue automático)
 ```
 

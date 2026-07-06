@@ -30,10 +30,7 @@ jobs:
           .agents/
           .htaccess.disabled
           .DS_Store
-          docs/
-          front/
           mybb-plugin-rol/
           README.md
-          agent.md
           skills-lock.json
           install/

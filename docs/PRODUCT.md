@@ -29,7 +29,7 @@ Oscuro, artesanal, misterioso. Nunca infantil, corporativo o genérico.
 
 ## Design Principles
 
-1. **Oscuridad con propósito**: el tema oscuro no es un default — cada elección de contraste, acento y espaciado debe sentirse intencional, no heredada de una plantilla.
+1. **Neobrutalismo con propósito**: el estilo neobrutalista (bordes gruesos, sombras sólidas, paleta pergamino + verde bosque + tinta dorada) no es un capricho estético — cada elección de contraste, acento y espaciado debe sentirse intencional, no heredada de una plantilla. — cada elección de contraste, acento y espaciado debe sentirse intencional, no heredada de una plantilla.
 2. **Cohesión artesanal**: cada página debe sentirse parte del mismo mundo. Nada de estilos improvisados o inconsistentes entre secciones.
 3. **Densidad informativa sin caos**: las fichas de personaje son densas en datos igual que un dashboard, pero con jerarquía visual clara y elementos que guían la mirada.
 4. **El elemento firma es el rey**: un único elemento de protagonismo visual por pantalla; el resto del diseño se mantiene disciplinado a su alrededor.
