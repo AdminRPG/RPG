@@ -1,4 +1,4 @@
-# Token System — I-Forge "Archivo del Cazador"
+# Token System — I-Forge
 
 > Fuente de verdad de todas las decisiones visuales. Cualquier componente, template o estilo nuevo debe usar exclusivamente estos tokens. No hardcodear valores.
 >
@@ -68,9 +68,9 @@ Escala de espaciado: 4 / 6 / 8 / 10 / 12 / 14 / 16 / 20 / 24 / 32 / 48 px
 
 Esto simula capas de cartulina/papel apiladas. Es esencial para la estética neobrutalista.
 
-## 5. Elemento firma — Sello de Cazador
+## 5. Elemento firma — Sello de Archivo
 
-Un carácter grande en Permanent Marker (normalmente "HUNTER" o las iniciales del personaje) a baja opacidad (4-14%) usado como marca de agua en:
+Un carácter grande en Permanent Marker (normalmente las iniciales del foro o del personaje) a baja opacidad (4-14%) usado como marca de agua en:
 - Banner del foro
 - Header de ficha de personaje
 - Tarjetas de categoría (esquina)

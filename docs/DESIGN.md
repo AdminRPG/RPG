@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: I-Forge — Archivo del Cazador
+name: I-Forge — Archivo del Rol
 colors:
   bg: "#f4f0e6"
   bg-dark: "#ebe6d6"
@@ -34,16 +34,16 @@ maxWidth: "1200px"
 spacing: "8px base (4-48px range)"
 ---
 
-# DESIGN.md — I-Forge: Archivo del Cazador
+# DESIGN.md — I-Forge: Archivo del Rol
 
 ## Overview
 
-I-Forge es un foro de rol play-by-post de ambientación oscura (Hunter x Hunter, lore original). El diseño es **neobrutalista**: páginas color pergamino (#f4f0e6), paneles verde oscuro (#2d5a27) con bordes negros gruesos (3px) y sombras sólidas sin blur, tipografía brush (Permanent Marker) para títulos que evocan manuscritos de cazador, y acentos en tinta dorada (#c9a84c) como hilo conductor visual.
+I-Forge es un foro de rol play-by-post de ambientación oscura con lore original. El diseño es **neobrutalista**: páginas color pergamino (#f4f0e6), paneles verde oscuro (#2d5a27) con bordes negros gruesos (3px) y sombras sólidas sin blur, tipografía brush (Permanent Marker) para títulos que evocan manuscritos antiguos, y acentos en tinta dorada (#c9a84c) como hilo conductor visual.
 
 Tres ideas fuerzan el carácter visual:
-1. **Pergamino de cazador** — fondo beige con líneas de cuaderno (repeating-linear-gradient sutil), como un archivo de notas de campo
+1. **Pergamino antiguo** — fondo beige con líneas de cuaderno (repeating-linear-gradient sutil), como un archivo de notas de campo
 2. **Brutalismo controlado** — bordes gruesos (3px), sombras sólidas sin difuminar, sin border-radius grandes (todo 3px). Cada elemento tiene peso visual y ocupa su espacio sin ambigüedad
-3. **Tinta dorada** — el acento oro (#c9a84c) aparece en títulos, enlaces, hover y badges, pero nunca inunda. Es la tinta con la que un cazador firma su archivo
+3. **Tinta dorada** — el acento oro (#c9a84c) aparece en títulos, enlaces, hover y badges, pero nunca inunda. Es la tinta con la que se firma un archivo
 
 ## Colors
 
@@ -71,8 +71,8 @@ Colores de rango (solo para badges de stat):
 
 ## Typography
 
-- **Display (Permanent Marker, cursive):** títulos de sección, nombre del foro, banner principal, tabs, headers de tarjeta. Evoca escritura a mano, notas de campo. Siempre uppercase + letter-spacing. Con text-shadow: 2px 2px 0 var(--border) para dar profundidad.
-- **Body (Georgia, serif):** texto general, posts, descripciones. Serif clásica que refuerza la estética de libro/documento.
+- **Display (Permanent Marker, cursive):** títulos de sección, nombre del foro, banner principal, tabs, headers de tarjeta. Evoca escritura a mano, anotaciones de archivo. Siempre uppercase + letter-spacing. Con text-shadow: 2px 2px 0 var(--border) para dar profundidad.
+- **Body (Georgia, serif):** texto general, posts, descripciones. Serif clásica que refuerza la estética de libro/documento antiguo.
 - **UI (system sans-serif):** botones, labels, metadatos, navegación, badges. Funcional y legible.
 - **Data (Menlo/Consolas, monospace):** estadísticas, valores numéricos, cantidades. Solo para datos.
 
@@ -85,7 +85,7 @@ Colores de rango (solo para badges de stat):
 - **Banner hero:** 300-320px, verde panel, con sello decorativo en Permanent Marker enorme al 14% opacidad, título en brush dorado con doble text-shadow
 - **Tablón (índice):** 3 columnas en desktop, 1 columna en móvil. Tarjetas con border 3px + shadow sólida
 - **Categorías:** headers verde panel con título brush dorado, subforos en grid de tarjetas (280px min-width) con hover que levanta la tarjeta (-2px translateY) y cambia el borde a dorado
-- **Ficha de personaje:** layout de dashboard denso. Tabs con estilo botón (mismo estilo que el tema). Stats en 3 columnas (Cuerpo/Mente/Espíritu) con barras de progreso y badges de rango letra. Estadísticas derivadas en grid de tarjetas pequeñas.
+- **Ficha de personaje:** layout de dashboard denso. Tabs con estilo botón (mismo estilo que el tema). Stats en columnas con barras de progreso y badges de rango letra. Estadísticas derivadas en grid de tarjetas pequeñas.
 
 ## Spacing
 

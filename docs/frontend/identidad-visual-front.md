@@ -19,8 +19,8 @@
 | Campo | Valor |
 |---|---|
 | Nombre del foro | I-Forge |
-| Ambientación / universo | Hunter x Hunter (mundo propio, lore original) |
-| Una frase que resuma el tono | "Archivo del Cazador" |
+| Ambientación / universo | Lore original (setting configurable) |
+| Una frase que resuma el tono | "Archivo del Rol" |
 | Público objetivo | Comunidad hispana de rol, 18+ |
 | 3 adjetivos que NUNCA debe transmitir | "infantil", "corporativo", "genérico" |
 | 3 adjetivos que SÍ debe transmitir | "artesanal", "brutalista", "misterioso" |
@@ -72,7 +72,7 @@ Define 4-6 colores con **función**, no solo hex. Un color sin función se conve
 
 **Escala tipográfica:** 10/11/12/13/14/15/16/18/20/24/28/32/48px
 
-**Regla de personalidad:** Permanent Marker simula escritura a mano de un cazador tomando notas de campo. Georgia refuerza la estética de libro/documento antiguo. Nunca usar Permanent Marker para body text — solo para títulos.
+**Regla de personalidad:** Permanent Marker simula escritura a mano sobre un cuaderno de bitácora. Georgia refuerza la estética de libro/documento antiguo. Nunca usar Permanent Marker para body text — solo para títulos.
 
 ---
 
@@ -90,14 +90,14 @@ Describe la estructura real de las pantallas clave.
 - Sidebar inferior: login, online, tareas
 
 ### 4.2 Ficha de personaje
-- Header con avatar, nombre en brush, badges de rango/Nen
+- Header con avatar, nombre en brush, badges de rango
 - Tabs estilo botón (fondo verde, hover/focus dorado)
-- Portada: 3 columnas de stats (Cuerpo/Mente/Espíritu) con badges de rango letra + barras
+- Portada: columnas de stats con badges de rango letra + barras
 - Estadísticas derivadas en grid de tarjetas pequeñas
 - Rasgos en grid con coste numérico
 - Biografía con sub-tabs (Historia/Apariencia/Personalidad/Extras)
-- Bélico: pilares Nen + disciplinas + stats de combate
-- Técnicas Nen: filtros por tier y tipo
+- Sistema de combate: disciplinas + stats de combate
+- Técnicas: filtros por tier y tipo
 - Inventario: grid de items + sidebar de equipamiento
 
 ### 4.3 Otras pantallas clave
@@ -116,9 +116,9 @@ Describe la estructura real de las pantallas clave.
 
 > El único elemento que hará que alguien reconozca tu foro sin ver el logo.
 
-**Elemento elegido:** el sello decorativo enorme (Permanent Marker, 200px, 14% opacidad) que actúa como marca de agua en banners y categorías. Evoca un blasón de cazador grabado en el pergamino.
+**Elemento elegido:** el sello decorativo enorme (Permanent Marker, 200px, 14% opacidad) que actúa como marca de agua en banners y categorías. Evoca un sello grabado en el pergamino.
 
-**Por qué encaja con la ambientación:** los cazadores firman sus archivos con un sello personal. El sello fantasmal de fondo transmite pertenencia al Gremio sin ser literal ni obvio.
+**Por qué funciona:** los archivos y documentos se sellan como marca de autenticidad. El sello fantasmal de fondo transmite pertenencia y continuidad sin ser literal.
 
 **Regla para agentes:** este elemento es donde se permite complejidad/riesgo visual. El resto del diseño debe mantenerse disciplinado alrededor de él — no repartir el "protagonismo visual" en cinco sitios a la vez.
 
@@ -177,7 +177,7 @@ Describe la estructura real de las pantallas clave.
 | Fecha | Decisión | Motivo |
 |---|---|---|
 | 2026-07-06 | Tema neobrutalista beige/verde/dorado adoptado como definitivo | Coincide con el CSS real en `iforge-child-theme.xml` y las preferencias del usuario |
-| 2026-07-06 | Permanent Marker como display, Georgia como body, monospace para datos | Refuerza la estética de "archivo de cazador" artesanal |
+| 2026-07-06 | Permanent Marker como display, Georgia como body, monospace para datos | Refuerza la estética de archivo artesanal |
 | 2026-07-06 | Sombras sólidas sin blur (`3px 3px 0`) en vez de sombras difuminadas | Coherente con neobrutalismo — simula capas de papel |
 | 2026-07-06 | Border-radius 3px universal | Consistencia neobrutalista |
 

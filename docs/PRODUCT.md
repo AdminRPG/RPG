@@ -6,17 +6,17 @@ product
 
 ## Users
 
-Roleplayers hispanos 18+, comunidad adulta que busca un universo oscuro de Cazadores (Hunter x Hunter, lore original). Vienen a contar historias colaborativas por escrito (play-by-post), gestionar personajes, y participar en un sistema de juego con estadísticas, inventario, economía y dados. Buscan una experiencia inmersiva, artesanal y misteriosa.
+Roleplayers hispanos 18+, comunidad adulta que busca un universo oscuro de fantasía con lore original. Vienen a contar historias colaborativas por escrito (play-by-post), gestionar personajes, y participar en un sistema de juego con estadísticas, inventario, economía y dados. Buscan una experiencia inmersiva, artesanal y misteriosa.
 
 ## Product Purpose
 
-I-Forge es un foro de rol play-by-post con ambientación oscura de Cazadores. Combina MyBB (foro, autenticación, narrativa) con un backend propio de mecánicas de juego (fichas de personaje, inventario, economía, tiradas de dados). El objetivo es ofrecer una experiencia de rol pulida, inmersiva y visualmente cohesiva que compita al nivel de referentes como One Piece Gaiden.
+I-Forge es un foro de rol play-by-post con ambientación oscura y lore original. Combina MyBB (foro, autenticación, narrativa) con un backend propio de mecánicas de juego (fichas de personaje, inventario, economía, tiradas de dados). El objetivo es ofrecer una experiencia de rol pulida, inmersiva y visualmente cohesiva que compita al nivel de referentes como One Piece Gaiden.
 
 ## Brand Personality
 
 Oscuro, artesanal, misterioso. Nunca infantil, corporativo o genérico.
 
-- Voz: narrativa, envolvente, con un toque de crudeza y misterio. El foro "habla" como un narrador de un mundo oscuro.
+- Voz: narrativa, envolvente, con un toque de crudeza y misterio. El foro "habla" como un cronista de un mundo oscuro.
 - Tono: serio pero no solemne. Permite momentos de calidez entre los jugadores, pero el envolvente general es de peligro y descubrimiento.
 - Copy: verbos activos, nada de "Submit" o "Success". Los errores explican qué pasó sin disculparse. Estados vacíos invitan a la acción en tono narrativo.
 

@@ -507,7 +507,7 @@ if (!empty($banners)) {
 }
 
 // I-Forge: Calendario (placeholder until real calendar is built)
-$calendario_texto = 'DÍA 1 · PRIMAVERA · AÑO 925';
+$calendario_texto = 'DÍA 1 · PRIMAVERA · AÑO I';
 
 // I-Forge: Latest posts
 $iforge_latest_posts = '';
@@ -529,36 +529,15 @@ while ($post = $db->fetch_array($q)) {
 }
 
 // I-Forge: Active searches (static placeholder)
-$iforge_active_searches = '
-    <div class="iforge-card-item">
-        Busco compa&ntilde;ero para T3
-        <div class="iforge-card-item-meta">Kael · Zona Candelaria</div>
-    </div>
-    <div class="iforge-card-item">
-        Mazmorra busca DPS
-        <div class="iforge-card-item-meta">Lyra · Continente Oscuro</div>
-    </div>';
+$iforge_active_searches = '';
 
 // I-Forge: News (static placeholder)
-$iforge_news = '
-    <div class="iforge-card-item">
-        <img src="'.$mybb->settings['bburl'].'/images/icons/newspaper.svg" class="icon" alt=""> Torneo de combate — Inscripciones abiertas
-        <div class="iforge-card-item-meta">hasta el D&iacute;a 60</div>
-    </div>
-    <div class="iforge-card-item">
-        <img src="'.$mybb->settings['bburl'].'/images/icons/newspaper.svg" class="icon" alt=""> Parche 1.2 — Nuevo sistema de clima
-        <div class="iforge-card-item-meta">05/07/2026</div>
-    </div>';
+$iforge_news = '';
 
 // I-Forge: Curiosidades
-$curiosidades = [
-    '¿Sab&iacute;as que los bosques del sur cambian de color seg&uacute;n la estaci&oacute;n?',
-    'Antes de la Gran Tormenta, el Archipi&eacute;lago Candelaria era una sola isla.',
-    'Se dice que en las monta&ntilde;as del norte vive un anciano que conoce el futuro.',
-    'Hay caminos subterr&aacute;neos que conectan continentes — pero nadie vuelve igual.',
-];
-$iforge_curiosidad = $curiosidades[0];
-$curiosidades_json = json_encode($curiosidades);
+$curiosidades = [];
+$iforge_curiosidad = '';
+$curiosidades_json = '[]';
 
 // I-Forge: Staff list
 $iforge_staff_list = '';

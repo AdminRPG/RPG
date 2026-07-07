@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I-FORGE · Trámites del taller</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="forge.css">
+<style>
+/* Extra local — SOLO var(--tokens), sin colores ni fuentes nuevas */
+.tram-intro{font-size:.92rem;color:var(--paper-dim);max-width:70ch;margin:-6px 0 18px;line-height:1.55}
+.tram-intro b{color:var(--paper);font-weight:600}
+
+/* Estado de trámites: placa oscura con filas de estado */
+.estado{margin-bottom:22px}
+.estado .plate-b{padding:0}
+.stat-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--iron-edge)}
+.stat-row:last-child{border-bottom:none}
+.stat-dot{width:11px;height:11px;flex:0 0 auto;border:2px solid #000}
+.stat-txt{flex:1;font-size:.86rem;color:var(--paper);line-height:1.35}
+.stat-txt b{font-weight:600;color:var(--paper)}
+.stat-when{font-family:var(--mono);font-size:.62rem;color:var(--ash);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.stat-badge{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 9px;border:2px solid #000;color:var(--iron);white-space:nowrap}
+.wallet{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;padding:11px 14px;background:var(--iron-edge);border-top:2px solid #000}
+.wallet .w-l{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--paper-dim);margin-right:2px}
+.coin{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--paper)}
+.coin b{font-family:var(--disp);font-weight:800;font-size:1.05rem;color:var(--h6);margin-right:4px}
+.coin .u{color:var(--ash);font-weight:400;font-size:.62rem;text-transform:uppercase;letter-spacing:.5px}
+
+/* Toolbar de filtros */
+.tram-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.tram-bar .bar-l{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--paper-dim)}
+
+/* metadatos y estado dentro de las tarjetas */
+.card-foot{flex-wrap:wrap}
+.card.hidden{display:none}
+.card-tag{font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border:2px solid #000;color:var(--iron);position:absolute;top:0;right:0;border-left:2px solid #000;border-bottom:2px solid #000}
+
+/* Horario del taller */
+.horario{margin-top:26px}
+.horario .plate-b{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.hbit{border:1px solid var(--rivet);background:var(--iron);padding:10px 12px}
+.hbit .hl{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim)}
+.hbit .hv{font-family:var(--disp);font-weight:800;font-size:1.15rem;color:var(--paper);line-height:1.1;margin-top:3px}
+.hbit .hv small{font-family:var(--mono);font-size:.6rem;color:var(--ash);font-weight:400}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a href="index.html" class="brand"><span class="spark" aria-hidden="true"></span>I-Forge</a>
+    <div class="nav-links">
+      <a href="foro.html" class="nav-a">Talleres</a>
+      <a href="index.html#mundo" class="nav-a">El Mundo</a>
+      <a href="tramites.html" class="nav-a on">Trámites</a>
+    </div>
+    <div class="nav-r">
+      <a href="ficha.html" class="nav-cta">Mi expediente</a>
+      <button class="nav-user" type="button" aria-label="Menú de cuenta">VK</button>
+    </div>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <div class="breadcrumb-in">
+    <a href="index.html">Fragua</a>
+    <span class="sep">›</span>
+    <b>Trámites</b>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="reveal">
+    <div class="shead">
+      <h1>Trámites del taller</h1>
+      <span class="code">// ventanillas de servicio</span>
+      <span class="rule"></span>
+    </div>
+    <p class="tram-intro">Estas son las <b>ventanillas oficiales</b> del taller: aquí gestionas tu personaje, tu economía y cualquier petición al staff. Cada solicitud entra en cola y es atendida por un <b>Fundidor</b> según su temple y prioridad.</p>
+  </section>
+
+  <!-- ===================== ESTADO DE TRÁMITES ===================== -->
+  <section class="estado reveal">
+    <div class="plate">
+      <div class="plate-h">
+        <span class="t">Estado de tus trámites</span>
+        <span class="c">Vania Korr</span>
+      </div>
+      <div class="plate-b">
+        <div class="stat-row">
+          <span class="stat-dot" style="background:var(--h6)"></span>
+          <span class="stat-txt"><b>Solicitud de rango C→B</b> — En cola</span>
+          <span class="stat-badge" style="background:var(--h6)">En cola</span>
+          <span class="stat-when">hace 2 días</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-dot" style="background:var(--patina-hi)"></span>
+          <span class="stat-txt"><b>Compra: Virotes de flujo ×12</b> — Aprobada</span>
+          <span class="stat-badge" style="background:var(--patina-hi)">Aprobada</span>
+          <span class="stat-when">ayer</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-dot" style="background:var(--h6)"></span>
+          <span class="stat-txt"><b>Petición: apertura de subforo de gremio</b> — Pendiente</span>
+          <span class="stat-badge" style="background:var(--h6)">Pendiente</span>
+          <span class="stat-when">hace 6 h</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-dot" style="background:var(--crack)"></span>
+          <span class="stat-txt"><b>Cambio de nombre</b> — Rechazada</span>
+          <span class="stat-badge" style="background:var(--crack);color:var(--paper)">Rechazada</span>
+          <span class="stat-when">hace 4 días</span>
+        </div>
+      </div>
+      <div class="wallet" aria-label="Cartera de Vania Korr">
+        <span class="w-l">Cartera</span>
+        <span class="coin"><b>4.850</b><span class="u">Marcos</span></span>
+        <span class="coin"><b>230</b><span class="u">Fichas de taller</span></span>
+        <span class="coin"><b>7</b><span class="u">Esquirlas</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FILTROS ===================== -->
+  <section class="reveal">
+    <div class="tram-bar">
+      <span class="bar-l">Ventanillas</span>
+      <div class="filters" role="group" aria-label="Filtrar trámites por categoría">
+        <button class="filt" aria-pressed="true" data-cat="all">Todas</button>
+        <button class="filt" aria-pressed="false" data-cat="economia">Economía</button>
+        <button class="filt" aria-pressed="false" data-cat="personaje">Personaje</button>
+        <button class="filt" aria-pressed="false" data-cat="comunidad">Comunidad</button>
+      </div>
+    </div>
+
+    <!-- ===================== GRID DE TARJETAS ===================== -->
+    <div class="cards" id="cards">
+
+      <!-- 1 · Tienda -->
+      <article class="card" data-cat="economia">
+        <div class="card-top">
+          <span class="card-ic"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
+          <div>
+            <div class="card-title">Tienda</div>
+            <div class="card-code">TRA-01</div>
+          </div>
+          <span class="card-tag" style="background:var(--h4)">Economía</span>
+        </div>
+        <div class="card-body">Compra equipo, consumibles y objetos del catálogo del taller pagando con Marcos.</div>
+        <div class="card-foot">
+          <span class="card-meta">Abierta · <b>34 objetos</b></span>
+          <a href="#" class="btn btn-ghost btn-sm">Entrar</a>
+        </div>
+      </article>
+
+      <!-- 2 · Petición administrativa -->
+      <article class="card" data-cat="comunidad">
+        <div class="card-top">
+          <span class="card-ic"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M9 13h6"/><path d="M9 17h4"/></svg></span>
+          <div>
+            <div class="card-title">Petición administrativa</div>
+            <div class="card-code">TRA-02</div>
+          </div>
+          <span class="card-tag" style="background:var(--patina-hi)">Comunidad</span>
+        </div>
+        <div class="card-body">Solicitudes generales al staff: aperturas, permisos, dudas y cualquier gestión fuera de catálogo.</div>
+        <div class="card-foot">
+          <span class="card-meta">Cola: <b>3</b> · ~24 h</span>
+          <a href="#" class="btn btn-hot btn-sm">Nueva petición</a>
+        </div>
+      </article>
+
+      <!-- 3 · Forjar personaje -->
+      <article class="card" data-cat="personaje">
+        <div class="card-top">
+          <span class="card-ic"><svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M6 20v-5h5v5"/><path d="M4 15l8-4 4 3"/><path d="M14 11l3-6 4 2-2 5"/><circle cx="9" cy="7" r="2.4"/></svg></span>
+          <div>
+            <div class="card-title">Forjar personaje</div>
+            <div class="card-code">TRA-03</div>
+          </div>
+          <span class="card-tag" style="background:var(--h6)">Personaje</span>
+        </div>
+        <div class="card-body">Crea y registra una ficha nueva paso a paso. Reparto de stats, virtudes, defectos y equipo inicial.</div>
+        <div class="card-foot">
+          <span class="card-meta">Guía incluida</span>
+          <a href="ficha.html" class="btn btn-hot btn-sm">Forjar</a>
+        </div>
+      </article>
+
+      <!-- 4 · Solicitud de rango -->
+      <article class="card" data-cat="personaje">
+        <div class="card-top">
+          <span class="card-ic"><svg viewBox="0 0 24 24"><path d="M4 20V13"/><path d="M10 20V9"/><path d="M16 20v-6"/><path d="M22 20V4"/><path d="M3 20h20"/></svg></span>
+          <div>
+            <div class="card-title">Solicitud de rango</div>
+            <div class="card-code">TRA-04</div>
+          </div>
+          <span class="card-tag" style="background:var(--h6)">Personaje</span>
+        </div>
+        <div class="card-body">Evaluación de ascenso en la escala de calor E→M+. El Fundidor mide tu temple antes de subirte.</div>
+        <div class="card-foot">
+          <span class="card-meta">Requiere <b>temple</b></span>
+          <a href="#" class="btn btn-ghost btn-sm">Solicitar</a>
+        </div>
+      </article>
+
+      <!-- 5 · Tesorería / Banco -->
+      <article class="card" data-cat="economia">
+        <div class="card-top">
+          <span class="card-ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="12" cy="12" r="3"/><path d="M7 9v6"/><path d="M17 9v6"/></svg></span>
+          <div>
+            <div class="card-title">Tesorería / Banco</div>
+            <div class="card-code">TRA-05</div>
+          </div>
+          <span class="card-tag" style="background:var(--h4)">Economía</span>
+        </div>
+        <div class="card-body">Gestiona tus Marcos, Fichas de taller y Esquirlas. Movimientos, depósitos y conversión de divisas.</div>
+        <div class="card-foot">
+          <span class="card-meta">Saldo: <b>4.850 M</b></span>
+          <a href="#" class="btn btn-ghost btn-sm">Ver saldo</a>
+        </div>
+      </article>
+
+      <!-- 6 · Cambio de nombre o apariencia -->
+      <article class="card" data-cat="personaje">
+        <div class="card-top">
+          <span class="card-ic"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
+          <div>
+            <div class="card-title">Cambio de nombre o apariencia</div>
+            <div class="card-code">TRA-06</div>
+          </div>
+          <span class="card-tag" style="background:var(--h6)">Personaje</span>
+        </div>
+        <div class="card-body">Renombra a tu personaje o actualiza su retrato y descripción física. Sujeto a revisión del staff.</div>
+        <div class="card-foot">
+          <span class="card-meta">Coste: <b>200 Marcos</b></span>
+          <a href="#" class="btn btn-ghost btn-sm">Solicitar</a>
+        </div>
+      </article>
+
+      <!-- 7 · Afiliación a gremio -->
+      <article class="card" data-cat="comunidad">
+        <div class="card-top">
+          <span class="card-ic"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <div>
+            <div class="card-title">Afiliación a gremio</div>
+            <div class="card-code">TRA-07</div>
+          </div>
+          <span class="card-tag" style="background:var(--patina-hi)">Comunidad</span>
+        </div>
+        <div class="card-body">Únete a Los Yunques u otros gremios abiertos, o solicita traslado entre hermandades del taller.</div>
+        <div class="card-foot">
+          <span class="card-meta"><b>3 gremios</b> abiertos</span>
+          <a href="#" class="btn btn-ghost btn-sm">Unirse</a>
+        </div>
+      </article>
+
+      <!-- 8 · Reportes e incidencias -->
+      <article class="card" data-cat="comunidad">
+        <div class="card-top">
+          <span class="card-ic"><svg viewBox="0 0 24 24"><path d="M10.3 3.6 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
+          <div>
+            <div class="card-title">Reportes e incidencias</div>
+            <div class="card-code">TRA-08</div>
+          </div>
+          <span class="card-tag" style="background:var(--patina-hi)">Comunidad</span>
+        </div>
+        <div class="card-body">Reporta problemas técnicos, errores de ficha o conductas que rompan las normas del taller.</div>
+        <div class="card-foot">
+          <span class="card-meta">Respuesta <b>~48 h</b></span>
+          <a href="#" class="btn btn-ghost btn-sm">Reportar</a>
+        </div>
+      </article>
+
+      <!-- 9 · Herrería / mejoras de equipo -->
+      <article class="card" data-cat="economia">
+        <div class="card-top">
+          <span class="card-ic"><svg viewBox="0 0 24 24"><path d="m14 7 3-3 4 4-3 3"/><path d="m18 8-9 9"/><path d="M9 17H5v-4"/><path d="m5 13 4-4"/><path d="M3 21l3-1"/></svg></span>
+          <div>
+            <div class="card-title">Herrería / mejoras</div>
+            <div class="card-code">TRA-09</div>
+          </div>
+          <span class="card-tag" style="background:var(--h4)">Economía</span>
+        </div>
+        <div class="card-body">Refuerza, encanta o repara tu equipo. Las mejoras consumen Fichas de taller y a veces Esquirlas.</div>
+        <div class="card-foot">
+          <span class="card-meta">Coste: <b>Fichas</b></span>
+          <a href="#" class="btn btn-ghost btn-sm">Mejorar</a>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ===================== HORARIO DEL TALLER ===================== -->
+  <section class="horario reveal">
+    <div class="plate">
+      <div class="plate-h">
+        <span class="t">Horario del taller</span>
+        <span class="c">// atención de staff</span>
+      </div>
+      <div class="plate-b mono">
+        <div class="hbit"><div class="hl">Atención de Fundidores</div><div class="hv">L–V · 09:00–22:00 <small>CET</small></div></div>
+        <div class="hbit"><div class="hl">Cola media · peticiones</div><div class="hv">~24 h <small>días laborables</small></div></div>
+        <div class="hbit"><div class="hl">Cola media · rangos</div><div class="hv">~72 h <small>evaluación</small></div></div>
+        <div class="hbit"><div class="hl">Incidencias urgentes</div><div class="hv">~48 h <small>respuesta</small></div></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="foot">
+  <div class="foot-in">
+    <div class="foot-b">I-Forge</div>
+    <div class="foot-links"><a href="index.html">Fragua</a><a href="foro.html">Talleres</a><a href="tramites.html">Trámites</a><a href="ficha.html">Expediente</a></div>
+    <div class="foot-c">Prototipo · dirección "foundry brutalism" · datos de ejemplo</div>
+  </div>
+  <div class="foot-note">Los tiempos de cola son orientativos. Cada trámite es atendido por un Fundidor según temple y prioridad.</div>
+</footer>
+
+<script>
+// --- Filtro de categorías ---
+const filts = document.querySelectorAll('.filt');
+const cards = document.querySelectorAll('#cards .card');
+filts.forEach(b => b.addEventListener('click', () => {
+  filts.forEach(x => x.setAttribute('aria-pressed', 'false'));
+  b.setAttribute('aria-pressed', 'true');
+  const cat = b.dataset.cat;
+  cards.forEach(c => {
+    const show = cat === 'all' || c.dataset.cat === cat;
+    c.classList.toggle('hidden', !show);
+  });
+}));
+
+// --- Reveal on scroll ---
+if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); }
+  }), { threshold: .08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+} else {
+  document.querySelectorAll('.reveal').forEach(el => el.classList.add('vis'));
+}
+</script>
+</body>
+</html>

@@ -2039,7 +2039,7 @@ td, th { padding: 8px 12px; text-align: left; }
       <div class="iforge-ambientacion-label">Ambientación</div>
       <div class="iforge-ambientacion-title">Capítulo I: Origen</div>
       <div class="iforge-ambientacion-text">
-        En el año 925 del calendario continental, los Cazadores regresan a las fronteras olvidadas. Rumores de una reliquia perdida agitan los círculos de la Asociación, y el Continente Oscuro vuelve a susurrar.
+        En los albores del mundo, los aventureros se reúnen en las fronteras del mapa conocido. Rumores de reliquias perdidas agitan los círculos del saber, y lo desconocido vuelve a susurrar.
       </div>
       <a href="{$mybb->settings['bburl']}/showthread.php?tid=2" class="iforge-lore-btn">Leer todo el Lore</a>
     </div>

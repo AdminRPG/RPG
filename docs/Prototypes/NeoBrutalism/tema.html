@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contrato #447 — Escolta de mineral · I-Forge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="forge.css">
+<style>
+/* ============================================================
+   I-FORGE — VISTA "DENTRO DE UN TEMA" (showthread)
+   Extiende forge.css. Solo var(--tokens). Sin colores/fuentes nuevos.
+   ============================================================ */
+
+/* cabecera de hilo (placa de hierro con brasa) */
+.thread-head{border:2px solid #000;background:var(--iron-plate);position:relative;overflow:hidden;margin-bottom:14px}
+.thread-head::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 100% at 88% 20%,rgba(224,100,31,.16),transparent 55%);pointer-events:none}
+.thread-head-in{position:relative;padding:20px 22px}
+.th-badge-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.th-title{font-family:var(--disp);font-weight:900;font-size:clamp(2rem,5vw,3.2rem);line-height:.9;text-transform:uppercase;letter-spacing:-1px;color:var(--paper);text-shadow:0 2px 0 #000}
+.th-meta{font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);margin:12px 0 12px;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.th-meta .sep{color:var(--rivet)}
+.th-meta b{color:var(--ember-hi)}
+.th-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.th-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.th-controls .pager{margin-left:auto}
+@media(max-width:560px){.th-controls .pager{margin-left:0}}
+
+/* avatar — el PNG cae limpio; si falta, muestra iniciales */
+.avatar{position:relative;width:100%;aspect-ratio:1;background:var(--iron);border:2px solid #000;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:11px}
+.avatar::before{content:"";position:absolute;inset:0;background:radial-gradient(75% 65% at 50% 78%,rgba(224,100,31,.42),transparent 70%);pointer-events:none;z-index:1}
+.avatar span{position:relative;z-index:0;font-family:var(--disp);font-weight:900;font-size:2.8rem;line-height:1;color:var(--ember-hi);text-shadow:0 0 22px rgba(239,139,30,.5)}
+.avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
+
+/* columna de autor: nombre, rango y tira de datos */
+.pa-name{font-family:var(--disp);font-weight:800;font-size:1.35rem;line-height:1;text-transform:uppercase;color:var(--paper);margin-bottom:7px}
+.pa-name a{color:var(--paper)}
+.pa-name a:hover{color:var(--ember-hi)}
+.pa-rank{margin-bottom:11px}
+.pa-stats{display:flex;flex-direction:column;gap:0}
+.pa-srow{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--iron);font-family:var(--mono);font-size:.62rem}
+.pa-srow:last-child{border-bottom:none}
+.pa-srow .l{color:var(--paper-dim);text-transform:uppercase;letter-spacing:.3px}
+.pa-srow .v{color:var(--paper);font-weight:700;text-align:right}
+.pa-srow .v.hot{color:var(--h6)}
+
+/* post: encabezado de contenido y permalink */
+.post-head a{color:var(--ash)}
+.post-head a:hover{color:var(--ember)}
+.post-content h4{font-family:var(--disp);font-weight:800;font-size:1.15rem;text-transform:uppercase;color:var(--ink);margin-bottom:8px;letter-spacing:.5px}
+.post-content .lead{font-family:var(--mono);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-2);border-left:3px solid var(--ember);padding-left:10px;margin-bottom:12px}
+
+/* narrador (staff): acento de brasa a la izquierda */
+.post.staff .post-author{border-left:4px solid var(--ember);background:linear-gradient(180deg,rgba(224,100,31,.09),transparent 40%),var(--iron-edge)}
+.post.staff .post-body{box-shadow:inset 4px 0 0 rgba(224,100,31,.28)}
+
+/* llamada de mecánica dentro de un post (integración de sistema) */
+.roll-call{border:2px solid #000;background:var(--iron);color:var(--paper);margin:14px 0;padding:0}
+.roll-call-h{background:var(--iron-edge);border-bottom:2px solid #000;padding:7px 12px;display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--h6)}
+.roll-call-h svg{width:16px;height:16px;stroke:var(--h6);fill:none;stroke-width:2}
+.roll-call-b{padding:11px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.roll-chip{font-family:var(--mono);font-size:.68rem;font-weight:700;color:var(--paper);background:var(--iron-edge);border:2px solid var(--rivet);padding:5px 10px}
+.roll-chip b{color:var(--h6)}
+.roll-chip.formula{border-color:var(--ember);color:var(--ember-hi)}
+
+/* resultado de dado forjado */
+.dice-res{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border:2px solid #000;padding:6px 12px;margin-top:6px}
+.dice-res .die{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:var(--iron);border:2px solid #000;font-family:var(--disp);font-weight:900;font-size:1.15rem;color:var(--h6);box-shadow:inset 0 0 14px rgba(224,100,31,.25)}
+.dice-res .outcome{color:var(--iron)}
+
+/* barra de acciones del hilo (paginación entre bloques) */
+.thread-bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:6px 0 16px}
+.thread-bar .grow{flex:1}
+
+/* barra de herramientas de respuesta rápida */
+.qtoolbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.qreply .q-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.qreply .q-note{font-family:var(--mono);font-size:.62rem;color:var(--ash);margin-left:auto}
+
+@media(max-width:700px){
+  .avatar{width:72px;aspect-ratio:1;margin-bottom:0;flex:0 0 auto}
+  .avatar span{font-size:1.8rem}
+  .pa-stats{display:none}
+  .pa-name{margin-bottom:5px}
+  .pa-rank{margin-bottom:0}
+  .post.staff .post-author{border-left:none;border-top:4px solid var(--ember)}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== NAV ===================== -->
+<nav class="nav">
+  <div class="nav-in">
+    <a href="index.html" class="brand"><span class="spark" aria-hidden="true"></span>I-Forge</a>
+    <div class="nav-links">
+      <a href="foro.html" class="nav-a on">Talleres</a>
+      <a href="index.html#mundo" class="nav-a">El Mundo</a>
+      <a href="tramites.html" class="nav-a">Trámites</a>
+    </div>
+    <div class="nav-r">
+      <a href="ficha.html" class="nav-cta">Mi expediente</a>
+      <button class="nav-user" type="button" aria-label="Menú de cuenta">VK</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== BREADCRUMB ===================== -->
+<div class="breadcrumb">
+  <div class="breadcrumb-in">
+    <a href="index.html">Fragua</a><span class="sep">›</span>
+    <a href="foro.html">Talleres</a><span class="sep">›</span>
+    <a href="foro.html">Tablón de contratos</a><span class="sep">›</span>
+    <b>Contrato #447 — Escolta de mineral</b>
+  </div>
+</div>
+
+<main class="wrap" style="padding-top:16px;padding-bottom:24px">
+
+  <!-- ===================== CABECERA DEL HILO ===================== -->
+  <header class="thread-head">
+    <div class="thread-head-in">
+      <div class="th-badge-row">
+        <span class="heat-badge" style="background:var(--h4)">RANGO B</span>
+        <span class="mono" style="font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ember-hi)">// contrato abierto · FID-07</span>
+      </div>
+      <h1 class="th-title">Contrato #447 — Escolta de mineral</h1>
+      <div class="th-meta">
+        <span>abierto por <b>Fundidor</b></span><span class="sep">·</span>
+        <span>hace 3 días</span><span class="sep">·</span>
+        <span>5 respuestas</span><span class="sep">·</span>
+        <span>214 vistas</span>
+      </div>
+      <div class="th-tags">
+        <span class="tag line">Zona: Ría de Escoria</span>
+        <span class="tag line">Riesgo: B</span>
+        <span class="tag line">Recompensa: 1.200 Marcos</span>
+      </div>
+      <div class="th-controls">
+        <a href="#responder" class="btn btn-hot">Responder</a>
+        <button class="btn btn-ghost" type="button" id="followBtn">Seguir</button>
+        <div class="pager" role="group" aria-label="Paginación del tema">
+          <button class="page nav" type="button" aria-label="Anterior">‹</button>
+          <button class="page on" type="button" aria-current="page">1</button>
+          <button class="page nav" type="button" aria-label="Siguiente">›</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== POSTS ===================== -->
+
+  <!-- POST #1 — Fundidor (narrador) abre el contrato -->
+  <article class="post staff reveal" id="post-1">
+    <div class="post-author">
+      <div class="avatar"><img src="assets/fundidor.png" alt="Retrato de Fundidor" onerror="this.remove()"><span>F</span></div>
+      <div class="pa-name"><a href="#">Fundidor</a></div>
+      <div class="pa-rank"><span class="tag act">Narrador · STAFF</span></div>
+      <div class="pa-stats">
+        <div class="pa-srow"><span class="l">Rol</span><span class="v hot">Maestro de fragua</span></div>
+        <div class="pa-srow"><span class="l">Mensajes</span><span class="v">3.402</span></div>
+        <div class="pa-srow"><span class="l">En la fragua desde</span><span class="v">Año 918</span></div>
+        <div class="pa-srow"><span class="l">Gremio</span><span class="v">El Taller</span></div>
+      </div>
+    </div>
+    <div class="post-body">
+      <div class="post-head">
+        <span>Día 11 · Verano 925 · 08:14</span>
+        <span><a href="#post-1" class="num">#1</a></span>
+      </div>
+      <div class="post-content">
+        <p class="lead">Encargo oficial del taller · abierto a operativas de rango C o superior</p>
+        <h4>El encargo</h4>
+        <p>Un cargamento de mineral en bruto debe salir de <strong>Puerto Yunque</strong> antes del cambio de marea y llegar entero al muelle bajo de la <strong>Ría de Escoria</strong>. Tres carros, tiro de mulas, ruta por la costa. El taller paga <strong>1.200 Marcos</strong> a repartir entre la escolta, más prima si la carga llega sin merma.</p>
+        <p>No es un paseo. La Ría hierve de contrabandistas y la escoria vieja esconde cosas que muerden. Riesgo evaluado en <strong>B</strong>: id preparados para pelear en terreno roto y con poca luz. Se admiten hasta tres operativas; la primera en firmar lleva la voz de mando.</p>
+        <p>Quien acepte, que lo diga aquí abajo y anote su rango. La fragua estará mirando.</p>
+        <div class="post-sig">— El metal se prueba en el yunque, no en la vitrina.</div>
+        <div class="post-actions">
+          <button class="btn btn-sm btn-ghost" type="button">Citar</button>
+          <a href="#responder" class="btn btn-sm btn-ghost">Responder</a>
+          <button class="btn btn-sm btn-ghost" type="button">Reportar</button>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- POST #2 — Vania Korr acepta -->
+  <article class="post reveal" id="post-2">
+    <div class="post-author">
+      <div class="avatar"><img src="assets/vania.png" alt="Retrato de Vania Korr" onerror="this.remove()"><span>VK</span></div>
+      <div class="pa-name"><a href="ficha.html">Vania Korr</a></div>
+      <div class="pa-rank"><span class="tag rank" style="background:var(--h3)">Rango C · Nivel 5</span></div>
+      <div class="pa-stats">
+        <div class="pa-srow"><span class="l">Oficio</span><span class="v">Rastreadora</span></div>
+        <div class="pa-srow"><span class="l">Temple</span><span class="v hot">3.100</span></div>
+        <div class="pa-srow"><span class="l">Mensajes</span><span class="v">487</span></div>
+        <div class="pa-srow"><span class="l">En la fragua desde</span><span class="v">Año 923</span></div>
+        <div class="pa-srow"><span class="l">Gremio</span><span class="v">Los Yunques</span></div>
+      </div>
+    </div>
+    <div class="post-body">
+      <div class="post-head">
+        <span>Día 11 · Verano 925 · 09:37</span>
+        <span><a href="#post-2" class="num">#2</a></span>
+      </div>
+      <div class="post-content">
+        <p>Vania leyó el tablón dos veces, arrancó la nota con el índice y se la guardó en el guante. Conocía la costa de la Ría mejor que los mapas del taller: había rastreado por esos canales cuando aún no tenía licencia.</p>
+        <p><em>«Firmo yo. Rango C, operativa de campo. Llevo la voz si nadie con más galones se me adelanta.»</em> Escribió su marca al pie del encargo con letra seca. «Salgo con el mineral a primera marea. Que el tiro de mulas venga descansado y los carros con el eje revisado — la escoria vieja parte ruedas como quien parte pan.»</p>
+        <p>Comprobó los virotes de flujo, contó doce, y cerró la aljaba. Puerto Yunque olía a hierro caliente y a mar. Buen presagio, si es que quedaba alguno.</p>
+        <div class="post-sig">— V. Korr · «Leo el terreno como mi madre leía el metal.»</div>
+        <div class="post-actions">
+          <button class="btn btn-sm btn-ghost" type="button">Citar</button>
+          <a href="#responder" class="btn btn-sm btn-ghost">Responder</a>
+          <button class="btn btn-sm btn-ghost" type="button">Reportar</button>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- POST #3 — Ren Duro se une -->
+  <article class="post reveal" id="post-3">
+    <div class="post-author">
+      <div class="avatar"><img src="assets/ren.png" alt="Retrato de Ren Duro" onerror="this.remove()"><span>RD</span></div>
+      <div class="pa-name"><a href="#">Ren Duro</a></div>
+      <div class="pa-rank"><span class="tag rank" style="background:var(--h4)">Rango B · Nivel 8</span></div>
+      <div class="pa-stats">
+        <div class="pa-srow"><span class="l">Oficio</span><span class="v">Escaramuza</span></div>
+        <div class="pa-srow"><span class="l">Temple</span><span class="v hot">9.640</span></div>
+        <div class="pa-srow"><span class="l">Mensajes</span><span class="v">1.128</span></div>
+        <div class="pa-srow"><span class="l">En la fragua desde</span><span class="v">Año 921</span></div>
+        <div class="pa-srow"><span class="l">Gremio</span><span class="v">Los Yunques</span></div>
+      </div>
+    </div>
+    <div class="post-body">
+      <div class="post-head">
+        <span>Día 11 · Verano 925 · 11:02</span>
+        <span><a href="#post-3" class="num">#3</a></span>
+      </div>
+      <div class="post-content">
+        <p>Ren llegó al muelle con el yelmo bajo el brazo y una sonrisa de las que no tranquilizan a nadie. Rango B, hombro ancho, cicatrices de las que cuentan historias que él nunca cuenta.</p>
+        <p><em>«Segundo firmante. Rango B — y antes de que nadie se ofenda, la voz de mando la lleva Korr: firmó primero y conoce la Ría. Yo pongo el muro.»</em> Golpeó el broquel contra el carro delantero, dos veces, comprobando el sonido del metal. «Si algo sale de la escoria, sale a mí primero. Vania, tú lee el terreno y dime dónde. Yo me encargo de que lleguen los tres carros.»</p>
+        <p>Repartió su mirada entre los tejados del puerto y la línea negra de la ría. Ya se había fijado en dos siluetas que no le gustaban.</p>
+        <div class="post-actions">
+          <button class="btn btn-sm btn-ghost" type="button">Citar</button>
+          <a href="#responder" class="btn btn-sm btn-ghost">Responder</a>
+          <button class="btn btn-sm btn-ghost" type="button">Reportar</button>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- POST #4 — Fundidor narra emboscada y pide tirada -->
+  <article class="post staff reveal" id="post-4">
+    <div class="post-author">
+      <div class="avatar"><img src="assets/fundidor.png" alt="Retrato de Fundidor" onerror="this.remove()"><span>F</span></div>
+      <div class="pa-name"><a href="#">Fundidor</a></div>
+      <div class="pa-rank"><span class="tag act">Narrador · STAFF</span></div>
+      <div class="pa-stats">
+        <div class="pa-srow"><span class="l">Rol</span><span class="v hot">Maestro de fragua</span></div>
+        <div class="pa-srow"><span class="l">Mensajes</span><span class="v">3.402</span></div>
+        <div class="pa-srow"><span class="l">En la fragua desde</span><span class="v">Año 918</span></div>
+        <div class="pa-srow"><span class="l">Gremio</span><span class="v">El Taller</span></div>
+      </div>
+    </div>
+    <div class="post-body">
+      <div class="post-head">
+        <span>Día 13 · Verano 925 · 19:48</span>
+        <span><a href="#post-4" class="num">#4</a></span>
+      </div>
+      <div class="post-content">
+        <p class="lead">Narración · segunda jornada de ruta · anochece sobre la Ría</p>
+        <p>Los carros avanzan pegados al acantilado de escoria. El mar ya no se ve, solo se oye, y el olor a azufre viejo se pega a la garganta. Las mulas llevan un rato inquietas: orejas tiesas, pasos cortos. Algo, en la penumbra de los montones de escoria, <strong>no encaja</strong>.</p>
+        <p>A la izquierda, entre dos crestas de metal fundido y frío, hay un silencio demasiado limpio. Ni ratas, ni gaviotas. Ren aprieta el broquel. Vania nota el flujo erizarse en las yemas cortadas de sus guantes.</p>
+        <div class="roll-call" role="note" aria-label="Tirada requerida">
+          <div class="roll-call-h">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><path d="M12 22V12M3.5 7L12 12l8.5-5"/></svg>
+            Tirada requerida
+          </div>
+          <div class="roll-call-b">
+            <span class="roll-chip">Prueba: <b>Percepción (PER)</b></span>
+            <span class="roll-chip formula">D20 + INI</span>
+            <span class="roll-chip">Dificultad: <b>15</b></span>
+            <span class="roll-chip">Falla → emboscada por sorpresa</span>
+          </div>
+        </div>
+        <p>Quien lidera la escolta decide si el grupo se detiene o sigue. Antes de eso: <strong>tirad Percepción</strong>. Un éxito os da el turno de reacción; un fallo, y la escoria se abrirá antes de que podáis desenvainar.</p>
+        <div class="post-sig">— El buen metal avisa antes de romperse. El malo, no.</div>
+        <div class="post-actions">
+          <button class="btn btn-sm btn-ghost" type="button">Citar</button>
+          <a href="#responder" class="btn btn-sm btn-ghost">Responder</a>
+          <button class="btn btn-sm btn-ghost" type="button">Reportar</button>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- POST #5 — Vania Korr publica su tirada -->
+  <article class="post reveal" id="post-5">
+    <div class="post-author">
+      <div class="avatar"><img src="assets/vania.png" alt="Retrato de Vania Korr" onerror="this.remove()"><span>VK</span></div>
+      <div class="pa-name"><a href="ficha.html">Vania Korr</a></div>
+      <div class="pa-rank"><span class="tag rank" style="background:var(--h3)">Rango C · Nivel 5</span></div>
+      <div class="pa-stats">
+        <div class="pa-srow"><span class="l">Oficio</span><span class="v">Rastreadora</span></div>
+        <div class="pa-srow"><span class="l">Temple</span><span class="v hot">3.100</span></div>
+        <div class="pa-srow"><span class="l">Mensajes</span><span class="v">488</span></div>
+        <div class="pa-srow"><span class="l">En la fragua desde</span><span class="v">Año 923</span></div>
+        <div class="pa-srow"><span class="l">Gremio</span><span class="v">Los Yunques</span></div>
+      </div>
+    </div>
+    <div class="post-body">
+      <div class="post-head">
+        <span>Día 13 · Verano 925 · 20:05</span>
+        <span><a href="#post-5" class="num">#5</a></span>
+      </div>
+      <div class="post-content">
+        <p>Vania levantó la mano cerrada y el pequeño convoy se detuvo sin un ruido. No miró el silencio: lo escuchó. El flujo le recorrió los antebrazos y el rastro apareció ante sus ojos como una quemadura en el aire — pisadas frescas, tres, quizá cuatro, agazapadas tras la cresta de escoria de la izquierda.</p>
+        <p><em>«Alto. No es limpio. Hay al menos tres esperando a nuestra izquierda, entre las crestas. Ren, muro a ese flanco. Nadie desenvaina hasta que yo lo diga.»</em></p>
+        <div class="dice-res" style="background:var(--h6)">
+          <span class="die">14</span>
+          <span>D20 (12) + INI (2) · Ojo de rastro +2</span>
+          <span class="outcome">→ 16 vs 15 · ÉXITO</span>
+        </div>
+        <p style="margin-top:12px">Su rasgo <strong>Ojo de rastro</strong> sumó el margen justo sobre la dificultad: la Percepción entrenada convirtió un resultado ajustado en ventaja. El grupo conservaba el turno de reacción. La emboscada ya no era emboscada — solo una pelea que empezaba en sus términos.</p>
+        <div class="post-sig">— V. Korr · «Leo el terreno como mi madre leía el metal.»</div>
+        <div class="post-actions">
+          <button class="btn btn-sm btn-ghost" type="button">Citar</button>
+          <a href="#responder" class="btn btn-sm btn-ghost">Responder</a>
+          <button class="btn btn-sm btn-ghost" type="button">Reportar</button>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ===================== PAGINACIÓN INFERIOR ===================== -->
+  <div class="thread-bar">
+    <div class="pager" role="group" aria-label="Paginación del tema">
+      <button class="page nav" type="button" aria-label="Anterior">‹</button>
+      <button class="page on" type="button" aria-current="page">1</button>
+      <button class="page nav" type="button" aria-label="Siguiente">›</button>
+    </div>
+    <span class="grow"></span>
+    <a href="#responder" class="btn btn-hot">Responder</a>
+  </div>
+
+  <!-- ===================== RESPUESTA RÁPIDA ===================== -->
+  <div class="plate" id="responder">
+    <div class="plate-h"><span class="t">Responder</span><span class="c">// golpea mientras está caliente</span></div>
+    <div class="plate-b">
+      <div class="qreply">
+        <div class="qtoolbar" role="toolbar" aria-label="Formato de respuesta">
+          <button class="btn btn-sm btn-ghost" type="button" data-wrap="**" title="Negrita"><b>B</b></button>
+          <button class="btn btn-sm btn-ghost" type="button" data-wrap="*" title="Cursiva"><em>I</em></button>
+          <button class="btn btn-sm btn-ghost" type="button" data-quote="1" title="Cita">Cita</button>
+          <button class="btn btn-sm btn-ghost" type="button" id="rollBtn" title="Insertar tirada">Tirada</button>
+        </div>
+        <textarea id="replyBox" placeholder="Escribe tu respuesta… golpea el metal mientras está caliente" aria-label="Texto de respuesta"></textarea>
+        <div class="q-actions">
+          <button class="btn btn-hot" type="button" id="postBtn">Publicar respuesta</button>
+          <span class="q-note">Firmando como <b>Vania Korr</b> · Rango C</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="foot">
+  <div class="foot-in">
+    <div class="foot-b">I-Forge</div>
+    <div class="foot-links"><a href="index.html">Fragua</a><a href="foro.html">Talleres</a><a href="tramites.html">Trámites</a><a href="ficha.html">Expediente</a></div>
+    <div class="foot-c">Prototipo · dirección "foundry brutalism" · datos de ejemplo</div>
+  </div>
+</footer>
+<p class="foot-note">Vista de tema · I-Forge · dirección "foundry brutalism" · contrato y personajes de ejemplo, ambientación neutral sin representar IP real.</p>
+
+<script>
+/* ---- Paginación (solo visual) ---- */
+document.querySelectorAll('.pager').forEach(pg=>{
+  pg.querySelectorAll('.page').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('nav'))return;
+    pg.querySelectorAll('.page').forEach(x=>{x.classList.remove('on');x.removeAttribute('aria-current');});
+    b.classList.add('on');b.setAttribute('aria-current','page');
+  }));
+});
+
+/* ---- Botón "Seguir" (visual) ---- */
+const fb=document.getElementById('followBtn');
+fb.addEventListener('click',()=>{
+  const on=fb.dataset.on==='1';
+  fb.dataset.on=on?'':'1';
+  fb.textContent=on?'Seguir':'Siguiendo ✓';
+});
+
+/* ---- Barra de herramientas de respuesta ---- */
+const box=document.getElementById('replyBox');
+function insertAtCursor(text){
+  const s=box.selectionStart??box.value.length, e=box.selectionEnd??box.value.length;
+  box.value=box.value.slice(0,s)+text+box.value.slice(e);
+  const pos=s+text.length;
+  box.focus();box.setSelectionRange(pos,pos);
+}
+function wrapSelection(token){
+  const s=box.selectionStart??box.value.length, e=box.selectionEnd??box.value.length;
+  const sel=box.value.slice(s,e)||'texto';
+  const wrapped=token+sel+token;
+  box.value=box.value.slice(0,s)+wrapped+box.value.slice(e);
+  box.focus();box.setSelectionRange(s+token.length,s+token.length+sel.length);
+}
+document.querySelectorAll('.qtoolbar [data-wrap]').forEach(b=>{
+  b.addEventListener('click',()=>wrapSelection(b.dataset.wrap));
+});
+document.querySelector('.qtoolbar [data-quote]').addEventListener('click',()=>{
+  insertAtCursor('\n[cita]\n\n[/cita]\n');
+});
+document.getElementById('rollBtn').addEventListener('click',()=>{
+  insertAtCursor('[tirada: D20]');
+});
+document.getElementById('postBtn').addEventListener('click',()=>{
+  if(!box.value.trim()){box.focus();return;}
+  const btn=document.getElementById('postBtn');
+  btn.textContent='Metal vertido ✓';
+  setTimeout(()=>btn.textContent='Publicar respuesta',1600);
+});
+
+/* ---- Reveal on scroll (sutil) ---- */
+if('IntersectionObserver'in window && !matchMedia('(prefers-reduced-motion:reduce)').matches){
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target);}}),{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+}else{document.querySelectorAll('.reveal').forEach(el=>el.classList.add('vis'));}
+</script>
+</body>
+</html>

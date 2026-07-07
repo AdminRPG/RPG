@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I-FORGE · Pantalla de título</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="pixel.css">
+<style>
+/* ============================================================
+   index.html — PANTALLA DE TÍTULO + MAPA DEL MUNDO + REGISTRO DE MISIONES
+   (fusiona banner y tablón). Solo var(--tokens) de pixel.css.
+   ============================================================ */
+
+/* ---- ticker de sistema (marquesina de eventos) ---- */
+.sysbar{background:var(--gold);color:var(--night);border-bottom:3px solid var(--edge-d);overflow:hidden;white-space:nowrap;font-family:var(--pixel);font-size:.5rem;letter-spacing:1px}
+.sysbar-run{display:inline-block;padding:7px 0;animation:run 34s linear infinite}
+.sysbar-run span{padding:0 20px;border-right:2px solid rgba(0,0,0,.25)}
+@keyframes run{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---- pantalla de título ---- */
+.title{position:relative;overflow:hidden;padding:40px 22px 34px;text-align:center;border-bottom:3px solid var(--edge-d);
+  background:
+    radial-gradient(120% 100% at 50% 0,rgba(171,123,236,.20),transparent 55%),
+    linear-gradient(180deg,#1a1636,#110f22)}
+.title .stars{position:absolute;inset:0;background-image:
+    radial-gradient(1px 1px at 20% 30%,#fff,transparent),radial-gradient(1px 1px at 70% 20%,#fff,transparent),
+    radial-gradient(1px 1px at 40% 70%,#cbd,transparent),radial-gradient(1px 1px at 85% 60%,#fff,transparent),
+    radial-gradient(1px 1px at 55% 45%,#9ad,transparent),radial-gradient(1px 1px at 12% 80%,#fff,transparent);
+  opacity:.5;pointer-events:none}
+.title-eyebrow{position:relative;font-family:var(--pixel);font-size:.56rem;color:var(--cyan);letter-spacing:2px;margin-bottom:20px}
+.logo{position:relative;font-family:var(--pixel);font-weight:400;font-size:clamp(1.6rem,6.5vw,3.6rem);line-height:1.25;color:var(--gold2);
+  text-shadow:0 0 0 #000,4px 4px 0 var(--edge-d),0 0 26px rgba(244,196,85,.35);letter-spacing:2px}
+.logo b{color:var(--cyan);text-shadow:4px 4px 0 var(--edge-d),0 0 24px rgba(84,220,214,.45)}
+.title-sub{position:relative;font-family:var(--vt);font-size:1.5rem;color:var(--ink-dim);max-width:52ch;margin:16px auto 0;line-height:1.35}
+.title-sub b{color:var(--ink)}
+.title-cta{position:relative;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+.title-press{position:relative;margin-top:20px}
+
+/* placa "partida guardada" (censo) */
+.save{position:relative;max-width:720px;margin:26px auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:3px solid var(--edge);box-shadow:0 0 0 3px var(--edge-d)}
+.save-c{padding:12px 10px;border-left:2px solid var(--edge-d);text-align:center}
+.save-c:first-child{border-left:none}
+.save-v{font-family:var(--pixel);font-size:.9rem;color:var(--gold2)}
+.save-v.-name{font-family:var(--vt);font-size:1.5rem;color:var(--ink)}
+.save-v .live{display:inline-block;width:8px;height:8px;background:var(--green);margin-left:5px;animation:beat 1.4s steps(2) infinite;vertical-align:middle}
+@keyframes beat{0%,100%{opacity:1}50%{opacity:.3}}
+.save-l{font-family:var(--vt);font-size:.95rem;color:var(--ink-dim);margin-top:4px}
+@media(max-width:640px){.save{grid-template-columns:1fr 1fr}.save-c:nth-child(3){border-left:none}}
+
+/* ---- MAPA DEL MUNDO ---- */
+.mapwin{margin-top:26px}
+.mapgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:760px){.mapgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:460px){.mapgrid{grid-template-columns:1fr}}
+.node{position:relative;min-height:150px;border:3px solid var(--edge-d);overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;transition:transform .1s,box-shadow .1s}
+.node:hover,.node:focus-visible{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--edge-d);outline:none}
+.node-art{position:absolute;inset:0}
+.node-art svg{width:100%;height:100%;display:block}
+.node-scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 2px,transparent 2px 4px);pointer-events:none}
+.node-veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,13,30,.96) 12%,rgba(15,13,30,.35) 55%,transparent)}
+.node-rank{position:absolute;top:0;right:0;z-index:2;font-family:var(--pixel);font-size:.62rem;color:var(--night);padding:5px 8px;border-left:2px solid var(--edge-d);border-bottom:2px solid var(--edge-d)}
+.node-kind{position:absolute;top:0;left:0;z-index:2;font-family:var(--vt);font-size:.95rem;color:var(--night);background:var(--gold2);padding:2px 8px;border-right:2px solid var(--edge-d);border-bottom:2px solid var(--edge-d)}
+.node-in{position:relative;z-index:2;padding:11px}
+.node-n{font-family:var(--pixel);font-size:.74rem;color:var(--gold2);line-height:1.4;text-shadow:2px 2px 0 var(--edge-d)}
+.node-d{font-family:var(--vt);font-size:1.05rem;color:var(--ink-dim);margin-top:5px;line-height:1.2}
+.node-m{font-family:var(--vt);font-size:.95rem;color:var(--cyan);margin-top:5px}
+.node .go{position:absolute;left:11px;bottom:11px;z-index:3;font-family:var(--pixel);font-size:.6rem;color:var(--gold);opacity:0}
+.node:hover .go{opacity:1;animation:cursor .6s steps(2) infinite}
+
+/* ---- layout principal ---- */
+.grid{display:grid;grid-template-columns:1fr 318px;gap:20px;padding:24px 0 40px}
+@media(max-width:960px){.grid{grid-template-columns:1fr}}
+.sect-h{display:flex;align-items:center;gap:12px;margin:4px 0 12px}
+.sect-h .h{font-family:var(--pixel);font-size:.86rem;color:var(--gold)}
+.sect-h .c{font-family:var(--vt);font-size:1.05rem;color:var(--ink-dim)}
+.sect-h .rule{flex:1;height:3px;background:repeating-linear-gradient(90deg,var(--edge) 0 6px,transparent 6px 12px)}
+
+/* quest log (talleres) */
+.qlog .menu-item{align-items:flex-start;gap:12px;padding:13px 14px 13px 32px}
+.qlog-ic{width:40px;height:40px;flex:0 0 auto;background:var(--panel);border:2px solid var(--edge);box-shadow:2px 2px 0 var(--edge-d);display:flex;align-items:center;justify-content:center}
+.qlog-ic svg{width:22px;height:22px;stroke:var(--gold);fill:none;stroke-width:2}
+.qlog-tx{flex:1}
+.qlog-n{font-family:var(--vt);font-size:1.35rem;color:var(--gold2);line-height:1.05}
+.qlog-d{font-family:var(--body);font-size:.84rem;color:var(--ink-dim);margin-top:3px;line-height:1.4}
+.qlog-last{font-family:var(--vt);font-size:1rem;color:var(--ink-dim2);margin-top:4px}
+.qlog-last b{color:var(--cyan)}
+.qlog-r{text-align:right;font-family:var(--vt);font-size:1rem;color:var(--ink-dim);white-space:nowrap;align-self:center}
+.qlog-r b{display:block;font-family:var(--pixel);font-size:.8rem;color:var(--gold2)}
+.qkind{font-family:var(--vt);font-size:.85rem;color:var(--night);padding:1px 7px;display:inline-block;margin-top:5px}
+
+/* event log (coladas) */
+.log-head{display:flex;align-items:center;gap:12px;margin:4px 0 12px}
+.log-head .h{font-family:var(--pixel);font-size:.86rem;color:var(--gold)}
+.filters{display:flex;margin-left:auto;border:3px solid var(--edge-d)}
+.filt{font-family:var(--pixel);font-size:.54rem;color:var(--ink-dim);background:var(--panel);padding:9px 12px;cursor:pointer;border-left:3px solid var(--edge-d)}
+.filt:first-child{border-left:none}
+.filt[aria-pressed="true"]{background:var(--gold);color:var(--night)}
+.log-i{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:11px 13px;border-bottom:2px solid rgba(195,189,255,.1)}
+.log-i:last-child{border-bottom:none}
+.log-av{width:38px;height:38px;flex:0 0 auto;background:var(--panel);border:2px solid var(--edge);box-shadow:2px 2px 0 var(--edge-d);display:flex;align-items:center;justify-content:center;font-family:var(--pixel);font-size:.55rem;color:var(--gold)}
+.log-t{font-family:var(--vt);font-size:1.25rem;color:var(--ink);line-height:1.1}
+.log-tag{font-family:var(--vt);font-size:.85rem;color:var(--night);padding:0 6px;margin-right:6px;vertical-align:middle}
+.log-m{font-family:var(--vt);font-size:.98rem;color:var(--ink-dim);margin-top:2px}
+.log-r{font-family:var(--vt);font-size:.9rem;color:var(--ink-dim);text-align:right;white-space:nowrap}
+.log-r b{display:block;font-family:var(--pixel);font-size:.62rem;color:var(--gold2)}
+
+/* rail widgets */
+.rail{display:flex;flex-direction:column;gap:16px}
+.party{display:flex;flex-wrap:wrap;gap:6px}
+.pu{font-family:var(--vt);font-size:1.02rem;color:var(--ink);background:var(--panel);border:2px solid var(--edge-d);padding:4px 9px;box-shadow:2px 2px 0 var(--edge-d)}
+.pu:hover{color:var(--gold2);border-color:var(--edge)}
+.pu.-staff{background:var(--gold);color:var(--night)}
+.pu.-guest{color:var(--ink-dim2);border-style:dashed;box-shadow:none}
+.side-post{padding:8px 12px;border-bottom:2px solid rgba(195,189,255,.1)}
+.side-post:last-child{border-bottom:none}
+.side-post a{font-family:var(--vt);font-size:1.15rem;color:var(--ink)}
+.side-post a:hover{color:var(--gold2)}
+.side-post .m{font-family:var(--vt);font-size:.9rem;color:var(--ink-dim2);margin-top:1px}
+.posts{max-height:250px;overflow:auto}
+.ptabs{display:flex;border-bottom:3px solid var(--edge-d)}
+.pt{flex:1;font-family:var(--pixel);font-size:.5rem;color:var(--ink-dim);background:var(--panel);padding:9px 4px;cursor:pointer;border-left:2px solid var(--edge-d)}
+.pt:first-child{border-left:none}
+.pt[aria-pressed="true"]{background:var(--gold);color:var(--night)}
+.tasks{list-style:none;display:flex;flex-direction:column;gap:7px}
+.tasks li{font-family:var(--vt);font-size:1.1rem;color:var(--ink);padding:7px 10px;background:var(--panel);border:2px solid var(--edge-d);display:flex;gap:8px}
+.tasks li::before{content:"▶";color:var(--gold)}
+.tasks li.done{color:var(--ink-dim2);text-decoration:line-through}
+.tasks li.done::before{content:"✓";color:var(--green)}
+.dice{display:flex;flex-direction:column;align-items:center;gap:11px}
+.dface{width:64px;height:64px;background:var(--panel);border:3px solid var(--edge);box-shadow:0 0 0 3px var(--edge-d),3px 3px 0 rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-family:var(--pixel);font-size:1.3rem;color:var(--gold2)}
+.dface.roll{animation:shake .4s steps(4)}
+@keyframes shake{25%{transform:translate(-3px,2px) rotate(-6deg)}50%{transform:translate(3px,-2px) rotate(6deg)}75%{transform:translate(-2px,1px)}}
+.dres{font-family:var(--vt);font-size:1.05rem;color:var(--ink-dim);text-align:center}
+.shard{font-family:var(--vt);font-size:1.2rem;color:var(--ink);line-height:1.4;border-left:3px solid var(--gold);padding-left:11px;min-height:60px;display:flex;align-items:center;transition:opacity .3s}
+.srow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:2px solid rgba(195,189,255,.1);font-family:var(--vt);font-size:1.15rem}
+.srow:last-child{border-bottom:none}
+.srow .l{color:var(--ink-dim)}.srow .v{color:var(--ink)}.srow .v.-warn{color:var(--rose)}
+</style>
+</head>
+<body>
+
+<!-- ===================== HUD (barra de estado) ===================== -->
+<header class="hud">
+  <div class="hud-in">
+    <a href="index.html" class="hud-logo">I-<b>FORGE</b></a>
+    <span class="hud-ava"><img src="assets/vania.png" alt="" onerror="this.remove()"><span aria-hidden="true">VK</span></span>
+    <div>
+      <div class="hud-name">Vania Korr <span class="lv">LV5</span></div>
+      <div class="hud-gauges">
+        <div class="gauge -hp" aria-label="HP"><i style="width:100%"></i></div>
+        <div class="gauge -mp" aria-label="MP"><i style="width:100%"></i></div>
+      </div>
+    </div>
+    <div class="hud-gold" title="Marcos">4.850</div>
+    <nav class="hud-cmd" aria-label="Menú principal">
+      <a href="index.html" class="on">Mundo</a>
+      <a href="foro.html">Foros</a>
+      <a href="tramites.html">Tienda</a>
+      <a href="ficha.html">Ficha</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===================== TICKER DE SISTEMA ===================== -->
+<div class="sysbar" aria-label="Estado del mundo">
+  <div class="sysbar-run">
+    <span>◆ FRAGUA ENCENDIDA · VERANO · AÑO 925</span><span>247 PERSONAJES FORJADOS</span><span>7 CONTRATOS ABIERTOS</span><span>3 EXPEDIENTES EN REVISIÓN</span><span>EVENTO: TORNEO DE LA FUNDICIÓN</span><span>ÚLTIMA COLADA HACE 8 MIN</span>
+    <span>◆ FRAGUA ENCENDIDA · VERANO · AÑO 925</span><span>247 PERSONAJES FORJADOS</span><span>7 CONTRATOS ABIERTOS</span><span>3 EXPEDIENTES EN REVISIÓN</span><span>EVENTO: TORNEO DE LA FUNDICIÓN</span><span>ÚLTIMA COLADA HACE 8 MIN</span>
+  </div>
+</div>
+
+<!-- ===================== PANTALLA DE TÍTULO (banner+census) ===================== -->
+<section class="title">
+  <div class="stars" aria-hidden="true"></div>
+  <div class="title-eyebrow">FRAGUA Nº 001 · FORO DE ROL PLAY-BY-POST</div>
+  <h1 class="logo">AQUÍ SE <b>FORJAN</b><br>LOS PERSONAJES</h1>
+  <p class="title-sub">I-Forge es el yunque donde tu personaje toma forma: <b>ficha, mecánicas, inventario y crónica</b> en una sola herramienta. Golpea el metal mientras está caliente.</p>
+  <div class="title-cta">
+    <a href="ficha.html" class="btn -gold">▶ Forjar personaje</a>
+    <a href="#mundo" class="btn">Explorar el mundo</a>
+  </div>
+  <div class="title-press"><span class="press">— PRESS START —</span></div>
+
+  <div class="save" aria-label="Estado de la partida">
+    <div class="save-c"><div class="save-v">247</div><div class="save-l">Personajes forjados</div></div>
+    <div class="save-c"><div class="save-v">18.432</div><div class="save-l">Mensajes en archivo</div></div>
+    <div class="save-c"><div class="save-v">34<span class="live" aria-hidden="true"></span></div><div class="save-l">En la fragua ahora</div></div>
+    <div class="save-c"><div class="save-v -name">Vania Korr</div><div class="save-l">Última colada · 8 min</div></div>
+  </div>
+</section>
+
+<div class="wrap">
+
+  <!-- ===================== MAPA DEL MUNDO (sectores) ===================== -->
+  <section class="window mapwin reveal" id="mundo">
+    <span class="win-title -cyan">Mapa del mundo ▸ elige destino</span>
+    <div class="win-body">
+      <div class="mapgrid">
+        <a href="#" class="node">
+          <div class="node-art"><svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice"><rect width="200" height="150" fill="#2a2456"/><polygon points="0,150 46,60 92,110 128,46 176,110 200,66 200,150" fill="#181433"/><rect x="150" y="28" width="16" height="14" fill="#f4c455"/><rect x="120" y="38" width="10" height="24" fill="#3a3780"/></svg></div>
+          <div class="node-scan" aria-hidden="true"></div><div class="node-veil"></div>
+          <span class="node-kind">Fundición</span><span class="node-rank" style="background:var(--tC)">C</span>
+          <div class="node-in"><div class="node-n">Puerto Yunque</div><div class="node-d">Ciudad-fábrica y sede del taller. Riesgo medio.</div><div class="node-m">128 temas · 2.1k msgs</div></div>
+          <span class="go">▶ Viajar</span>
+        </a>
+        <a href="#" class="node">
+          <div class="node-art"><svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice"><rect width="200" height="150" fill="#1e3320"/><polygon points="0,150 24,86 52,124 78,62 104,116 132,52 164,124 190,82 200,150" fill="#122414"/></svg></div>
+          <div class="node-scan" aria-hidden="true"></div><div class="node-veil"></div>
+          <span class="node-kind">Salvaje</span><span class="node-rank" style="background:var(--tS)">S</span>
+          <div class="node-in"><div class="node-n">Bosque Cenizo</div><div class="node-d">Espesura densa. Bestias de rango S y clanes ocultos.</div><div class="node-m">87 temas · 1.4k msgs</div></div>
+          <span class="go">▶ Viajar</span>
+        </a>
+        <a href="#" class="node">
+          <div class="node-art"><svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice"><rect width="200" height="150" fill="#3a3e56"/><polygon points="0,150 44,46 74,90 104,22 134,84 166,40 200,98 200,150" fill="#232744"/><polygon points="104,22 118,46 90,46" fill="#cbd0ff"/></svg></div>
+          <div class="node-scan" aria-hidden="true"></div><div class="node-veil"></div>
+          <span class="node-kind">Altura</span><span class="node-rank" style="background:var(--tA)">A</span>
+          <div class="node-in"><div class="node-n">Sierra de Hierro</div><div class="node-d">Picos minados y talleres colgantes de altura.</div><div class="node-m">45 temas · 678 msgs</div></div>
+          <span class="go">▶ Viajar</span>
+        </a>
+        <a href="#" class="node">
+          <div class="node-art"><svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice"><rect width="200" height="150" fill="#1a2a3d"/><path d="M0 96 Q50 82 100 96 T200 96 V150 H0Z" fill="#22415d"/><path d="M0 120 Q50 106 100 120 T200 120 V150 H0Z" fill="#2f5878"/></svg></div>
+          <div class="node-scan" aria-hidden="true"></div><div class="node-veil"></div>
+          <span class="node-kind">Costa</span><span class="node-rank" style="background:var(--tB)">B</span>
+          <div class="node-in"><div class="node-n">Ría de Escoria</div><div class="node-d">Puertos, subastas y rutas de contrabando marítimo.</div><div class="node-m">56 temas · 920 msgs</div></div>
+          <span class="go">▶ Viajar</span>
+        </a>
+        <a href="#" class="node">
+          <div class="node-art"><svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice"><rect width="200" height="150" fill="#0f0d1c"/><polygon points="0,150 30,82 60,130 90,56 120,122 150,74 200,150" fill="#171529"/><circle cx="100" cy="46" r="3" fill="#f06a9c"/><circle cx="140" cy="32" r="2" fill="#f4c455"/></svg></div>
+          <div class="node-scan" aria-hidden="true"></div><div class="node-veil"></div>
+          <span class="node-kind">Prohibido</span><span class="node-rank" style="background:var(--tSS)">SS</span>
+          <div class="node-in"><div class="node-n">La Escoria Negra</div><div class="node-d">Territorio vedado. Solo con licencia especial.</div><div class="node-m">89 temas · 1.4k msgs</div></div>
+          <span class="go">▶ Viajar</span>
+        </a>
+        <a href="#" class="node">
+          <div class="node-art"><svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice"><rect width="200" height="150" fill="#3a2f4e"/><polygon points="0,150 200,150 200,112 150,122 100,92 50,122 0,112" fill="#281f3a"/><rect x="84" y="46" width="34" height="72" fill="#4a3d68"/><polygon points="74,46 128,46 100,22" fill="#33284a"/></svg></div>
+          <div class="node-scan" aria-hidden="true"></div><div class="node-veil"></div>
+          <span class="node-kind">Refugio</span><span class="node-rank" style="background:var(--tE)">E</span>
+          <div class="node-in"><div class="node-n">La Escuela</div><div class="node-d">Formación de aprendices y evaluación de licencias.</div><div class="node-m">62 temas · 810 msgs</div></div>
+          <span class="go">▶ Viajar</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <!-- ===================== MAIN ===================== -->
+    <main>
+      <!-- REGISTRO DE MISIONES (talleres) -->
+      <section class="reveal" id="foros">
+        <div class="sect-h"><span class="h">Registro de misiones</span><span class="c">// guías &amp; gestión</span><span class="rule"></span></div>
+        <div class="window qlog">
+          <div class="menu">
+            <a href="#" class="menu-item" role="button">
+              <span class="qlog-ic"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>
+              <span class="qlog-tx"><span class="qlog-n">Guías &amp; Reglamento</span><span class="qlog-d">Sistema de stats, escala de rangos E→M+ y creación de ficha paso a paso.</span><span class="qlog-last">Última: <b>Cambios v1.2 — clima dinámico</b> · hace 2 h</span><span class="qkind" style="background:var(--tC)">GUÍA</span></span>
+              <span class="qlog-r"><b>44</b>temas · 512</span>
+            </a>
+            <a href="foro.html" class="menu-item" role="button">
+              <span class="qlog-ic"><svg viewBox="0 0 24 24"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/></svg></span>
+              <span class="qlog-tx"><span class="qlog-n">Tablón de contratos</span><span class="qlog-d">Misiones oficiales y encargos entre personajes, ordenados por riesgo.</span><span class="qlog-last">Última: <b>#453 — Investigación en las minas</b> · hace 30 min</span><span class="qkind" style="background:var(--tA)">CONTRATOS</span></span>
+              <span class="qlog-r"><b>73</b>temas · 540</span>
+            </a>
+            <a href="ficha.html" class="menu-item" role="button">
+              <span class="qlog-ic"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+              <span class="qlog-tx"><span class="qlog-n">Expedientes</span><span class="qlog-d">Registro oficial de personajes forjados y aprobados por el taller.</span><span class="qlog-last">Último: <b>Vania Korr</b> · aprobado hace 3 h</span><span class="qkind" style="background:var(--tB)">FICHAS</span></span>
+              <span class="qlog-r"><b>247</b>fichas</span>
+            </a>
+            <a href="#" class="menu-item" role="button">
+              <span class="qlog-ic"><svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></span>
+              <span class="qlog-tx"><span class="qlog-n">Bestiario</span><span class="qlog-d">Criaturas catalogadas por región y clase de peligro.</span><span class="qlog-last">Último: <b>Centinela de escoria</b> · hace 1 d</span><span class="qkind" style="background:var(--tS)">BESTIARIO</span></span>
+              <span class="qlog-r"><b>34</b>temas · 456</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- REGISTRO DE EVENTOS (coladas) -->
+      <section class="reveal" id="coladas">
+        <div class="log-head">
+          <span class="h">Registro de eventos</span>
+          <div class="filters" role="group" aria-label="Filtrar publicaciones">
+            <button class="filt" aria-pressed="true" data-f="all">Todo</button>
+            <button class="filt" aria-pressed="false" data-f="rol">Rol</button>
+            <button class="filt" aria-pressed="false" data-f="off">Off</button>
+          </div>
+        </div>
+        <div class="window"><div id="feed"></div></div>
+      </section>
+    </main>
+
+    <!-- ===================== RAIL ===================== -->
+    <aside class="rail">
+      <div class="window -plain">
+        <span class="win-title">Party en línea</span>
+        <div class="win-body -tight">
+          <div class="party">
+            <a href="ficha.html" class="pu -staff">Fundidor · Staff</a>
+            <a href="ficha.html" class="pu">Vania Korr</a>
+            <a href="#" class="pu">Ren Duro</a>
+            <a href="#" class="pu">Mira Cinzel</a>
+            <a href="#" class="pu">Taro Yesca</a>
+            <a href="#" class="pu">Nala Brasa</a>
+            <span class="pu -guest">Google, Bing +22</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="window -plain">
+        <span class="win-title">Estado del mundo</span>
+        <div class="win-body -tight">
+          <div class="srow"><span class="l">Presente on-rol</span><span class="v">Verano 925</span></div>
+          <div class="srow"><span class="l">Contratos abiertos</span><span class="v">7</span></div>
+          <div class="srow"><span class="l">Expedientes por revisar</span><span class="v -warn">3</span></div>
+          <div class="srow"><span class="l">Evento</span><span class="v">Torneo</span></div>
+        </div>
+      </div>
+
+      <div class="window -plain">
+        <div class="ptabs" role="group" aria-label="Filtrar registro lateral">
+          <button class="pt" aria-pressed="true" data-p="all">Todo</button>
+          <button class="pt" aria-pressed="false" data-p="rol">Rol</button>
+          <button class="pt" aria-pressed="false" data-p="off">Off</button>
+        </div>
+        <div class="posts" id="sidePosts"></div>
+      </div>
+
+      <div class="window -plain">
+        <span class="win-title">Misiones pendientes</span>
+        <div class="win-body -tight"><ul class="tasks">
+          <li>Responder al contrato #447</li>
+          <li>Revisar aptitud pendiente</li>
+          <li class="done">Aprobar expediente de Vania</li>
+          <li>Leer la crónica del Bosque Cenizo</li>
+        </ul></div>
+      </div>
+
+      <div class="window -plain">
+        <span class="win-title">Tirada · D20</span>
+        <div class="win-body -tight dice">
+          <div class="dface" id="dface">?</div>
+          <button class="btn -sm -gold" id="dbtn" type="button">Tirar dado</button>
+          <div class="dres" id="dres">Pulsa para tirar</div>
+        </div>
+      </div>
+
+      <div class="window -plain">
+        <span class="win-title">Esquirla</span>
+        <div class="win-body -tight"><p class="shard" id="shard">El acero de Puerto Yunque se templa con agua de la Ría; dicen que por eso guarda el frío del mar.</p></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="foot">
+  <div class="foot-in">
+    <div class="lg">I-FORGE</div>
+    <div><a href="foro.html">Foros</a><a href="tramites.html">Tienda</a><a href="ficha.html">Ficha</a><a href="#">Discord</a></div>
+    <small>Prototipo · estilo "PixelRPG" · datos de ejemplo</small>
+  </div>
+  <div class="foot-note">Vista de prototipo estático — sin backend. Personajes, rangos y datos son ficticios.</div>
+</footer>
+
+<script>
+const FEED=[
+  {ty:'rol',tag:'A',c:'--tA',t:'Emboscada en el cruce de la Ría',a:'Ren Duro',w:'Sectores · hace 8 min',r:'12'},
+  {ty:'rol',tag:'S',c:'--tS',t:'Informe: centinela de escoria avistado',a:'Mira Cinzel',w:'Gremio · hace 22 min',r:'31'},
+  {ty:'rol',tag:'B',c:'--tB',t:'Prácticas de flujo en la Escuela',a:'Taro Yesca',w:'Aptitudes · hace 45 min',r:'6'},
+  {ty:'off',tag:'OFF',c:'--ink-fade',t:'Colada 1.2 — clima dinámico ya activo',a:'Fundidor',w:'Anuncios · hace 1 h',r:'9'},
+  {ty:'rol',tag:'C',c:'--tC',t:'Primer contacto con el clan del Hollín',a:'Nala Brasa',w:'Sectores · hace 1 h',r:'4'},
+  {ty:'rol',tag:'B',c:'--tB',t:'Contrato #447 — Escolta de mineral',a:'Vania Korr',w:'Gremio · hace 3 h',r:'5'},
+  {ty:'off',tag:'OFF',c:'--ink-fade',t:'Presentación: aprendiz recién llegado',a:'Sora Vela',w:'Off-rol · hace 4 h',r:'18'},
+  {ty:'off',tag:'OFF',c:'--ink-fade',t:'Debate: mejores oficios para empezar',a:'Akio Brea',w:'Off-rol · hace 5 h',r:'27'},
+];
+const ini=a=>a.split(' ').map(x=>x[0]).join('').slice(0,2);
+function feedItem(p){return `<div class="log-i"><span class="log-av">${ini(p.a)}</span>
+  <div><div class="log-t"><span class="log-tag" style="background:var(${p.c})">${p.tag}</span>${p.t}</div><div class="log-m">${p.a} · ${p.w}</div></div>
+  <div class="log-r"><b>${p.r}</b>resp.</div></div>`;}
+function renderFeed(f){document.getElementById('feed').innerHTML=FEED.filter(p=>f==='all'||p.ty===f).map(feedItem).join('');}
+document.querySelectorAll('.filt').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filt').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');renderFeed(b.dataset.f);}));
+renderFeed('all');
+function renderSide(f){document.getElementById('sidePosts').innerHTML=FEED.filter(p=>f==='all'||p.ty===f).map(p=>`<div class="side-post"><a href="#">${p.t}</a><div class="m">${p.a} · ${p.w}</div></div>`).join('');}
+document.querySelectorAll('.pt').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.pt').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');renderSide(b.dataset.p);}));
+renderSide('all');
+
+const dface=document.getElementById('dface'),dbtn=document.getElementById('dbtn'),dres=document.getElementById('dres');
+dbtn.addEventListener('click',()=>{dface.classList.remove('roll');void dface.offsetWidth;dface.classList.add('roll');const v=Math.floor(Math.random()*20)+1;setTimeout(()=>{dface.textContent=v;dres.textContent=v===20?'¡CRÍTICO! 20':v===1?'PIFIA… 1':'Resultado: '+v;},260);});
+
+const SHARDS=[
+  'El acero de Puerto Yunque se templa con agua de la Ría; dicen que por eso guarda el frío del mar.',
+  'Un personaje sin oficio se oxida rápido: la fragua premia a quien sigue golpeando.',
+  'La escala de calor mide poder, no temperatura. Un rango M+ arde blanco aunque toques hielo.',
+  'En el Bosque Cenizo, la ceniza nunca cae: flota, y por eso los rastros duran semanas.',
+  'La carga combativa marca cuánto peso llevas sin perder agilidad. Cárgate de más y serás yunque, no martillo.'
+];
+let si=0;setInterval(()=>{si=(si+1)%SHARDS.length;const el=document.getElementById('shard');el.style.opacity=0;setTimeout(()=>{el.textContent=SHARDS[si];el.style.opacity=1;},220);},9000);
+
+if('IntersectionObserver'in window && !matchMedia('(prefers-reduced-motion:reduce)').matches){
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target);}}),{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+}else{document.querySelectorAll('.reveal').forEach(el=>el.classList.add('vis'));}
+</script>
+</body>
+</html>

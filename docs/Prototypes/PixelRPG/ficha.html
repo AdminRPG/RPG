@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menú de estado — Vania Korr · I-Forge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="pixel.css">
+<style>
+/* ============================================================
+   ficha.html — MENÚ DE ESTADO / PARTY (JRPG). Solo var(--tokens).
+   La firma es el SPRITE/RETRATO PNG como carta de personaje, con
+   gauges HP/MP/XP y menú de comandos (Estado/Crónica/Combate/…).
+   ============================================================ */
+.status{max-width:1240px;margin:0 auto;padding:16px 16px 0;display:grid;grid-template-columns:330px 1fr;gap:20px;align-items:start}
+@media(max-width:960px){.status{grid-template-columns:1fr}}
+
+/* ---- carta de personaje (izquierda) ---- */
+.charcol{position:sticky;top:74px;display:flex;flex-direction:column;gap:14px}
+@media(max-width:960px){.charcol{position:static}}
+.portrait{position:relative;aspect-ratio:4/5;width:100%}
+.portrait .sprite{width:100%;height:100%}
+.portrait .fallback{font-size:2.6rem}
+.p-rank{position:absolute;top:0;right:0;z-index:4;font-family:var(--pixel);font-size:1rem;color:var(--night);padding:6px 11px;border-left:3px solid var(--edge-d);border-bottom:3px solid var(--edge-d)}
+.p-serial{position:absolute;top:0;left:0;z-index:4;font-family:var(--vt);font-size:.95rem;color:var(--night);background:var(--gold2);padding:2px 9px;border-right:3px solid var(--edge-d);border-bottom:3px solid var(--edge-d)}
+.p-lv{position:absolute;left:8px;bottom:52px;z-index:4;font-family:var(--pixel);font-size:.62rem;color:var(--night);background:var(--cyan);padding:4px 8px;border:2px solid var(--edge-d)}
+.p-name{position:absolute;left:0;right:0;bottom:0;z-index:4;background:linear-gradient(to top,rgba(10,9,20,.96),rgba(10,9,20,.72) 60%,transparent);padding:22px 10px 9px}
+.p-name b{display:block;font-family:var(--pixel);font-size:1.05rem;color:var(--gold2);line-height:1.4;text-shadow:2px 2px 0 var(--edge-d)}
+.p-name span{font-family:var(--vt);font-size:1.05rem;color:var(--cyan)}
+
+/* gauges de la carta */
+.vitals .win-body{padding:12px}
+.gauge-row .nb b{color:var(--gold2)}
+.xp-note{font-family:var(--vt);font-size:.95rem;color:var(--ink-dim2);margin-top:6px;line-height:1.3}
+.goldline{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:2px solid rgba(195,189,255,.12);font-family:var(--vt);font-size:1.2rem;color:var(--ink-dim)}
+.goldline b{font-family:var(--pixel);font-size:.8rem;color:var(--gold)}
+.acts{display:flex;gap:8px;margin-top:12px}
+.acts .btn{flex:1;text-align:center}
+
+/* identidad */
+.idmeta{font-family:var(--vt);font-size:1.02rem;color:var(--ink-dim);line-height:1.35}
+.idmeta .desig{color:var(--ink);margin:6px 0 10px;display:block}
+.idtags{display:flex;flex-wrap:wrap;gap:6px}
+
+/* ---- panel derecho ---- */
+.panel{display:none}
+.panel.on{display:block}
+.sect-h{display:flex;align-items:center;gap:10px;margin:2px 0 10px}
+.sect-h .h{font-family:var(--pixel);font-size:.72rem;color:var(--gold)}
+.sect-h .c{font-family:var(--vt);font-size:1rem;color:var(--ink-dim);margin-left:auto}
+
+/* stats crisol */
+.grp{margin-bottom:14px}
+.grp-h{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.grp-h .n{font-family:var(--pixel);font-size:.66rem}
+.grp-h .bar{flex:1;height:2px;background:var(--edge-d)}
+.grp-h .avg{font-family:var(--vt);font-size:1rem;color:var(--ink-dim)}
+.pstat{display:grid;grid-template-columns:120px 1fr 30px 30px;gap:10px;align-items:center;padding:4px 0}
+.pstat .lb{font-family:var(--vt);font-size:1.15rem;color:var(--ink)}
+.pstat .lb small{color:var(--ink-dim2);font-size:.85rem}
+.pstat .vl{font-family:var(--vt);font-size:1.3rem;color:var(--ink);text-align:right}
+.pstat .rk{font-family:var(--pixel);font-size:.6rem;text-align:center}
+@media(max-width:520px){.pstat{grid-template-columns:96px 1fr 26px 26px;gap:7px}}
+
+.forge-temp{margin-top:12px;display:flex;align-items:center;gap:12px;padding:11px;background:var(--panel);border:2px solid var(--edge-d)}
+.forge-temp .big{font-family:var(--pixel);font-size:1.5rem;line-height:1}
+.forge-temp .lbl{font-family:var(--vt);font-size:1rem;color:var(--ink-dim)}
+.forge-temp .meter{flex:1;height:14px;background:#0a0913;border:2px solid var(--edge);overflow:hidden}
+.forge-temp .meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--tE),var(--tC),var(--tA),var(--tSS),var(--tMx));transition:width 1s ease}
+
+/* heatscale */
+.heat{display:flex;gap:3px;margin:0 0 14px}
+.heat .cell{flex:1;text-align:center;padding:7px 2px;border:2px solid var(--edge-d);font-family:var(--vt);font-size:.95rem;color:var(--night)}
+.heat .cell b{display:block;font-family:var(--pixel);font-size:.6rem}
+.heat .cell.on{outline:3px solid var(--gold);outline-offset:-1px;z-index:2}
+
+/* derivadas */
+.der-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.der{border:2px solid var(--edge-d);background:var(--panel);padding:8px 10px}
+.der .n{font-family:var(--vt);font-size:1.02rem;color:var(--ink-dim);line-height:1.1}
+.der .v{font-family:var(--pixel);font-size:.82rem;color:var(--gold2);margin:3px 0}
+.der .v small{font-family:var(--vt);font-size:.9rem;color:var(--ink-dim)}
+.der .fx{font-family:var(--vt);font-size:.9rem;color:var(--cyan)}
+
+/* mini paneles (bolsa/rep/sin repartir) */
+.mini{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px}
+@media(max-width:720px){.mini{grid-template-columns:1fr}}
+.coin{display:flex;align-items:center;gap:8px;font-family:var(--vt);font-size:1.1rem;color:var(--ink);padding:4px 0}
+.coin .dot{width:12px;height:12px;border:2px solid var(--edge-d)}
+.coin b{margin-left:auto;font-family:var(--pixel);font-size:.7rem;color:var(--gold2)}
+.repbar{display:flex;height:16px;border:2px solid var(--edge-d);margin:2px 0 6px;overflow:hidden}
+.repbar .p{background:var(--green)}.repbar .n{background:var(--rose)}
+.repnums{display:flex;justify-content:space-between;font-family:var(--vt);font-size:1.05rem}
+.repnums .p{color:var(--green)}.repnums .n{color:var(--rose)}
+
+/* crónica */
+.bio{display:grid;grid-template-columns:230px 1fr;gap:14px}
+@media(max-width:820px){.bio{grid-template-columns:1fr}}
+.subtabs{display:flex;border:3px solid var(--edge-d);margin-bottom:12px;width:fit-content}
+.subtab{font-family:var(--pixel);font-size:.54rem;color:var(--ink-dim);background:var(--panel);padding:9px 11px;cursor:pointer;border-left:3px solid var(--edge-d)}
+.subtab:first-child{border-left:none}
+.subtab[aria-selected="true"]{background:var(--gold);color:var(--night)}
+.prose{font-family:var(--body);font-size:.94rem;color:var(--ink);line-height:1.65}
+.prose p{margin-bottom:11px}.prose p:last-child{margin-bottom:0}
+.prose strong{color:var(--gold2)}
+.kv{font-family:var(--vt)}
+.of{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:2px solid rgba(195,189,255,.1);font-family:var(--vt);font-size:1.1rem}
+.of:last-child{border-bottom:none}
+.of .ico{width:28px;height:28px;flex:0 0 auto;background:var(--panel);border:2px solid var(--edge-d);display:flex;align-items:center;justify-content:center}
+.of .ico svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:2}
+.of .lv{margin-left:auto;color:var(--ink-dim)}.of .lv b{color:var(--gold2)}
+.trait{display:flex;gap:9px;padding:7px 0;border-bottom:2px solid rgba(195,189,255,.1);font-family:var(--vt);font-size:1.05rem}
+.trait:last-child{border-bottom:none}
+.trait .d{width:9px;height:9px;margin-top:5px;flex:0 0 auto}
+.trait .d.v{background:var(--green)}.trait .d.x{background:var(--rose)}
+.trait .b{color:var(--ink)}.trait small{display:block;color:var(--ink-dim);font-size:.9rem}
+.trait .id{margin-left:auto;font-family:var(--vt);font-size:.85rem;color:var(--ink-dim2);border:2px solid var(--edge-d);padding:0 5px;height:fit-content}
+.tl{display:flex;flex-direction:column}
+.tl-i{position:relative;padding:6px 0 6px 16px;font-family:var(--vt);font-size:1.05rem;border-left:2px solid var(--edge)}
+.tl-i:last-child{border-left-color:transparent}
+.tl-i::before{content:"";position:absolute;left:-6px;top:9px;width:9px;height:9px;background:var(--gold);border:2px solid var(--edge-d)}
+.tl-i b{color:var(--cyan)}.tl-i span{color:var(--ink-dim)}
+
+/* combate */
+.combat{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:820px){.combat{grid-template-columns:1fr}}
+.flow{display:grid;grid-template-columns:130px 1fr 26px;gap:9px;align-items:center;padding:6px 0;border-bottom:2px solid rgba(195,189,255,.1);font-family:var(--vt);font-size:1.1rem}
+.flow:last-child{border-bottom:none}
+.flow .rk{font-family:var(--pixel);font-size:.66rem;text-align:center}
+.disc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.disc{position:relative;min-height:120px;border:3px solid var(--edge-d);background:linear-gradient(160deg,#241f52,#141130);overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+.disc-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.85}
+.disc-art svg{width:56%;height:56%;stroke-width:2;fill:none}
+.disc-veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,9,20,.95) 12%,rgba(10,9,20,.3) 60%,transparent)}
+.disc-rk{position:absolute;top:0;right:0;z-index:2;font-family:var(--pixel);font-size:.62rem;color:var(--night);padding:4px 8px;border-left:2px solid var(--edge-d);border-bottom:2px solid var(--edge-d)}
+.disc-in{position:relative;z-index:2;padding:10px}
+.disc-n{font-family:var(--vt);font-size:1.3rem;color:var(--gold2);line-height:1}
+.disc-sp{font-family:var(--vt);font-size:.92rem;color:var(--ink-dim);margin-top:2px}
+.disc-sp b{color:var(--cyan)}
+.disc.lock{filter:grayscale(.7) brightness(.66)}
+.disc .lockmsg{font-family:var(--vt);font-size:.9rem;color:var(--ink-dim2);margin-top:2px}
+
+/* aptitudes */
+.apt{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;border:2px solid var(--edge-d);background:var(--panel);padding:10px 12px;margin-bottom:8px}
+.apt-t{font-family:var(--pixel);font-size:.6rem;color:var(--night);background:var(--gold);border:2px solid var(--edge-d);padding:5px 7px;min-width:34px;text-align:center}
+.apt-n{font-family:var(--vt);font-size:1.3rem;color:var(--gold2);line-height:1}
+.apt-d{font-family:var(--body);font-size:.84rem;color:var(--ink-dim);margin-top:2px}
+.apt-cost{font-family:var(--vt);font-size:.95rem;color:var(--rose);margin-top:2px}
+.apt-tp{font-family:var(--vt);font-size:.9rem;color:var(--night);padding:3px 8px;white-space:nowrap}
+.filters.f2{margin-bottom:8px;width:fit-content}
+
+/* equipo */
+.eq{display:grid;grid-template-columns:250px 1fr;gap:14px}
+@media(max-width:820px){.eq{grid-template-columns:1fr}}
+.slot{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:2px solid rgba(195,189,255,.1);font-family:var(--vt);font-size:1.1rem}
+.slot:last-child{border-bottom:none}
+.slot .ic{width:30px;height:30px;flex:0 0 auto;background:var(--panel);border:2px solid var(--edge-d);display:flex;align-items:center;justify-content:center}
+.slot .ic svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:2}
+.slot .b{font-family:var(--vt);font-size:.9rem;color:var(--ink-dim);text-transform:uppercase}
+.slot .s{color:var(--ink)}
+.slot.empty .s{color:var(--ink-dim2);font-style:italic}.slot.empty .ic{border-style:dashed}
+.capl{font-family:var(--vt);font-size:1.05rem;color:var(--ink-dim);margin-top:10px}.capl b{color:var(--gold2)}
+.cap-track{height:10px;border:2px solid var(--edge);background:#0a0913;overflow:hidden;margin-top:4px}.cap-track i{display:block;height:100%;background:var(--cyan)}
+.inv-tabs{display:flex;flex-wrap:wrap;border:3px solid var(--edge-d);margin:10px 0 12px;width:fit-content}
+.inv-tab{font-family:var(--pixel);font-size:.5rem;color:var(--ink-dim);background:var(--panel);padding:8px 10px;cursor:pointer;border-left:3px solid var(--edge-d)}
+.inv-tab:first-child{border-left:none}
+.inv-tab[aria-pressed="true"]{background:var(--gold);color:var(--night)}
+.inv-sec{font-family:var(--pixel);font-size:.56rem;color:var(--cyan);margin:14px 0 8px;border-bottom:2px solid var(--edge-d);padding-bottom:6px}
+.inv-sec:first-child{margin-top:0}
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.item{position:relative;border:2px solid var(--edge-d);background:var(--panel);padding:8px;text-align:center;cursor:pointer;transition:transform .1s,box-shadow .1s}
+.item:hover{transform:translate(-2px,-2px);box-shadow:3px 3px 0 var(--edge-d)}
+.item::before{content:"";position:absolute;top:0;left:0;width:100%;height:4px}
+.item[data-r="c"]::before{background:var(--tE)}.item[data-r="u"]::before{background:var(--tD)}
+.item[data-r="r"]::before{background:var(--tC)}.item[data-r="e"]::before{background:var(--tB)}
+.item .ic{width:38px;height:38px;margin:4px auto 6px;background:#0e0c1c;border:2px solid var(--edge-d);display:flex;align-items:center;justify-content:center}
+.item .ic svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:2}
+.item .n{font-family:var(--vt);font-size:1rem;color:var(--ink);line-height:1.05}
+.item .q{font-family:var(--vt);font-size:.9rem;color:var(--gold2)}
+</style>
+</head>
+<body>
+
+<!-- ===================== HUD ===================== -->
+<header class="hud">
+  <div class="hud-in">
+    <a href="index.html" class="hud-logo">I-<b>FORGE</b></a>
+    <span class="hud-ava"><img src="assets/vania.png" alt="" onerror="this.remove()"><span aria-hidden="true">VK</span></span>
+    <div>
+      <div class="hud-name">Vania Korr <span class="lv">LV5</span></div>
+      <div class="hud-gauges">
+        <div class="gauge -hp" aria-label="HP"><i style="width:100%"></i></div>
+        <div class="gauge -mp" aria-label="MP"><i style="width:100%"></i></div>
+      </div>
+    </div>
+    <div class="hud-gold" title="Marcos">4.850</div>
+    <nav class="hud-cmd" aria-label="Menú principal">
+      <a href="index.html">Mundo</a>
+      <a href="foro.html">Foros</a>
+      <a href="tramites.html">Tienda</a>
+      <a href="ficha.html" class="on">Ficha</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===================== BREADCRUMB ===================== -->
+<nav class="crumb" aria-label="Ruta"><div class="crumb-in"><a href="index.html">Mundo</a><span class="sep">›</span><a href="index.html#foros">Expedientes</a><span class="sep">›</span><b>Vania Korr</b></div></nav>
+
+<div class="status">
+  <!-- ============ CARTA DE PERSONAJE ============ -->
+  <div class="charcol">
+    <div class="portrait">
+      <div class="sprite">
+        <div class="grd" aria-hidden="true"></div>
+        <img src="assets/vania.png" alt="Retrato de Vania Korr" onerror="this.remove()">
+        <span class="fallback" aria-hidden="true">VK</span>
+      </div>
+      <span class="p-serial">Nº 04127</span>
+      <span class="p-rank" id="pRank" style="background:var(--tC)">C</span>
+      <span class="p-lv">LV 5</span>
+      <div class="p-name"><b>VANIA<br>KORR</b><span>Operativa · Rastreadora</span></div>
+    </div>
+
+    <div class="window -plain vitals">
+      <span class="win-title">Vitales</span>
+      <div class="win-body">
+        <div class="gauge-row"><span class="lb">HP</span><div class="gauge -hp"><i style="width:100%"></i></div><span class="nb" id="hpN">100/100</span></div>
+        <div class="gauge-row"><span class="lb">MP</span><div class="gauge -mp"><i style="width:100%"></i></div><span class="nb" id="mpN">90/90</span></div>
+        <div class="gauge-row"><span class="lb">XP</span><div class="gauge -xp"><i id="xpFill" style="width:0"></i></div><span class="nb"><b>62%</b></span></div>
+        <div class="xp-note">Temple 5 → 6 · <b style="color:var(--gold2)">3.100 / 5.000</b> · restan 1.900 · +60/100 semanal · recolada en 4 días</div>
+        <div class="goldline"><span>◆ Marcos</span><b>4.850</b></div>
+        <div class="acts">
+          <a class="btn -gold -sm" href="#">Editar</a>
+          <a class="btn -ghost -sm" href="#">Exportar</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="window -plain">
+      <span class="win-title">Expediente</span>
+      <div class="win-body -tight">
+        <div class="idmeta">
+          Nº 04127 · Forjado 925 · Taller de Puerto Yunque
+          <span class="desig">Operativa de campo · Rastreadora · Humana · 24 años · Afinidad Flujo de Emisión</span>
+          <div class="idtags">
+            <span class="tag" style="color:var(--gold2)">Rango C · Nv5</span>
+            <span class="tag">Activo</span>
+            <span class="tag">Gremio · Los Yunques</span>
+            <span class="tag">Rep · Fiable</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PANEL DERECHO ============ -->
+  <div>
+    <div class="cmd" role="tablist" aria-label="Secciones del expediente">
+      <button role="tab" aria-selected="true" data-tab="estado">Estado</button>
+      <button role="tab" aria-selected="false" data-tab="cronica">Crónica</button>
+      <button role="tab" aria-selected="false" data-tab="combate">Combate</button>
+      <button role="tab" aria-selected="false" data-tab="aptitudes">Aptitudes</button>
+      <button role="tab" aria-selected="false" data-tab="equipo">Equipo</button>
+    </div>
+    <div style="height:16px"></div>
+
+    <!-- ESTADO (crisol + derivadas) -->
+    <section class="panel on" id="tab-estado" role="tabpanel">
+      <div class="window">
+        <span class="win-title">Parámetros ▸ calor = rango</span>
+        <div class="win-body">
+          <div class="sect-h"><span class="h">El Crisol</span><span class="c">cada atributo arde a la temperatura de su rango · E1 → M+9</span></div>
+          <div class="heat" id="heat" aria-label="Escala de rango E a M+"></div>
+          <div id="crucible"></div>
+          <div class="forge-temp">
+            <span class="big" id="ftLetter">C</span>
+            <div><div class="lbl">Temperatura de forja</div><div class="lbl" id="ftVal"></div></div>
+            <div class="meter"><i id="ftMeter"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="mini">
+        <div class="window -plain"><span class="win-title">Bolsa</span><div class="win-body -tight">
+          <div class="coin"><span class="dot" style="background:var(--gold)"></span>Marcos<b>4.850</b></div>
+          <div class="coin"><span class="dot" style="background:var(--green)"></span>Fichas<b>230</b></div>
+          <div class="coin"><span class="dot" style="background:var(--cyan)"></span>Esquirlas<b>7</b></div>
+        </div></div>
+        <div class="window -plain"><span class="win-title">Reputación</span><div class="win-body -tight">
+          <div class="repbar"><div class="p" style="width:76%"></div><div class="n" style="width:24%"></div></div>
+          <div class="repnums"><span class="p">+58</span><span class="n">−18</span></div>
+        </div></div>
+        <div class="window -plain"><span class="win-title">Sin repartir</span><div class="win-body -tight">
+          <div class="kv"><span class="l">Atributo</span><span class="v" style="color:var(--gold2)">4</span></div>
+          <div class="kv"><span class="l">Aptitud única</span><span class="v">1 vale</span></div>
+        </div></div>
+      </div>
+      <div style="height:14px"></div>
+      <div class="window">
+        <span class="win-title">Derivadas ▸ fórmula visible</span>
+        <div class="win-body"><div class="der-grid" id="derGrid"></div></div>
+      </div>
+    </section>
+
+    <!-- CRÓNICA -->
+    <section class="panel" id="tab-cronica" role="tabpanel">
+      <div class="bio">
+        <aside>
+          <div class="window -plain"><span class="win-title">Rápido</span><div class="win-body -tight">
+            <div class="kv"><span class="l">Altura</span><span class="v">168 cm</span></div>
+            <div class="kv"><span class="l">Peso</span><span class="v">61 kg</span></div>
+            <div class="kv"><span class="l">Origen</span><span class="v">Puerto Yunque</span></div>
+            <div class="kv"><span class="l">Estado</span><span class="v" style="color:var(--green)">Activa</span></div>
+          </div></div>
+          <div style="height:14px"></div>
+          <div class="window -plain"><span class="win-title">Oficios</span><div class="win-body -tight">
+            <div class="of"><span class="ico"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/></svg></span>Rastreadora<span class="lv">Niv <b>3</b></span></div>
+            <div class="of"><span class="ico"><svg viewBox="0 0 24 24"><path d="M10 2v7.3M14 9.3V2M8.5 2h7M14 9.3a6.5 6.5 0 11-4 0"/></svg></span>Herborista<span class="lv">Niv <b>2</b></span></div>
+            <div class="of"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5"/></svg></span>Herrera<span class="lv">Niv <b>2</b></span></div>
+          </div></div>
+        </aside>
+        <div>
+          <div class="subtabs" role="tablist" aria-label="Secciones de la crónica">
+            <button class="subtab" role="tab" aria-selected="true" data-bio="historia">Historia</button>
+            <button class="subtab" role="tab" aria-selected="false" data-bio="apariencia">Apariencia</button>
+            <button class="subtab" role="tab" aria-selected="false" data-bio="caracter">Carácter</button>
+          </div>
+          <div class="window"><div class="win-body prose" data-bio-c="historia">
+            <p>Vania Korr creció entre los altos hornos de Puerto Yunque, hija de una herrera y un contramaestre de muelle. Aprendió a leer el terreno como su madre leía el metal: por color, tensión y sonido.</p>
+            <p>El <strong>Flujo</strong> le despertó tarde, durante una emboscada en el Bosque Cenizo: su aura brotó como una descarga que empujó a sus atacantes tres metros atrás. Desde entonces canaliza la <strong>Emisión</strong> con precisión seca, como quien clava un remache.</p>
+            <p>Hoy acepta contratos del taller para saldar una deuda vieja — y para llegar, algún día, hasta <strong>La Escoria Negra</strong>.</p>
+          </div></div>
+          <div class="window"><div class="win-body prose" data-bio-c="apariencia" hidden>
+            <p>Complexión seca y fuerte, 168 cm. Pelo cobrizo recogido con alambre de forja. Ojos ámbar, siempre entrecerrados como si calculara distancias. Peto de cuero endurecido y guantes con las yemas cortadas para sentir el flujo.</p>
+            <p>Una quemadura antigua le cruza el antebrazo derecho: recuerdo del horno que la hizo dejar la fundición.</p>
+          </div></div>
+          <div class="window"><div class="win-body prose" data-bio-c="caracter" hidden>
+            <p>Práctica hasta la aspereza. Habla poco y promete menos, pero lo que promete lo cumple aunque arda. Su rasgo <strong>terca</strong> la mete en discusiones que no necesita ganar; su sangre fría la saca de casi todas.</p>
+          </div></div>
+          <div style="height:14px"></div>
+          <div class="window -plain"><span class="win-title">Rasgos ▸ 42/42</span><div class="win-body -tight">
+            <div class="trait"><span class="d v"></span><div><span class="b">Ojo de rastro</span><small>+2 Percepción siguiendo huellas</small></div><span class="id">V014</span></div>
+            <div class="trait"><span class="d v"></span><div><span class="b">Sangre fría</span><small>+1 Voluntad ante el miedo</small></div><span class="id">V022</span></div>
+            <div class="trait"><span class="d x"></span><div><span class="b">Terca</span><small>−1 Concentración si la contradicen</small></div><span class="id">D009</span></div>
+            <div class="trait"><span class="d x"></span><div><span class="b">Vieja herida</span><small>−1 Vigor en climas fríos</small></div><span class="id">D021</span></div>
+          </div></div>
+          <div style="height:14px"></div>
+          <div class="window -plain"><span class="win-title">Línea de tiempo</span><div class="win-body -tight"><div class="tl">
+            <div class="tl-i"><b>Año 901</b> · <span>Nace en Puerto Yunque</span></div>
+            <div class="tl-i"><b>Año 920</b> · <span>Deja la fundición; empieza a rastrear</span></div>
+            <div class="tl-i"><b>Año 923</b> · <span>Despierta el Flujo en el Bosque Cenizo</span></div>
+            <div class="tl-i"><b>Año 925</b> · <span>Licencia de operativa, rango C</span></div>
+          </div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMBATE -->
+    <section class="panel" id="tab-combate" role="tabpanel">
+      <div class="combat">
+        <div class="window -plain"><span class="win-title">Pilares de Flujo</span><div class="win-body">
+          <div class="flow"><span class="l">Cierre (defensa)</span><div class="gauge"><i style="width:33%;background-color:var(--tC)"></i></div><span class="rk" style="color:var(--tC)">C</span></div>
+          <div class="flow"><span class="l">Sello (ocultar)</span><div class="gauge"><i style="width:22%;background-color:var(--tD)"></i></div><span class="rk" style="color:var(--tD)">D</span></div>
+          <div class="flow"><span class="l">Empuje (intensidad)</span><div class="gauge"><i style="width:22%;background-color:var(--tD)"></i></div><span class="rk" style="color:var(--tD)">D</span></div>
+          <div class="flow"><span class="l">Emisión (proyectar)</span><div class="gauge"><i style="width:44%;background-color:var(--tB)"></i></div><span class="rk" style="color:var(--tB)">B</span></div>
+        </div></div>
+        <div class="window -plain"><span class="win-title">Modificadores</span><div class="win-body"><div class="der-grid" id="combatGrid"></div></div></div>
+      </div>
+      <div style="height:14px"></div>
+      <div class="window"><span class="win-title">Disciplinas ▸ doble especialización</span><div class="win-body"><div class="disc-grid" id="discGrid"></div></div></div>
+    </section>
+
+    <!-- APTITUDES -->
+    <section class="panel" id="tab-aptitudes" role="tabpanel">
+      <div class="window"><span class="win-title">Aptitudes de Flujo <span id="aptCount" style="color:var(--cyan)"></span></span>
+        <div class="win-body">
+          <div class="filters f2" id="tierF" role="group" aria-label="Filtrar por tier">
+            <button class="filt" aria-pressed="true" data-f="all">Todas</button>
+            <button class="filt" aria-pressed="false" data-f="T1">T1</button>
+            <button class="filt" aria-pressed="false" data-f="T2">T2</button>
+            <button class="filt" aria-pressed="false" data-f="T3">T3</button>
+          </div>
+          <div class="filters f2" id="typeF" role="group" aria-label="Filtrar por tipo">
+            <button class="filt" aria-pressed="true" data-t="all">Tipos</button>
+            <button class="filt" aria-pressed="false" data-t="of">Ofensiva</button>
+            <button class="filt" aria-pressed="false" data-t="de">Defensiva</button>
+            <button class="filt" aria-pressed="false" data-t="ut">Utilidad</button>
+            <button class="filt" aria-pressed="false" data-t="pa">Pasiva</button>
+          </div>
+          <div id="aptList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EQUIPO -->
+    <section class="panel" id="tab-equipo" role="tabpanel">
+      <div class="eq">
+        <aside>
+          <div class="window -plain"><span class="win-title">Equipado</span><div class="win-body -tight">
+            <div class="slot"><span class="ic"><svg viewBox="0 0 24 24"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/></svg></span><div><div class="b">Arma</div><span class="s">Ballesta ligera · T1</span></div></div>
+            <div class="slot"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><div><div class="b">Armadura</div><span class="s">Peto de cuero · +1</span></div></div>
+            <div class="slot"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg></span><div><div class="b">Accesorio</div><span class="s">Brújula de rastro</span></div></div>
+            <div class="slot empty"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18"/></svg></span><div><div class="b">Reliquia</div><span class="s">Sin equipar</span></div></div>
+            <div class="capl">Carga combativa: <b>11</b> / 24 kg</div>
+            <div class="cap-track"><i style="width:46%"></i></div>
+          </div></div>
+        </aside>
+        <div>
+          <input class="field" id="invSearch" type="text" placeholder="Buscar objeto…" aria-label="Buscar objeto">
+          <div class="inv-tabs" role="group" aria-label="Categorías">
+            <button class="inv-tab" aria-pressed="true" data-c="all">Todo</button>
+            <button class="inv-tab" aria-pressed="false" data-c="consumibles">Consumibles</button>
+            <button class="inv-tab" aria-pressed="false" data-c="armas">Armas</button>
+            <button class="inv-tab" aria-pressed="false" data-c="utensilios">Utensilios</button>
+            <button class="inv-tab" aria-pressed="false" data-c="materiales">Materiales</button>
+          </div>
+          <div class="window"><div class="win-body"><div id="invBody"></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <p class="foot-note">Menú de estado · I-Forge · estilo "PixelRPG" · el sprite se carga desde <b>assets/vania.png</b> · datos de ejemplo.</p>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="foot-in">
+    <div class="lg">I-FORGE</div>
+    <div><a href="index.html">Mundo</a><a href="foro.html">Foros</a><a href="tramites.html">Tienda</a><a href="ficha.html">Ficha</a></div>
+    <small>Prototipo · estilo "PixelRPG" · datos de ejemplo</small>
+  </div>
+</footer>
+
+<script>
+const RV={E:1,D:2,C:3,B:4,A:5,S:6,SS:7,M:8,'M+':9};
+const RSCALE=['E','D','C','B','A','S','SS','M','M+'];
+const TC={1:'--tE',2:'--tD',3:'--tC',4:'--tB',5:'--tA',6:'--tS',7:'--tSS',8:'--tM',9:'--tMx'};
+const tier=v=>`var(${TC[Math.round(v)]||'--tE'})`;
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+const STATS=[
+  {ab:'FUE',nm:'Fuerza',p:'Cuerpo',r:'C'},{ab:'DES',nm:'Destreza',p:'Cuerpo',r:'C'},
+  {ab:'VIG',nm:'Vigor',p:'Cuerpo',r:'D'},{ab:'AGI',nm:'Agilidad',p:'Cuerpo',r:'B'},
+  {ab:'INT',nm:'Intelecto',p:'Mente',r:'C'},{ab:'ING',nm:'Ingenio',p:'Mente',r:'C'},
+  {ab:'CON',nm:'Concentración',p:'Mente',r:'D'},{ab:'PER',nm:'Percepción',p:'Mente',r:'B'},
+  {ab:'CAU',nm:'Caudal',p:'Espíritu',r:'C'},{ab:'CTR',nm:'Control',p:'Espíritu',r:'D'},
+  {ab:'VOL',nm:'Voluntad',p:'Espíritu',r:'C'},{ab:'SEN',nm:'Sensibilidad',p:'Espíritu',r:'D'},
+];
+const V={};STATS.forEach(s=>V[s.ab]=RV[s.r]);const ARM=1;
+const D={PV:V.VIG*50,PA:V.CAU*30,ENE:V.VIG*20,ESP:V.VOL+V.CAU,INI:V.AGI*2+V.PER,
+  DFIS:V.VIG+V.AGI+ARM,DFLU:V.VIG+V.AGI+ARM+V.CAU*30/4,DMEN:V.VOL+V.CON,
+  PFIS:V.DES+V.AGI,PFLU:V.CTR+V.SEN,MOV:5+V.AGI,SV:0.5+V.AGI*0.3,SH:1+V.AGI*0.6,
+  CAI:V.VIG*2,CMAX:V.FUE*15,CCOMB:V.FUE*8};
+
+const allAvg=STATS.reduce((a,s)=>a+V[s.ab],0)/STATS.length;
+const ftLetter=RSCALE[Math.round(allAvg)-1]||'E';
+
+/* HUD/vitales HP y MP en texto */
+document.getElementById('hpN').textContent=D.PV+'/'+D.PV;
+document.getElementById('mpN').textContent=D.PA+'/'+D.PA;
+
+/* escala de calor */
+document.getElementById('heat').innerHTML=RSCALE.map((r,i)=>
+  `<div class="cell${r==='C'?' on':''}" style="background:var(${TC[i+1]})"><b>${r}</b>${i+1}</div>`).join('');
+
+/* xp */
+setTimeout(()=>{document.getElementById('xpFill').style.width='62%';},60);
+
+/* crisol */
+const groups=['Cuerpo','Mente','Espíritu'];
+document.getElementById('crucible').innerHTML=groups.map(g=>{
+  const rows=STATS.filter(s=>s.p===g);const avg=rows.reduce((a,s)=>a+V[s.ab],0)/rows.length;
+  return `<div class="grp"><div class="grp-h"><span class="n" style="color:${tier(avg)}">${g}</span><span class="bar"></span><span class="avg">media ${avg.toFixed(2)}</span></div>`+
+    rows.map(s=>{const v=V[s.ab];return `<div class="pstat"><span class="lb">${s.nm} <small>${s.ab}</small></span>
+      <div class="gauge"><i class="fl" data-w="${v/9*100}" style="width:0;background-color:${tier(v)}"></i></div>
+      <span class="rk" style="color:${tier(v)}">${s.r}</span><span class="vl">${v}</span></div>`;}).join('')+`</div>`;
+}).join('');
+requestAnimationFrame(()=>document.querySelectorAll('.pstat .fl').forEach((f,i)=>{
+  if(reduce){f.style.width=f.dataset.w+'%';return;}setTimeout(()=>f.style.width=f.dataset.w+'%',80+i*35);}));
+document.getElementById('ftLetter').textContent=ftLetter;
+document.getElementById('ftLetter').style.color=tier(allAvg);
+document.getElementById('ftVal').textContent=allAvg.toFixed(2)+' / 9';
+setTimeout(()=>{document.getElementById('ftMeter').style.width=(allAvg/9*100)+'%';},120);
+
+/* derivadas */
+const fmt=n=>Number.isInteger(n)?n:n.toFixed(1);
+const DER=[['Vida (PV)',D.PV,'VIG×50'],['Flujo (PA)',D.PA,'CAU×30'],['Energía',D.ENE,'VIG×20'],
+  ['Espíritu',D.ESP,'VOL+CAU'],['Iniciativa',D.INI,'AGI×2+PER'],
+  ['Def. Física',D.DFIS,'VIG+AGI+Arm'],['Def. Flujo',fmt(D.DFLU),'VIG+AGI+Arm+PA÷4'],['Def. Mental',D.DMEN,'VOL+CON'],
+  ['Prec. Física',D.PFIS,'DES+AGI'],['Prec. Flujo',D.PFLU,'CTR+SEN'],
+  ['Movimiento',D.MOV,'5+AGI',' m'],['Salto vert.',fmt(D.SV),'0.5+AGI×0.3',' m'],
+  ['Salto horiz.',fmt(D.SH),'1+AGI×0.6',' m'],['Caída segura',D.CAI,'VIG×2',' m'],
+  ['Carga máx.',D.CMAX,'FUE×15',' kg'],['Carga comb.',D.CCOMB,'FUE×8',' kg']];
+const derHTML=a=>a.map(([n,v,f,u])=>`<div class="der"><div class="n">${n}</div><div class="v">${v}<small>${u||''}</small></div><div class="fx">${f}</div></div>`).join('');
+document.getElementById('derGrid').innerHTML=derHTML(DER);
+document.getElementById('combatGrid').innerHTML=derHTML([DER[5],DER[6],DER[7],DER[8],DER[9],DER[4]]);
+
+/* disciplinas */
+const DISC=[
+  {n:'Rastreadora',a:'Ojeadora',b:'Cazadora',r:'C',art:'<circle cx="50" cy="50" r="26" stroke="#f4c455"/><path d="M50 24v52M24 50h52" stroke="#54dcd6"/>'},
+  {n:'Emisora',a:'Descarga',b:'Proyectil',r:'B',art:'<circle cx="50" cy="50" r="7" stroke="#f4c455" fill="#f4c455"/><circle cx="50" cy="50" r="21" stroke="#54dcd6"/><circle cx="50" cy="50" r="33" stroke="#f4c455" opacity=".5"/>'},
+  {n:'Tiradora',a:'Duelista',b:'Certera',r:'C',art:'<circle cx="50" cy="50" r="24" stroke="#f4c455"/><path d="M50 22v14M50 64v14M22 50h14M64 50h14" stroke="#54dcd6"/>'},
+  {n:'Escaramuza',a:'Vanguardia',b:'Bastión',r:'D',art:'<path d="M50 20l24 8v20c0 16-24 26-24 26S26 64 26 48V28z" stroke="#f4c455"/>'},
+  {n:'Herrera',a:'Templadora',b:'Forjadora',r:'D',art:'<rect x="34" y="26" width="32" height="16" stroke="#f4c455"/><path d="M50 42v34" stroke="#54dcd6" stroke-width="3"/>'},
+  {n:'Pícara',a:'Gambito',b:'Embuste',r:'E',art:'<path d="M32 68l24-40 12 12-24 40z" stroke="#f4c455"/><circle cx="36" cy="64" r="5" stroke="#54dcd6"/>'},
+  {n:'Espadachina',a:'Estoque',b:'Guardia',r:null,art:'<path d="M50 20v42M40 30h20M44 62h12l-6 12z" stroke="#888"/>'},
+  {n:'Bruta',a:'Berserk',b:'Campeona',r:null,art:'<path d="M46 24v52M46 28c14-8 26 2 22 16-10 2-18-4-22-6z" stroke="#888"/>'},
+  {n:'Sombra',a:'Verdugo',b:'Acecho',r:null,art:'<path d="M50 22l6 34-6 8-6-8z" stroke="#888"/><path d="M40 56h20" stroke="#888"/>'},
+  {n:'Manipuladora',a:'Titiritera',b:'Domadora',r:null,art:'<rect x="34" y="46" width="32" height="26" stroke="#888"/><path d="M40 46v-6a10 10 0 0120 0v6" stroke="#888"/>',req:'Requiere Nivel 7 · 3.500 temple'},
+];
+document.getElementById('discGrid').innerHTML=DISC.map(d=>{const lock=!d.r;
+  return `<div class="disc${lock?' lock':''}">
+    <div class="disc-art"><svg viewBox="0 0 100 100">${d.art}</svg></div><div class="disc-veil"></div>
+    <div class="disc-rk" style="background:${lock?'var(--ink-fade)':tier(RV[d.r])}">${d.r||'✕'}</div>
+    <div class="disc-in"><div class="disc-n">${d.n}</div><div class="disc-sp"><b>${d.a}</b> · ${d.b}</div>${lock?`<div class="lockmsg">${d.req||'Bloqueada'}</div>`:''}</div></div>`;
+}).join('');
+
+/* aptitudes */
+const APT=[
+  {t:'T1',tp:'of',n:'Chispa',d:'Descarga breve de flujo a corta distancia.',c:'PA 10'},
+  {t:'T1',tp:'de',n:'Cierre',d:'Refuerza el aura un turno; reduce el daño recibido.',c:'PA 5'},
+  {t:'T2',tp:'of',n:'Andanada',d:'Tres descargas consecutivas de Emisión.',c:'PA 15/u'},
+  {t:'T2',tp:'ut',n:'Ojo de rastro',d:'Amplía la Percepción; detecta flujo oculto a 10 m.',c:'PA 12'},
+  {t:'T1',tp:'pa',n:'Pie ligero',d:'Anula la penalización por terreno roto.',c:'pasiva'},
+  {t:'T1',tp:'de',n:'Muro seco',d:'Barrera de aura frente a la operativa.',c:'PA 20'},
+  {t:'T2',tp:'of',n:'Remache',d:'Concentra el flujo para perforar defensas.',c:'PA 18'},
+  {t:'T2',tp:'pa',n:'Sangre fría',d:'+1 Iniciativa en terreno ya explorado.',c:'pasiva'},
+  {t:'T3',tp:'of',n:'Lanza de Yunque',d:'Emisión concentrada de largo alcance; requiere carga.',c:'PA 30'},
+];
+const TPN={of:'Ofensiva',de:'Defensiva',ut:'Utilidad',pa:'Pasiva'},TPC={of:'--tC',de:'--tA',ut:'--green',pa:'--ink-dim'};
+let fT='all',fY='all';
+function renderApt(){const l=APT.filter(a=>(fT==='all'||a.t===fT)&&(fY==='all'||a.tp===fY));
+  document.getElementById('aptList').innerHTML=l.map(a=>`<div class="apt"><span class="apt-t">${a.t}</span>
+    <div><div class="apt-n">${a.n}</div><div class="apt-d">${a.d}</div><div class="apt-cost">${a.c}</div></div>
+    <span class="apt-tp" style="background:var(${TPC[a.tp]})">${TPN[a.tp]}</span></div>`).join('')||'<p class="empty-note">Sin aptitudes para este filtro.</p>';
+  document.getElementById('aptCount').textContent=l.length+' de '+APT.length;}
+document.querySelectorAll('#tierF .filt').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#tierF .filt').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');fT=b.dataset.f;renderApt();}));
+document.querySelectorAll('#typeF .filt').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#typeF .filt').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');fY=b.dataset.t;renderApt();}));
+renderApt();
+
+/* equipo / inventario */
+const ITEMS=[
+  {c:'consumibles',r:'u',n:'Ampolla de vigor',q:'×3',ic:'<path d="M10 2v7.3M14 9.3V2M8.5 2h7M14 9.3a6.5 6.5 0 11-4 0"/>'},
+  {c:'consumibles',r:'c',n:'Ración seca',q:'×5',ic:'<rect x="2" y="7" width="20" height="14"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>'},
+  {c:'consumibles',r:'r',n:'Esquirla de flujo',q:'×2',ic:'<path d="M12 2 2 8l10 14L22 8z"/>'},
+  {c:'armas',r:'u',n:'Cuchillo de monte',q:'×1',ic:'<path d="M14.5 17.5L3 6V3h3l11.5 11.5"/>'},
+  {c:'armas',r:'r',n:'Virotes de flujo',q:'×12',ic:'<path d="M12 2v20M6 8l6-6 6 6"/>'},
+  {c:'utensilios',r:'c',n:'Cuaderno de rastro',q:'×1',ic:'<path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>'},
+  {c:'utensilios',r:'c',n:'Brújula de rastro',q:'×1',ic:'<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>'},
+  {c:'utensilios',r:'e',n:'Marca del contramaestre',q:'×1',ic:'<path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 000-7.8z"/>'},
+  {c:'materiales',r:'c',n:'Cuero endurecido',q:'×8',ic:'<rect x="3" y="3" width="18" height="18"/>'},
+  {c:'materiales',r:'u',n:'Colmillo de bestia',q:'×3',ic:'<path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/>'},
+  {c:'materiales',r:'r',n:'Lingote de acero crudo',q:'×2',ic:'<path d="M4 9h16l-2 8H6z"/>'},
+];
+const CN={consumibles:'Consumibles',armas:'Armas',utensilios:'Utensilios',materiales:'Materiales'};
+let iC='all',iQ='';
+function renderInv(){let h='';['consumibles','armas','utensilios','materiales'].forEach(cat=>{
+  if(iC!=='all'&&iC!==cat)return;const l=ITEMS.filter(it=>it.c===cat&&it.n.toLowerCase().includes(iQ));if(!l.length)return;
+  h+=`<div class="inv-sec">${CN[cat]}</div><div class="inv-grid">`+l.map(it=>`<div class="item" data-r="${it.r}" title="${it.n}"><div class="ic"><svg viewBox="0 0 24 24">${it.ic}</svg></div><div class="n">${it.n}</div><div class="q">${it.q}</div></div>`).join('')+`</div>`;});
+  document.getElementById('invBody').innerHTML=h||'<p class="empty-note">Sin objetos que coincidan.</p>';}
+document.querySelectorAll('.inv-tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.inv-tab').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');iC=b.dataset.c;renderInv();}));
+document.getElementById('invSearch').addEventListener('input',e=>{iQ=e.target.value.toLowerCase().trim();renderInv();});
+renderInv();
+
+/* menú de comandos (tabs) */
+document.querySelectorAll('.cmd button').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.cmd button').forEach(x=>x.setAttribute('aria-selected','false'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  t.setAttribute('aria-selected','true');document.getElementById('tab-'+t.dataset.tab).classList.add('on');}));
+/* subtabs crónica */
+document.querySelectorAll('.subtab').forEach(s=>s.addEventListener('click',()=>{
+  document.querySelectorAll('.subtab').forEach(x=>x.setAttribute('aria-selected','false'));s.setAttribute('aria-selected','true');
+  document.querySelectorAll('[data-bio-c]').forEach(c=>{c.hidden=c.dataset.bioC!==s.dataset.bio;});}));
+</script>
+</body>
+</html>
