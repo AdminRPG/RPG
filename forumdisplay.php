@@ -25,6 +25,7 @@ require_once "./global.php";
 require_once MYBB_ROOT."inc/functions_post.php";
 require_once MYBB_ROOT."inc/functions_forumlist.php";
 require_once MYBB_ROOT."inc/class_parser.php";
+require_once MYBB_ROOT."inc/iforge_functions.php";
 $parser = new postParser;
 
 $orderarrow = $sortsel = array('rating' => '', 'subject' => '', 'starter' => '', 'started' => '', 'replies' => '', 'views' => '', 'lastpost' => '');
@@ -80,6 +81,17 @@ $parentlist = $foruminfo['parentlist'];
 
 // To validate, turn & to &amp; but support unicode
 $foruminfo['name'] = preg_replace("#&(?!\#[0-9]+;)#si", "&amp;", $foruminfo['name']);
+
+// I-Forge: forum thread/post counters are excluded from the forum cache,
+// so read the real values for the header meta ("N coladas / N mensajes").
+$iforge_counts = $db->fetch_array($db->simple_select("forums", "threads, posts", "fid='".(int)$fid."'"));
+$foruminfo['threads'] = (int)$iforge_counts['threads'];
+$foruminfo['posts'] = (int)$iforge_counts['posts'];
+
+// I-Forge: los foros que cuelgan de la categoría "El Mundo" (regiones e islas)
+// usan un estilo enriquecido: cabecera con foto + tarjetas grandes para sus hijos.
+$iforge_world_root = iforge_world_root_name($foruminfo);
+$iforge_is_world = (mb_stripos($iforge_world_root, 'mundo') !== false);
 
 $forumpermissions = forum_permissions();
 $fpermissions = $forumpermissions[$fid];
@@ -151,13 +163,113 @@ else
 }
 
 $subforums = '';
-$child_forums = build_forumbits($fid, 2);
+$iforge_world_cards = $iforge_is_world ? iforge_render_region_cards($fid, $forumpermissions) : '';
 
-if(!empty($child_forums) && !empty($child_forums['forum_list']))
+if ($iforge_world_cards !== '')
 {
-	$forums = $child_forums['forum_list'];
-	$lang->sub_forums_in = $lang->sprintf($lang->sub_forums_in, $foruminfo['name']);
-	eval("\$subforums = \"".$templates->get("forumdisplay_subforums")."\";");
+	// Región de "El Mundo": sus hijos son islas -> tarjetas grandes con foto.
+	// $forums se mantiene con contenido (aunque no se use en la plantilla) porque
+	// MyBB comprueba más abajo `empty($forums)` para decidir si una categoría
+	// "no tiene subforos" y lanzar un error.
+	$forums = $iforge_world_cards;
+	$iforge_subheading = (mb_stripos($foruminfo['name'], 'mundo') !== false) ? 'Regiones' : 'Islas';
+	$subforums = '
+	<div class="iforge-shead"><h2>'.$iforge_subheading.'</h2><span class="iforge-shead-code">// navega el mundo</span><span class="iforge-shead-rule"></span></div>
+	<div class="iforge-regions" style="margin-bottom:22px">
+		'.$iforge_world_cards.'
+	</div>';
+}
+else
+{
+	$child_forums = build_forumbits($fid, 2);
+
+	if(!empty($child_forums) && !empty($child_forums['forum_list']))
+	{
+		$forums = $child_forums['forum_list'];
+		$lang->sub_forums_in = $lang->sprintf($lang->sub_forums_in, $foruminfo['name']);
+		eval("\$subforums = \"".$templates->get("forumdisplay_subforums")."\";");
+	}
+}
+
+// I-Forge: cabecera con foto para foros del "El Mundo" (foto + nombre, y debajo
+// una ficha con pestañas: Resumen, Dueño actual, Clima, Zonas y Anotaciones,
+// leídas de mybb_rol_forum_meta). Cuando hay banner, la placa clásica de debajo
+// omite el nombre/descripción (ya en el banner/ficha) y solo conserva contadores.
+$iforge_world_head = '';
+$iforge_fhead_title = '<h1 class="iforge-fhead-t">'.$foruminfo['name'].'</h1>';
+$iforge_fhead_desc = '<p class="iforge-fhead-d">'.$foruminfo['description'].'</p>';
+if ($iforge_is_world)
+{
+	$iforge_fhead_title = '';
+	$iforge_fhead_desc = '';
+
+	$iforge_head_img = iforge_forum_image($fid);
+	$iforge_head_art = $iforge_head_img !== null
+		? '<img src="'.$iforge_head_img.'" alt="'.$foruminfo['name'].'" loading="lazy">'
+		: iforge_sector_art($fid);
+
+	$iforge_meta = iforge_forum_meta($fid);
+
+	// Construye pestañas solo para los datos que existen de verdad.
+	$iforge_itabs = '';
+	$iforge_ipanels = '';
+	$iforge_itab_n = 0;
+	$iforge_add_tab = function ($key, $label, $bodyHtml) use (&$iforge_itabs, &$iforge_ipanels, &$iforge_itab_n) {
+		$active = ($iforge_itab_n === 0) ? ' iforge-itab-active' : '';
+		$pressed = ($iforge_itab_n === 0) ? 'true' : 'false';
+		$iforge_itabs .= '<button type="button" class="iforge-itab'.$active.'" data-itab="'.$key.'" aria-pressed="'.$pressed.'">'.$label.'</button>';
+		$iforge_ipanels .= '<div class="iforge-itabpanel'.$active.'" data-itabpanel="'.$key.'">'.$bodyHtml.'</div>';
+		$iforge_itab_n++;
+	};
+
+	if (trim($foruminfo['description']) !== '')
+	{
+		$iforge_add_tab('resumen', 'Resumen', '<p class="iforge-itab-text">'.$foruminfo['description'].'</p>');
+	}
+	if (trim($iforge_meta['dueno']) !== '')
+	{
+		$iforge_add_tab('dueno', 'Dueño actual', '<p class="iforge-itab-text">'.htmlspecialchars_uni($iforge_meta['dueno']).'</p>');
+	}
+	if (trim($iforge_meta['clima']) !== '')
+	{
+		$iforge_add_tab('clima', 'Clima', '<p class="iforge-itab-text">'.htmlspecialchars_uni($iforge_meta['clima']).'</p>');
+	}
+	if (!empty($iforge_meta['zonas']))
+	{
+		$iforge_zonas_html = '<ul class="iforge-itab-zonas">';
+		foreach ($iforge_meta['zonas'] as $iforge_zona)
+		{
+			$iforge_zonas_html .= '<li>'.htmlspecialchars_uni((string)$iforge_zona).'</li>';
+		}
+		$iforge_zonas_html .= '</ul>';
+		$iforge_add_tab('zonas', 'Zonas', $iforge_zonas_html);
+	}
+	if (trim($iforge_meta['anotaciones']) !== '')
+	{
+		$iforge_add_tab('anotaciones', 'Anotaciones', '<div class="iforge-itab-text">'.nl2br(htmlspecialchars_uni($iforge_meta['anotaciones'])).'</div>');
+	}
+
+	$iforge_tabbox = '';
+	if ($iforge_itab_n > 0)
+	{
+		$iforge_tabbox = '
+	<div class="iforge-island-tabs" role="tablist">'.$iforge_itabs.'</div>
+	<div class="iforge-island-tabpanels">'.$iforge_ipanels.'</div>';
+	}
+
+	$iforge_world_head = '
+<div class="iforge-wrap">
+	<div class="iforge-island-head">
+		<div class="iforge-island-art">'.$iforge_head_art.'</div>
+		<div class="iforge-island-veil"></div>
+		<div class="iforge-island-in">
+			<div class="iforge-island-kicker">// '.$iforge_world_root.'</div>
+			<h1 class="iforge-island-n">'.$foruminfo['name'].'</h1>
+		</div>
+	</div>'.($iforge_tabbox !== '' ? '
+	<div class="iforge-island-card">'.$iforge_tabbox.'
+	</div>' : '').'
+</div>';
 }
 
 $excols = "forumdisplay";
