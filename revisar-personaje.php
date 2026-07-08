@@ -39,6 +39,11 @@ if (!$pj) {
     exit;
 }
 
+if ($staff_level < 1) {
+    header('Location: ' . $bburl . '/zona-staff.php');
+    exit;
+}
+
 $datos     = $pj['datos'] ? json_decode($pj['datos'], true) : array();
 $inventario = $pj['inventario'] ? json_decode($pj['inventario'], true) : array();
 $economia   = $pj['economia'] ? json_decode($pj['economia'], true) : array();
@@ -136,13 +141,6 @@ if ($loggedin && $staff_level >= 1 && $mybb->request_method === 'post') {
     }
 }
 
-// Iniciales para avatar
-$initials = '';
-$parts = preg_split('/\s+/', trim((string)$mybb->user['username']));
-foreach ($parts as $p) { if ($p !== '') $initials .= mb_strtoupper(mb_substr($p, 0, 1, 'UTF-8'), 'UTF-8'); }
-$initials = mb_substr($initials, 0, 2, 'UTF-8');
-$initials_e = htmlspecialchars_uni($initials);
-
 // Función local para heat
 function iforge_heat_var($rango) {
     $map = ['F'=>'--h1','E'=>'--h1','D'=>'--h2','C'=>'--h3','B'=>'--h4','A'=>'--h5','S'=>'--h6','SS'=>'--h7','M'=>'--h8','M+'=>'--h9'];
@@ -175,7 +173,7 @@ header('Content-Type: text/html; charset=utf-8');
   --rivet:#3d6f9e;
   --concrete:#eef6fc; --concrete-2:#dbecf9; --concrete-line:#b2d3ea;
   --ink:#0a2f52; --ink-2:#1c5285; --ash:#5c83a7; --paper:#eaf4fb; --paper-dim:#a9c6e0;
-  --ember:#FFCB93; --ember-hi:#FFE9A3; --patina:#41A4E0; --patina-hi:#63b8ea; --crack:#e63b2e;
+  --ember:#FFCB93; --ember-hi:#FFE9A3; --patina:#41A4E0; --patina-hi:#63b8ea; --crack:#e63b2e; --red-hi:#ff5a49;
   --h1:#10477B; --h2:#2f6ea8; --h3:#458CC5; --h4:#41A4E0; --h5:#63b8ea;
   --h6:#FFCB93; --h7:#ffdcae; --h8:#FFE9A3; --h9:#fff6d8;
   --disp:'Big Shoulders Display',Impact,sans-serif;
