@@ -80,21 +80,7 @@ if ($loggedin && $mybb->request_method === 'post' && $db->table_exists('rol_pers
     $action  = $mybb->get_input('action');
     $set_pid = $mybb->get_input('pid', MyBB::INPUT_INT);
 
-    if (($action === 'approve_char' || $action === 'reject_char') && $staff_level >= 1 && verify_post_check($mybb->get_input('my_post_key'), true) && $set_pid > 0) {
-        $vq = $db->simple_select('rol_personajes', 'pid, nombre, estado', "pid = {$set_pid}", array('limit' => 1));
-        if ($db->num_rows($vq)) {
-            $prow = $db->fetch_array($vq);
-            $nuevo_estado = $action === 'approve_char' ? 'aprobado' : 'rechazado';
-            $db->update_query('rol_personajes', array('estado' => $nuevo_estado, 'lastedit' => TIME_NOW), "pid = {$set_pid}");
-            if ($db->table_exists('rol_tramites')) {
-                $db->update_query('rol_tramites', array('estado' => $nuevo_estado === 'aprobado' ? 'aprobado' : 'rechazado', 'lastedit' => TIME_NOW), "pid = {$set_pid} AND tipo = 'crear_personaje'");
-            }
-            $flash = 'Ficha "' . htmlspecialchars_uni($prow['nombre']) . '" ' . ($nuevo_estado === 'aprobado' ? 'aprobada' : 'rechazada') . '.';
-        } else {
-            $flash = 'Esa ficha ya no existe.';
-            $flash_kind = 'warn';
-        }
-    } elseif ($action === 'set_active' && verify_post_check($mybb->get_input('my_post_key'), true) && $set_pid > 0) {
+    if ($action === 'set_active' && verify_post_check($mybb->get_input('my_post_key'), true) && $set_pid > 0) {
         // Verifica que el personaje pertenece al usuario y está aprobado.
         $vq = $db->simple_select(
             'rol_personajes',
@@ -177,20 +163,6 @@ if ($flash === '' && $loggedin && $mybb->get_input('forjado', MyBB::INPUT_INT)) 
     $flash_kind = 'ok';
 }
 
-// ── Staff: cola de fichas pendientes de aprobación (todas las cuentas) ──
-$pendientes = array();
-if ($staff_level >= 1 && $db->table_exists('rol_personajes')) {
-    $pq = $db->query("
-        SELECT p.pid, p.nombre, p.rango, p.dateline, p.datos, u.username, u.uid
-        FROM " . TABLE_PREFIX . "rol_personajes p
-        LEFT JOIN " . TABLE_PREFIX . "users u ON (u.uid = p.uid)
-        WHERE p.estado = 'revision'
-        ORDER BY p.dateline ASC
-    ");
-    while ($prow = $db->fetch_array($pq)) {
-        $pendientes[] = $prow;
-    }
-}
 
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
@@ -199,63 +171,9 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Personaje</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<?php echo iforge_rol_head_base(); ?>
 <style>
-/* ============================================================
-   I-FORGE · SISTEMA COMPARTIDO — "FOUNDRY BRUTALISM"
-   ============================================================ */
-:root{
-  --iron:#1b1d22; --iron-plate:#24272e; --iron-hi:#31353d; --iron-edge:#0d0e11;
-  --rivet:#565b64;
-  --concrete:#d7d3c6; --concrete-2:#cbc6b6; --concrete-line:#b3ad9c;
-  --ink:#161512; --ink-2:#4a463d; --ash:#7f7a6d; --paper:#e9e6dd; --paper-dim:#a9a599;
-  --ember:#e0641f; --ember-hi:#f2842f; --patina:#5f8a6a; --patina-hi:#7aa886; --crack:#c14a29;
-  --h1:#6b6f78; --h2:#9a6b4e; --h3:#c14a29; --h4:#e0641f; --h5:#ef8b1e;
-  --h6:#f4b02f; --h7:#f8cf4f; --h8:#fbe488; --h9:#fdf4cf;
-  --disp:'Big Shoulders Display',Impact,sans-serif;
-  --mono:'Space Mono',Menlo,Consolas,monospace;
-  --body:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--iron);color:var(--paper);font-family:var(--body);font-size:15px;line-height:1.55;padding-top:52px;
-  background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:26px 26px}
-a{color:var(--ember-hi);text-decoration:none}
-a:hover{color:var(--h6)}
-::selection{background:var(--ember);color:var(--iron)}
-img,svg{display:block}
-:focus-visible{outline:3px solid var(--ember-hi);outline-offset:2px}
-.wrap{max-width:1300px;margin:0 auto;padding:0 18px}
-.mono{font-family:var(--mono)}
-
-/* ---------------- NAVBAR (iforge-*, idéntica al tema) ---------------- */
-#iforge-navbar{position:fixed;inset:0 0 auto 0;height:52px;z-index:1000;background:var(--iron-edge);border-bottom:2px solid #000}
-.iforge-nav{max-width:1300px;margin:0 auto;height:100%;padding:0 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
-.iforge-nav-logo{font-family:var(--disp);font-weight:900;font-size:1.45rem;letter-spacing:1px;color:var(--paper);text-transform:uppercase;line-height:1;display:flex;align-items:center;gap:9px}
-.iforge-nav-logo::before{content:"";width:11px;height:11px;background:var(--ember);box-shadow:0 0 10px var(--ember);flex:0 0 auto}
-.iforge-nav-logo:hover{color:#fff}
-.iforge-nav-links{display:flex;gap:2px}
-.iforge-nav-link{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--paper-dim);text-transform:uppercase;letter-spacing:1px;padding:7px 11px;border:1px solid transparent}
-.iforge-nav-link:hover,.iforge-nav-link.on{color:var(--iron);background:var(--ember);border-color:#000}
-.iforge-nav-right{display:flex;align-items:center;gap:10px}
-.iforge-nav-cta{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--iron);background:var(--paper);padding:7px 12px;border:2px solid #000;transition:transform .12s,box-shadow .12s}
-.iforge-nav-cta:hover{transform:translate(-1px,-1px);color:var(--iron);box-shadow:2px 2px 0 #000}
-.iforge-user-menu{position:relative}
-.iforge-user-btn{width:34px;height:34px;background:var(--iron-plate);border:2px solid #000;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:.85rem;color:var(--ember-hi);cursor:pointer}
-.iforge-user-btn:hover{border-color:var(--ember)}
-.iforge-user-name{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper);background:var(--iron-plate);border:2px solid #000;padding:7px 12px;cursor:pointer;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.iforge-user-name:hover{border-color:var(--ember)}
-.iforge-dropdown{display:none;position:absolute;right:0;top:44px;background:var(--iron-plate);border:2px solid #000;min-width:200px;z-index:100}
-.iforge-dropdown.open{display:block}
-.iforge-dropdown-item{display:block;padding:10px 14px;font-family:var(--mono);font-size:.68rem;color:var(--paper-dim);border-bottom:1px solid var(--iron-edge)}
-.iforge-dropdown-item:last-child{border-bottom:none}
-.iforge-dropdown-item:hover{background:var(--iron-hi);color:var(--paper)}
-.iforge-dropdown-divider{border:none;border-top:1px solid var(--iron-edge);margin:0}
-.iforge-btn-ghost.iforge-btn-sm{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:7px 12px;border:2px solid var(--rivet);color:var(--paper);background:transparent}
-.iforge-btn-ghost.iforge-btn-sm:hover{color:var(--iron);background:var(--paper);border-color:#000}
-@media(max-width:640px){.iforge-nav-links{display:none}}
+/* Estilos de esta página — base global (:root, body, fondo) en docs/themes/iforge.css */
 
 /* ---------------- BREADCRUMB ---------------- */
 .breadcrumb{background:var(--iron-plate);border-bottom:2px solid #000}
@@ -338,6 +256,9 @@ a.pjcard-name:hover{color:var(--ember-hi)}
 .pj-empty .acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
 .pj-who{font-family:var(--mono);font-size:.66rem;color:var(--ash);text-transform:uppercase;letter-spacing:.5px}
 .pj-who b{color:var(--h6)}
+.pjcard-chip{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:4px 11px;border:2px solid #000;display:inline-block}
+.pjcard-chip[style*="--h6"]{animation:pulse-revision 2s ease-in-out infinite}
+@keyframes pulse-revision{0%,100%{box-shadow:0 0 0 0 rgba(255,203,147,.4)}50%{box-shadow:0 0 0 6px rgba(255,203,147,0)}}
 </style>
 </head>
 <body>
@@ -346,7 +267,7 @@ a.pjcard-name:hover{color:var(--ember-hi)}
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
-    <a href="<?php echo $bburl; ?>/index.php">Fragua</a>
+    <a href="<?php echo $bburl; ?>/index.php">Inicio</a>
     <span class="sep">&#8250;</span>
     <b>Personaje</b>
   </div>
@@ -357,7 +278,7 @@ a.pjcard-name:hover{color:var(--ember-hi)}
   <section class="reveal">
     <div class="shead">
       <h1>Personaje</h1>
-      <span class="code">// expedientes forjados</span>
+      <span class="code">// expedientes</span>
       <span class="rule"></span>
     </div>
     <p class="pj-intro">El <b>registro de personajes</b> de tu cuenta. Elige cu&aacute;l es tu <b>personaje activo</b>: ser&aacute; con el que publiques en el foro. Cada expediente re&uacute;ne ficha, mec&aacute;nicas, inventario y cr&oacute;nica.</p>
@@ -367,51 +288,7 @@ a.pjcard-name:hover{color:var(--ember-hi)}
   <div class="flash <?php echo $flash_kind; ?>"><?php echo $flash; ?></div>
 <?php endif; ?>
 
-<?php if ($staff_level >= 1): ?>
-  <section class="reveal">
-    <div class="plate">
-      <div class="plate-h">
-        <span class="t">Aprobaci&oacute;n de expedientes</span>
-        <span class="c">// <?php echo count($pendientes); ?> pendiente(s)</span>
-      </div>
-      <div class="plate-b">
-<?php if (empty($pendientes)): ?>
-        <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">No hay fichas en revisi&oacute;n ahora mismo.</p>
-<?php else: ?>
-        <div class="cards">
-<?php foreach ($pendientes as $pp):
-          $pdatos = json_decode((string) $pp['datos'], true);
-          $praza = is_array($pdatos) ? ($pdatos['raza_principal'] ?? '') : '';
-          $pfaccion = is_array($pdatos) ? ($pdatos['faccion'] ?? '') : '';
-?>
-          <article class="pjcard">
-            <div class="pjcard-top">
-              <span class="pjcard-av"><?php echo htmlspecialchars_uni(function_exists('mb_substr') ? mb_strtoupper(mb_substr($pp['nombre'], 0, 1, 'UTF-8'), 'UTF-8') : strtoupper(substr($pp['nombre'], 0, 1))); ?></span>
-              <div>
-                <a class="pjcard-name" href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pp['pid']; ?>"><?php echo htmlspecialchars_uni($pp['nombre']); ?></a>
-                <div class="pjcard-sub">de <?php echo htmlspecialchars_uni($pp['username'] ?? '?'); ?> &middot; <?php echo htmlspecialchars_uni(ucfirst($praza)); ?><?php echo $pfaccion !== '' ? ' &middot; ' . htmlspecialchars_uni(ucfirst($pfaccion)) : ''; ?></div>
-              </div>
-            </div>
-            <div class="pjcard-body">
-              <span class="heat-badge" style="background:var(<?php echo iforge_heat_var($pp['rango']); ?>)"><?php echo htmlspecialchars_uni($pp['rango']); ?></span>
-              <span class="pjcard-chip" style="background:var(--h6)">En revisi&oacute;n</span>
-            </div>
-            <div class="pjcard-foot">
-              <form method="post" action="<?php echo $bburl; ?>/personajes.php" style="display:flex;gap:8px">
-                <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
-                <input type="hidden" name="pid" value="<?php echo (int) $pp['pid']; ?>">
-                <button type="submit" name="action" value="approve_char" class="btn btn-hot btn-sm">Aprobar</button>
-                <button type="submit" name="action" value="reject_char" class="btn btn-ghost btn-sm">Rechazar</button>
-              </form>
-            </div>
-          </article>
-<?php endforeach; ?>
-        </div>
-<?php endif; ?>
-      </div>
-    </div>
-  </section>
-<?php endif; ?>
+
 
   <section class="reveal">
 <?php if ($loggedin && $tiene_personajes): ?>
@@ -419,7 +296,7 @@ a.pjcard-name:hover{color:var(--ember-hi)}
       <span class="pj-count"><b><?php echo $usados_slots; ?>/<?php echo $slots; ?></b> hueco(s) usados &middot; sesi&oacute;n: <b><?php echo $username; ?></b></span>
       <span class="pj-spacer"></span>
 <?php if ($hay_hueco): ?>
-      <a href="<?php echo $bburl; ?>/crear-personaje.php" class="btn btn-hot btn-sm">Forjar personaje</a>
+      <a href="<?php echo $bburl; ?>/crear-personaje.php" class="btn btn-hot btn-sm">Crear personaje</a>
 <?php else: ?>
       <a href="<?php echo $bburl; ?>/tramites.php" class="btn btn-ghost btn-sm">Pedir m&aacute;s huecos</a>
 <?php endif; ?>
@@ -483,10 +360,10 @@ a.pjcard-name:hover{color:var(--ember-hi)}
       <div class="plate-b">
         <div class="pj-empty">
           <span class="anvil" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M6 20v-5h5v5"/><path d="M4 15l8-4 4 3"/><path d="M14 11l3-6 4 2-2 5"/><circle cx="9" cy="7" r="2.4"/></svg></span>
-          <div class="big">A&uacute;n no has forjado ning&uacute;n personaje</div>
-          <p>Cuando forjes tu primera ficha, tu expediente aparecer&aacute; aqu&iacute; con su crisol, inventario y cr&oacute;nica. Golpea el metal mientras est&aacute; caliente.</p>
+          <div class="big">A&uacute;n no has creado ning&uacute;n personaje</div>
+          <p>Cuando crees tu primera ficha, tu expediente aparecer&aacute; aqu&iacute; con sus atributos, inventario y cr&oacute;nica. Da el primer paso cuando quieras.</p>
           <div class="acts">
-            <a href="<?php echo $bburl; ?>/crear-personaje.php" class="btn btn-hot">Forjar personaje</a>
+            <a href="<?php echo $bburl; ?>/crear-personaje.php" class="btn btn-hot">Crear personaje</a>
             <a href="<?php echo $bburl; ?>/tramites.php" class="btn btn-ghost">Ver tr&aacute;mites</a>
           </div>
           <span class="pj-who">Sesi&oacute;n iniciada como <b><?php echo $username; ?></b></span>
@@ -504,9 +381,9 @@ a.pjcard-name:hover{color:var(--ember-hi)}
         <div class="pj-empty">
           <span class="anvil" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M6 20v-5h5v5"/><path d="M4 15l8-4 4 3"/><path d="M14 11l3-6 4 2-2 5"/><circle cx="9" cy="7" r="2.4"/></svg></span>
           <div class="big">Accede para ver tu expediente</div>
-          <p>Necesitas una cuenta en la fragua para forjar y consultar personajes. F&oacute;rjate una o accede con la tuya para empezar.</p>
+          <p>Necesitas una cuenta en el foro para crear y consultar personajes. Reg&iacute;strate o accede con la tuya para empezar.</p>
           <div class="acts">
-            <a href="<?php echo $bburl; ?>/member.php?action=register" class="btn btn-hot">Forjarse</a>
+            <a href="<?php echo $bburl; ?>/member.php?action=register" class="btn btn-hot">Reg&iacute;strate</a>
             <a href="<?php echo $bburl; ?>/member.php?action=login" class="btn btn-ghost">Acceder</a>
           </div>
         </div>
@@ -517,13 +394,7 @@ a.pjcard-name:hover{color:var(--ember-hi)}
 
 </div>
 
-<footer class="foot">
-  <div class="foot-in">
-    <div class="foot-b">I-Forge</div>
-    <div class="foot-links"><a href="<?php echo $bburl; ?>/index.php">Fragua</a><a href="<?php echo $bburl; ?>/personajes.php">Personaje</a><a href="<?php echo $bburl; ?>/tramites.php">Tr&aacute;mites</a><a href="<?php echo $bburl; ?>/guias.php">Gu&iacute;as</a></div>
-    <div class="foot-c">Direcci&oacute;n "foundry brutalism"</div>
-  </div>
-</footer>
+<?php include __DIR__ . '/inc/footer_custom.php'; ?>
 
 <script>
 if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
