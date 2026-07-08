@@ -77,6 +77,19 @@ if ($loggedin && $db->table_exists('rol_personajes')) {
 }
 $hay_hueco = $usados < $slots;
 
+// ── Detección de edición de ficha moderada ──
+$editando_pid = (int)($mybb->get_input('editar', MyBB::INPUT_INT));
+$editando = null;
+if ($editando_pid > 0 && $loggedin && $db->table_exists('rol_personajes')) {
+    $eq = $db->simple_select('rol_personajes', '*', "pid = {$editando_pid} AND uid = {$uid}", array('limit' => 1));
+    if ($db->num_rows($eq)) {
+        $editando = $db->fetch_array($eq);
+        if ($db->table_exists('rol_mensajes')) {
+            $db->update_query('rol_mensajes', array('leido' => 1), "destino_pid = {$editando_pid} AND asunto LIKE 'Moderación:%'");
+        }
+    }
+}
+
 // ─────────────────────────────────────────────────────────────
 // POST: validar y crear
 // ─────────────────────────────────────────────────────────────
@@ -128,7 +141,7 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         if ($nombre !== '' && $db->table_exists('rol_personajes')) {
             $dupe = $db->simple_select('rol_personajes', 'pid', "nombre = '" . $db->escape_string($nombre) . "'", array('limit' => 1));
             if ($db->num_rows($dupe)) {
-                $errores[] = 'Ya existe un personaje forjado con ese nombre.';
+                $errores[] = 'Ya existe un personaje con ese nombre.';
             }
         }
 
@@ -332,62 +345,11 @@ header('Content-Type: text/html; charset=utf-8');
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?php echo $bbname; ?> · Forjar personaje</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title><?php echo $bbname; ?> · Crear personaje</title>
+<?php echo iforge_rol_head_base(); ?>
 <style>
-/* ============================================================
-   I-FORGE · SISTEMA COMPARTIDO — "FOUNDRY BRUTALISM"
-   ============================================================ */
-:root{
-  --iron:#1b1d22; --iron-plate:#24272e; --iron-hi:#31353d; --iron-edge:#0d0e11;
-  --rivet:#565b64;
-  --concrete:#d7d3c6; --concrete-2:#cbc6b6; --concrete-line:#b3ad9c;
-  --ink:#161512; --ink-2:#4a463d; --ash:#7f7a6d; --paper:#e9e6dd; --paper-dim:#a9a599;
-  --ember:#e0641f; --ember-hi:#f2842f; --patina:#5f8a6a; --patina-hi:#7aa886; --crack:#c14a29;
-  --h1:#6b6f78; --h2:#9a6b4e; --h3:#c14a29; --h4:#e0641f; --h5:#ef8b1e;
-  --h6:#f4b02f; --h7:#f8cf4f; --h8:#fbe488; --h9:#fdf4cf;
-  --disp:'Big Shoulders Display',Impact,sans-serif;
-  --mono:'Space Mono',Menlo,Consolas,monospace;
-  --body:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--iron);color:var(--paper);font-family:var(--body);font-size:15px;line-height:1.55;padding-top:52px;
-  background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:26px 26px}
-a{color:var(--ember-hi);text-decoration:none}
-a:hover{color:var(--h6)}
-::selection{background:var(--ember);color:var(--iron)}
-img,svg{display:block}
-:focus-visible{outline:3px solid var(--ember-hi);outline-offset:2px}
+/* Estilos de esta página — base global (:root, body, fondo) en docs/themes/iforge.css */
 .wrap{max-width:1100px;margin:0 auto;padding:0 18px}
-.mono{font-family:var(--mono)}
-
-/* ---------------- NAVBAR ---------------- */
-#iforge-navbar{position:fixed;inset:0 0 auto 0;height:52px;z-index:1000;background:var(--iron-edge);border-bottom:2px solid #000}
-.iforge-nav{max-width:1300px;margin:0 auto;height:100%;padding:0 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
-.iforge-nav-logo{font-family:var(--disp);font-weight:900;font-size:1.45rem;letter-spacing:1px;color:var(--paper);text-transform:uppercase;line-height:1;display:flex;align-items:center;gap:9px}
-.iforge-nav-logo::before{content:"";width:11px;height:11px;background:var(--ember);box-shadow:0 0 10px var(--ember);flex:0 0 auto}
-.iforge-nav-logo:hover{color:#fff}
-.iforge-nav-links{display:flex;gap:2px}
-.iforge-nav-link{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--paper-dim);text-transform:uppercase;letter-spacing:1px;padding:7px 11px;border:1px solid transparent}
-.iforge-nav-link:hover,.iforge-nav-link.on{color:var(--iron);background:var(--ember);border-color:#000}
-.iforge-nav-right{display:flex;align-items:center;gap:10px}
-.iforge-nav-cta{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--iron);background:var(--paper);padding:7px 12px;border:2px solid #000;transition:transform .12s,box-shadow .12s}
-.iforge-nav-cta:hover{transform:translate(-1px,-1px);color:var(--iron);box-shadow:2px 2px 0 #000}
-.iforge-user-menu{position:relative}
-.iforge-user-btn{width:34px;height:34px;background:var(--iron-plate);border:2px solid #000;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:.85rem;color:var(--ember-hi);cursor:pointer}
-.iforge-user-btn:hover{border-color:var(--ember)}
-.iforge-dropdown{display:none;position:absolute;right:0;top:44px;background:var(--iron-plate);border:2px solid #000;min-width:200px;z-index:100}
-.iforge-dropdown.open{display:block}
-.iforge-dropdown-item{display:block;padding:10px 14px;font-family:var(--mono);font-size:.68rem;color:var(--paper-dim);border-bottom:1px solid var(--iron-edge)}
-.iforge-dropdown-item:last-child{border-bottom:none}
-.iforge-dropdown-item:hover{background:var(--iron-hi);color:var(--paper)}
-.iforge-dropdown-divider{border:none;border-top:1px solid var(--iron-edge);margin:0}
-.iforge-btn-ghost.iforge-btn-sm{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:7px 12px;border:2px solid var(--rivet);color:var(--paper);background:transparent}
-.iforge-btn-ghost.iforge-btn-sm:hover{color:var(--iron);background:var(--paper);border-color:#000}
-@media(max-width:640px){.iforge-nav-links{display:none}}
 
 /* ---------------- BREADCRUMB ---------------- */
 .breadcrumb{background:var(--iron-plate);border-bottom:2px solid #000}
@@ -533,11 +495,11 @@ img,svg{display:block}
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
-    <a href="<?php echo $bburl; ?>/index.php">Fragua</a>
+    <a href="<?php echo $bburl; ?>/index.php">Inicio</a>
     <span class="sep">&#8250;</span>
     <a href="<?php echo $bburl; ?>/personajes.php">Personaje</a>
     <span class="sep">&#8250;</span>
-    <b>Forjar</b>
+    <b>Crear</b>
   </div>
 </div>
 
@@ -545,7 +507,7 @@ img,svg{display:block}
 
   <section>
     <div class="shead">
-      <h1>Forjar personaje</h1>
+      <h1>Crear personaje</h1>
       <span class="code">// one piece eternal</span>
       <span class="rule"></span>
     </div>
@@ -553,20 +515,20 @@ img,svg{display:block}
 
 <?php if (!$loggedin): ?>
   <div class="plate">
-    <div class="plate-h"><span class="t">Acceso requerido</span><span class="c">// forja</span></div>
+    <div class="plate-h"><span class="t">Acceso requerido</span><span class="c">// acceso</span></div>
     <div class="plate-b">
       <div class="pj-empty">
         <span class="anvil"><svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M6 20v-5h5v5"/><path d="M4 15l8-4 4 3"/><path d="M14 11l3-6 4 2-2 5"/><circle cx="9" cy="7" r="2.4"/></svg></span>
-        <div class="big">Accede para forjar un personaje</div>
-        <p>Necesitas una cuenta en la fragua para crear una ficha.</p>
+        <div class="big">Accede para crear un personaje</div>
+        <p>Necesitas una cuenta en el foro para crear una ficha.</p>
         <div class="acts">
-          <a href="<?php echo $bburl; ?>/member.php?action=register" class="btn btn-hot">Forjarse</a>
+          <a href="<?php echo $bburl; ?>/member.php?action=register" class="btn btn-hot">Reg&iacute;strate</a>
           <a href="<?php echo $bburl; ?>/member.php?action=login" class="btn btn-ghost">Acceder</a>
         </div>
       </div>
     </div>
   </div>
-<?php elseif (!$hay_hueco): ?>
+<?php elseif (!$hay_hueco && !$editando): ?>
   <div class="plate">
     <div class="plate-h"><span class="t">Sin huecos disponibles</span><span class="c">// <?php echo $usados; ?>/<?php echo $slots; ?></span></div>
     <div class="plate-b">
@@ -584,13 +546,20 @@ img,svg{display:block}
 <?php else: ?>
 
 <?php if (!empty($errores)): ?>
-  <div class="flash warn">No se pudo forjar el personaje:
+  <div class="flash warn">No se pudo crear el personaje:
     <ul><?php foreach ($errores as $e) echo '<li>' . htmlspecialchars_uni($e) . '</li>'; ?></ul>
   </div>
 <?php endif; ?>
 
+<?php if ($editando): ?>
+  <div style="margin-bottom:14px;padding:12px 16px;border:2px solid var(--h6);background:var(--iron-plate);display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <span style="font-family:var(--mono);font-size:.68rem;color:var(--paper-dim)">Est&aacute;s editando la ficha de <b style="color:var(--paper)"><?php echo htmlspecialchars_uni($editando['nombre']); ?></b>. Los cambios se enviar&aacute;n a revisi&oacute;n de nuevo.</span>
+    <a href="<?php echo $bburl; ?>/personajes.php" class="btn btn-ghost btn-sm">Cancelar</a>
+  </div>
+<?php endif; ?>
+
   <p class="mono" style="font-size:.78rem;color:var(--paper-dim);max-width:76ch;margin-bottom:16px">
-    Sigue los <b style="color:var(--paper)">7 pasos</b> del taller: raza, concepto, estadísticas, virtudes/defectos, facción, equipo e historia. Rellena todo en una sola sesión — al enviar, tu ficha entra en <b style="color:var(--h6)">revisión</b> del staff.
+    Sigue los <b style="color:var(--paper)">7 pasos</b> del foro: raza, concepto, estadísticas, virtudes/defectos, facción, equipo e historia. Rellena todo en una sola sesión — al enviar, tu ficha entra en <b style="color:var(--h6)">revisión</b> del staff.
   </p>
 
   <div class="wiz-progress" id="wizProgress"></div>
@@ -791,13 +760,7 @@ img,svg{display:block}
 
 </div>
 
-<footer class="foot">
-  <div class="foot-in">
-    <div class="foot-b">I-Forge</div>
-    <div class="foot-links"><a href="<?php echo $bburl; ?>/index.php">Fragua</a><a href="<?php echo $bburl; ?>/personajes.php">Personaje</a><a href="<?php echo $bburl; ?>/tramites.php">Trámites</a><a href="<?php echo $bburl; ?>/guias.php">Guías</a></div>
-    <div class="foot-c">Dirección "foundry brutalism" · One Piece Eternal</div>
-  </div>
-</footer>
+<?php include __DIR__ . '/inc/footer_custom.php'; ?>
 
 <?php if ($loggedin && $hay_hueco): ?>
 <script>

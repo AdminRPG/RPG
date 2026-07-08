@@ -142,6 +142,23 @@ if ($loggedin && $db->table_exists('rol_personajes')) {
 }
 $tiene_personajes = count($personajes) > 0;
 
+$personajes_moderados = array();
+if ($loggedin && $db->table_exists('rol_mensajes')) {
+    foreach ($personajes as $pj) {
+        if ($pj['estado'] === 'revision') {
+            $pid_i = (int)$pj['pid'];
+            $mc = $db->query("
+                SELECT COUNT(*) as cnt FROM " . TABLE_PREFIX . "rol_mensajes
+                WHERE destino_pid = {$pid_i} AND leido = 0
+                AND asunto LIKE 'Moderación:%'
+            ");
+            if ((int)$db->fetch_field($mc, 'cnt') > 0) {
+                $personajes_moderados[$pid_i] = true;
+            }
+        }
+    }
+}
+
 // Huecos de personaje disponibles (mybb_rol_cuentas.slots, por defecto 1)
 $slots = 1;
 if ($loggedin && $db->table_exists('rol_cuentas')) {
@@ -345,6 +362,10 @@ a.pjcard-name:hover{color:var(--ember-hi)}
           </form>
 <?php else: ?>
           <span class="pjcard-sub">Pendiente</span>
+<?php endif; ?>
+<?php if ($pj['estado'] === 'revision' && isset($personajes_moderados[(int)$pj['pid']])): ?>
+          <a href="<?php echo $bburl; ?>/crear-personaje.php?editar=<?php echo (int)$pj['pid']; ?>" class="btn btn-hot btn-sm" style="margin-top:8px">Editar ficha</a>
+          <span style="color:var(--h6);font-family:var(--mono);font-size:.6rem;display:block;margin-top:4px">Cambios solicitados por el staff</span>
 <?php endif; ?>
         </div>
       </article>
