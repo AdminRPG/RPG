@@ -133,6 +133,7 @@ header('Content-Type: text/html; charset=utf-8');
   --iron:#0b3157; --iron-plate:#10477B; --iron-hi:#175a95; --iron-edge:#082742;
   --rivet:#3d6f9e; --paper:#eaf4fb; --paper-dim:#a9c6e0; --ash:#5c83a7;
   --ember:#FFCB93; --ember-hi:#FFE9A3; --patina:#41A4E0; --crack:#e63b2e;
+  --h6:#FFCB93;
   --disp:'Big Shoulders Display',Impact,sans-serif;
   --mono:'Space Mono',Menlo,Consolas,monospace;
   --body:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
@@ -248,7 +249,7 @@ a{color:var(--ember-hi);text-decoration:none}
             <div style="padding:20px;text-align:center;font-family:var(--mono);font-size:.64rem;color:var(--ash)">Sin mensajes aún.</div>
           <?php else: ?>
             <?php foreach ($hilos as $h): ?>
-              <a href="?t=<?php echo (int)$h['thread_id']; ?>" class="msg-thread<?php echo $thread_open === (int)$h['thread_id'] ? ' active' : ''; ?>">
+              <a href="<?php echo $bburl; ?>/mensajes.php?t=<?php echo (int)$h['thread_id']; ?>" class="msg-thread<?php echo $thread_open === (int)$h['thread_id'] ? ' active' : ''; ?>">
                 <div class="th-name"><?php echo htmlspecialchars_uni($h['otro_nombre'] ?? '?'); ?></div>
                 <div class="th-subject"><?php echo htmlspecialchars_uni($h['asunto']); ?></div>
                 <div class="th-meta"><?php echo date('d/m H:i', (int)$h['dateline']); ?><?php if ((int)$h['no_leidos'] > 0): ?><span class="th-badge"><?php echo (int)$h['no_leidos']; ?></span><?php endif; ?></div>
