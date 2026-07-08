@@ -794,9 +794,16 @@ ONE PIECE ETERNAL
 
 ---
 
-## 10. Errores del Diseño Actual a Eliminar
+## 10. Errores del Diseño Antiguo (RESUELTO — histórico)
 
-El diseño actual de I-Forge (CSS en `docs/themes/iforge.css`) tiene los siguientes tells de AI que deben corregirse:
+> **Estado: resuelto.** Esta sección documentaba los *tells* de AI del CSS
+> legado de I-Forge (`docs/themes/iforge.css`, clases `.iforge-*`), que ya **no
+> existe**: se rebautizó a `docs/themes/ope.css` con clases `.ope-*` y se
+> reimplementó bajo la paleta océano real (ver `docs/DESIGN.md` §2). Se conserva
+> como registro de decisiones; las rutas y clases `iforge` de abajo son
+> referencias históricas, no archivos vigentes.
+
+El CSS legado de I-Forge tenía los siguientes tells de AI, ya corregidos:
 
 ### 10.1 Grid decorativo de fondo (LÍNEA 26-27)
 

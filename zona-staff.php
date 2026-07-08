@@ -20,85 +20,60 @@ $loggedin  = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid       = (int) ($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
-// ── Nivel de staff (plugin iforge_rol, con respaldo directo) ──
-$staff_level = 0;
-if ($loggedin) {
-    if (isset($mybb->user['iforge_staff_level'])) {
-        $staff_level = (int) $mybb->user['iforge_staff_level'];
-    } elseif ($db->table_exists('rol_cuentas')) {
-        $cq = $db->simple_select('rol_cuentas', 'staff_level', "uid = {$uid}", array('limit' => 1));
-        if ($db->num_rows($cq)) {
-            $staff_level = (int) $db->fetch_field($cq, 'staff_level');
-        }
-    }
+// ── Staff del PERSONAJE ACTIVO (no de la cuenta) ──
+// El rol de staff vive en el personaje: si tienes activo un personaje sin rol,
+// no eres staff aquí aunque otro de tus personajes lo sea.
+$staff = $loggedin
+    ? ope_rol_active_staff($uid)
+    : array('pid' => 0, 'rol' => '', 'narrador' => 0, 'rank' => 0, 'is_staff' => false, 'nombre' => '');
+$rank      = (int) $staff['rank'];
+$narrador  = (int) $staff['narrador'];
+$is_staff  = !empty($staff['is_staff']);
+$rol_lbl   = ope_rol_staff_label($staff['rol']);
+$char_name = htmlspecialchars_uni((string) $staff['nombre']);
+
+// Etiqueta de rango a mostrar ("Administrador + Narrador", "Narrador", ...).
+$mi_rango_lbl = $rol_lbl !== '' ? $rol_lbl : 'Sin rango';
+if ($narrador) {
+    $mi_rango_lbl = $rol_lbl !== '' ? ($rol_lbl . ' + Narrador') : 'Narrador';
 }
 
-$initials = '';
-if ($loggedin) {
-    $parts = preg_split('/\s+/', trim((string) $mybb->user['username']));
-    foreach ($parts as $p) {
-        if ($p !== '') {
-            $initials .= function_exists('mb_substr') ? mb_substr($p, 0, 1, 'UTF-8') : substr($p, 0, 1);
-        }
-    }
-    $initials = function_exists('mb_substr') ? mb_substr($initials, 0, 2, 'UTF-8') : substr($initials, 0, 2);
-    $initials = function_exists('mb_strtoupper') ? mb_strtoupper($initials, 'UTF-8') : strtoupper($initials);
-}
-$initials_e = htmlspecialchars_uni($initials);
-
-$nivel_labels = array(0 => 'Sin rango', 1 => 'Narrador', 2 => 'Moderador', 3 => 'Administrador');
-$mi_nivel_lbl = $nivel_labels[min($staff_level, 3)] ?? 'Sin rango';
-
-// ── Contador de fichas pendientes de revisión ──
-$pendientes_count = 0;
+// ── Fichas pendientes de revisión (lista + contador) ──
+$pendientes = array();
 if ($db->table_exists('rol_personajes')) {
-    $pc = $db->simple_select('rol_personajes', 'COUNT(*) as cnt', "estado = 'revision'");
-    $pendientes_count = (int)$db->fetch_field($pc, 'cnt');
+    $pq = $db->simple_select('rol_personajes', 'pid, nombre, uid', "estado = 'revision'", array('order_by' => 'pid', 'order_dir' => 'ASC', 'limit' => 30));
+    while ($prow = $db->fetch_array($pq)) {
+        $prow['owner'] = '?';
+        if ((int)$prow['uid'] > 0) {
+            $uq = $db->simple_select('users', 'username', 'uid = ' . (int)$prow['uid'], array('limit' => 1));
+            if ($db->num_rows($uq)) $prow['owner'] = $db->fetch_field($uq, 'username');
+        }
+        $pendientes[] = $prow;
+    }
+}
+$pendientes_count   = count($pendientes);
+$primer_pendiente   = $pendientes_count > 0 ? (int)$pendientes[0]['pid'] : 0;
+
+// ── Contador de personajes con rol de staff (para la tarjeta de gestión) ──
+$staff_count = 0;
+if ($db->table_exists('rol_personajes')) {
+    $scq = $db->simple_select('rol_personajes', 'COUNT(*) AS c', "staff_rol <> '' OR staff_narrador = 1");
+    $staff_count = (int) $db->fetch_field($scq, 'c');
 }
 
-// ── Definición de zonas (min_level, cumulativas) ──
+// ── Definición de zonas ──
+// Cada tarjeta pertenece a un grupo de rol. "Aprobación de expedientes" ahora
+// requiere Colaborador (rol >= colaborador). El resto de utilidades se añadirán
+// cuando tengan backend real.
 $zonas = array(
-    // Nivel 1 · Narrador
-    array('lvl' => 1, 'grupo' => 'Narrador', 'code' => 'STF-01', 'color' => 'var(--h6)',
+    array('grp' => 'colaborador', 'code' => 'STF-01',
         'title' => 'Aprobaci&oacute;n de expedientes',
         'body'  => 'Revisa las fichas enviadas a revisi&oacute;n, aprueba o rechaza personajes y deja notas al jugador.',
-        'meta'  => $pendientes_count . ' pendiente(s)', 'cta' => 'Revisar', 'href' => $bburl . '/revisar-personaje.php'),
-    array('lvl' => 1, 'grupo' => 'Narrador', 'code' => 'STF-02', 'color' => 'var(--h6)',
-        'title' => 'Gesti&oacute;n de tramas y eventos',
-        'body'  => 'Organiza tramas, eventos y misiones del foro. Coordina las tramas narrativas en curso.',
-        'meta'  => 'Narrativa', 'cta' => 'Gestionar', 'href' => $bburl . '/calendar.php'),
-    array('lvl' => 1, 'grupo' => 'Narrador', 'code' => 'STF-03', 'color' => 'var(--h6)',
-        'title' => 'Calendario del rol',
-        'body'  => 'Planifica fechas de eventos, cierres de trama y aperturas de temporada en el calendario.',
-        'meta'  => 'Agenda', 'cta' => 'Ver calendario', 'href' => $bburl . '/calendar.php'),
-
-    // Nivel 2 · Moderador
-    array('lvl' => 2, 'grupo' => 'Moderador', 'code' => 'STF-04', 'color' => 'var(--ember-hi)',
-        'title' => 'Cola de moderaci&oacute;n',
-        'body'  => 'Aprueba o rechaza mensajes y temas en espera. Gestiona el contenido moderado del foro.',
-        'meta'  => 'ModCP', 'cta' => 'Abrir cola', 'href' => $bburl . '/modcp.php'),
-    array('lvl' => 2, 'grupo' => 'Moderador', 'code' => 'STF-05', 'color' => 'var(--ember-hi)',
-        'title' => 'Reportes',
-        'body'  => 'Atiende los reportes de usuarios: mensajes denunciados, conductas y errores de ficha.',
-        'meta'  => 'Incidencias', 'cta' => 'Ver reportes', 'href' => $bburl . '/modcp.php?action=reports'),
-    array('lvl' => 2, 'grupo' => 'Moderador', 'code' => 'STF-06', 'color' => 'var(--ember-hi)',
-        'title' => 'Gesti&oacute;n de temas y foros',
-        'body'  => 'Mueve, fusiona, cierra o destaca temas. Mantiene el orden de los foros.',
-        'meta'  => 'Herramientas', 'cta' => 'Gestionar', 'href' => $bburl . '/modcp.php?action=modqueue'),
-
-    // Nivel 3 · Administrador
-    array('lvl' => 3, 'grupo' => 'Administrador', 'code' => 'STF-07', 'color' => 'var(--crack)',
-        'title' => 'Configuraci&oacute;n del foro',
-        'body'  => 'Ajustes globales del foro: nombre, opciones, temas y plantillas del foro.',
-        'meta'  => 'Admin CP', 'cta' => 'Configurar', 'href' => $bburl . '/admin/'),
-    array('lvl' => 3, 'grupo' => 'Administrador', 'code' => 'STF-08', 'color' => 'var(--crack)',
-        'title' => 'Usuarios y rangos de staff',
-        'body'  => 'Gestiona cuentas, grupos y niveles de staff (narrador, moderador, administrador).',
-        'meta'  => 'Usuarios', 'cta' => 'Administrar', 'href' => $bburl . '/admin/index.php?module=user-users'),
-    array('lvl' => 3, 'grupo' => 'Administrador', 'code' => 'STF-09', 'color' => 'var(--crack)',
-        'title' => 'Econom&iacute;a global',
-        'body'  => 'Supervisa la econom&iacute;a del foro: divisas, ajustes de saldo y transacciones globales.',
-        'meta'  => 'Tesorer&iacute;a', 'cta' => 'Supervisar', 'href' => $bburl . '/tramites.php'),
+        'meta'  => $pendientes_count . ' pendiente(s)', 'cta' => 'Revisar', 'badge' => $pendientes_count, 'href' => $bburl . '/revisar-personaje.php'),
+    array('grp' => 'webmaster', 'code' => 'STF-02',
+        'title' => 'Gesti&oacute;n de staff',
+        'body'  => 'Asigna el rol (Colaborador, Moderador, Administrador, Web Master) y el a&ntilde;adido de Narrador a cada personaje, y consulta los permisos de cada rol.',
+        'meta'  => $staff_count . ' con rol', 'cta' => 'Gestionar', 'badge' => $staff_count, 'href' => $bburl . '/gestionar-staff.php'),
 );
 
 header('Content-Type: text/html; charset=utf-8');
@@ -108,89 +83,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Zona Staff</title>
-<?php echo iforge_rol_head_base(); ?>
-<style>
-/* Estilos de esta página — base global (:root, body, fondo) en docs/themes/iforge.css */
-
-/* ---------------- BREADCRUMB ---------------- */
-.breadcrumb{background:var(--iron-plate);border-bottom:2px solid #000}
-.breadcrumb-in{max-width:1300px;margin:0 auto;padding:9px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.breadcrumb-in a{color:var(--paper-dim)}
-.breadcrumb-in a:hover{color:var(--ember-hi)}
-.breadcrumb-in .sep{color:var(--rivet)}
-.breadcrumb-in b{color:var(--paper)}
-
-/* ---------------- BOTONES ---------------- */
-.btn{font-family:var(--mono);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 20px;border:2px solid #000;cursor:pointer;transition:transform .12s,box-shadow .12s;display:inline-block}
-.btn-hot{background:var(--ember);color:var(--iron)}
-.btn-hot:hover{background:var(--ember-hi);color:var(--iron);transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-ghost{background:transparent;color:var(--paper);border-color:var(--rivet)}
-.btn-ghost:hover{color:var(--iron);background:var(--paper);border-color:#000;transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-sm{padding:7px 13px;font-size:.7rem}
-
-/* ---------------- PLACAS / HEADER ---------------- */
-.plate{border:2px solid #000;background:var(--iron-plate);margin-bottom:12px}
-.plate-h{background:var(--iron-edge);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:2px solid #000}
-.plate-h .t{font-family:var(--disp);font-weight:800;font-size:1.1rem;text-transform:uppercase;color:var(--paper);letter-spacing:.5px}
-.plate-h .c{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
-.plate-b{padding:20px 22px;text-align:center}
-.shead{display:flex;align-items:baseline;gap:14px;margin:8px 0 14px}
-.shead h1,.shead h2{font-family:var(--disp);font-weight:800;font-size:2rem;text-transform:uppercase;color:var(--paper);line-height:1}
-.shead .code{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ember-hi);letter-spacing:1px}
-.shead .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--rivet) 0 6px,transparent 6px 12px)}
-
-/* ---------------- INTRO / NIVEL ---------------- */
-.zs-intro{font-size:.92rem;color:var(--paper-dim);max-width:72ch;margin:-6px 0 16px;line-height:1.55}
-.zs-intro b{color:var(--paper);font-weight:600}
-.zs-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
-.zs-level{font-family:var(--mono);font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--paper-dim)}
-.zs-level b{color:var(--iron);background:var(--ember);padding:3px 10px;border:2px solid #000;margin-left:6px}
-
-/* ---------------- GRUPOS DE ZONAS ---------------- */
-.zs-group{margin-bottom:26px}
-.zs-group-h{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.zs-group-h .lbl{font-family:var(--disp);font-weight:800;font-size:1.3rem;text-transform:uppercase;color:var(--paper);letter-spacing:.5px}
-.zs-group-h .need{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--iron);padding:2px 8px;border:2px solid #000}
-.zs-group-h .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--rivet) 0 6px,transparent 6px 12px)}
-
-/* ---------------- TARJETAS ---------------- */
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-.card{border:2px solid #000;background:var(--iron-plate);display:flex;flex-direction:column;transition:transform .16s,box-shadow .16s;position:relative}
-.card:hover{transform:translate(-3px,-3px);box-shadow:6px 6px 0 #000}
-.card-top{position:relative;padding:16px;border-bottom:2px solid #000;display:flex;align-items:center;gap:13px;background:linear-gradient(150deg,var(--iron-hi),var(--iron-edge))}
-.card-ic{width:52px;height:52px;flex:0 0 auto;background:var(--iron);border:2px solid #000;display:flex;align-items:center;justify-content:center}
-.card-ic svg{width:26px;height:26px;stroke:var(--h6);fill:none;stroke-width:2}
-.card-title{font-family:var(--disp);font-weight:800;font-size:1.35rem;text-transform:uppercase;line-height:.98;color:var(--paper)}
-.card-code{font-family:var(--mono);font-size:.6rem;font-weight:700;color:var(--ember-hi);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
-.card-body{padding:14px 16px;flex:1;font-size:.86rem;color:var(--paper-dim);line-height:1.5}
-.card-foot{padding:12px 16px;border-top:2px solid #000;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.card-meta{font-family:var(--mono);font-size:.62rem;color:var(--ash);text-transform:uppercase}
-.card-tag{font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border:2px solid #000;color:var(--iron);position:absolute;top:0;right:0;border-left:2px solid #000;border-bottom:2px solid #000}
-
-/* ---------------- SIN PERMISO ---------------- */
-.noperm{border:2px dashed var(--crack);background:var(--iron-plate);padding:40px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
-.noperm .lock{width:72px;height:72px;background:var(--iron);border:2px solid #000;display:flex;align-items:center;justify-content:center}
-.noperm .lock svg{width:36px;height:36px;stroke:var(--crack);fill:none;stroke-width:2}
-.noperm .big{font-family:var(--disp);font-weight:800;font-size:1.9rem;text-transform:uppercase;color:var(--paper);line-height:1}
-.noperm p{font-family:var(--mono);font-size:.76rem;color:var(--paper-dim);line-height:1.6;max-width:54ch}
-
-/* ---------------- FOOTER ---------------- */
-.foot{background:var(--iron-edge);border-top:2px solid #000;padding:24px 18px;margin-top:36px}
-.foot-in{max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
-.foot-b{font-family:var(--disp);font-weight:900;font-size:1.3rem;text-transform:uppercase;color:var(--paper)}
-.foot-links{display:flex;gap:16px;flex-wrap:wrap}
-.foot-links a{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
-.foot-links a:hover{color:var(--ember-hi)}
-.foot-c{font-family:var(--mono);font-size:.62rem;color:var(--ash)}
-
-.reveal{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
-.reveal.vis{opacity:1;transform:none}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
-</style>
+<?php echo ope_rol_head_base(); ?>
+<!-- estilos en docs/themes/ope.css (scope: ope-pg-zona-staff) -->
 </head>
-<body>
+<body class="ope-pg-zona-staff">
 
-<?php echo iforge_rol_navbar_html(); ?>
+<?php echo ope_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -210,7 +108,7 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
   </section>
 
-<?php if ($staff_level < 1): ?>
+<?php if (!$is_staff): ?>
   <section class="reveal">
     <div class="plate">
       <div class="plate-h">
@@ -229,27 +127,26 @@ header('Content-Type: text/html; charset=utf-8');
   </section>
 <?php else: ?>
   <section class="reveal">
-    <p class="zs-intro">Panel de <b>administraci&oacute;n del foro</b>. Solo ves las zonas que desbloquea tu rango; los permisos son <b>acumulativos</b> (un administrador ve todo lo de narrador y moderador).</p>
-<?php if ($pendientes_count > 0): ?>
-    <div style="margin-bottom:14px;padding:12px 16px;border:2px solid var(--ember);background:var(--iron-plate);display:flex;align-items:center;justify-content:space-between;gap:12px">
-      <span style="font-family:var(--mono);font-size:.68rem;color:var(--ember-hi)"><b style="color:var(--ember)"><?php echo $pendientes_count; ?></b> expediente(s) pendiente(s) de revisi&oacute;n</span>
-      <a href="<?php echo $bburl; ?>/revisar-personaje.php" class="btn btn-hot btn-sm">Revisar ahora</a>
-    </div>
-<?php endif; ?>
+    <p class="zs-intro">Panel de <b>administraci&oacute;n del foro</b>. El rol de staff va por <b>personaje</b>: solo ves las zonas que desbloquea el rol del personaje que tienes activo. Los roles son <b>acumulativos</b> (un administrador ve lo de colaborador y moderador); <b>Narrador</b> es un rol independiente que puede combinarse con cualquiera.</p>
     <div class="zs-bar">
-      <span class="zs-level">Tu rango de staff: <b><?php echo $mi_nivel_lbl; ?></b></span>
+      <span class="zs-level">Personaje activo: <b><?php echo $char_name !== '' ? $char_name : '&mdash;'; ?></b> &middot; rol: <b><?php echo $mi_rango_lbl; ?></b></span>
     </div>
   </section>
 
 <?php
+  // Grupos por rol. 'rank' = rango mínimo jerárquico; 'narr' = grupo del rol narrador.
   $grupos = array(
-      1 => array('lbl' => 'Narrador',      'need' => 'Nivel &ge; 1', 'col' => 'var(--h6)'),
-      2 => array('lbl' => 'Moderador',     'need' => 'Nivel &ge; 2', 'col' => 'var(--ember-hi)'),
-      3 => array('lbl' => 'Administrador', 'need' => 'Nivel &ge; 3', 'col' => 'var(--crack)'),
+      'colaborador'   => array('lbl' => 'Colaborador',   'need' => 'Rol &ge; Colaborador',   'col' => 'var(--h6)',        'rank' => 1),
+      'moderador'     => array('lbl' => 'Moderador',     'need' => 'Rol &ge; Moderador',     'col' => 'var(--ember-hi)',  'rank' => 2),
+      'administrador' => array('lbl' => 'Administrador', 'need' => 'Rol &ge; Administrador', 'col' => 'var(--crack)',     'rank' => 3),
+      'webmaster'     => array('lbl' => 'Web Master',    'need' => 'Rol Web Master',         'col' => 'var(--patina)',    'rank' => 4),
+      'narrador'      => array('lbl' => 'Narrador',      'need' => 'Rol Narrador',           'col' => 'var(--patina-hi)', 'narr' => true),
   );
-  foreach ($grupos as $glvl => $g):
-      if ($staff_level < $glvl) continue;
-      $zonas_grupo = array_filter($zonas, function ($z) use ($glvl) { return $z['lvl'] === $glvl; });
+  foreach ($grupos as $gkey => $g):
+      $puede = !empty($g['narr']) ? ($narrador === 1) : ($rank >= $g['rank']);
+      if (!$puede) continue;
+      $zonas_grupo = array_filter($zonas, function ($z) use ($gkey) { return $z['grp'] === $gkey; });
+      if (empty($zonas_grupo)) continue; // no renderizar grupos sin utilidades
 ?>
   <section class="zs-group reveal">
     <div class="zs-group-h">
@@ -266,7 +163,10 @@ header('Content-Type: text/html; charset=utf-8');
             <div class="card-title"><?php echo $z['title']; ?></div>
             <div class="card-code"><?php echo $z['code']; ?></div>
           </div>
-          <span class="card-tag" style="background:<?php echo $z['color']; ?>"><?php echo $g['lbl']; ?></span>
+          <span class="card-tag" style="background:<?php echo $g['col']; ?>"><?php echo $g['lbl']; ?></span>
+<?php if (!empty($z['badge'])): ?>
+          <span class="card-count" title="<?php echo (int)$z['badge']; ?> en revisi&oacute;n"><?php echo (int)$z['badge']; ?></span>
+<?php endif; ?>
         </div>
         <div class="card-body"><?php echo $z['body']; ?></div>
         <div class="card-foot">

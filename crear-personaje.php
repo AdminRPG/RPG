@@ -1,13 +1,13 @@
 <?php
 /**
  * I-Forge · Forjar personaje (wizard de creación)
- * Página de front-end MyBB (dirección "Foundry Brutalism").
+ * Página de front-end MyBB (dirección "One Piece Eternal").
  *
  * Wizard de un único envío (sin borradores intermedios) que sigue los
  * 7 pasos de one-piece-eternal-sistemas/01-creacion-de-personaje.md:
  * raza, concepto, stats, virtudes/defectos, facción, equipo, historia.
  *
- * Al enviar: valida TODO en servidor contra inc/iforge_rol_data.php
+ * Al enviar: valida TODO en servidor contra inc/ope_rol_data.php
  * (nunca confía en lo que calculó el JS), inserta en mybb_rol_personajes
  * con estado=revision y abre un trámite en mybb_rol_tramites para que el
  * staff lo apruebe desde "Mi expediente".
@@ -16,7 +16,7 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'crear-personaje.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/iforge_rol_data.php';
+require_once MYBB_ROOT . 'inc/ope_rol_data.php';
 
 $bburl    = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
@@ -26,8 +26,8 @@ $username = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
 $staff_level = 0;
 if ($loggedin) {
-    if (isset($mybb->user['iforge_staff_level'])) {
-        $staff_level = (int)$mybb->user['iforge_staff_level'];
+    if (isset($mybb->user['ope_staff_level'])) {
+        $staff_level = (int)$mybb->user['ope_staff_level'];
     } elseif ($db->table_exists('rol_cuentas')) {
         $cq = $db->simple_select('rol_cuentas', 'staff_level', "uid = {$uid}", array('limit' => 1));
         if ($db->num_rows($cq)) {
@@ -49,15 +49,15 @@ if ($loggedin) {
 }
 $initials_e = htmlspecialchars_uni($initials);
 
-$RAZAS      = iforge_rol_razas();
-$VIRTUDES   = iforge_rol_virtudes();
-$DEFECTOS   = iforge_rol_defectos();
-$FACCIONES  = iforge_rol_facciones();
-$ARMAS      = iforge_rol_armas();
-$STATS      = iforge_rol_stats();
-$STAT_KEYS  = iforge_rol_stat_keys();
-$PC_BASE    = iforge_rol_pc_iniciales();
-$BERRIES_BASE = iforge_rol_berries_iniciales();
+$RAZAS      = ope_rol_razas();
+$VIRTUDES   = ope_rol_virtudes();
+$DEFECTOS   = ope_rol_defectos();
+$FACCIONES  = ope_rol_facciones();
+$ARMAS      = ope_rol_armas();
+$STATS      = ope_rol_stats();
+$STAT_KEYS  = ope_rol_stat_keys();
+$PC_BASE    = ope_rol_pc_iniciales();
+$BERRIES_BASE = ope_rol_berries_iniciales();
 
 // ─────────────────────────────────────────────────────────────
 // Slots disponibles
@@ -97,7 +97,7 @@ $errores = array();
 $ok = false;
 $old = $_POST;
 
-function iforge_rol_clean($s, $max = 4000)
+function ope_rol_clean($s, $max = 4000)
 {
     $s = trim((string)$s);
     if (function_exists('mb_substr')) {
@@ -125,12 +125,12 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         }
 
         // ---- Concepto ----
-        $nombre = iforge_rol_clean($mybb->get_input('nombre'), 120);
-        $apodo = iforge_rol_clean($mybb->get_input('apodo'), 60);
-        $edad = iforge_rol_clean($mybb->get_input('edad'), 20);
-        $genero = iforge_rol_clean($mybb->get_input('genero'), 40);
+        $nombre = ope_rol_clean($mybb->get_input('nombre'), 120);
+        $apodo = ope_rol_clean($mybb->get_input('apodo'), 60);
+        $edad = ope_rol_clean($mybb->get_input('edad'), 20);
+        $genero = ope_rol_clean($mybb->get_input('genero'), 40);
         $tiene_d = $mybb->get_input('tiene_d', MyBB::INPUT_INT) ? true : false;
-        $concepto = iforge_rol_clean($mybb->get_input('concepto'), 600);
+        $concepto = ope_rol_clean($mybb->get_input('concepto'), 600);
 
         if ($nombre === '' || function_exists('mb_strlen') ? mb_strlen($nombre, 'UTF-8') < 3 : strlen($nombre) < 3) {
             $errores[] = 'El nombre del personaje debe tener al menos 3 caracteres.';
@@ -188,7 +188,7 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             $stats_efectivas[$b] = ($stats_efectivas[$b] ?? 1) + 1;
         }
         $suma = array_sum($stats_efectivas);
-        $rango = iforge_rol_rank_from_sum($suma);
+        $rango = ope_rol_rank_from_sum($suma);
 
         // ---- Virtudes y Defectos ----
         $virtudes_in = $mybb->get_input('virtudes', MyBB::INPUT_ARRAY);
@@ -199,9 +199,9 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         $pc_gastado = 0;
         $virtudes_sel = array();
         foreach ($virtudes_in as $vid) {
-            $v = iforge_rol_find_virtud($vid);
+            $v = ope_rol_find_virtud($vid);
             if ($v === null) continue;
-            $spec = !empty($v['spec']) ? iforge_rol_clean($mybb->get_input('virtud_spec_' . $vid), 200) : '';
+            $spec = !empty($v['spec']) ? ope_rol_clean($mybb->get_input('virtud_spec_' . $vid), 200) : '';
             if (!empty($v['spec']) && $spec === '') {
                 $errores[] = 'La virtud "' . $v['nombre'] . '" requiere que especifiques un detalle.';
             }
@@ -219,9 +219,9 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         $pc_devuelto = 0;
         $defectos_sel = array();
         foreach ($defectos_in as $did) {
-            $d = iforge_rol_find_defecto($did);
+            $d = ope_rol_find_defecto($did);
             if ($d === null) continue;
-            $spec = !empty($d['spec']) ? iforge_rol_clean($mybb->get_input('defecto_spec_' . $did), 200) : '';
+            $spec = !empty($d['spec']) ? ope_rol_clean($mybb->get_input('defecto_spec_' . $did), 200) : '';
             if (!empty($d['spec']) && $spec === '') {
                 $errores[] = 'El defecto "' . $d['nombre'] . '" requiere que especifiques un detalle.';
             }
@@ -242,7 +242,7 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
 
         // ---- Equipo ----
         $arma = $mybb->get_input('arma');
-        $objeto_personal = iforge_rol_clean($mybb->get_input('objeto_personal'), 200);
+        $objeto_personal = ope_rol_clean($mybb->get_input('objeto_personal'), 200);
         if (!isset($ARMAS[$arma])) {
             $errores[] = 'Elige un arma inicial válida.';
         }
@@ -255,9 +255,9 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         if (isset($virtudes_sel['V-RIQ-03'])) $berries += 10000000;
 
         // ---- Historia ----
-        $historia_pasado = iforge_rol_clean($mybb->get_input('historia_pasado'), 6000);
-        $historia_motivacion = iforge_rol_clean($mybb->get_input('historia_motivacion'), 3000);
-        $historia_relaciones = iforge_rol_clean($mybb->get_input('historia_relaciones'), 3000);
+        $historia_pasado = ope_rol_clean($mybb->get_input('historia_pasado'), 6000);
+        $historia_motivacion = ope_rol_clean($mybb->get_input('historia_motivacion'), 3000);
+        $historia_relaciones = ope_rol_clean($mybb->get_input('historia_relaciones'), 3000);
         $min_len = function_exists('mb_strlen') ? mb_strlen($historia_pasado, 'UTF-8') : strlen($historia_pasado);
         if ($min_len < 80) {
             $errores[] = 'Cuenta el pasado de tu personaje con algo más de detalle (mínimo ~80 caracteres).';
@@ -346,152 +346,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Crear personaje</title>
-<?php echo iforge_rol_head_base(); ?>
-<style>
-/* Estilos de esta página — base global (:root, body, fondo) en docs/themes/iforge.css */
-.wrap{max-width:1100px;margin:0 auto;padding:0 18px}
-
-/* ---------------- BREADCRUMB ---------------- */
-.breadcrumb{background:var(--iron-plate);border-bottom:2px solid #000}
-.breadcrumb-in{max-width:1300px;margin:0 auto;padding:9px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.breadcrumb-in a{color:var(--paper-dim)}
-.breadcrumb-in a:hover{color:var(--ember-hi)}
-.breadcrumb-in .sep{color:var(--rivet)}
-.breadcrumb-in b{color:var(--paper)}
-
-/* ---------------- BOTONES ---------------- */
-.btn{font-family:var(--mono);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 20px;border:2px solid #000;cursor:pointer;transition:transform .12s,box-shadow .12s;display:inline-block}
-.btn-hot{background:var(--ember);color:var(--iron)}
-.btn-hot:hover{background:var(--ember-hi);color:var(--iron);transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-hot:disabled{background:var(--rivet);color:var(--paper-dim);cursor:not-allowed;transform:none;box-shadow:none}
-.btn-ghost{background:transparent;color:var(--paper);border-color:var(--rivet)}
-.btn-ghost:hover{color:var(--iron);background:var(--paper);border-color:#000;transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-sm{padding:7px 13px;font-size:.7rem}
-
-/* ---------------- PLACAS ---------------- */
-.plate{border:2px solid #000;background:var(--iron-plate);margin-bottom:12px}
-.plate-h{background:var(--iron-edge);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:2px solid #000}
-.plate-h .t{font-family:var(--disp);font-weight:800;font-size:1.1rem;text-transform:uppercase;color:var(--paper);letter-spacing:.5px}
-.plate-h .c{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
-.plate-b{padding:16px}
-.shead{display:flex;align-items:baseline;gap:14px;margin:8px 0 14px}
-.shead h1,.shead h2{font-family:var(--disp);font-weight:800;font-size:2rem;text-transform:uppercase;color:var(--paper);line-height:1}
-.shead .code{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ember-hi);letter-spacing:1px}
-.shead .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--rivet) 0 6px,transparent 6px 12px)}
-
-/* ---------------- FLASH ---------------- */
-.flash{border:2px solid #000;padding:11px 14px;margin-bottom:16px;font-family:var(--mono);font-size:.74rem;font-weight:700;letter-spacing:.3px}
-.flash.warn{background:var(--h6);color:var(--iron)}
-.flash ul{margin:6px 0 0 18px}
-
-/* ---------------- FOOTER ---------------- */
-.foot{background:var(--iron-edge);border-top:2px solid #000;padding:24px 18px;margin-top:36px}
-.foot-in{max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
-.foot-b{font-family:var(--disp);font-weight:900;font-size:1.3rem;text-transform:uppercase;color:var(--paper)}
-.foot-links{display:flex;gap:16px;flex-wrap:wrap}
-.foot-links a{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
-.foot-links a:hover{color:var(--ember-hi)}
-.foot-c{font-family:var(--mono);font-size:.62rem;color:var(--ash)}
-
-/* ---------------- EMPTY / NOPERM ---------------- */
-.pj-empty{border:2px dashed var(--rivet);background:var(--iron-plate);padding:40px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
-.pj-empty .anvil{width:72px;height:72px;background:var(--iron);border:2px solid #000;display:flex;align-items:center;justify-content:center}
-.pj-empty .anvil svg{width:38px;height:38px;stroke:var(--h6);fill:none;stroke-width:2}
-.pj-empty .big{font-family:var(--disp);font-weight:800;font-size:1.9rem;text-transform:uppercase;color:var(--paper);line-height:1}
-.pj-empty p{font-family:var(--mono);font-size:.76rem;color:var(--paper-dim);line-height:1.6;max-width:54ch}
-.pj-empty .acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
-
-/* ============================================================
-   WIZARD
-   ============================================================ */
-.wiz-progress{display:flex;gap:4px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px}
-.wiz-step-dot{flex:1 0 auto;min-width:88px;text-align:center;font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--paper-dim);padding:8px 6px;border:2px solid var(--rivet);background:var(--iron-plate);white-space:nowrap}
-.wiz-step-dot .n{display:block;font-family:var(--disp);font-size:1.1rem;font-weight:800;color:var(--paper-dim)}
-.wiz-step-dot.done{border-color:var(--patina);color:var(--patina-hi)}
-.wiz-step-dot.done .n{color:var(--patina-hi)}
-.wiz-step-dot.on{border-color:var(--ember);background:var(--ember);color:var(--iron)}
-.wiz-step-dot.on .n{color:var(--iron)}
-
-.wiz-step{display:none}
-.wiz-step.on{display:block}
-.field{margin-bottom:16px}
-.field label.flabel{display:block;font-family:var(--mono);font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--paper-dim);margin-bottom:6px}
-.field input[type=text],.field input[type=number],.field select,.field textarea{width:100%;background:var(--iron);border:2px solid var(--rivet);color:var(--paper);font-family:var(--body);font-size:.9rem;padding:10px 12px}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--ember)}
-.field textarea{resize:vertical;min-height:90px;line-height:1.5}
-.field .hint{font-family:var(--mono);font-size:.62rem;color:var(--ash);margin-top:5px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:640px){.grid2{grid-template-columns:1fr}}
-
-/* raza cards */
-.race-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
-.race-card{position:relative;border:2px solid var(--rivet);background:var(--iron-plate);padding:13px;cursor:pointer;transition:border-color .12s,transform .12s}
-.race-card:hover{border-color:var(--ember-hi);transform:translate(-2px,-2px)}
-.race-card input{position:absolute;opacity:0;pointer-events:none}
-.race-card input:checked ~ .rc-body{}
-.race-card:has(input:checked){border-color:var(--ember);background:var(--iron-hi);box-shadow:3px 3px 0 #000}
-.rc-name{font-family:var(--disp);font-weight:800;font-size:1.15rem;text-transform:uppercase;color:var(--paper);margin-bottom:3px}
-.rc-resumen{font-size:.74rem;color:var(--paper-dim);line-height:1.4;margin-bottom:8px}
-.rc-pas{font-family:var(--mono);font-size:.62rem;line-height:1.5;color:var(--ash);border-top:1px solid var(--iron-edge);padding-top:7px;margin-top:7px}
-.rc-pas b{color:var(--h6)}
-
-/* stats table */
-.stats-pillar{margin-bottom:14px}
-.stats-pillar-h{font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--h6);margin-bottom:6px;border-bottom:1px solid var(--iron-edge);padding-bottom:4px}
-.stat-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--iron-edge)}
-.stat-row:last-child{border-bottom:none}
-.stat-name{flex:0 0 160px;font-size:.82rem;color:var(--paper)}
-.stat-name .sig{font-family:var(--mono);color:var(--paper-dim);font-size:.68rem}
-.stat-val{flex:0 0 40px;text-align:center;font-family:var(--disp);font-weight:800;font-size:1.1rem}
-.stat-val.neg{color:var(--crack)}
-.stat-val.pos{color:var(--patina-hi)}
-.stat-eff{flex:0 0 46px;text-align:center;font-family:var(--disp);font-weight:900;font-size:1.3rem;color:var(--h6)}
-.stat-bump{flex:0 0 auto;display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.6rem;color:var(--paper-dim);text-transform:uppercase}
-.wiz-sum-bar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--iron-edge);border:2px solid #000;padding:10px 14px;margin:14px 0;font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.4px}
-.wiz-sum-bar b{color:var(--h6);font-family:var(--disp);font-size:1.1rem}
-
-/* virtudes / defectos */
-.pc-bar{position:sticky;top:60px;z-index:5;display:flex;align-items:center;gap:14px;background:var(--iron-edge);border:2px solid #000;padding:10px 14px;margin-bottom:14px;font-family:var(--mono);font-size:.72rem;text-transform:uppercase;flex-wrap:wrap}
-.pc-bar .pc-num{font-family:var(--disp);font-size:1.4rem;font-weight:900;color:var(--h6)}
-.pc-bar.bad .pc-num{color:var(--crack)}
-.cat-group{border:2px solid var(--rivet);margin-bottom:10px;background:var(--iron-plate)}
-.cat-h{background:var(--iron-edge);padding:8px 12px;font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);cursor:pointer;display:flex;justify-content:space-between}
-.cat-body{padding:4px 12px 8px}
-.item-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--iron-edge)}
-.item-row:last-child{border-bottom:none}
-.item-row input[type=checkbox]{margin-top:3px;flex:0 0 auto}
-.item-txt{flex:1;min-width:0}
-.item-name{font-size:.84rem;font-weight:600;color:var(--paper)}
-.item-name .badge{font-family:var(--mono);font-size:.6rem;font-weight:700;padding:1px 7px;border:1px solid #000;margin-left:6px}
-.badge.cost{background:var(--crack);color:var(--paper)}
-.badge.back{background:var(--patina);color:var(--iron)}
-.item-desc{font-size:.74rem;color:var(--paper-dim);line-height:1.4;margin-top:2px}
-.item-spec{display:none;margin-top:6px}
-.item-spec.show{display:block}
-.item-spec input{width:100%;background:var(--iron);border:1px solid var(--rivet);color:var(--paper);font-size:.78rem;padding:6px 8px}
-
-/* facción cards */
-.fac-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-.fac-card{position:relative;border:2px solid var(--rivet);background:var(--iron-plate);padding:13px;cursor:pointer}
-.fac-card input{position:absolute;opacity:0;pointer-events:none}
-.fac-card:has(input:checked){border-color:var(--ember);background:var(--iron-hi);box-shadow:3px 3px 0 #000}
-.fac-name{font-family:var(--disp);font-weight:800;font-size:1.2rem;text-transform:uppercase;color:var(--paper)}
-.fac-desc{font-size:.78rem;color:var(--paper-dim);margin:4px 0 8px}
-.fac-adv{font-family:var(--mono);font-size:.62rem;color:var(--h6);line-height:1.4}
-
-/* resumen */
-.sum-block{border:2px solid var(--rivet);background:var(--iron-edge);padding:12px 14px;margin-bottom:10px}
-.sum-block h4{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.6px;color:var(--h6);margin-bottom:8px}
-.sum-block .line{font-size:.82rem;color:var(--paper);margin-bottom:3px}
-.sum-block .line b{color:var(--paper-dim);font-weight:400;font-family:var(--mono);font-size:.68rem;text-transform:uppercase;margin-right:6px}
-
-.wiz-nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
-.wiz-err{font-family:var(--mono);font-size:.68rem;color:var(--crack);margin-top:8px;min-height:1em}
-</style>
+<?php echo ope_rol_head_base(); ?>
+<!-- estilos en docs/themes/ope.css (scope: ope-pg-crear-personaje) -->
 </head>
-<body>
+<body class="ope-pg-crear-personaje">
 
-<?php echo iforge_rol_navbar_html(); ?>
+<?php echo ope_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

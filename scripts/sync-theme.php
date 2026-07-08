@@ -5,7 +5,7 @@
  *   php scripts/sync-theme.php import      Repo -> DB (default)
  *   php scripts/sync-theme.php export      DB -> repo files
  *   php scripts/sync-theme.php verify      Detect drift
- *   php scripts/sync-theme.php build-xml   Build iforge-child-theme.xml for Admin CP
+ *   php scripts/sync-theme.php build-xml   Build ope-child-theme.xml for Admin CP
  *   php scripts/sync-theme.php bootstrap   One-time: extract CSS + shared templates from legacy child-theme.xml
  */
 require __DIR__ . '/_theme-sync-lib.php';
@@ -14,101 +14,101 @@ $command = $argv[1] ?? 'import';
 
 switch ($command) {
     case 'bootstrap':
-        iforge_bootstrap_from_legacy();
+        ope_bootstrap_from_legacy();
         break;
 
     case 'export':
-        $db = iforge_db_connect();
-        $theme = iforge_resolve_theme($db);
+        $db = ope_db_connect();
+        $theme = ope_resolve_theme($db);
         echo "Exporting from tid={$theme['tid']} templateset={$theme['templateset']}\n";
-        iforge_export_css($db, $theme['tid']);
-        iforge_export_templates($db, $theme['templateset']);
+        ope_export_css($db, $theme['tid']);
+        ope_export_templates($db, $theme['templateset']);
         $db->close();
         break;
 
     case 'verify':
-        $db = iforge_db_connect();
-        $theme = iforge_resolve_theme($db);
+        $db = ope_db_connect();
+        $theme = ope_resolve_theme($db);
         echo "Verifying tid={$theme['tid']} templateset={$theme['templateset']}\n";
-        $errors = iforge_verify_sync($db, $theme['tid'], $theme['templateset']);
+        $errors = ope_verify_sync($db, $theme['tid'], $theme['templateset']);
         $db->close();
         exit($errors > 0 ? 1 : 0);
 
     case 'build-xml':
-        iforge_build_child_theme_xml();
+        ope_build_child_theme_xml();
         break;
 
     case 'import':
     default:
-        if (!is_file(IFORGE_CSS_FILE)) {
-            echo "iforge.css not found — running bootstrap first...\n";
-            iforge_bootstrap_from_legacy();
+        if (!is_file(OPE_CSS_FILE)) {
+            echo "ope.css not found — running bootstrap first...\n";
+            ope_bootstrap_from_legacy();
         }
-        if (!is_file(IFORGE_THEME_ROOT . '/iforge-foundry-shared.xml')) {
-            echo "iforge-foundry-shared.xml not found — running bootstrap first...\n";
-            iforge_bootstrap_from_legacy();
+        if (!is_file(OPE_THEME_ROOT . '/ope-shared.xml')) {
+            echo "ope-shared.xml not found — running bootstrap first...\n";
+            ope_bootstrap_from_legacy();
         }
 
-        $db = iforge_db_connect();
-        $theme = iforge_resolve_theme($db);
+        $db = ope_db_connect();
+        $theme = ope_resolve_theme($db);
         echo "Importing to tid={$theme['tid']} templateset={$theme['templateset']}\n\n";
 
         echo "--- CSS ---\n";
-        iforge_import_css($db, $theme['tid']);
+        ope_import_css($db, $theme['tid']);
 
         echo "\n--- Templates ---\n";
-        $count = iforge_import_templates($db, $theme['templateset']);
+        $count = ope_import_templates($db, $theme['templateset']);
 
-        iforge_clear_theme_caches($db);
+        ope_clear_theme_caches($db);
         $db->close();
 
         echo "\n=== DONE ===\n";
         echo "Templates synced: $count\n";
-        echo "Sources: docs/themes/iforge.css + docs/themes/iforge-foundry-*.xml\n";
+        echo "Sources: docs/themes/ope.css + docs/themes/ope-*.xml\n";
         echo "Hard-refresh the forum (Ctrl+Shift+R).\n";
         break;
 }
 
 /**
  * One-time migration: pull CSS and auxiliary templates out of the monolithic
- * iforge-child-theme.xml so they are not overwritten on the next import.
+ * ope-child-theme.xml so they are not overwritten on the next import.
  */
-function iforge_bootstrap_from_legacy(): void
+function ope_bootstrap_from_legacy(): void
 {
-    if (!is_file(IFORGE_CHILD_XML)) {
-        fwrite(STDERR, "Legacy file not found: " . IFORGE_CHILD_XML . "\n");
+    if (!is_file(OPE_CHILD_XML)) {
+        fwrite(STDERR, "Legacy file not found: " . OPE_CHILD_XML . "\n");
         exit(1);
     }
 
-    $xml = simplexml_load_file(IFORGE_CHILD_XML);
+    $xml = simplexml_load_file(OPE_CHILD_XML);
     if (!$xml) {
-        fwrite(STDERR, "Invalid XML: " . IFORGE_CHILD_XML . "\n");
+        fwrite(STDERR, "Invalid XML: " . OPE_CHILD_XML . "\n");
         exit(1);
     }
 
   // ── CSS ──
-    if (!is_file(IFORGE_CSS_FILE) && $xml->stylesheets && $xml->stylesheets->stylesheet) {
+    if (!is_file(OPE_CSS_FILE) && $xml->stylesheets && $xml->stylesheets->stylesheet) {
         foreach ($xml->stylesheets->stylesheet as $sheet) {
-            if ((string)$sheet['name'] === 'iforge.css') {
+            if ((string)$sheet['name'] === 'ope.css') {
                 $css = (string)$sheet;
                 if (substr($css, -1) !== "\n") {
                     $css .= "\n";
                 }
-                file_put_contents(IFORGE_CSS_FILE, $css);
-                echo "Bootstrap: wrote docs/themes/iforge.css (" . strlen($css) . " bytes)\n";
+                file_put_contents(OPE_CSS_FILE, $css);
+                echo "Bootstrap: wrote docs/themes/ope.css (" . strlen($css) . " bytes)\n";
                 break;
             }
         }
     }
 
   // ── Shared templates (everything in child-theme NOT in foundry-* files) ──
-    $sharedPath = IFORGE_THEME_ROOT . '/iforge-foundry-shared.xml';
+    $sharedPath = OPE_THEME_ROOT . '/ope-shared.xml';
     if (!is_file($sharedPath) && $xml->templates && $xml->templates->template) {
-        $foundryNames = array_keys(iforge_load_repo_templates_from([
-            IFORGE_THEME_ROOT . '/iforge-foundry-forms.xml',
-            IFORGE_THEME_ROOT . '/iforge-foundry-showthread.xml',
-            IFORGE_THEME_ROOT . '/iforge-foundry-forumdisplay.xml',
-            IFORGE_THEME_ROOT . '/iforge-foundry-index.xml',
+        $foundryNames = array_keys(ope_load_repo_templates_from([
+            OPE_THEME_ROOT . '/ope-forms.xml',
+            OPE_THEME_ROOT . '/ope-showthread.xml',
+            OPE_THEME_ROOT . '/ope-forumdisplay.xml',
+            OPE_THEME_ROOT . '/ope-index.xml',
         ]));
 
         $dom = new DOMDocument('1.0', 'UTF-8');
@@ -134,15 +134,15 @@ function iforge_bootstrap_from_legacy(): void
         $themeEl->appendChild($tempsEl);
         $dom->appendChild($themeEl);
         $dom->save($sharedPath);
-        echo "Bootstrap: wrote docs/themes/iforge-foundry-shared.xml ($count templates)\n";
+        echo "Bootstrap: wrote docs/themes/ope-shared.xml ($count templates)\n";
     }
 
-    iforge_write_child_theme_stub();
-    echo "Bootstrap: replaced iforge-child-theme.xml with properties stub\n";
+    ope_write_child_theme_stub();
+    echo "Bootstrap: replaced ope-child-theme.xml with properties stub\n";
 }
 
 /** @param list<string> $files */
-function iforge_load_repo_templates_from(array $files): array
+function ope_load_repo_templates_from(array $files): array
 {
     $templates = [];
     foreach ($files as $path) {
@@ -160,17 +160,17 @@ function iforge_load_repo_templates_from(array $files): array
     return $templates;
 }
 
-function iforge_write_child_theme_stub(): void
+function ope_write_child_theme_stub(): void
 {
-    $props = iforge_child_theme_properties();
+    $props = ope_child_theme_properties();
     $dom = new DOMDocument('1.0', 'UTF-8');
     $dom->formatOutput = true;
 
     $comment = $dom->createComment(
         ' Properties stub — NOT the source of truth. '
-        . 'Edit docs/themes/iforge.css and docs/themes/iforge-foundry-*.xml. '
+        . 'Edit docs/themes/ope.css and docs/themes/ope-*.xml. '
         . 'Deploy: php scripts/sync-theme.php import '
-        . 'Admin CP bundle: php scripts/sync-theme.php build-xml -> iforge-child-theme.bundle.xml '
+        . 'Admin CP bundle: php scripts/sync-theme.php build-xml -> ope-child-theme.bundle.xml '
     );
     $dom->appendChild($comment);
 
@@ -192,5 +192,5 @@ function iforge_write_child_theme_stub(): void
     }
     $themeEl->appendChild($propsEl);
     $dom->appendChild($themeEl);
-    $dom->save(IFORGE_CHILD_XML);
+    $dom->save(OPE_CHILD_XML);
 }

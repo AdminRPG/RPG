@@ -1,7 +1,7 @@
 <?php
 /**
  * I-Forge · Personajes ("Mi expediente" / roster)
- * Página de front-end MyBB (dirección "Foundry Brutalism").
+ * Página de front-end MyBB (dirección "One Piece Eternal").
  *
  * El usuario autenticado ve sus personajes (mybb_rol_personajes) en tarjetas
  * y puede marcar cuál es el personaje ACTIVO (con el que publica). La selección
@@ -19,11 +19,11 @@ $loggedin  = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid       = (int) ($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
-// ── Nivel de staff (lo expone el plugin iforge_rol; con respaldo directo) ──
+// ── Nivel de staff (lo expone el plugin ope_rol; con respaldo directo) ──
 $staff_level = 0;
 if ($loggedin) {
-    if (isset($mybb->user['iforge_staff_level'])) {
-        $staff_level = (int) $mybb->user['iforge_staff_level'];
+    if (isset($mybb->user['ope_staff_level'])) {
+        $staff_level = (int) $mybb->user['ope_staff_level'];
     } elseif ($db->table_exists('rol_cuentas')) {
         $cq = $db->simple_select('rol_cuentas', 'staff_level', "uid = {$uid}", array('limit' => 1));
         if ($db->num_rows($cq)) {
@@ -47,11 +47,11 @@ if ($loggedin) {
 $initials_e = htmlspecialchars_uni($initials);
 
 // Nombre a mostrar en la navbar: personaje activo o, en su defecto, la cuenta.
-$display_name   = (string) ($mybb->user['iforge_display_name'] ?? ($mybb->user['username'] ?? ''));
+$display_name   = (string) ($mybb->user['ope_display_name'] ?? ($mybb->user['username'] ?? ''));
 $display_name_e = htmlspecialchars_uni($display_name);
 
 // ── Mapa de rango → variable de calor ──
-function iforge_heat_var(string $rango): string
+function ope_heat_var(string $rango): string
 {
     $map = array(
         'F' => '--h1', 'E' => '--h1', 'D' => '--h2', 'C' => '--h3', 'B' => '--h4',
@@ -61,7 +61,7 @@ function iforge_heat_var(string $rango): string
     return $map[$rango] ?? '--h1';
 }
 
-function iforge_estado_label(string $estado): array
+function ope_estado_label(string $estado): array
 {
     switch ($estado) {
         case 'aprobado':  return array('Aprobado', 'var(--patina-hi)');
@@ -90,7 +90,9 @@ if ($loggedin && $mybb->request_method === 'post' && $db->table_exists('rol_pers
         );
         if ($db->num_rows($vq)) {
             $prow = $db->fetch_array($vq);
-            if ($prow['estado'] === 'aprobado') {
+            // Se puede activar un personaje aprobado o EN REVISIÓN (con este
+            // último solo se podrá postear en Off Topic hasta la aprobación).
+            if ($prow['estado'] === 'aprobado' || $prow['estado'] === 'revision') {
                 // Solo un activo por cuenta: desactiva el resto y activa el elegido.
                 $db->update_query('rol_personajes', array('activo' => 0), "uid = {$uid}");
                 $db->update_query('rol_personajes', array('activo' => 1), "pid = {$set_pid} AND uid = {$uid}");
@@ -111,8 +113,11 @@ if ($loggedin && $mybb->request_method === 'post' && $db->table_exists('rol_pers
                     }
                 }
                 $flash = 'Personaje activo actualizado: ' . htmlspecialchars_uni($prow['nombre']) . '.';
+                if ($prow['estado'] === 'revision') {
+                    $flash .= ' Está en revisión: solo podrás publicar en la zona Off Topic hasta que el staff lo apruebe.';
+                }
             } else {
-                $flash = 'Solo puedes activar un personaje aprobado.';
+                $flash = 'Solo puedes activar un personaje aprobado o en revisión.';
                 $flash_kind = 'warn';
             }
         } else {
@@ -188,99 +193,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Personaje</title>
-<?php echo iforge_rol_head_base(); ?>
-<style>
-/* Estilos de esta página — base global (:root, body, fondo) en docs/themes/iforge.css */
-
-/* ---------------- BREADCRUMB ---------------- */
-.breadcrumb{background:var(--iron-plate);border-bottom:2px solid #000}
-.breadcrumb-in{max-width:1300px;margin:0 auto;padding:9px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.breadcrumb-in a{color:var(--paper-dim)}
-.breadcrumb-in a:hover{color:var(--ember-hi)}
-.breadcrumb-in .sep{color:var(--rivet)}
-.breadcrumb-in b{color:var(--paper)}
-
-/* ---------------- BOTONES ---------------- */
-.btn{font-family:var(--mono);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 20px;border:2px solid #000;cursor:pointer;transition:transform .12s,box-shadow .12s;display:inline-block}
-.btn-hot{background:var(--ember);color:var(--iron)}
-.btn-hot:hover{background:var(--ember-hi);color:var(--iron);transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-ghost{background:transparent;color:var(--paper);border-color:var(--rivet)}
-.btn-ghost:hover{color:var(--iron);background:var(--paper);border-color:#000;transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-sm{padding:7px 13px;font-size:.7rem}
-
-/* ---------------- PLACAS ---------------- */
-.plate{border:2px solid #000;background:var(--iron-plate);margin-bottom:12px}
-.plate-h{background:var(--iron-edge);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:2px solid #000}
-.plate-h .t{font-family:var(--disp);font-weight:800;font-size:1.1rem;text-transform:uppercase;color:var(--paper);letter-spacing:.5px}
-.plate-h .c{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
-.plate-b{padding:13px}
-.shead{display:flex;align-items:baseline;gap:14px;margin:8px 0 14px}
-.shead h1,.shead h2{font-family:var(--disp);font-weight:800;font-size:2rem;text-transform:uppercase;color:var(--paper);line-height:1}
-.shead .code{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ember-hi);letter-spacing:1px}
-.shead .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--rivet) 0 6px,transparent 6px 12px)}
-
-/* ---------------- FLASH ---------------- */
-.flash{border:2px solid #000;padding:11px 14px;margin-bottom:16px;font-family:var(--mono);font-size:.74rem;font-weight:700;letter-spacing:.3px}
-.flash.ok{background:var(--patina);color:var(--iron)}
-.flash.warn{background:var(--h6);color:var(--iron)}
-
-/* ---------------- FOOTER ---------------- */
-.foot{background:var(--iron-edge);border-top:2px solid #000;padding:24px 18px;margin-top:36px}
-.foot-in{max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
-.foot-b{font-family:var(--disp);font-weight:900;font-size:1.3rem;text-transform:uppercase;color:var(--paper)}
-.foot-links{display:flex;gap:16px;flex-wrap:wrap}
-.foot-links a{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
-.foot-links a:hover{color:var(--ember-hi)}
-.foot-c{font-family:var(--mono);font-size:.62rem;color:var(--ash)}
-
-/* ---------------- REVEAL ---------------- */
-.reveal{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
-.reveal.vis{opacity:1;transform:none}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
-
-/* ---------------- LOCAL: roster ---------------- */
-.pj-intro{font-size:.92rem;color:var(--paper-dim);max-width:70ch;margin:-6px 0 18px;line-height:1.55}
-.pj-intro b{color:var(--paper);font-weight:600}
-.pj-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
-.pj-count{font-family:var(--mono);font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--paper-dim)}
-.pj-count b{color:var(--h6)}
-.pj-spacer{flex:1}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-.pjcard{border:2px solid #000;background:var(--iron-plate);display:flex;flex-direction:column;transition:transform .16s,box-shadow .16s;position:relative}
-.pjcard:hover{transform:translate(-3px,-3px);box-shadow:6px 6px 0 #000}
-.pjcard.active{border-color:var(--ember)}
-.pjcard.active::after{content:"ACTIVO";position:absolute;top:0;right:0;background:var(--ember);color:var(--iron);font-family:var(--mono);font-size:.56rem;font-weight:700;letter-spacing:.5px;padding:3px 8px;border-left:2px solid #000;border-bottom:2px solid #000}
-.pjcard-top{padding:16px;border-bottom:2px solid #000;display:flex;align-items:center;gap:13px;background:linear-gradient(150deg,var(--iron-hi),var(--iron-edge))}
-.pjcard-av{width:56px;height:56px;flex:0 0 auto;background:var(--iron);border:2px solid #000;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:900;font-size:1.5rem;color:var(--ember-hi);overflow:hidden;position:relative}
-.pjcard-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.pjcard-name{display:inline-block;font-family:var(--disp);font-weight:800;font-size:1.45rem;text-transform:uppercase;line-height:.98;color:var(--paper)}
-a.pjcard-name:hover{color:var(--ember-hi)}
-.pjcard-sub{font-family:var(--mono);font-size:.6rem;font-weight:700;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
-.heat-badge{font-family:var(--disp);font-weight:900;font-size:1rem;color:var(--iron);padding:2px 9px;border:2px solid #000;display:inline-block;line-height:1}
-.pjcard-body{padding:14px 16px;flex:1;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.pjcard-chip{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:3px 9px;border:2px solid #000;color:var(--iron)}
-.pjcard-chip.line{background:var(--iron);color:var(--paper);border-color:var(--rivet)}
-.pjcard-foot{padding:12px 16px;border-top:2px solid #000;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.pjcard-foot form{margin:0}
-.is-active-note{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ember-hi)}
-
-/* ---------------- EMPTY ---------------- */
-.pj-empty{border:2px dashed var(--rivet);background:var(--iron-plate);padding:40px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
-.pj-empty .anvil{width:72px;height:72px;background:var(--iron);border:2px solid #000;display:flex;align-items:center;justify-content:center}
-.pj-empty .anvil svg{width:38px;height:38px;stroke:var(--h6);fill:none;stroke-width:2}
-.pj-empty .big{font-family:var(--disp);font-weight:800;font-size:1.9rem;text-transform:uppercase;color:var(--paper);line-height:1}
-.pj-empty p{font-family:var(--mono);font-size:.76rem;color:var(--paper-dim);line-height:1.6;max-width:54ch}
-.pj-empty .acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
-.pj-who{font-family:var(--mono);font-size:.66rem;color:var(--ash);text-transform:uppercase;letter-spacing:.5px}
-.pj-who b{color:var(--h6)}
-.pjcard-chip{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:4px 11px;border:2px solid #000;display:inline-block}
-.pjcard-chip[style*="--h6"]{animation:pulse-revision 2s ease-in-out infinite}
-@keyframes pulse-revision{0%,100%{box-shadow:0 0 0 0 rgba(255,203,147,.4)}50%{box-shadow:0 0 0 6px rgba(255,203,147,0)}}
-</style>
+<?php echo ope_rol_head_base(); ?>
+<!-- estilos en docs/themes/ope.css (scope: ope-pg-personajes) -->
 </head>
-<body>
+<body class="ope-pg-personajes">
 
-<?php echo iforge_rol_navbar_html(); ?>
+<?php echo ope_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -324,8 +242,8 @@ a.pjcard-name:hover{color:var(--ember-hi)}
         $es_activo   = ((int) $pj['activo']) === 1;
         $rango       = (string) $pj['rango'];
         $rango_e     = htmlspecialchars_uni($rango);
-        $heat        = iforge_heat_var($rango);
-        list($est_lbl, $est_col) = iforge_estado_label((string) $pj['estado']);
+        $heat        = ope_heat_var($rango);
+        list($est_lbl, $est_col) = ope_estado_label((string) $pj['estado']);
         $nombre_e    = htmlspecialchars_uni($pj['nombre']);
         $nivel       = (int) $pj['nivel'];
         $avatar      = trim((string) $pj['avatar']);
@@ -350,22 +268,30 @@ a.pjcard-name:hover{color:var(--ember-hi)}
           <span class="pjcard-chip" style="background:<?php echo $est_col; ?>"><?php echo $est_lbl; ?></span>
         </div>
         <div class="pjcard-foot">
-          <a class="btn btn-ghost btn-sm" href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">Ver ficha</a>
+          <div class="pjcard-actions">
+            <a class="btn btn-ghost btn-sm" href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">Ver ficha</a>
 <?php if ($es_activo): ?>
-          <span class="is-active-note">&#9670; Activo</span>
-<?php elseif ($pj['estado'] === 'aprobado'): ?>
-          <form method="post" action="<?php echo $bburl; ?>/personajes.php">
-            <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
-            <input type="hidden" name="action" value="set_active">
-            <input type="hidden" name="pid" value="<?php echo (int) $pj['pid']; ?>">
-            <button type="submit" class="btn btn-hot btn-sm">Activar</button>
-          </form>
-<?php else: ?>
-          <span class="pjcard-sub">Pendiente</span>
+            <span class="is-active-note">&#9670; Activo</span>
+<?php elseif ($pj['estado'] === 'aprobado' || $pj['estado'] === 'revision'): ?>
+            <form method="post" action="<?php echo $bburl; ?>/personajes.php">
+              <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+              <input type="hidden" name="action" value="set_active">
+              <input type="hidden" name="pid" value="<?php echo (int) $pj['pid']; ?>">
+              <button type="submit" class="btn btn-hot btn-sm">Activar</button>
+            </form>
 <?php endif; ?>
 <?php if ($pj['estado'] === 'revision' && isset($personajes_moderados[(int)$pj['pid']])): ?>
-          <a href="<?php echo $bburl; ?>/crear-personaje.php?editar=<?php echo (int)$pj['pid']; ?>" class="btn btn-hot btn-sm" style="margin-top:8px">Editar ficha</a>
-          <span style="color:var(--h6);font-family:var(--mono);font-size:.6rem;display:block;margin-top:4px">Cambios solicitados por el staff</span>
+            <a href="<?php echo $bburl; ?>/crear-personaje.php?editar=<?php echo (int)$pj['pid']; ?>" class="btn btn-hot btn-sm">Editar ficha</a>
+<?php endif; ?>
+          </div>
+<?php if (!$es_activo && $pj['estado'] !== 'aprobado' && $pj['estado'] !== 'revision'): ?>
+          <span class="pjcard-note">Pendiente</span>
+<?php endif; ?>
+<?php if ($pj['estado'] === 'revision'): ?>
+          <span class="pjcard-note">En revisi&oacute;n &middot; solo Off Topic</span>
+<?php endif; ?>
+<?php if ($pj['estado'] === 'revision' && isset($personajes_moderados[(int)$pj['pid']])): ?>
+          <span class="pjcard-note warn">Cambios solicitados por el staff</span>
 <?php endif; ?>
         </div>
       </article>

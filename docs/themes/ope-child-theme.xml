@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Properties stub — NOT the source of truth.
-     Edit docs/themes/iforge.css and docs/themes/iforge-foundry-*.xml.
+     Edit docs/themes/ope.css and docs/themes/ope-*.xml.
      Deploy: php scripts/sync-theme.php import
-     Admin CP bundle: php scripts/sync-theme.php build-xml -> iforge-child-theme.bundle.xml -->
+     Admin CP bundle: php scripts/sync-theme.php build-xml -> ope-child-theme.bundle.xml -->
 <theme name="I-Forge RPG" version="1839">
   <properties>
     <templateset>12</templateset>
@@ -12,7 +12,7 @@
     <borderwidth>0</borderwidth>
     <editortheme>mybb.css</editortheme>
     <disporder>
-      <iforge.css>1</iforge.css>
+      <ope.css>1</ope.css>
       <global.css>2</global.css>
       <usercp.css>3</usercp.css>
       <modcp.css>4</modcp.css>

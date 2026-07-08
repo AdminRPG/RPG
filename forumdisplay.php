@@ -25,7 +25,7 @@ require_once "./global.php";
 require_once MYBB_ROOT."inc/functions_post.php";
 require_once MYBB_ROOT."inc/functions_forumlist.php";
 require_once MYBB_ROOT."inc/class_parser.php";
-require_once MYBB_ROOT."inc/iforge_functions.php";
+require_once MYBB_ROOT."inc/ope_functions.php";
 $parser = new postParser;
 
 $orderarrow = $sortsel = array('rating' => '', 'subject' => '', 'starter' => '', 'started' => '', 'replies' => '', 'views' => '', 'lastpost' => '');
@@ -84,14 +84,14 @@ $foruminfo['name'] = preg_replace("#&(?!\#[0-9]+;)#si", "&amp;", $foruminfo['nam
 
 // I-Forge: forum thread/post counters are excluded from the forum cache,
 // so read the real values for the header meta ("N coladas / N mensajes").
-$iforge_counts = $db->fetch_array($db->simple_select("forums", "threads, posts", "fid='".(int)$fid."'"));
-$foruminfo['threads'] = (int)$iforge_counts['threads'];
-$foruminfo['posts'] = (int)$iforge_counts['posts'];
+$ope_counts = $db->fetch_array($db->simple_select("forums", "threads, posts", "fid='".(int)$fid."'"));
+$foruminfo['threads'] = (int)$ope_counts['threads'];
+$foruminfo['posts'] = (int)$ope_counts['posts'];
 
 // I-Forge: los foros que cuelgan de la categoría "El Mundo" (regiones e islas)
 // usan un estilo enriquecido: cabecera con foto + tarjetas grandes para sus hijos.
-$iforge_world_root = iforge_world_root_name($foruminfo);
-$iforge_is_world = (mb_stripos($iforge_world_root, 'mundo') !== false);
+$ope_world_root = ope_world_root_name($foruminfo);
+$ope_is_world = (mb_stripos($ope_world_root, 'mundo') !== false);
 
 $forumpermissions = forum_permissions();
 $fpermissions = $forumpermissions[$fid];
@@ -163,20 +163,26 @@ else
 }
 
 $subforums = '';
-$iforge_world_cards = $iforge_is_world ? iforge_render_region_cards($fid, $forumpermissions) : '';
+$ope_world_cards = $ope_is_world ? ope_render_region_cards($fid, $forumpermissions) : '';
 
-if ($iforge_world_cards !== '')
+// Un "mar" es una región de El Mundo con islas colgando (o la propia categoría
+// El Mundo con sus regiones): funciona como PORTADA -> solo foto + nombre + islas.
+// La ficha de datos (dueño/clima/zonas), los contadores, "Nueva historia" y el
+// listado de historias pertenecen a las ISLAS (foros hoja donde se juega).
+$ope_is_sea = $ope_is_world && ($ope_world_cards !== '');
+
+if ($ope_world_cards !== '')
 {
 	// Región de "El Mundo": sus hijos son islas -> tarjetas grandes con foto.
 	// $forums se mantiene con contenido (aunque no se use en la plantilla) porque
 	// MyBB comprueba más abajo `empty($forums)` para decidir si una categoría
 	// "no tiene subforos" y lanzar un error.
-	$forums = $iforge_world_cards;
-	$iforge_subheading = (mb_stripos($foruminfo['name'], 'mundo') !== false) ? 'Regiones' : 'Islas';
+	$forums = $ope_world_cards;
+	$ope_subheading = (mb_stripos($foruminfo['name'], 'mundo') !== false) ? 'Regiones' : 'Islas';
 	$subforums = '
-	<div class="iforge-shead"><h2>'.$iforge_subheading.'</h2><span class="iforge-shead-code">// navega el mundo</span><span class="iforge-shead-rule"></span></div>
-	<div class="iforge-regions" style="margin-bottom:22px">
-		'.$iforge_world_cards.'
+	<div class="ope-shead"><h2>'.$ope_subheading.'</h2><span class="ope-shead-code">// navega el mundo</span><span class="ope-shead-rule"></span></div>
+	<div class="ope-regions" style="margin-bottom:22px">
+		'.$ope_world_cards.'
 	</div>';
 }
 else
@@ -195,79 +201,83 @@ else
 // una ficha con pestañas: Resumen, Dueño actual, Clima, Zonas y Anotaciones,
 // leídas de mybb_rol_forum_meta). Cuando hay banner, la placa clásica de debajo
 // omite el nombre/descripción (ya en el banner/ficha) y solo conserva contadores.
-$iforge_world_head = '';
-$iforge_fhead_title = '<h1 class="iforge-fhead-t">'.$foruminfo['name'].'</h1>';
-$iforge_fhead_desc = '<p class="iforge-fhead-d">'.$foruminfo['description'].'</p>';
-if ($iforge_is_world)
+$ope_world_head = '';
+$ope_fhead_title = '<h1 class="ope-fhead-t">'.$foruminfo['name'].'</h1>';
+$ope_fhead_desc = '<p class="ope-fhead-d">'.$foruminfo['description'].'</p>';
+if ($ope_is_world)
 {
-	$iforge_fhead_title = '';
-	$iforge_fhead_desc = '';
+	$ope_fhead_title = '';
+	$ope_fhead_desc = '';
 
-	$iforge_head_img = iforge_forum_image($fid);
-	$iforge_head_art = $iforge_head_img !== null
-		? '<img src="'.$iforge_head_img.'" alt="'.$foruminfo['name'].'" loading="lazy">'
-		: iforge_sector_art($fid);
+	$ope_head_img = ope_forum_image($fid);
+	$ope_head_art = $ope_head_img !== null
+		? '<img src="'.$ope_head_img.'" alt="'.$foruminfo['name'].'" loading="lazy">'
+		: ope_sector_art($fid);
 
-	$iforge_meta = iforge_forum_meta($fid);
+	$ope_meta = ope_forum_meta($fid);
 
-	// Construye pestañas solo para los datos que existen de verdad.
-	$iforge_itabs = '';
-	$iforge_ipanels = '';
-	$iforge_itab_n = 0;
-	$iforge_add_tab = function ($key, $label, $bodyHtml) use (&$iforge_itabs, &$iforge_ipanels, &$iforge_itab_n) {
-		$active = ($iforge_itab_n === 0) ? ' iforge-itab-active' : '';
-		$pressed = ($iforge_itab_n === 0) ? 'true' : 'false';
-		$iforge_itabs .= '<button type="button" class="iforge-itab'.$active.'" data-itab="'.$key.'" aria-pressed="'.$pressed.'">'.$label.'</button>';
-		$iforge_ipanels .= '<div class="iforge-itabpanel'.$active.'" data-itabpanel="'.$key.'">'.$bodyHtml.'</div>';
-		$iforge_itab_n++;
+	// Construye pestañas solo para los datos que existen de verdad, y SOLO en
+	// islas: un mar es portada (foto + nombre) sin dueño, clima ni resumen.
+	$ope_itabs = '';
+	$ope_ipanels = '';
+	$ope_itab_n = 0;
+	if (!$ope_is_sea)
+	{
+	$ope_add_tab = function ($key, $label, $bodyHtml) use (&$ope_itabs, &$ope_ipanels, &$ope_itab_n) {
+		$active = ($ope_itab_n === 0) ? ' ope-itab-active' : '';
+		$pressed = ($ope_itab_n === 0) ? 'true' : 'false';
+		$ope_itabs .= '<button type="button" class="ope-itab'.$active.'" data-itab="'.$key.'" aria-pressed="'.$pressed.'">'.$label.'</button>';
+		$ope_ipanels .= '<div class="ope-itabpanel'.$active.'" data-itabpanel="'.$key.'">'.$bodyHtml.'</div>';
+		$ope_itab_n++;
 	};
 
 	if (trim($foruminfo['description']) !== '')
 	{
-		$iforge_add_tab('resumen', 'Resumen', '<p class="iforge-itab-text">'.$foruminfo['description'].'</p>');
+		$ope_add_tab('resumen', 'Resumen', '<p class="ope-itab-text">'.$foruminfo['description'].'</p>');
 	}
-	if (trim($iforge_meta['dueno']) !== '')
+	if (trim($ope_meta['dueno']) !== '')
 	{
-		$iforge_add_tab('dueno', 'Dueño actual', '<p class="iforge-itab-text">'.htmlspecialchars_uni($iforge_meta['dueno']).'</p>');
+		$ope_add_tab('dueno', 'Dueño actual', '<p class="ope-itab-text">'.htmlspecialchars_uni($ope_meta['dueno']).'</p>');
 	}
-	if (trim($iforge_meta['clima']) !== '')
+	if (trim($ope_meta['clima']) !== '')
 	{
-		$iforge_add_tab('clima', 'Clima', '<p class="iforge-itab-text">'.htmlspecialchars_uni($iforge_meta['clima']).'</p>');
+		$ope_add_tab('clima', 'Clima', '<p class="ope-itab-text">'.htmlspecialchars_uni($ope_meta['clima']).'</p>');
 	}
-	if (!empty($iforge_meta['zonas']))
+	if (!empty($ope_meta['zonas']))
 	{
-		$iforge_zonas_html = '<ul class="iforge-itab-zonas">';
-		foreach ($iforge_meta['zonas'] as $iforge_zona)
+		$ope_zonas_html = '<ul class="ope-itab-zonas">';
+		foreach ($ope_meta['zonas'] as $ope_zona)
 		{
-			$iforge_zonas_html .= '<li>'.htmlspecialchars_uni((string)$iforge_zona).'</li>';
+			$ope_zonas_html .= '<li>'.htmlspecialchars_uni((string)$ope_zona).'</li>';
 		}
-		$iforge_zonas_html .= '</ul>';
-		$iforge_add_tab('zonas', 'Zonas', $iforge_zonas_html);
+		$ope_zonas_html .= '</ul>';
+		$ope_add_tab('zonas', 'Zonas', $ope_zonas_html);
 	}
-	if (trim($iforge_meta['anotaciones']) !== '')
+	if (trim($ope_meta['anotaciones']) !== '')
 	{
-		$iforge_add_tab('anotaciones', 'Anotaciones', '<div class="iforge-itab-text">'.nl2br(htmlspecialchars_uni($iforge_meta['anotaciones'])).'</div>');
+		$ope_add_tab('anotaciones', 'Anotaciones', '<div class="ope-itab-text">'.nl2br(htmlspecialchars_uni($ope_meta['anotaciones'])).'</div>');
+	}
+	} // fin: pestañas solo en islas (no en mares)
+
+	$ope_tabbox = '';
+	if ($ope_itab_n > 0)
+	{
+		$ope_tabbox = '
+	<div class="ope-island-tabs" role="tablist">'.$ope_itabs.'</div>
+	<div class="ope-island-tabpanels">'.$ope_ipanels.'</div>';
 	}
 
-	$iforge_tabbox = '';
-	if ($iforge_itab_n > 0)
-	{
-		$iforge_tabbox = '
-	<div class="iforge-island-tabs" role="tablist">'.$iforge_itabs.'</div>
-	<div class="iforge-island-tabpanels">'.$iforge_ipanels.'</div>';
-	}
-
-	$iforge_world_head = '
-<div class="iforge-wrap">
-	<div class="iforge-island-head">
-		<div class="iforge-island-art">'.$iforge_head_art.'</div>
-		<div class="iforge-island-veil"></div>
-		<div class="iforge-island-in">
-			<div class="iforge-island-kicker">// '.$iforge_world_root.'</div>
-			<h1 class="iforge-island-n">'.$foruminfo['name'].'</h1>
+	$ope_world_head = '
+<div class="ope-wrap">
+	<div class="ope-island-head">
+		<div class="ope-island-art">'.$ope_head_art.'</div>
+		<div class="ope-island-veil"></div>
+		<div class="ope-island-in">
+			<div class="ope-island-kicker">// '.$ope_world_root.'</div>
+			<h1 class="ope-island-n">'.$foruminfo['name'].'</h1>
 		</div>
-	</div>'.($iforge_tabbox !== '' ? '
-	<div class="iforge-island-card">'.$iforge_tabbox.'
+	</div>'.($ope_tabbox !== '' ? '
+	<div class="ope-island-card">'.$ope_tabbox.'
 	</div>' : '').'
 </div>';
 }
@@ -1671,6 +1681,53 @@ else
 $plugins->run_hooks("forumdisplay_end");
 
 $foruminfo['name'] = strip_tags($foruminfo['name']);
+
+// El Mundo: en un MAR (portada) NO se muestran ni la placa de datos/contadores
+// ni el listado de historias; solo la foto, el nombre y las islas. En islas y en
+// foros normales se muestran ambos bloques como siempre.
+$ope_fhead = '';
+$ope_stories = '';
+if (!$ope_is_sea)
+{
+	$ope_fhead = '
+  <section class="ope-plate" style="margin-top:22px">
+    <div class="ope-fhead">
+      <div class="ope-fhead-in">
+        <div>
+          '.$ope_fhead_title.'
+          '.$ope_fhead_desc.'
+          <div class="ope-fhead-meta">
+            <span><b>'.$foruminfo['threads'].'</b> historias</span>
+            <span><b>'.$foruminfo['posts'].'</b> mensajes</span>
+            '.$moderatedby.'
+          </div>
+        </div>
+        <div class="ope-fhead-btns">
+          '.$newthread.'
+          '.$clearstoredpass.'
+        </div>
+      </div>
+    </div>
+  </section>';
+
+	$ope_stories = '
+  <div class="ope-shead"><h2>Historias</h2><span class="ope-shead-code">// temas</span><span class="ope-shead-rule"></span></div>
+  <div class="ope-toolbar">
+    <div class="ope-filters" role="group" aria-label="Filtrar historias">
+      <button class="ope-filt" type="button" aria-pressed="true" data-f="todos">Todos</button>
+      <button class="ope-filt" type="button" aria-pressed="false" data-f="abiertos">Abiertos</button>
+      <button class="ope-filt" type="button" aria-pressed="false" data-f="calientes">Calientes</button>
+      <button class="ope-filt" type="button" aria-pressed="false" data-f="cerrados">Cerrados</button>
+    </div>
+    <div class="ope-toolbar-count"><b>'.$threadcount.'</b> temas</div>
+  </div>
+  <div class="ope-slab">
+    '.$announcementlist.'
+    '.$threads.'
+    '.$inlinemod.'
+  </div>
+  <div class="ope-pager-wrap">'.$multipage.'</div>';
+}
 
 eval("\$forums = \"".$templates->get("forumdisplay")."\";");
 output_page($forums);

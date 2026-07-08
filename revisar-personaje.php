@@ -7,7 +7,7 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'revisar-personaje.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/iforge_rol_data.php';
+require_once MYBB_ROOT . 'inc/ope_rol_data.php';
 
 $bburl     = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname    = htmlspecialchars_uni($mybb->settings['bbname']);
@@ -16,32 +16,36 @@ $uid       = (int)($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 $pid       = (int)($mybb->get_input('pid', MyBB::INPUT_INT));
 
-// Staff level
-$staff_level = 0;
-if ($loggedin) {
-    if (isset($mybb->user['iforge_staff_level'])) {
-        $staff_level = (int)$mybb->user['iforge_staff_level'];
-    } elseif ($db->table_exists('rol_cuentas')) {
-        $cq = $db->simple_select('rol_cuentas', 'staff_level', "uid = {$uid}", array('limit' => 1));
-        if ($db->num_rows($cq)) $staff_level = (int)$db->fetch_field($cq, 'staff_level');
-    }
+// Staff del PERSONAJE ACTIVO. Aprobar/moderar/rechazar expedientes requiere
+// rol >= Colaborador (rank 1). El staff va por personaje, no por cuenta.
+$staff       = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0);
+$staff_level = (int) $staff['rank'];
+
+// Acceso: Colaborador o superior (con el personaje activo).
+if (!$loggedin || $staff_level < 1) {
+    header('Location: ' . $bburl . '/index.php');
+    exit;
 }
 
-// Cargar personaje
+// Cargar personaje concreto (si se ha pedido uno con ?pid=).
 $pj = null;
 if ($pid > 0 && $db->table_exists('rol_personajes')) {
     $q = $db->simple_select('rol_personajes', '*', "pid = {$pid}", array('limit' => 1));
     $pj = $db->fetch_array($q);
 }
 
-if (!$pj) {
-    header('Location: ' . $bburl . '/zona-staff.php');
-    exit;
-}
-
-if ($staff_level < 1) {
-    header('Location: ' . $bburl . '/zona-staff.php');
-    exit;
+// Sin personaje concreto → mostramos la COLA de expedientes en revisión.
+$queue = array();
+if (!$pj && $db->table_exists('rol_personajes')) {
+    $qq = $db->simple_select('rol_personajes', 'pid, nombre, uid, rango, dateline', "estado = 'revision'", array('order_by' => 'dateline', 'order_dir' => 'ASC', 'limit' => 100));
+    while ($qr = $db->fetch_array($qq)) {
+        $qr['owner'] = '?';
+        if ((int)$qr['uid'] > 0) {
+            $uq = $db->simple_select('users', 'username', 'uid = ' . (int)$qr['uid'], array('limit' => 1));
+            if ($db->num_rows($uq)) $qr['owner'] = $db->fetch_field($uq, 'username');
+        }
+        $queue[] = $qr;
+    }
 }
 
 $datos     = $pj['datos'] ? json_decode($pj['datos'], true) : array();
@@ -58,7 +62,7 @@ if ($pj['uid'] > 0) {
 
 // POST: aprobar / rechazar / moderar
 $flash = ''; $flash_kind = 'ok';
-if ($loggedin && $staff_level >= 1 && $mybb->request_method === 'post') {
+if ($pj && $loggedin && $staff_level >= 1 && $mybb->request_method === 'post') {
     if (!verify_post_check($mybb->get_input('my_post_key'), true)) {
         $flash = 'Sesión caducada. Recarga la página.';
         $flash_kind = 'warn';
@@ -142,7 +146,7 @@ if ($loggedin && $staff_level >= 1 && $mybb->request_method === 'post') {
 }
 
 // Función local para heat
-function iforge_heat_var($rango) {
+function ope_heat_var($rango) {
     $map = ['F'=>'--h1','E'=>'--h1','D'=>'--h2','C'=>'--h3','B'=>'--h4','A'=>'--h5','S'=>'--h6','SS'=>'--h7','M'=>'--h8','M+'=>'--h9'];
     return $map[$rango] ?? '--h1';
 }
@@ -163,127 +167,53 @@ header('Content-Type: text/html; charset=utf-8');
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?php echo $bbname; ?> · Revisar: <?php echo htmlspecialchars_uni($pj['nombre']); ?></title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --iron:#0b3157; --iron-plate:#10477B; --iron-hi:#175a95; --iron-edge:#082742;
-  --rivet:#3d6f9e;
-  --concrete:#eef6fc; --concrete-2:#dbecf9; --concrete-line:#b2d3ea;
-  --ink:#0a2f52; --ink-2:#1c5285; --ash:#5c83a7; --paper:#eaf4fb; --paper-dim:#a9c6e0;
-  --ember:#FFCB93; --ember-hi:#FFE9A3; --patina:#41A4E0; --patina-hi:#63b8ea; --crack:#e63b2e; --red-hi:#ff5a49;
-  --h1:#10477B; --h2:#2f6ea8; --h3:#458CC5; --h4:#41A4E0; --h5:#63b8ea;
-  --h6:#FFCB93; --h7:#ffdcae; --h8:#FFE9A3; --h9:#fff6d8;
-  --disp:'Big Shoulders Display',Impact,sans-serif;
-  --mono:'Space Mono',Menlo,Consolas,monospace;
-  --body:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--iron);color:var(--paper);font-family:var(--body);font-size:15px;line-height:1.55;padding-top:52px;
-  background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:26px 26px}
-.wrap{max-width:1100px;margin:0 auto;padding:0 18px}
-
-/* BREADCRUMB */
-.breadcrumb{background:var(--iron-plate);border-bottom:2px solid #000}
-.breadcrumb-in{max-width:1100px;margin:0 auto;padding:9px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.breadcrumb-in a{color:var(--paper-dim);text-decoration:none}
-.breadcrumb-in a:hover{color:var(--ember-hi)}
-.breadcrumb-in .sep{color:var(--rivet)}
-.breadcrumb-in b{color:var(--paper)}
-
-/* BOTONES */
-.btn{font-family:var(--mono);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 20px;border:2px solid #000;cursor:pointer;transition:transform .12s,box-shadow .12s;display:inline-block}
-.btn-hot{background:var(--ember);color:var(--iron)}
-.btn-hot:hover{background:var(--ember-hi);transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-ghost{background:transparent;color:var(--paper);border-color:var(--rivet)}
-.btn-ghost:hover{color:var(--iron);background:var(--paper);border-color:#000;transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-danger{background:var(--crack);color:#fff}
-.btn-danger:hover{background:var(--red-hi);transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-sm{padding:7px 13px;font-size:.7rem}
-
-/* SHEAD */
-.shead{display:flex;align-items:baseline;gap:14px;margin:20px 0 14px}
-.shead h1{font-family:var(--disp);font-weight:800;font-size:2rem;text-transform:uppercase;color:var(--paper);line-height:1}
-.shead .code{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ember-hi);letter-spacing:1px}
-.shead .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--rivet) 0 6px,transparent 6px 12px)}
-
-/* FLASH */
-.flash{font-family:var(--mono);font-size:.72rem;padding:10px 14px;border:2px solid #000;margin-bottom:14px}
-.flash.ok{background:var(--iron-plate);color:var(--h6);border-color:var(--patina)}
-.flash.warn{background:var(--iron-plate);color:var(--ember);border-color:var(--ember)}
-
-/* FICHA */
-.sheet{border:2px solid #000;background:var(--iron-plate);margin-bottom:14px}
-.sheet-h{background:var(--iron-edge);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:2px solid #000}
-.sheet-h-left{display:flex;align-items:center;gap:12px}
-.sheet-av{width:56px;height:56px;background:var(--iron);border:2px solid #000;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:900;font-size:1.4rem;color:var(--ember-hi)}
-.sheet-name{font-family:var(--disp);font-weight:800;font-size:1.7rem;text-transform:uppercase;color:var(--paper);line-height:1}
-.sheet-owner{font-family:var(--mono);font-size:.62rem;color:var(--ash);text-transform:uppercase;margin-top:2px}
-.sheet-badge{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;padding:5px 11px;border:2px solid #000;display:inline-block}
-.sheet-b{padding:18px}
-
-.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.sheet-block{border:2px solid #000;background:var(--iron);overflow:hidden}
-.sheet-block-h{background:var(--iron-edge);padding:8px 12px;font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);border-bottom:2px solid #000}
-.sheet-block-b{padding:12px}
-
-.stat-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--iron-hi);font-size:.82rem}
-.stat-row:last-child{border-bottom:none}
-.stat-row .sn{font-family:var(--mono);font-size:.64rem;font-weight:700;color:var(--paper-dim);text-transform:uppercase;min-width:36px}
-.stat-row .sl{color:var(--paper-dim);flex:1}
-.stat-row .sv{font-family:var(--mono);font-size:.7rem;font-weight:700}
-.stat-row .rb{font-family:var(--disp);font-weight:900;font-size:.85rem;padding:2px 8px;border:2px solid #000;line-height:1}
-
-.chip-list{display:flex;flex-wrap:wrap;gap:6px}
-.chip-item{font-family:var(--mono);font-size:.62rem;font-weight:700;padding:4px 10px;border:1px solid var(--rivet);color:var(--paper-dim)}
-.chip-item.good{color:var(--patina-hi);border-color:var(--patina)}
-.chip-item.bad{color:var(--crack);border-color:var(--crack)}
-
-.text-block{font-size:.84rem;color:var(--paper-dim);line-height:1.6}
-.text-block strong{color:var(--paper)}
-.text-block p{margin-bottom:8px}
-
-/* ACCIONES */
-.actions-bar{border:2px solid #000;background:var(--iron-plate);margin:14px 0}
-.actions-bar-in{padding:14px 18px;display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
-.actions-bar .ab-label{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--paper-dim);margin-bottom:4px}
-.actions-bar button{margin-left:auto}
-.actions-bar textarea{flex:1;min-width:280px;min-height:60px;background:var(--iron);border:2px solid #000;color:var(--paper);font-family:var(--mono);font-size:.72rem;padding:8px 10px;resize:vertical}
-.actions-bar textarea:focus{outline:none;border-color:var(--ember)}
-
-/* FOOTER */
-.foot{background:var(--iron-edge);border-top:2px solid #000;padding:24px 18px;margin-top:36px}
-.foot-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
-.foot-b{font-family:var(--disp);font-weight:900;font-size:1.3rem;text-transform:uppercase;color:var(--paper)}
-
-/* RESPONSIVE */
-@media(max-width:768px){
-  .sheet-grid{grid-template-columns:1fr}
-  .actions-bar-in{flex-direction:column;align-items:stretch}
-  .actions-bar button{margin-left:0}
-}
-</style>
+<title><?php echo $bbname; ?> · <?php echo $pj ? 'Revisar: ' . htmlspecialchars_uni($pj['nombre']) : 'Cola de revisión'; ?></title>
+<?php echo ope_rol_head_base(); ?>
+<!-- estilos en docs/themes/ope.css (scope: ope-pg-revisar-personaje) -->
 </head>
-<body>
+<body class="ope-pg-revisar-personaje">
 
-<?php echo iforge_rol_navbar_html(); ?>
+<?php echo ope_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
     <a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span>
     <a href="<?php echo $bburl; ?>/zona-staff.php">Zona Staff</a><span class="sep">›</span>
-    <b><?php echo htmlspecialchars_uni($pj['nombre']); ?></b>
+    <b><?php echo $pj ? htmlspecialchars_uni($pj['nombre']) : 'Cola de revisión'; ?></b>
   </div>
 </div>
 
 <div class="wrap">
   <div class="shead">
-    <h1>Revisar expediente</h1>
+    <h1><?php echo $pj ? 'Revisar expediente' : 'Cola de revisión'; ?></h1>
     <span class="code">// staff</span>
     <span class="rule"></span>
   </div>
+
+<?php if (!$pj): ?>
+  <!-- COLA DE EXPEDIENTES EN REVISIÓN -->
+  <?php if (empty($queue)): ?>
+    <div class="empty-state">
+      <div class="big">No hay expedientes pendientes</div>
+      <p>Cuando un jugador envíe una ficha a revisión aparecerá aquí para que la apruebes, moderes o rechaces.</p>
+    </div>
+  <?php else: ?>
+    <div class="rp-queue">
+      <div class="rp-queue-h"><b><?php echo count($queue); ?></b> expediente(s) pendiente(s) de revisión</div>
+      <?php foreach ($queue as $qr):
+        $q_ini = function_exists('mb_strtoupper') ? mb_strtoupper(mb_substr($qr['nombre'], 0, 1, 'UTF-8'), 'UTF-8') : strtoupper(substr($qr['nombre'], 0, 1)); ?>
+        <div class="rp-queue-item">
+          <span class="rp-q-av"><?php echo htmlspecialchars_uni($q_ini); ?></span>
+          <div class="rp-q-info">
+            <span class="rp-q-name"><?php echo htmlspecialchars_uni($qr['nombre']); ?></span>
+            <span class="rp-q-meta">// <?php echo htmlspecialchars_uni($qr['owner']); ?> &middot; enviado <?php echo date('d/m/Y', (int)$qr['dateline']); ?></span>
+          </div>
+          <a href="<?php echo $bburl; ?>/revisar-personaje.php?pid=<?php echo (int)$qr['pid']; ?>" class="btn btn-hot btn-sm">Revisar</a>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
+<?php else: ?>
 
   <?php if ($flash !== ''): ?>
     <div class="flash <?php echo $flash_kind; ?>"><?php echo $flash; ?></div>
@@ -339,7 +269,7 @@ body{background:var(--iron);color:var(--paper);font-family:var(--body);font-size
                     $v = (int)($stats[$k] ?? 0);
                     $rangos = ['F','E','D','C','B','A','S','SS','M','M+'];
                     $rl = $rangos[max(0, min(9, $v))] ?? '?';
-                    $hv = iforge_heat_var($rl);
+                    $hv = ope_heat_var($rl);
                   ?>
                     <div class="stat-row">
                       <span class="sn"><?php echo $k; ?></span>
@@ -443,6 +373,8 @@ body{background:var(--iron);color:var(--paper);font-family:var(--body);font-size
     </form>
   </div>
   <?php endif; ?>
+
+<?php endif; /* fin: detalle vs cola */ ?>
 
 </div>
 

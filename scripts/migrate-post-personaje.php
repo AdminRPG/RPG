@@ -7,13 +7,13 @@
  * no sólo con la cuenta (uid). Es idempotente: comprueba SHOW COLUMNS antes de
  * ejecutar cada ALTER, así que se puede re-ejecutar sin efectos secundarios.
  *
- *   mybb_posts.iforge_pid       -> personaje autor de ese mensaje
- *   mybb_threads.iforge_pid     -> personaje autor del hilo (primer mensaje)
- *   mybb_threads.iforge_lastpid -> personaje del último mensaje del hilo
- *   mybb_forums.iforge_lastpid  -> personaje del último mensaje del foro
+ *   mybb_posts.ope_pid       -> personaje autor de ese mensaje
+ *   mybb_threads.ope_pid     -> personaje autor del hilo (primer mensaje)
+ *   mybb_threads.ope_lastpid -> personaje del último mensaje del hilo
+ *   mybb_forums.ope_lastpid  -> personaje del último mensaje del foro
  *
- * Tras crear las columnas, hace un backfill best-effort de iforge_lastpid en
- * hilos y foros a partir de los iforge_pid de los mensajes existentes.
+ * Tras crear las columnas, hace un backfill best-effort de ope_lastpid en
+ * hilos y foros a partir de los ope_pid de los mensajes existentes.
  *
  * Ejecutar:
  *   & "C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe" \
@@ -56,10 +56,10 @@ function add_col(mysqli $db, string $table, string $col, string $definition): vo
 
 echo "=== Migración posteo por personaje ===\n";
 
-add_col($db, "{$PREFIX}posts",   'iforge_pid', "INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'personaje de rol autor del mensaje'");
-add_col($db, "{$PREFIX}threads", 'iforge_pid', "INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'personaje autor del hilo'");
-add_col($db, "{$PREFIX}threads", 'iforge_lastpid', "INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'personaje del último mensaje del hilo'");
-add_col($db, "{$PREFIX}forums",  'iforge_lastpid', "INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'personaje del último mensaje del foro'");
+add_col($db, "{$PREFIX}posts",   'ope_pid', "INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'personaje de rol autor del mensaje'");
+add_col($db, "{$PREFIX}threads", 'ope_pid', "INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'personaje autor del hilo'");
+add_col($db, "{$PREFIX}threads", 'ope_lastpid', "INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'personaje del último mensaje del hilo'");
+add_col($db, "{$PREFIX}forums",  'ope_lastpid', "INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'personaje del último mensaje del foro'");
 
 // Índices (idempotentes vía IF NOT EXISTS emulado con SHOW INDEX).
 function idx_exists(mysqli $db, string $table, string $index): bool
@@ -69,23 +69,23 @@ function idx_exists(mysqli $db, string $table, string $index): bool
     $res = $db->query("SHOW INDEX FROM `{$t}` WHERE Key_name = '{$i}'");
     return $res && $res->num_rows > 0;
 }
-if (!idx_exists($db, "{$PREFIX}posts", 'idx_iforge_pid')) {
-    if ($db->query("ALTER TABLE `{$PREFIX}posts` ADD INDEX `idx_iforge_pid` (`iforge_pid`)") !== false) {
-        echo "  [OK] índice posts.idx_iforge_pid\n";
+if (!idx_exists($db, "{$PREFIX}posts", 'idx_ope_pid')) {
+    if ($db->query("ALTER TABLE `{$PREFIX}posts` ADD INDEX `idx_ope_pid` (`ope_pid`)") !== false) {
+        echo "  [OK] índice posts.idx_ope_pid\n";
     }
 }
 
 // ─────────────────────────────────────────────────────────────
-// Backfill best-effort de iforge_lastpid en hilos y foros.
-// Usa el iforge_pid del mensaje visible más reciente de cada hilo/foro.
+// Backfill best-effort de ope_lastpid en hilos y foros.
+// Usa el ope_pid del mensaje visible más reciente de cada hilo/foro.
 // ─────────────────────────────────────────────────────────────
-echo "\n--- Backfill iforge_lastpid ---\n";
+echo "\n--- Backfill ope_lastpid ---\n";
 
 // Hilos: último mensaje visible por tid.
 $sqlThreads = "
     UPDATE `{$PREFIX}threads` t
     JOIN (
-        SELECT p.tid, p.iforge_pid
+        SELECT p.tid, p.ope_pid
         FROM `{$PREFIX}posts` p
         JOIN (
             SELECT tid, MAX(dateline) AS md
@@ -94,11 +94,11 @@ $sqlThreads = "
             GROUP BY tid
         ) last ON last.tid = p.tid AND last.md = p.dateline
     ) src ON src.tid = t.tid
-    SET t.iforge_lastpid = src.iforge_pid
-    WHERE src.iforge_pid > 0
+    SET t.ope_lastpid = src.ope_pid
+    WHERE src.ope_pid > 0
 ";
 if ($db->query($sqlThreads) !== false) {
-    echo "  [OK] threads.iforge_lastpid backfilled ({$db->affected_rows} filas)\n";
+    echo "  [OK] threads.ope_lastpid backfilled ({$db->affected_rows} filas)\n";
 } else {
     echo "  [warn] backfill threads: " . $db->error . "\n";
 }
@@ -107,7 +107,7 @@ if ($db->query($sqlThreads) !== false) {
 $sqlForums = "
     UPDATE `{$PREFIX}forums` f
     JOIN (
-        SELECT p.fid, p.iforge_pid
+        SELECT p.fid, p.ope_pid
         FROM `{$PREFIX}posts` p
         JOIN (
             SELECT fid, MAX(dateline) AS md
@@ -116,11 +116,11 @@ $sqlForums = "
             GROUP BY fid
         ) last ON last.fid = p.fid AND last.md = p.dateline
     ) src ON src.fid = f.fid
-    SET f.iforge_lastpid = src.iforge_pid
-    WHERE src.iforge_pid > 0
+    SET f.ope_lastpid = src.ope_pid
+    WHERE src.ope_pid > 0
 ";
 if ($db->query($sqlForums) !== false) {
-    echo "  [OK] forums.iforge_lastpid backfilled ({$db->affected_rows} filas)\n";
+    echo "  [OK] forums.ope_lastpid backfilled ({$db->affected_rows} filas)\n";
 } else {
     echo "  [warn] backfill forums: " . $db->error . "\n";
 }

@@ -18,7 +18,7 @@ $templatelist .= ",forumbit_moderators_group,forumbit_moderators_user,forumbit_d
 require_once './global.php';
 require_once MYBB_ROOT.'inc/functions_forumlist.php';
 require_once MYBB_ROOT.'inc/class_parser.php';
-require_once MYBB_ROOT.'inc/iforge_functions.php';
+require_once MYBB_ROOT.'inc/ope_functions.php';
 $parser = new postParser;
 
 // Load global language phrases
@@ -467,35 +467,35 @@ $forums = $forum_list['forum_list'];
 $plugins->run_hooks('index_end');
 
 // I-Forge: Register link for guests
-$iforge_register_link = '';
+$ope_register_link = '';
 if ($mybb->user['uid'] == 0) {
-    $iforge_register_link = '<a href="'.$mybb->settings['bburl'].'/member.php?action=register" class="iforge-nav-link" style="color:var(--color-accent)">Registrarse</a>';
+    $ope_register_link = '<a href="'.$mybb->settings['bburl'].'/member.php?action=register" class="ope-nav-link" style="color:var(--color-accent)">Registrarse</a>';
 }
 
 // I-Forge navbar: Zona Privada link visibility
-$iforge_zona_privada_link = '';
+$ope_zona_privada_link = '';
 if ($mybb->usergroup['cancp'] == 1 || $mybb->usergroup['issupermod'] == 1) {
-    $iforge_zona_privada_link = '<a href="'.$mybb->settings['bburl'].'/private.php" class="iforge-nav-link">Zona Privada</a>';
+    $ope_zona_privada_link = '<a href="'.$mybb->settings['bburl'].'/private.php" class="ope-nav-link">Zona Privada</a>';
 }
 
 // I-Forge navbar: User menu
 if ($mybb->user['uid']) {
-    $iforge_user_menu = '
-    <div class="iforge-user-menu">
-      <button class="iforge-user-btn" id="iforge-user-btn">
+    $ope_user_menu = '
+    <div class="ope-user-menu">
+      <button class="ope-user-btn" id="ope-user-btn">
         <img src="'.$mybb->settings['bburl'].'/images/nav-icon.svg" width="28" height="28" alt="Personaje">
       </button>
-      <div class="iforge-dropdown" id="iforge-dropdown">
-        <a href="'.$mybb->settings['bburl'].'/mensajes.php" class="iforge-dropdown-item">Mensajería</a>
-        <a href="'.$mybb->settings['bburl'].'/configuracion.php" class="iforge-dropdown-item">Configuración</a>
-        <hr class="iforge-dropdown-divider">
-        <a href="'.$mybb->settings['bburl'].'/member.php?action=logout&amp;logoutkey='.$mybb->user['logoutkey'].'" class="iforge-dropdown-item">Cerrar sesión</a>
+      <div class="ope-dropdown" id="ope-dropdown">
+        <a href="'.$mybb->settings['bburl'].'/mensajes.php" class="ope-dropdown-item">Mensajería</a>
+        <a href="'.$mybb->settings['bburl'].'/configuracion.php" class="ope-dropdown-item">Configuración</a>
+        <hr class="ope-dropdown-divider">
+        <a href="'.$mybb->settings['bburl'].'/member.php?action=logout&amp;logoutkey='.$mybb->user['logoutkey'].'" class="ope-dropdown-item">Cerrar sesión</a>
       </div>
     </div>';
 } else {
-    $iforge_user_menu = '
-    <a href="'.$mybb->settings['bburl'].'/member.php?action=login" class="iforge-nav-link">Iniciar sesión</a>
-    '.$iforge_register_link;
+    $ope_user_menu = '
+    <a href="'.$mybb->settings['bburl'].'/member.php?action=login" class="ope-nav-link">Iniciar sesión</a>
+    '.$ope_register_link;
 }
 
 // I-Forge: Random banner
@@ -511,14 +511,14 @@ if (!empty($banners)) {
 $calendario_texto = 'DÍA 1 · PRIMAVERA · AÑO I';
 
 // I-Forge: Latest posts (feed with avatar initial + relative time)
-// El autor mostrado es el PERSONAJE que posteó (iforge_pid), no la cuenta.
-$iforge_latest_posts = '';
-$iforge_has_rol = $db->table_exists('rol_personajes');
+// El autor mostrado es el PERSONAJE que posteó (ope_pid), no la cuenta.
+$ope_latest_posts = '';
+$ope_has_rol = $db->table_exists('rol_personajes');
 $feedSelect = "p.pid, p.subject, p.tid, p.uid, p.dateline, u.username";
 $feedJoin   = "";
-if ($iforge_has_rol) {
-    $feedSelect .= ", p.iforge_pid, rp.nombre AS char_name";
-    $feedJoin    = "LEFT JOIN ".TABLE_PREFIX."rol_personajes rp ON (rp.pid = p.iforge_pid)";
+if ($ope_has_rol) {
+    $feedSelect .= ", p.ope_pid, rp.nombre AS char_name";
+    $feedJoin    = "LEFT JOIN ".TABLE_PREFIX."rol_personajes rp ON (rp.pid = p.ope_pid)";
 }
 $q = $db->query("
     SELECT {$feedSelect}
@@ -530,7 +530,7 @@ $q = $db->query("
     LIMIT 6
 ");
 while ($post = $db->fetch_array($q)) {
-    $charPid  = (int) ($post['iforge_pid'] ?? 0);
+    $charPid  = (int) ($post['ope_pid'] ?? 0);
     $charName = trim((string) ($post['char_name'] ?? ''));
     if ($charPid > 0 && $charName !== '') {
         $author   = $charName;
@@ -540,39 +540,81 @@ while ($post = $db->fetch_array($q)) {
         $linkHref = '';
     }
     $initial = htmlspecialchars_uni(my_strtoupper(my_substr($author, 0, 1)));
-    $iforge_latest_posts .= '
-    <a href="'.$mybb->settings['bburl'].'/showthread.php?tid='.$post['tid'].'&amp;pid='.$post['pid'].'#pid'.$post['pid'].'" class="iforge-feed-i">
-        <span class="iforge-feed-av">'.$initial.'</span>
-        <span class="iforge-feed-main">
-            <span class="iforge-feed-t">'.htmlspecialchars_uni($post['subject']).'</span>
-            <span class="iforge-feed-m">'.htmlspecialchars_uni($author).' &middot; '.iforge_reltime($post['dateline']).'</span>
+    $ope_latest_posts .= '
+    <a href="'.$mybb->settings['bburl'].'/showthread.php?tid='.$post['tid'].'&amp;pid='.$post['pid'].'#pid'.$post['pid'].'" class="ope-feed-i">
+        <span class="ope-feed-av">'.$initial.'</span>
+        <span class="ope-feed-main">
+            <span class="ope-feed-t">'.htmlspecialchars_uni($post['subject']).'</span>
+            <span class="ope-feed-m">'.htmlspecialchars_uni($author).' &middot; '.ope_reltime($post['dateline']).'</span>
         </span>
     </a>';
 }
 
 // I-Forge: Home dynamic content (curiosidades + lore) — stored as JSON in datacache, admin-editable
-$iforge_home = $cache->read('iforge_home');
-if (!is_array($iforge_home) || empty($iforge_home)) {
-    $iforge_home = [
+$ope_home = $cache->read('ope_home');
+if (!is_array($ope_home) || empty($ope_home)) {
+    $ope_home = [
         'curiosidades' => [
-            'El acero de la fragua se templa con agua fría: dicen que por eso guarda el frío del mar aun al rojo vivo.',
-            'La escala de calor mide poder, no temperatura. Un rango alto arde blanco aunque toque hielo.',
-            'Un personaje sin oficio se oxida rápido; la fragua premia a quien sigue golpeando el metal.',
-            'Cada colada deja una marca en el yunque. Ninguna historia pasa sin dejar huella.',
+            'En el Grand Line las brújulas normales no sirven: solo un Log Pose marca el rumbo entre islas.',
+            'La escala de poder mide fuerza, no tamaño. Un rango alto impone aunque el personaje parezca inofensivo.',
+            'Un personaje sin rumbo se estanca; el mundo premia a quien sigue navegando y arriesgando.',
+            'Cada historia deja huella en el mundo. Ninguna aventura pasa sin dejar marca.',
         ],
         'lore' => [
-            'titulo' => 'El taller sigue encendido',
-            'texto'  => 'La fragua abre sus puertas a una nueva generación de forjadores. El mundo, sus reglas y su historia se escriben aquí, colada a colada. Golpea el metal mientras está caliente.',
+            'titulo' => 'La aventura continúa',
+            'texto'  => 'One Piece Eternal abre sus puertas a una nueva generación de aventureros. El mundo, sus reglas y su historia se escriben aquí, historia a historia. Crea tu personaje y zárpate a descubrir el mundo.',
         ],
         // Instante OOC en el que arranca el día 1 · Primavera · Año I del calendario on-rol.
         'rol_epoch' => mktime(0, 0, 0, 1, 1, 2026),
         'discord_url' => 'https://discord.gg/',
     ];
-    $cache->update('iforge_home', $iforge_home);
+    $cache->update('ope_home', $ope_home);
+}
+// Afiliados (admin-editable). 'hermanos' = botones grandes; 'afiliados' = botones 88x31.
+// Cada entrada: ['url' => ..., 'img' => ..., 'nombre' => ...].
+if (!isset($ope_home['afiliados'])) { $ope_home['afiliados'] = []; }
+if (!isset($ope_home['hermanos'])) { $ope_home['hermanos'] = []; }
+$ope_hermanos = is_array($ope_home['hermanos']) ? $ope_home['hermanos'] : [];
+$ope_afiliados = is_array($ope_home['afiliados']) ? $ope_home['afiliados'] : [];
+
+// I-Forge: banner del hero — resuelve cualquier imagen images/ope/banner.* (jpg/png/webp…)
+$ope_hero_banner = '';
+$heroDir = MYBB_ROOT . 'images/ope/';
+$heroCandidates = glob($heroDir . 'banner.{jpg,jpeg,png,webp,gif,avif}', GLOB_BRACE);
+if (!empty($heroCandidates)) {
+    // Prioriza el más reciente para que un archivo recién subido gane.
+    usort($heroCandidates, static function ($a, $b) { return filemtime($b) <=> filemtime($a); });
+    $ope_hero_banner = $mybb->settings['bburl'] . '/images/ope/' . basename($heroCandidates[0]);
+}
+
+// Construye los botones de afiliados/hermanos (HTML) para el template.
+$ope_hermanos_html = '';
+foreach ($ope_hermanos as $af) {
+    $url = htmlspecialchars_uni((string)($af['url'] ?? '#'));
+    $img = trim((string)($af['img'] ?? ''));
+    $nombre = htmlspecialchars_uni((string)($af['nombre'] ?? 'Afiliado hermano'));
+    if ($img !== '') {
+        $inner = '<img src="'.htmlspecialchars_uni($img).'" alt="'.$nombre.'" loading="lazy">';
+    } else {
+        $inner = '<span>'.$nombre.'</span>';
+    }
+    $ope_hermanos_html .= '<a href="'.$url.'" class="ope-afil-hermano" title="'.$nombre.'" target="_blank" rel="noopener">'.$inner.'</a>';
+}
+$ope_afiliados_html = '';
+foreach ($ope_afiliados as $af) {
+    $url = htmlspecialchars_uni((string)($af['url'] ?? '#'));
+    $img = trim((string)($af['img'] ?? ''));
+    $nombre = htmlspecialchars_uni((string)($af['nombre'] ?? 'Afiliado'));
+    if ($img !== '') {
+        $inner = '<img src="'.htmlspecialchars_uni($img).'" alt="'.$nombre.'" loading="lazy">';
+    } else {
+        $inner = '<span>'.$nombre.'</span>';
+    }
+    $ope_afiliados_html .= '<a href="'.$url.'" class="ope-afil-btn" title="'.$nombre.'" target="_blank" rel="noopener">'.$inner.'</a>';
 }
 
 // I-Forge: calendario on-rol (4 estaciones × 65 días; 1 día OOC = 2 días on-rol)
-$rol_epoch = isset($iforge_home['rol_epoch']) ? (int)$iforge_home['rol_epoch'] : mktime(0, 0, 0, 1, 1, 2026);
+$rol_epoch = isset($ope_home['rol_epoch']) ? (int)$ope_home['rol_epoch'] : mktime(0, 0, 0, 1, 1, 2026);
 $rol_seasons = [
     ['Primavera', 'var(--patina-hi)'],
     ['Verano',    'var(--ember)'],
@@ -586,32 +628,32 @@ $rol_year = (int)floor($rol_day_index / 260) + 1;
 $rol_doy = $rol_day_index % 260;                // día dentro del año (0..259)
 $rol_season_idx = (int)floor($rol_doy / 65);    // 0..3
 $rol_day_in_season = ($rol_doy % 65) + 1;       // 1..65
-$iforge_rol_season = $rol_seasons[$rol_season_idx][0];
-$iforge_rol_season_color = $rol_seasons[$rol_season_idx][1];
-$iforge_rol_day = $rol_day_in_season;
-$iforge_rol_year = $rol_year;
-$iforge_rol_progress = round(($rol_day_in_season / 65) * 100);
+$ope_rol_season = $rol_seasons[$rol_season_idx][0];
+$ope_rol_season_color = $rol_seasons[$rol_season_idx][1];
+$ope_rol_day = $rol_day_in_season;
+$ope_rol_year = $rol_year;
+$ope_rol_progress = round(($rol_day_in_season / 65) * 100);
 $rol_year_roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X'];
-$iforge_rol_year_label = $rol_year <= 10 ? $rol_year_roman[$rol_year - 1] : (string)$rol_year;
+$ope_rol_year_label = $rol_year <= 10 ? $rol_year_roman[$rol_year - 1] : (string)$rol_year;
 
-$curiosidades = (isset($iforge_home['curiosidades']) && is_array($iforge_home['curiosidades'])) ? array_values($iforge_home['curiosidades']) : [];
-$lore = (isset($iforge_home['lore']) && is_array($iforge_home['lore'])) ? $iforge_home['lore'] : ['titulo' => '', 'texto' => ''];
+$curiosidades = (isset($ope_home['curiosidades']) && is_array($ope_home['curiosidades'])) ? array_values($ope_home['curiosidades']) : [];
+$lore = (isset($ope_home['lore']) && is_array($ope_home['lore'])) ? $ope_home['lore'] : ['titulo' => '', 'texto' => ''];
 
 $curiosidades_json = json_encode($curiosidades, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 if ($curiosidades_json === false) {
     $curiosidades_json = '[]';
 }
-$iforge_curiosidad = !empty($curiosidades) ? htmlspecialchars_uni($curiosidades[0]) : '';
+$ope_curiosidad = !empty($curiosidades) ? htmlspecialchars_uni($curiosidades[0]) : '';
 
-$iforge_lore_title = htmlspecialchars_uni($lore['titulo'] ?? '');
-$iforge_lore_text = htmlspecialchars_uni($lore['texto'] ?? '');
-$iforge_discord_url = htmlspecialchars_uni((string)($iforge_home['discord_url'] ?? 'https://discord.gg/'));
+$ope_lore_title = htmlspecialchars_uni($lore['titulo'] ?? '');
+$ope_lore_text = htmlspecialchars_uni($lore['texto'] ?? '');
+$ope_discord_url = htmlspecialchars_uni((string)($ope_home['discord_url'] ?? 'https://discord.gg/'));
 
 // I-Forge: Presence — active now + last 24h (real MyBB session/user data)
-$iforge_online_now = '';
-$iforge_online_now_count = 0;
-$iforge_online_24h = '';
-$iforge_online_24h_count = 0;
+$ope_online_now = '';
+$ope_online_now_count = 0;
+$ope_online_24h = '';
+$ope_online_24h_count = 0;
 
 $now_cut = TIME_NOW - (int)$mybb->settings['wolcutoff'];
 $q_now = $db->query("
@@ -628,8 +670,8 @@ while ($ou = $db->fetch_array($q_now)) {
     }
     $name = format_name(htmlspecialchars_uni($ou['username']), $ou['usergroup'], $ou['displaygroup']);
     $link = build_profile_link($name, $ou['uid']);
-    $iforge_online_now .= '<span class="iforge-ou">'.$link.'</span>';
-    $iforge_online_now_count++;
+    $ope_online_now .= '<span class="ope-ou">'.$link.'</span>';
+    $ope_online_now_count++;
 }
 
 $day_cut = TIME_NOW - 86400;
@@ -643,12 +685,12 @@ $q_day = $db->query("
 while ($du = $db->fetch_array($q_day)) {
     $name = format_name(htmlspecialchars_uni($du['username']), $du['usergroup'], $du['displaygroup']);
     $link = build_profile_link($name, $du['uid']);
-    $iforge_online_24h .= '<span class="iforge-ou">'.$link.'</span>';
-    $iforge_online_24h_count++;
+    $ope_online_24h .= '<span class="ope-ou">'.$link.'</span>';
+    $ope_online_24h_count++;
 }
 
 // I-Forge: Staff list (portraits with role + heat ring)
-$iforge_staff_list = '';
+$ope_staff_list = '';
 $staffQuery = $db->query("
     SELECT u.uid, u.username, u.usergroup, u.displaygroup, g.title AS grouptitle, g.issupermod, g.cancp
     FROM ".TABLE_PREFIX."users u
@@ -668,10 +710,10 @@ while ($staff = $db->fetch_array($staffQuery)) {
     }
     $uname = htmlspecialchars_uni($staff['username']);
     $initial = htmlspecialchars_uni(my_strtoupper(my_substr($staff['username'], 0, 1)));
-    $iforge_staff_list .= '
-    <a href="'.$mybb->settings['bburl'].'/member.php?action=profile&amp;uid='.$staff['uid'].'" class="iforge-staff-p" title="'.htmlspecialchars_uni($role).'">
-        <span class="iforge-staff-av" style="--ring:'.$ring.'">'.$initial.'</span>
-        <span class="iforge-staff-meta"><span class="iforge-staff-n">'.$uname.'</span><span class="iforge-staff-r">'.htmlspecialchars_uni($role).'</span></span>
+    $ope_staff_list .= '
+    <a href="'.$mybb->settings['bburl'].'/member.php?action=profile&amp;uid='.$staff['uid'].'" class="ope-staff-p" title="'.htmlspecialchars_uni($role).'">
+        <span class="ope-staff-av" style="--ring:'.$ring.'">'.$initial.'</span>
+        <span class="ope-staff-meta"><span class="ope-staff-n">'.$uname.'</span><span class="ope-staff-r">'.htmlspecialchars_uni($role).'</span></span>
     </a>';
 }
 
@@ -679,7 +721,7 @@ while ($staff = $db->fetch_array($staffQuery)) {
 //   · "El Mundo" (o cualquier categoría cuyos foros tengan subforos/islas) => tarjetas-región con foto.
 //   · Resto ("Off Topic", etc.) => lista de foros estilo placa (concrete slab).
 $bburl = $mybb->settings['bburl'];
-$iforge_categories = '';
+$ope_categories = '';
 $catQuery = $db->query("
     SELECT fid, name, description
     FROM ".TABLE_PREFIX."forums
@@ -692,11 +734,11 @@ while ($cat = $db->fetch_array($catQuery)) {
     // Recolectar foros de la categoría + detectar si alguno tiene islas (subforos)
     $forumQuery = $db->query("
         SELECT f.fid, f.name, f.description, f.threads, f.posts, f.lastpost, f.lastpostsubject, f.lastposter, f.lastposteruid,
-               f.iforge_lastpid, rp.nombre AS lastchar_name,
+               f.ope_lastpid, rp.nombre AS lastchar_name,
                t.tid AS lastpost_tid
         FROM ".TABLE_PREFIX."forums f
         LEFT JOIN ".TABLE_PREFIX."threads t ON (t.fid = f.fid AND t.lastpost = f.lastpost)
-        LEFT JOIN ".TABLE_PREFIX."rol_personajes rp ON (rp.pid = f.iforge_lastpid)
+        LEFT JOIN ".TABLE_PREFIX."rol_personajes rp ON (rp.pid = f.ope_lastpid)
         WHERE f.type = 'f' AND f.pid = '{$cat['fid']}' AND f.active = 1
         ORDER BY f.disporder ASC
     ");
@@ -720,11 +762,11 @@ while ($cat = $db->fetch_array($catQuery)) {
     if ($isWorld) {
         // ---- Estilo REGIÓN: tarjetas grandes con foto que llevan a las islas ----
         $catDesc = trim($cat['description']) !== '' ? htmlspecialchars_uni($cat['description']) : 'regiones &middot; navega para ver las islas';
-        $cards = iforge_render_region_cards($cat['fid'], $forumpermissions);
-        $iforge_categories .= '
-        <section class="iforge-block-cat" id="cat_'.$cat['fid'].'">
-            <div class="iforge-shead"><h2>'.$catName.'</h2><span class="iforge-shead-code">// '.$catDesc.'</span><span class="iforge-shead-rule"></span></div>
-            <div class="iforge-regions">
+        $cards = ope_render_region_cards($cat['fid'], $forumpermissions);
+        $ope_categories .= '
+        <section class="ope-block-cat" id="cat_'.$cat['fid'].'">
+            <div class="ope-shead"><h2>'.$catName.'</h2><span class="ope-shead-code">// '.$catDesc.'</span><span class="ope-shead-rule"></span></div>
+            <div class="ope-regions ope-world-bento">
                 '.$cards.'
             </div>
         </section>';
@@ -742,32 +784,50 @@ while ($cat = $db->fetch_array($catQuery)) {
                 $lastAuthor = trim((string) ($forum['lastchar_name'] ?? '')) !== ''
                     ? $forum['lastchar_name']
                     : $forum['lastposter'];
-                $lastMeta = '<b>'.htmlspecialchars_uni($forum['lastpostsubject']).'</b> &middot; '.htmlspecialchars_uni($lastAuthor).' &middot; '.iforge_reltime($forum['lastpost']);
+                $lastMeta = '<b>'.htmlspecialchars_uni($forum['lastpostsubject']).'</b> &middot; '.htmlspecialchars_uni($lastAuthor).' &middot; '.ope_reltime($forum['lastpost']);
             } else {
                 $lastMeta = 'Sin mensajes a&uacute;n';
             }
-            $descHtml = $forumDesc !== '' ? '<div class="iforge-forum-d">'.$forumDesc.'</div>' : '';
+            $descHtml = $forumDesc !== '' ? '<div class="ope-forum-d">'.$forumDesc.'</div>' : '';
             $rows .= '
-            <a href="'.$bburl.'/forumdisplay.php?fid='.$forum['fid'].'" class="iforge-forum">
-                <div class="iforge-forum-ic"><span>'.$initial.'</span></div>
+            <a href="'.$bburl.'/forumdisplay.php?fid='.$forum['fid'].'" class="ope-forum">
+                <div class="ope-forum-ic"><span>'.$initial.'</span></div>
                 <div>
-                    <div class="iforge-forum-n">'.$forumName.' <span class="iforge-forum-fid">FID-'.$forum['fid'].'</span></div>
+                    <div class="ope-forum-n">'.$forumName.' <span class="ope-forum-fid">FID-'.$forum['fid'].'</span></div>
                     '.$descHtml.'
-                    <div class="iforge-forum-last">'.$lastMeta.'</div>
+                    <div class="ope-forum-last">'.$lastMeta.'</div>
                 </div>
-                <div class="iforge-forum-stat"><b>'.$threads.'</b><i>temas</i> '.$posts.' msgs</div>
+                <div class="ope-forum-stat"><b>'.$threads.'</b><i>temas</i> '.$posts.' msgs</div>
             </a>';
         }
-        $iforge_categories .= '
-        <section class="iforge-block-cat" id="cat_'.$cat['fid'].'">
-            <div class="iforge-shead"><h2>'.$catName.'</h2><span class="iforge-shead-code">// '.$catDesc.'</span><span class="iforge-shead-rule"></span></div>
-            <div class="iforge-slab">
+        $ope_categories .= '
+        <section class="ope-block-cat" id="cat_'.$cat['fid'].'">
+            <div class="ope-shead"><h2>'.$catName.'</h2><span class="ope-shead-code">// '.$catDesc.'</span><span class="ope-shead-rule"></span></div>
+            <div class="ope-slab">
                 '.$rows.'
             </div>
         </section>';
     }
 }
-$forums = $iforge_categories;
+$forums = $ope_categories;
+
+// I-Forge: último personaje creado (para el censo del pie de portada)
+$ope_last_char = '';
+if ($db->table_exists('rol_personajes')) {
+    $lcq = $db->simple_select('rol_personajes', 'pid, nombre', "estado = 'aprobado'", array('order_by' => 'pid', 'order_dir' => 'DESC', 'limit' => 1));
+    if ($db->num_rows($lcq)) {
+        $lcRow = $db->fetch_array($lcq);
+        $ope_last_char = '<a href="'.$mybb->settings['bburl'].'/ficha.php?pid='.(int)$lcRow['pid'].'">'.htmlspecialchars_uni($lcRow['nombre']).'</a>';
+    }
+}
+if ($ope_last_char === '') {
+    $laststats = $cache->read('stats');
+    if (!empty($laststats['lastusername'])) {
+        $ope_last_char = build_profile_link($laststats['lastusername'], $laststats['lastuid']);
+    } else {
+        $ope_last_char = 'Nadie a&uacute;n';
+    }
+}
 
 eval('$index = "'.$templates->get('index').'";');
 output_page($index);

@@ -15,9 +15,9 @@ if (!defined('IN_MYBB')) {
     die('Direct initialization of this file is not allowed.');
 }
 
-if (!function_exists('iforge_rol_stats')) {
+if (!function_exists('ope_rol_stats')) {
     /** Las 12 stats, agrupadas en 3 pilares. */
-    function iforge_rol_stats()
+    function ope_rol_stats()
     {
         return array(
             'cuerpo' => array(
@@ -51,10 +51,10 @@ if (!function_exists('iforge_rol_stats')) {
     }
 
     /** Lista plana de las 12 siglas, en orden de presentación. */
-    function iforge_rol_stat_keys()
+    function ope_rol_stat_keys()
     {
         $keys = array();
-        foreach (iforge_rol_stats() as $pilar) {
+        foreach (ope_rol_stats() as $pilar) {
             foreach ($pilar['stats'] as $k => $v) {
                 $keys[] = $k;
             }
@@ -63,7 +63,7 @@ if (!function_exists('iforge_rol_stats')) {
     }
 
     /** Escala de rangos F..M+ → valor numérico. */
-    function iforge_rol_rank_scale()
+    function ope_rol_rank_scale()
     {
         return array(
             'F' => 1, 'E' => 2, 'D' => 3, 'C' => 4, 'B' => 5,
@@ -72,7 +72,7 @@ if (!function_exists('iforge_rol_stats')) {
     }
 
     /** Rango del personaje según la suma de las 12 stats efectivas (doc 05). */
-    function iforge_rol_rank_from_sum($sum)
+    function ope_rol_rank_from_sum($sum)
     {
         $sum = (int)$sum;
         if ($sum >= 66) return 'M+';
@@ -88,13 +88,13 @@ if (!function_exists('iforge_rol_stats')) {
     }
 }
 
-if (!function_exists('iforge_rol_razas')) {
+if (!function_exists('ope_rol_razas')) {
     /**
      * 9 razas. 'mod' = deltas a las stats efectivas de la PASIVA PRIMARIA
      * (siempre se aplica, pura o híbrida). 'mod_secundaria' solo se aplica
      * si el personaje es PURO de esa raza (no híbrido).
      */
-    function iforge_rol_razas()
+    function ope_rol_razas()
     {
         return array(
             'humano' => array(
@@ -192,8 +192,8 @@ if (!function_exists('iforge_rol_razas')) {
     }
 }
 
-if (!function_exists('iforge_rol_facciones')) {
-    function iforge_rol_facciones()
+if (!function_exists('ope_rol_facciones')) {
+    function ope_rol_facciones()
     {
         return array(
             'marine' => array(
@@ -211,9 +211,14 @@ if (!function_exists('iforge_rol_facciones')) {
                 'desc' => 'Miembro del Ejército Revolucionario. Lucha en las sombras.',
                 'ventaja' => 'Identidad secreta gratuita. Acceso a red de contactos revolucionarios.',
             ),
+            'gobierno' => array(
+                'nombre' => 'Gobierno',
+                'desc' => 'Agente del Gobierno Mundial: Cipher Pol, burocracia y operaciones encubiertas.',
+                'ventaja' => 'Credenciales del Gobierno Mundial y acceso a recursos de Cipher Pol. Autoridad sobre Marines de menor rango.',
+            ),
             'cazarrecompensas' => array(
-                'nombre' => 'Cazarrecompensas',
-                'desc' => 'Independiente. Caza piratas por dinero.',
+                'nombre' => 'Cazadores',
+                'desc' => 'Cazarrecompensas. Caza piratas y forajidos por dinero.',
                 'ventaja' => '+1 nivel en el Gremio de Cazadores. +10% berries por capturas.',
             ),
             'civil' => array(
@@ -221,17 +226,12 @@ if (!function_exists('iforge_rol_facciones')) {
                 'desc' => 'Comerciante, artesano, médico, erudito...',
                 'ventaja' => '+1 Oficio gratuito. Sin Wanted inicial. Sin enemigos declarados.',
             ),
-            'independiente' => array(
-                'nombre' => 'Independiente',
-                'desc' => 'Sin afiliación. Tu propio camino.',
-                'ventaja' => 'Máxima libertad narrativa. Sin ventajas ni restricciones de facción.',
-            ),
         );
     }
 }
 
-if (!function_exists('iforge_rol_armas')) {
-    function iforge_rol_armas()
+if (!function_exists('ope_rol_armas')) {
+    function ope_rol_armas()
     {
         return array(
             'contundente' => array('nombre' => 'Arma contundente (palo, maza)', 'detalle' => '1d6 + FUE · cuerpo a cuerpo. Puede noquear.'),
@@ -243,12 +243,12 @@ if (!function_exists('iforge_rol_armas')) {
     }
 }
 
-if (!function_exists('iforge_rol_virtudes')) {
+if (!function_exists('ope_rol_virtudes')) {
     /**
      * Catálogo de virtudes (coste en PC). 'spec' = true si el ítem requiere
      * que el jugador especifique algo en un campo de texto libre.
      */
-    function iforge_rol_virtudes()
+    function ope_rol_virtudes()
     {
         return array(
             'A) Linaje e Identidad' => array(
@@ -319,9 +319,9 @@ if (!function_exists('iforge_rol_virtudes')) {
     }
 }
 
-if (!function_exists('iforge_rol_defectos')) {
+if (!function_exists('ope_rol_defectos')) {
     /** Catálogo de defectos (PC que devuelven). */
-    function iforge_rol_defectos()
+    function ope_rol_defectos()
     {
         return array(
             'H) Salud y Cuerpo' => array(
@@ -401,28 +401,28 @@ if (!function_exists('iforge_rol_defectos')) {
     }
 }
 
-if (!function_exists('iforge_rol_pc_iniciales')) {
-    function iforge_rol_pc_iniciales() { return 6; }
+if (!function_exists('ope_rol_pc_iniciales')) {
+    function ope_rol_pc_iniciales() { return 6; }
 }
 
-if (!function_exists('iforge_rol_berries_iniciales')) {
-    function iforge_rol_berries_iniciales() { return 50000; }
+if (!function_exists('ope_rol_berries_iniciales')) {
+    function ope_rol_berries_iniciales() { return 50000; }
 }
 
-if (!function_exists('iforge_rol_find_virtud')) {
-    function iforge_rol_find_virtud($id)
+if (!function_exists('ope_rol_find_virtud')) {
+    function ope_rol_find_virtud($id)
     {
-        foreach (iforge_rol_virtudes() as $cat) {
+        foreach (ope_rol_virtudes() as $cat) {
             if (isset($cat[$id])) return $cat[$id];
         }
         return null;
     }
 }
 
-if (!function_exists('iforge_rol_find_defecto')) {
-    function iforge_rol_find_defecto($id)
+if (!function_exists('ope_rol_find_defecto')) {
+    function ope_rol_find_defecto($id)
     {
-        foreach (iforge_rol_defectos() as $cat) {
+        foreach (ope_rol_defectos() as $cat) {
             if (isset($cat[$id])) return $cat[$id];
         }
         return null;

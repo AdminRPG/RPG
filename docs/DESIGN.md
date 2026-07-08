@@ -1,151 +1,203 @@
 ---
-version: alpha
-name: I-Forge — Archivo del Rol
-colors:
-  bg: "#f4f0e6"
-  bg-dark: "#ebe6d6"
-  panel: "#2d5a27"
-  panel-hover: "#3d7a35"
-  gold: "#c9a84c"
-  gold-hover: "#e2c96b"
-  ink: "#1a1a1a"
-  ink-secondary: "#5a5a4a"
-  border: "#1e3d1a"
-  shadow: "3px 3px 0 #1e3d1a"
-  shadow-hover: "4px 4px 0 #1e3d1a"
-typography:
-  display:
-    fontFamily: "Permanent Marker"
-    fontWeight: 400
-    letterSpacing: "varies (1-5px)"
-  body:
-    fontFamily: "Georgia, 'Palatino Linotype', serif"
-    fontWeight: 400
-  ui:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
-    fontWeight: "400-800"
-  data:
-    fontFamily: "Menlo, Consolas, Monaco, monospace"
-    fontWeight: "400-700"
-rounded: "3px"
-borders: "3px solid #1e3d1a"
-shadow: "3px 3px 0 #1e3d1a"
-maxWidth: "1200px"
-spacing: "8px base (4-48px range)"
+version: 2.1
+name: One Piece Eternal
+palette: océano de aventura
+stylesheet: docs/themes/ope.css
+plugin: inc/plugins/ope_rol.php
 ---
 
-# DESIGN.md — I-Forge: Archivo del Rol
+# DESIGN.md — One Piece Eternal (fuente de verdad técnica)
 
-## Overview
+Este documento describe **cómo se implementan** los estilos en el proyecto: los
+tokens reales, las fuentes reales y —sobre todo— la **arquitectura CSS de fuente
+única** que evita que cada página tenga su propia copia de estilos.
 
-I-Forge es un foro de rol play-by-post de ambientación oscura con lore original. El diseño es **neobrutalista**: páginas color pergamino (#f4f0e6), paneles verde oscuro (#2d5a27) con bordes negros gruesos (3px) y sombras sólidas sin blur, tipografía brush (Permanent Marker) para títulos que evocan manuscritos antiguos, y acentos en tinta dorada (#c9a84c) como hilo conductor visual.
+Para la visión narrativa/estética extendida (referentes de One Piece, patrones
+como el bounty poster, anti-AI checklist) ver `docs/DESIGN-ONE-PIECE-ETERNAL.md`.
+Este archivo manda en lo técnico: si algo contradice a los valores reales de
+`docs/themes/ope.css`, gana `ope.css` y hay que actualizar este documento.
 
-Tres ideas fuerzan el carácter visual:
-1. **Pergamino antiguo** — fondo beige con líneas de cuaderno (repeating-linear-gradient sutil), como un archivo de notas de campo
-2. **Brutalismo controlado** — bordes gruesos (3px), sombras sólidas sin difuminar, sin border-radius grandes (todo 3px). Cada elemento tiene peso visual y ocupa su espacio sin ambigüedad
-3. **Tinta dorada** — el acento oro (#c9a84c) aparece en títulos, enlaces, hover y badges, pero nunca inunda. Es la tinta con la que se firma un archivo
+---
 
-## Colors
+## 0. Regla de oro: una sola fuente de verdad, cero estilos inline
 
-Paleta reducida con alto contraste y personalidad:
+**Sí, tu superior tiene razón.** Los `<style>` inline (o repetidos página a
+página) son malos porque:
 
-- **bg (#f4f0e6):** fondo general. Pergamino envejecido.
-- **bg-dark (#ebe6d6):** fondos de tarjetas y paneles interiores. Pergamino más oscuro.
-- **panel (#2d5a27):** barras de navegación, headers de sección, botones primarios. Verde bosque profundo.
-- **gold (#c9a84c):** títulos, enlaces, hover, badges. Tinta dorada.
-- **ink (#1a1a1a):** texto principal. Negro tinta.
-- **ink-secondary (#5a5a4a):** metadatos, fechas, texto secundario. Marrón apagado.
-- **border (#1e3d1a):** todos los bordes. Verde casi negro.
-- **shadow:** 3px 3px 0 #1e3d1a (sólida, sin blur).
-- **shadow-hover:** 4px 4px 0 #1e3d1a (ligeramente más grande al hover).
+1. **No hay cohesión** — cada página deriva su propia copia de la paleta, la
+   navbar o los botones; con el tiempo divergen y el sitio se ve distinto en
+   cada zona (es justo lo que nos pasaba con la navbar).
+2. **No se cachean** — el navegador re-descarga los mismos bytes en cada página
+   en vez de reutilizar un `.css` cacheado.
+3. **Duplican el mantenimiento** — un cambio de color obliga a editar N archivos
+   y es fácil olvidar uno.
+4. **Colisionan** — dos páginas con reglas globales (`.card`, `body{…}`) se pisan.
 
-Colores de rango (solo para badges de stat):
-- **rank-E (#8b949e):** gris
-- **rank-D (#6e7681):** gris medio
-- **rank-C (#58a6ff):** azul
-- **rank-B (#a371f7):** violeta
-- **rank-A (#f0883e):** naranja
-- **rank-S (#c9a84c):** dorado (solo para el máximo)
+**Cómo lo resolvemos aquí:** todo el CSS vive en **`docs/themes/ope.css`** (una
+sola hoja, cacheada, sincronizada a la BD del tema MyBB). Ninguna página PHP
+lleva `<style>`. La cohesión se garantiza con tres mecanismos:
 
-**Prohibido:** glassmorphism, sombras con blur, border-radius > 6px, fondos blancos puros (#fff), azules bootstrap, neón, degradados arcoíris.
+| Mecanismo | Dónde | Qué garantiza |
+|-----------|-------|---------------|
+| Hoja única `ope.css` | `docs/themes/ope.css` | Todos los tokens y componentes en un sitio |
+| `ope_rol_head_base()` | `inc/plugins/ope_rol.php:323` | Todas las páginas cargan las mismas fuentes + `ope.css` |
+| `ope_rol_navbar_html()` / `ope_rol_navbar_css()` | `inc/plugins/ope_rol.php:190,277` | La navbar es idéntica en todas las zonas (HTML + CSS generados una vez) |
+| Scope por página `body.ope-pg-<pagina>` | dentro de `ope.css` | Estilos específicos de una página sin colisionar con otras |
 
-## Typography
+**Prohibido:** reintroducir `<style>…</style>` en cualquier `.php`. Si una página
+necesita CSS propio, va en `ope.css` bajo su clase `body.ope-pg-<pagina>`.
 
-- **Display (Permanent Marker, cursive):** títulos de sección, nombre del foro, banner principal, tabs, headers de tarjeta. Evoca escritura a mano, anotaciones de archivo. Siempre uppercase + letter-spacing. Con text-shadow: 2px 2px 0 var(--border) para dar profundidad.
-- **Body (Georgia, serif):** texto general, posts, descripciones. Serif clásica que refuerza la estética de libro/documento antiguo.
-- **UI (system sans-serif):** botones, labels, metadatos, navegación, badges. Funcional y legible.
-- **Data (Menlo/Consolas, monospace):** estadísticas, valores numéricos, cantidades. Solo para datos.
+---
 
-**Regla:** Permanent Marker solo en títulos y elementos decorativos — nunca en body text. Monospace solo para números y datos. Georgia para todo el contenido legible.
+## 1. Arquitectura CSS
 
-## Layout
+```
+docs/themes/ope.css                 ← ÚNICA hoja de estilos (tokens + componentes + páginas)
+inc/plugins/ope_rol.php
+  ├─ ope_rol_head_base()            ← <head>: preconnect fuentes + <link> a ope.css
+  ├─ ope_rol_navbar_html()          ← HTML de la navbar (mismo markup en todas partes)
+  └─ ope_rol_navbar_css()           ← CSS de la navbar, scopeado bajo #ope-navbar
+```
 
-- **Ancho máximo:** 1200px centrado con padding lateral de 16px
-- **Navbar:** fija superior, 56px, fondo verde panel con border-bottom 3px + shadow
-- **Banner hero:** 300-320px, verde panel, con sello decorativo en Permanent Marker enorme al 14% opacidad, título en brush dorado con doble text-shadow
-- **Tablón (índice):** 3 columnas en desktop, 1 columna en móvil. Tarjetas con border 3px + shadow sólida
-- **Categorías:** headers verde panel con título brush dorado, subforos en grid de tarjetas (280px min-width) con hover que levanta la tarjeta (-2px translateY) y cambia el borde a dorado
-- **Ficha de personaje:** layout de dashboard denso. Tabs con estilo botón (mismo estilo que el tema). Stats en columnas con barras de progreso y badges de rango letra. Estadísticas derivadas en grid de tarjetas pequeñas.
+### 1.1 Cómo se estructura `ope.css`
 
-## Spacing
+1. **`:root`** — todos los tokens (paleta, fuentes). Ver §2 y §3.
+2. **Base** — reset, `body`, enlaces, selección, foco.
+3. **Componentes globales** — breadcrumb, `.ope-wrap`, botones, tarjetas, etc.
+4. **Páginas autónomas** — bloque final, cada una scopeada bajo
+   `body.ope-pg-<pagina>` (personajes, ficha, tramites, guias, zona-staff,
+   crear-personaje, alertas, mensajes, revisar-personaje).
 
-Escala estricta de 8px con saltos de 4px:
-- 4px: entre icono y texto inline, gap entre badges
-- 8px: entre elementos relacionados, padding interior de chips
-- 12-16px: padding de tarjetas y secciones
-- 24px: entre bloques mayores
-- 48px: separación de secciones grandes
+### 1.2 Cómo una página PHP consume los estilos
 
-## Elevation
+```php
+<!doctype html>
+<html lang="es">
+<head>
+  <?php echo ope_rol_head_base(); /* fuentes + ope.css, nada de <style> */ ?>
+  <title>One Piece Eternal · …</title>
+</head>
+<body class="ope-pg-personajes">   <!-- clase de scope obligatoria -->
+  <?php echo ope_rol_navbar_html(); /* navbar única (HTML + su CSS) */ ?>
+  …
+</body>
+</html>
+```
 
-Sin sombras difuminadas. La jerarquía se comunica con:
-- **Contraste de color:** paneles verdes (#2d5a27) sobre fondo beige (#f4f0e6)
-- **Bordes gruesos:** 3px solid #1e3d1a en TODOS los elementos elevados
-- **Sombras sólidas:** 3px 3px 0 (sin blur) — simula capas de papel/cartulina apiladas
-- **Hover:** la tarjeta se eleva (-2px translateY), el borde cambia a dorado, la sombra crece a 4px 4px 0
+### 1.3 Añadir estilos a una página sin romper la regla
 
-## Shapes
+En `ope.css`, al final, dentro del bloque de la página:
 
-Todo usa border-radius: 3px. Solo los avatares y botones de usuario circular usan border-radius: 50%.
+```css
+/* ---- personajes.php ---- */
+body.ope-pg-personajes .mi-modulo{ … }
+```
 
-## Components
+Nunca escribas `.mi-modulo{…}` sin el prefijo `body.ope-pg-…`: sin scope puede
+colisionar con otra página o con las plantillas de MyBB.
 
-### Navbar
-Fija superior, 56px, verde panel. Logo en Permanent Marker dorado con text-shadow. Links en sans-serif blanco con underline animada dorada al hover. Botón de usuario circular con borde 3px.
+### 1.4 Despliegue (repo → BD/caché del tema)
 
-### Banner
-Fondo verde panel, 300-320px. Sello decorativo enorme (200px, Permanent Marker, opacidad 14%) centrado. Título en brush dorado con doble text-shadow (sombra verde + brillo blanco). Subtítulo en Georgia blanca. Stats en brush dorado.
+`ope.css` y las plantillas viven en el repo y se sincronizan a MyBB:
 
-### Categorías (subforos)
-Header: panel verde, título brush dorado con text-shadow. Grid de tarjetas: panel verde, texto blanco, nombre en brush dorado. Hover: translateY(-2px), borde dorado, shadow-hover.
+```bash
+php scripts/sync-theme.php import   # repo → BD + cache/themes/theme13/ope.css
+php scripts/sync-theme.php verify   # comprobar que repo y BD coinciden
+```
 
-### Tarjetas (tablón)
-Fondo bg-dark, borde 3px + shadow. Header en panel verde con título brush dorado. Items con borde dashed entre ellos. Hover de items: color dorado.
+Editar en Admin CP y no sincronizar rompe la fuente única. Flujo correcto:
+editar `ope.css` → `import` → `verify` → commit.
 
-### Tabs (pestañas)
-Botones verdes con borde 3px + shadow. Brush font, uppercase, blanco. Activo/hover: fondo dorado, texto verde.
+---
 
-### Badges de rango
-Píldoras con borde 2px + shadow 2px. Fondo semitransparente del color de rango. Texto del color sólido. Solo para rangos de stat.
+## 2. Tokens de color (valores reales de `ope.css`)
 
-### Botones
-- **Primario (verde):** fondo panel, borde 3px, texto dorado, sombra sólida. Hover: panel-hover.
-- **Acento (dorado):** fondo gold, borde 2px, texto verde panel. Hover: gold-hover.
-- **Cancelar:** fondo bg, borde 2px, texto ink-secondary.
+Paleta **océano de aventura**: base océano profundo con acentos cálidos
+(melocotón / amanecer). Definida en `:root`.
 
-### Formularios
-Inputs: fondo bg, borde 3px, sombra 2px sólida. Focus: borde dorado. Sin border-radius grande.
+### 2.1 Paleta cruda One Piece
 
-## Do's and Don'ts
+| Token | Hex | Nombre |
+|-------|-----|--------|
+| `--op-sky` | `#41A4E0` | Azul Cielo |
+| `--op-peach` | `#FFCB93` | Nube Melocotón |
+| `--op-dawn` | `#FFE9A3` | Brillo de Amanecer |
+| `--op-ocean` | `#10477B` | Azul Océano Profundo |
+| `--op-tide` | `#458CC5` | Azul Marea |
+| `--op-wood` | `#8C5936` | Madera de Navío |
 
-- **Sí** usar Permanent Marker solo en títulos y elementos decorativos — nunca en body text
-- **Sí** mantener bordes de 3px y sombras sólidas consistentes en TODOS los componentes
-- **Sí** usar el dorado con moderación: títulos, enlaces, hover, badges — no fondos completos
-- **Sí** respetar la paleta: beige + verde + dorado + negro. No introducir colores nuevos sin justificación
-- **Sí** usar monospace para datos numéricos (stats, cantidades)
-- **Sí** text-shadow en títulos brush para dar profundidad
-- **No** usar border-radius > 6px en nada
-- **No** usar sombras con blur (box-shadow con 3er parámetro distinto de 0)
-- **No** usar glassmorphism, fondos blancos puros, ni neón
-- **No** mezclar Permanent Marker con otras fuentes display (Comic Sans, cursive genéricas)
-- **No** usar más de 2 pesos tipográficos por pantalla
+### 2.2 Roles semánticos
+
+| Token | Hex | Uso |
+|-------|-----|-----|
+| `--iron` | `#0b3157` | Fondo base / casco profundo |
+| `--iron-plate` | `#10477B` | Paneles, headers de sección |
+| `--iron-hi` | `#175a95` | Elevación / hover de panel |
+| `--iron-edge` | `#082742` | Bordes oscuros, velo de fondo |
+| `--rivet` | `#3d6f9e` | Separadores, detalles |
+| `--concrete` / `--concrete-2` | `#eef6fc` / `#dbecf9` | Superficies de lectura (papel de mapa) |
+| `--ink` / `--ink-2` | `#0a2f52` / `#1c5285` | Texto sobre superficies claras |
+| `--paper` / `--paper-dim` | `#eef7ff` / `#c6ddf3` | Texto sobre fondos oscuros |
+| `--ash` | `#8ba9c9` | Texto terciario / metadatos |
+| `--ember` / `--ember-hi` | `#FFCB93` / `#FFE9A3` | **Acento primario** (acción, enlaces, hover) |
+| `--patina` / `--patina-hi` | `#41A4E0` / `#63b8ea` | Acento secundario (cielo marino) |
+| `--gold` / `--gold-hi` / `--gold-deep` | `#FFCB93` / `#FFE9A3` / `#e0a866` | Marca / rótulos destacados |
+| `--sea` / `--sea-hi` / `--sea-deep` | `#458CC5` / `#41A4E0` / `#10477B` | Azules de estructura |
+| `--red` / `--crack` | `#e63b2e` | Peligro, alertas |
+
+### 2.3 Escala de poder (stats), océano → amanecer
+
+`--h1 #10477B` · `--h2 #2f6ea8` · `--h3 #458CC5` · `--h4 #41A4E0` ·
+`--h5 #63b8ea` · `--h6 #FFCB93` · `--h7 #ffdcae` · `--h8 #FFE9A3` · `--h9 #fff6d8`
+
+**Regla:** usa siempre los tokens, nunca hex sueltos. Un color nuevo se añade
+primero como variable en `:root` con un porqué; si no puedes justificarlo en el
+mundo One Piece, no entra.
+
+---
+
+## 3. Tipografía (valores reales)
+
+| Token | Familia | Uso |
+|-------|---------|-----|
+| `--disp` | `'Big Shoulders Display', Impact, sans-serif` | Rótulos, títulos de sección, banner |
+| `--mono` | `'Space Mono', Menlo, Consolas, monospace` | Datos, stats, labels, breadcrumb |
+| `--body` | `'Archivo', -apple-system, 'Segoe UI', sans-serif` | Cuerpo, descripciones, posts |
+
+Las fuentes se cargan **solo** desde `ope_rol_head_base()` (preconnect + Google
+Fonts). No añadas `<link>` de fuentes en páginas sueltas.
+
+**Reglas:** `uppercase` solo en rótulos/labels/badges, nunca en cuerpo ni en
+enlaces normales. Máximo 3 familias por pantalla (ya cubiertas por los tokens).
+
+---
+
+## 4. Fondo global
+
+El `body` usa `images/ope/fondo.jpg` a pantalla completa (`fixed`, `cover`) con
+un velo degradado oceánico encima para legibilidad. Se aplica con propiedades
+separadas (`background-image`, `-repeat`, `-position`, `-size`, `-attachment`),
+**nunca** con el atajo `background:` + `!important` (aplasta la imagen a `none`).
+Este fondo es global: aplica a todas las páginas por venir del `body` de `ope.css`.
+
+---
+
+## 5. Navbar (fuente única)
+
+- HTML: `ope_rol_navbar_html()` — mismo markup en toda página (logo, links,
+  dropdown de usuario). **No** incluye "Mis personajes".
+- CSS: `ope_rol_navbar_css()`, scopeado bajo `#ope-navbar` para alta
+  especificidad y consistencia total de tamaños/orientación entre zonas.
+- Nunca dupliques reglas `.ope-nav-*` en `ope.css` ni en PHP.
+
+---
+
+## 6. Checklist antes de commitear UI
+
+- [ ] Ninguna página `.php` contiene `<style>`.
+- [ ] La página llama a `ope_rol_head_base()` y a `ope_rol_navbar_html()`.
+- [ ] El `<body>` tiene su clase `ope-pg-<pagina>` si tiene CSS propio.
+- [ ] Los estilos nuevos están en `ope.css`, con tokens (no hex sueltos) y
+      scopeados bajo `body.ope-pg-<pagina>` si son específicos de una página.
+- [ ] Ejecutado `php scripts/sync-theme.php import` y `verify` sin diferencias.
+- [ ] Commit de `docs/themes/ope.css` (+ PHP/plantillas tocadas).

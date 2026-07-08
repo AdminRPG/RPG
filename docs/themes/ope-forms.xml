@@ -3,14 +3,14 @@
   <templates>
     <template name="newthread" version="1839"><![CDATA[
 <html><head>{$headerinclude}</head><body>
-<div id="iforge-breadcrumb"><div class="iforge-breadcrumb-in"><a href="{$mybb->settings['bburl']}/index.php">Fragua</a><span class="sep">›</span>{$breadcrumb}</div></div>
+<div id="ope-breadcrumb"><div class="ope-breadcrumb-in"><a href="{$mybb->settings['bburl']}/index.php">Inicio</a><span class="sep">›</span>{$breadcrumb}</div></div>
 {$header}
-<div class="iforge-wrap" style="padding-top:16px">
-  <div class="iforge-shead"><h1>Forjar colada</h1><span class="iforge-shead-code">// nuevo tema</span><span class="iforge-shead-rule"></span></div>
+<div class="ope-wrap" style="padding-top:16px">
+  <div class="ope-shead"><h1>Nueva historia</h1><span class="ope-shead-code">// nuevo tema</span><span class="ope-shead-rule"></span></div>
   {$preview}
-  <div class="iforge-plate">
-    <div class="iforge-plate-h"><span class="iforge-plate-h-t">{$forum['name']}</span><span class="iforge-plate-h-c">// golpea mientras está caliente</span></div>
-    <div class="iforge-plate-b">
+  <div class="ope-plate">
+    <div class="ope-plate-h"><span class="ope-plate-h-t">{$forum['name']}</span><span class="ope-plate-h-c">// comienza tu historia</span></div>
+    <div class="ope-plate-b">
       <form action="newthread.php?fid={$fid}&amp;processed=1" method="post" enctype="multipart/form-data">
         <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
         <div style="margin-bottom:12px">
@@ -21,17 +21,49 @@
           <label>Asunto</label><br>
           <input type="text" name="subject" value="{$subject}" style="width:100%" maxlength="85" />
         </div>
+        <div class="ope-meta-fields">
+          <div class="ope-meta-field">
+            <label>&Eacute;poca</label>
+            <select name="ope_era" id="ope_era" class="ope-meta-sel">
+              <option value="presente">Presente &middot; fecha actual (inalterable)</option>
+              <option value="pasado">Pasado</option>
+            </select>
+          </div>
+          <div class="ope-meta-field" id="ope-fecha-wrap" style="display:none">
+            <label>A&ntilde;o in-rol</label>
+            <input type="number" name="ope_fecha_rol" id="ope_fecha_rol" class="ope-meta-sel" min="0" max="9999" step="1" placeholder="p. ej. 1518" />
+          </div>
+          <div class="ope-meta-field">
+            <label>Etiqueta</label>
+            <select name="ope_tag" class="ope-meta-sel">
+              <option value="">Sin etiqueta</option>
+              <option value="Mision">Misi&oacute;n</option>
+              <option value="Trama">Trama</option>
+              <option value="Viaje">Viaje</option>
+              <option value="Fic">Fic</option>
+            </select>
+          </div>
+        </div>
+        <script>
+        (function(){
+          var e=document.getElementById('ope_era'),f=document.getElementById('ope-fecha-wrap');
+          if(!e||!f)return;
+          function u(){f.style.display=(e.value==='pasado')?'block':'none';}
+          e.addEventListener('change',u);u();
+        })();
+        </script>
         <div style="margin-bottom:12px">
           <label>Mensaje</label><br>
           {$codebuttons}
+          {$ope_tpl_inserter}
           <textarea name="message" id="message" rows="20" style="width:100%">{$message}</textarea>
         </div>
         {$posticons}
         {$postoptions}
         <div style="margin-top:14px;display:flex;gap:10px">
-          <input type="submit" class="iforge-btn iforge-btn-hot" value="Publicar colada" />
-          <input type="submit" name="previewpost" class="iforge-btn iforge-btn-ghost" value="Previsualizar" />
-          <input type="submit" name="savedraft" class="iforge-btn iforge-btn-ghost" value="Guardar borrador" />
+          <input type="submit" class="ope-btn ope-btn-hot" value="Publicar historia" />
+          <input type="submit" name="previewpost" class="ope-btn ope-btn-ghost" value="Previsualizar" />
+          <input type="submit" name="savedraft" class="ope-btn ope-btn-ghost" value="Guardar borrador" />
         </div>
       </form>
     </div>
@@ -43,19 +75,20 @@
 
     <template name="newreply" version="1839"><![CDATA[
 <html><head>{$headerinclude}</head><body>
-<div id="iforge-breadcrumb"><div class="iforge-breadcrumb-in"><a href="{$mybb->settings['bburl']}/index.php">Fragua</a><span class="sep">›</span>{$breadcrumb}</div></div>
+<div id="ope-breadcrumb"><div class="ope-breadcrumb-in"><a href="{$mybb->settings['bburl']}/index.php">Inicio</a><span class="sep">›</span>{$breadcrumb}</div></div>
 {$header}
-<div class="iforge-wrap" style="padding-top:16px">
-  <div class="iforge-shead"><h1>Responder</h1><span class="iforge-shead-code">// nueva respuesta</span><span class="iforge-shead-rule"></span></div>
+<div class="ope-wrap" style="padding-top:16px">
+  <div class="ope-shead"><h1>Responder</h1><span class="ope-shead-code">// nueva respuesta</span><span class="ope-shead-rule"></span></div>
   {$preview}
-  <div class="iforge-plate">
-    <div class="iforge-plate-h"><span class="iforge-plate-h-t">{$thread['subject']}</span><span class="iforge-plate-h-c">// golpea mientras está caliente</span></div>
-    <div class="iforge-plate-b">
+  <div class="ope-plate">
+    <div class="ope-plate-h"><span class="ope-plate-h-t">{$thread['subject']}</span><span class="ope-plate-h-c">// continúa la historia</span></div>
+    <div class="ope-plate-b">
       <form action="newreply.php?tid={$tid}&amp;processed=1" method="post" enctype="multipart/form-data">
         <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
         <div style="margin-bottom:12px">
           <label>Mensaje</label><br>
           {$codebuttons}
+          {$ope_tpl_inserter}
           <textarea name="message" id="message" rows="20" style="width:100%">{$message}</textarea>
           {$multiquote_external}
         </div>
@@ -63,8 +96,8 @@
         {$postoptions}
         {$modoptions}
         <div style="margin-top:14px;display:flex;gap:10px">
-          <input type="submit" class="iforge-btn iforge-btn-hot" value="Publicar respuesta" />
-          <input type="submit" name="previewpost" class="iforge-btn iforge-btn-ghost" value="Previsualizar" />
+          <input type="submit" class="ope-btn ope-btn-hot" value="Publicar respuesta" />
+          <input type="submit" name="previewpost" class="ope-btn ope-btn-ghost" value="Previsualizar" />
         </div>
       </form>
     </div>
@@ -77,14 +110,14 @@
 
     <template name="editpost" version="1839"><![CDATA[
 <html><head>{$headerinclude}</head><body>
-<div id="iforge-breadcrumb"><div class="iforge-breadcrumb-in"><a href="{$mybb->settings['bburl']}/index.php">Fragua</a><span class="sep">›</span>{$breadcrumb}</div></div>
+<div id="ope-breadcrumb"><div class="ope-breadcrumb-in"><a href="{$mybb->settings['bburl']}/index.php">Inicio</a><span class="sep">›</span>{$breadcrumb}</div></div>
 {$header}
-<div class="iforge-wrap" style="padding-top:16px">
-  <div class="iforge-shead"><h1>Editar mensaje</h1><span class="iforge-shead-code">// retocar el metal</span><span class="iforge-shead-rule"></span></div>
+<div class="ope-wrap" style="padding-top:16px">
+  <div class="ope-shead"><h1>Editar mensaje</h1><span class="ope-shead-code">// retoca tu texto</span><span class="ope-shead-rule"></span></div>
   {$preview}
-  <div class="iforge-plate">
-    <div class="iforge-plate-h"><span class="iforge-plate-h-t">{$thread['subject']}</span></div>
-    <div class="iforge-plate-b">
+  <div class="ope-plate">
+    <div class="ope-plate-h"><span class="ope-plate-h-t">{$thread['subject']}</span></div>
+    <div class="ope-plate-b">
       <form action="editpost.php?pid={$pid}&amp;processed=1" method="post" enctype="multipart/form-data">
         <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
         <div style="margin-bottom:12px">
@@ -103,8 +136,8 @@
         {$posticons}
         {$postoptions}
         <div style="margin-top:14px;display:flex;gap:10px">
-          <input type="submit" class="iforge-btn iforge-btn-hot" value="Actualizar" />
-          <input type="submit" name="previewpost" class="iforge-btn iforge-btn-ghost" value="Previsualizar" />
+          <input type="submit" class="ope-btn ope-btn-hot" value="Actualizar" />
+          <input type="submit" name="previewpost" class="ope-btn ope-btn-ghost" value="Previsualizar" />
         </div>
       </form>
     </div>
@@ -120,11 +153,11 @@
 {$headerinclude}
 <meta http-equiv="refresh" content="2;URL={$url}" />
 </head><body>
-<div class="iforge-wrap" style="padding-top:70px">
-  <div class="iforge-plate" style="text-align:center;padding:48px 24px">
+<div class="ope-wrap" style="padding-top:70px">
+  <div class="ope-plate" style="text-align:center;padding:48px 24px">
     <div style="font-family:var(--disp);font-weight:900;font-size:2rem;text-transform:uppercase;color:var(--paper);margin-bottom:8px">{$title}</div>
     <p style="font-family:var(--mono);font-size:.82rem;color:var(--paper-dim);margin-bottom:16px">{$message}</p>
-    <a href="{$url}" class="iforge-btn iforge-btn-hot">Continuar</a>
+    <a href="{$url}" class="ope-btn ope-btn-hot">Continuar</a>
   </div>
 </div>
 </body></html>
@@ -135,8 +168,8 @@
 <title>{$title}</title>
 {$headerinclude}
 </head><body>
-<div class="iforge-wrap" style="padding-top:70px">
-  <div class="iforge-plate" style="border-color:var(--crack);text-align:center;padding:48px 24px">
+<div class="ope-wrap" style="padding-top:70px">
+  <div class="ope-plate" style="border-color:var(--crack);text-align:center;padding:48px 24px">
     <div style="font-family:var(--disp);font-weight:900;font-size:2rem;text-transform:uppercase;color:var(--crack);margin-bottom:8px">{$title}</div>
     <p style="font-family:var(--mono);font-size:.82rem;color:var(--paper-dim);margin-bottom:16px">{$message}</p>
     {$error}
@@ -150,8 +183,8 @@
 <title>{$title}</title>
 {$headerinclude}
 </head><body>
-<div class="iforge-wrap" style="padding-top:70px">
-  <div class="iforge-plate" style="border-color:var(--crack);text-align:center;padding:48px 24px">
+<div class="ope-wrap" style="padding-top:70px">
+  <div class="ope-plate" style="border-color:var(--crack);text-align:center;padding:48px 24px">
     <div style="font-family:var(--disp);font-weight:900;font-size:2rem;text-transform:uppercase;color:var(--crack);margin-bottom:8px">{$title}</div>
     <p style="font-family:var(--mono);font-size:.82rem;color:var(--paper-dim);margin-bottom:16px">{$message}</p>
   </div>
@@ -160,7 +193,7 @@
 ]]></template>
 
     <template name="multipage" version="1839"><![CDATA[
-<div class="iforge-pager">
+<div class="ope-pager">
   {$prevpage}
   {$start}
   {$pages}
@@ -169,28 +202,28 @@
 ]]></template>
 
     <template name="multipage_page" version="1839"><![CDATA[
-<a href="{$page_url}" class="iforge-page">{$page}</a>
+<a href="{$page_url}" class="ope-page">{$page}</a>
 ]]></template>
 
     <template name="multipage_page_current" version="1839"><![CDATA[
-<span class="iforge-page on">{$page}</span>
+<span class="ope-page on">{$page}</span>
 ]]></template>
 
     <template name="multipage_prevpage" version="1839"><![CDATA[
-<a href="{$prevpage_url}" class="iforge-page nav" aria-label="Anterior">‹</a>
+<a href="{$prevpage_url}" class="ope-page nav" aria-label="Anterior">‹</a>
 ]]></template>
 
     <template name="multipage_nextpage" version="1839"><![CDATA[
-<a href="{$nextpage_url}" class="iforge-page nav" aria-label="Siguiente">›</a>
+<a href="{$nextpage_url}" class="ope-page nav" aria-label="Siguiente">›</a>
 ]]></template>
 
     <template name="forumjump_advanced" version="1839"><![CDATA[
-<div class="iforge-plate" style="margin-top:14px">
-  <div class="iforge-plate-h"><span class="iforge-plate-h-t">Ir a un foro</span></div>
-  <div class="iforge-plate-b">
+<div class="ope-plate" style="margin-top:14px">
+  <div class="ope-plate-h"><span class="ope-plate-h-t">Ir a un foro</span></div>
+  <div class="ope-plate-b">
     <form method="get" action="forumdisplay.php" style="display:flex;gap:8px;align-items:center">
       <select name="fid">{$forumjumpbits}</select>
-      <input type="submit" class="iforge-btn iforge-btn-sm iforge-btn-hot" value="Ir" />
+      <input type="submit" class="ope-btn ope-btn-sm ope-btn-hot" value="Ir" />
     </form>
   </div>
 </div>
@@ -224,9 +257,9 @@
 ]]></template>
 
     <template name="codebuttons" version="1839"><![CDATA[
-<div class="iforge-plate" style="margin-bottom:0;border-bottom:0">
-  <div class="iforge-plate-h"><span class="iforge-plate-h-t">Herramientas</span></div>
-  <div class="iforge-plate-b">{$codebuttons}</div>
+<div class="ope-plate" style="margin-bottom:0;border-bottom:0">
+  <div class="ope-plate-h"><span class="ope-plate-h-t">Herramientas</span></div>
+  <div class="ope-plate-b">{$codebuttons}</div>
 </div>
 ]]></template>
 

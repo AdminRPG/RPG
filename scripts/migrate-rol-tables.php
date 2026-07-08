@@ -162,7 +162,7 @@ if ($seed->execute()) {
 $seed->close();
 
 // ─────────────────────────────────────────────────────────────
-// Activar el plugin iforge_rol en la caché de plugins de MyBB.
+// Activar el plugin ope_rol en la caché de plugins de MyBB.
 // ─────────────────────────────────────────────────────────────
 $res = $db->query("SELECT cache FROM {$PREFIX}datacache WHERE title = 'plugins' LIMIT 1");
 $plugins = array('active' => array());
@@ -177,7 +177,7 @@ if ($res && ($row = $res->fetch_assoc())) {
 if (!isset($plugins['active']) || !is_array($plugins['active'])) {
     $plugins['active'] = array();
 }
-$plugins['active']['iforge_rol'] = 'iforge_rol';
+$plugins['active']['ope_rol'] = 'ope_rol';
 $serialized = serialize($plugins);
 
 if ($exists_row) {
@@ -191,7 +191,7 @@ if ($exists_row) {
     $stmt->execute();
     $stmt->close();
 }
-echo "  [OK] plugin iforge_rol activado (datacache 'plugins')\n";
+echo "  [OK] plugin ope_rol activado (datacache 'plugins')\n";
 
 // Verificación
 echo "\n--- Verificación ---\n";

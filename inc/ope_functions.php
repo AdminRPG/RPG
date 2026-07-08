@@ -3,13 +3,13 @@
  * I-Forge · Helpers compartidos (index.php + forumdisplay.php)
  * --------------------------------------------------------------
  * Funciones puras de presentación reutilizadas por varias páginas:
- *   - iforge_reltime()          tiempo relativo ("hace 5 min")
- *   - iforge_heat()             badge de calor E..SS según nº de posts
- *   - iforge_forum_image()      localiza images/foros/{fid}.{ext}
- *   - iforge_sector_art()       arte SVG procedural (fallback sin foto)
- *   - iforge_render_region_cards()  tarjetas grandes con foto para los
+ *   - ope_reltime()          tiempo relativo ("hace 5 min")
+ *   - ope_heat()             badge de calor E..SS según nº de posts
+ *   - ope_forum_image()      localiza images/foros/{fid}.{ext}
+ *   - ope_sector_art()       arte SVG procedural (fallback sin foto)
+ *   - ope_render_region_cards()  tarjetas grandes con foto para los
  *                                    hijos directos de un foro/categoría
- *   - iforge_world_root_name()  nombre de la categoría raíz de un foro,
+ *   - ope_world_root_name()  nombre de la categoría raíz de un foro,
  *                                    para saber si pertenece a "El Mundo"
  */
 
@@ -17,8 +17,8 @@ if (!defined('IN_MYBB')) {
     exit('Direct access not permitted.');
 }
 
-if (!function_exists('iforge_reltime')) {
-    function iforge_reltime($ts) {
+if (!function_exists('ope_reltime')) {
+    function ope_reltime($ts) {
         $d = TIME_NOW - (int)$ts;
         if ($d < 0) $d = 0;
         if ($d < 60) return 'ahora';
@@ -29,8 +29,8 @@ if (!function_exists('iforge_reltime')) {
     }
 }
 
-if (!function_exists('iforge_heat')) {
-    function iforge_heat($posts) {
+if (!function_exists('ope_heat')) {
+    function ope_heat($posts) {
         $posts = (int)$posts;
         if ($posts >= 1500) return ['SS', 'var(--h8)', 'var(--iron)'];
         if ($posts >= 700)  return ['S',  'var(--h7)', 'var(--iron)'];
@@ -42,8 +42,8 @@ if (!function_exists('iforge_heat')) {
     }
 }
 
-if (!function_exists('iforge_forum_image')) {
-    function iforge_forum_image($fid) {
+if (!function_exists('ope_forum_image')) {
+    function ope_forum_image($fid) {
         global $mybb;
         static $cache = [];
         $fid = (int)$fid;
@@ -59,9 +59,9 @@ if (!function_exists('iforge_forum_image')) {
     }
 }
 
-if (!function_exists('iforge_sector_art')) {
+if (!function_exists('ope_sector_art')) {
     /** Arte SVG procedural determinista por fid (fallback cuando no hay foto). */
-    function iforge_sector_art($fid) {
+    function ope_sector_art($fid) {
         static $art = [
             // 0 · fundición / ciudad
             '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><rect width="200" height="168" fill="#2a2d33"/><polygon points="0,168 46,64 92,120 128,50 176,120 200,72 200,168" fill="#1b1d22"/><rect x="150" y="30" width="16" height="14" fill="#e0641f"/><rect x="120" y="40" width="10" height="24" fill="#31353d"/></svg>',
@@ -80,14 +80,14 @@ if (!function_exists('iforge_sector_art')) {
     }
 }
 
-if (!function_exists('iforge_render_region_cards')) {
+if (!function_exists('ope_render_region_cards')) {
     /**
      * Construye tarjetas grandes con foto para los foros hijos directos de
      * $pid (usado tanto para "El Mundo" en el índice como para una región
      * concreta en forumdisplay.php, donde $pid es la propia región y los
      * hijos son sus islas).
      */
-    function iforge_render_region_cards($pid, array $forumpermissions) {
+    function ope_render_region_cards($pid, array $forumpermissions) {
         global $db;
         $bburl = $GLOBALS['mybb']->settings['bburl'];
         $cards = '';
@@ -118,26 +118,33 @@ if (!function_exists('iforge_render_region_cards')) {
 
             $forumName = htmlspecialchars_uni($forum['name']);
             $forumDesc = htmlspecialchars_uni($forum['description']);
-            $img = iforge_forum_image($forum['fid']);
+            $img = ope_forum_image($forum['fid']);
             $art = $img !== null
                 ? '<img src="'.$img.'" alt="'.$forumName.'" loading="lazy">'
-                : iforge_sector_art($forum['fid']);
+                : ope_sector_art($forum['fid']);
 
             if ($childCount > 0) {
                 $meta = '<b>'.$childCount.'</b> islas &middot; '.my_number_format($childThreads).' temas';
             } else {
                 $meta = '<b>'.my_number_format($forum['threads']).'</b> temas &middot; '.my_number_format($forum['posts']).' msgs';
             }
-            $descHtml = $forumDesc !== '' ? '<div class="iforge-region-d">'.$forumDesc.'</div>' : '';
+            $descHtml = $forumDesc !== '' ? '<div class="ope-region-d">'.$forumDesc.'</div>' : '';
+
+            // Slug estable del nombre (east-blue, calm-belt, paraiso, new-world...)
+            // usado por el bento de "El Mundo" para asignar cada panel a su celda.
+            $slug = strtolower($forum['name']);
+            $slug = strtr($slug, array('á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u','ñ'=>'n'));
+            $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
+            $slug = trim($slug, '-');
 
             $cards .= '
-            <a href="'.$bburl.'/forumdisplay.php?fid='.$forum['fid'].'" class="iforge-region">
-                <div class="iforge-region-art">'.$art.'</div>
-                <div class="iforge-region-veil"></div>
-                <div class="iforge-region-in">
-                    <div class="iforge-region-n">'.$forumName.'</div>
+            <a href="'.$bburl.'/forumdisplay.php?fid='.$forum['fid'].'" class="ope-region ope-region--'.$slug.'">
+                <div class="ope-region-art">'.$art.'</div>
+                <div class="ope-region-veil"></div>
+                <div class="ope-region-in">
+                    <div class="ope-region-n">'.$forumName.'</div>
                     '.$descHtml.'
-                    <div class="iforge-region-m">'.$meta.'</div>
+                    <div class="ope-region-m">'.$meta.'</div>
                 </div>
             </a>';
         }
@@ -145,14 +152,14 @@ if (!function_exists('iforge_render_region_cards')) {
     }
 }
 
-if (!function_exists('iforge_forum_meta')) {
+if (!function_exists('ope_forum_meta')) {
     /**
      * Ficha enriquecida de una región/isla (dueño actual, clima, zonas,
      * anotaciones), guardada en mybb_rol_forum_meta (1:1 por fid).
      * Devuelve un array con claves 'dueno','clima','zonas' (array) y
      * 'anotaciones', todas vacías si no hay tabla o no hay fila.
      */
-    function iforge_forum_meta($fid) {
+    function ope_forum_meta($fid) {
         global $db;
         static $cache = [];
         $fid = (int)$fid;
@@ -176,13 +183,13 @@ if (!function_exists('iforge_forum_meta')) {
     }
 }
 
-if (!function_exists('iforge_world_root_name')) {
+if (!function_exists('ope_world_root_name')) {
     /**
      * Devuelve el nombre de la categoría raíz (nivel 0) a la que pertenece
      * un foro, usando su `parentlist`. Sirve para saber si un foro vive
      * bajo "El Mundo" y debe usar el estilo rico (tarjetas + cabecera foto).
      */
-    function iforge_world_root_name(array $foruminfo) {
+    function ope_world_root_name(array $foruminfo) {
         global $db;
         $parentlist = trim($foruminfo['parentlist'] ?? '', ', ');
         if ($parentlist === '') {

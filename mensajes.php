@@ -13,7 +13,7 @@ $bbname    = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin  = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid       = (int)($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
-$activePid = (int)($mybb->user['iforge_active_pid'] ?? 0);
+$activePid = (int)($mybb->user['ope_active_pid'] ?? 0);
 
 // Fallback: buscar personaje activo
 if ($activePid <= 0 && $loggedin && $db->table_exists('rol_personajes')) {
@@ -22,8 +22,8 @@ if ($activePid <= 0 && $loggedin && $db->table_exists('rol_personajes')) {
 }
 
 $staff_level = 0;
-if ($loggedin && isset($mybb->user['iforge_staff_level'])) {
-    $staff_level = (int)$mybb->user['iforge_staff_level'];
+if ($loggedin && isset($mybb->user['ope_staff_level'])) {
+    $staff_level = (int)$mybb->user['ope_staff_level'];
 }
 
 // POST: enviar mensaje
@@ -77,15 +77,23 @@ if ($thread_open > 0 && $activePid > 0 && $db->table_exists('rol_mensajes')) {
 // Cargar hilos (conversaciones)
 $hilos = array();
 if ($activePid > 0 && $db->table_exists('rol_mensajes')) {
+    // Último mensaje de cada hilo (self-join al MAX(dateline) por thread_id;
+    // compatible con ONLY_FULL_GROUP_BY de MySQL 8 — no seleccionar columnas
+    // sin agregar junto a un GROUP BY).
     $hq = $db->query("
         SELECT m.*, 
                CASE WHEN m.origen_pid = {$activePid} THEN m.destino_pid ELSE m.origen_pid END as otro_pid,
                (SELECT nombre FROM " . TABLE_PREFIX . "rol_personajes WHERE pid = CASE WHEN m.origen_pid = {$activePid} THEN m.destino_pid ELSE m.origen_pid END LIMIT 1) as otro_nombre,
                (SELECT COUNT(*) FROM " . TABLE_PREFIX . "rol_mensajes WHERE thread_id = m.thread_id AND destino_pid = {$activePid} AND leido = 0) as no_leidos
         FROM " . TABLE_PREFIX . "rol_mensajes m
+        INNER JOIN (
+            SELECT thread_id, MAX(dateline) AS max_dl
+            FROM " . TABLE_PREFIX . "rol_mensajes
+            WHERE origen_pid = {$activePid} OR destino_pid = {$activePid}
+            GROUP BY thread_id
+        ) latest ON latest.thread_id = m.thread_id AND latest.max_dl = m.dateline
         WHERE m.origen_pid = {$activePid} OR m.destino_pid = {$activePid}
-        GROUP BY m.thread_id
-        ORDER BY MAX(m.dateline) DESC
+        ORDER BY m.dateline DESC
     ");
     while ($row = $db->fetch_array($hq)) $hilos[] = $row;
 }
@@ -125,93 +133,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Mensajes</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --iron:#0b3157; --iron-plate:#10477B; --iron-hi:#175a95; --iron-edge:#082742;
-  --rivet:#3d6f9e; --paper:#eaf4fb; --paper-dim:#a9c6e0; --ash:#5c83a7;
-  --ember:#FFCB93; --ember-hi:#FFE9A3; --patina:#41A4E0; --crack:#e63b2e;
-  --h6:#FFCB93;
-  --disp:'Big Shoulders Display',Impact,sans-serif;
-  --mono:'Space Mono',Menlo,Consolas,monospace;
-  --body:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--iron);color:var(--paper);font-family:var(--body);font-size:15px;line-height:1.55;padding-top:52px;
-  background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:26px 26px}
-a{color:var(--ember-hi);text-decoration:none}
-.wrap{max-width:1300px;margin:0 auto;padding:0 18px}
-
-.breadcrumb{background:var(--iron-plate);border-bottom:2px solid #000}
-.breadcrumb-in{max-width:1300px;margin:0 auto;padding:9px 18px;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.breadcrumb-in a{color:var(--paper-dim)}
-.breadcrumb-in a:hover{color:var(--ember-hi)}
-.breadcrumb-in .sep{color:var(--rivet)}
-.breadcrumb-in b{color:var(--paper)}
-
-.shead{display:flex;align-items:baseline;gap:14px;margin:20px 0 14px}
-.shead h1{font-family:var(--disp);font-weight:800;font-size:2rem;text-transform:uppercase;color:var(--paper);line-height:1}
-.shead .code{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ember-hi);letter-spacing:1px}
-.shead .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--rivet) 0 6px,transparent 6px 12px)}
-
-.btn{font-family:var(--mono);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:10px 18px;border:2px solid #000;cursor:pointer;transition:transform .12s,box-shadow .12s;display:inline-block}
-.btn-hot{background:var(--ember);color:var(--iron)}
-.btn-hot:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-ghost{background:transparent;color:var(--paper);border-color:var(--rivet)}
-.btn-ghost:hover{color:var(--iron);background:var(--paper);border-color:#000;transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-sm{padding:6px 12px;font-size:.7rem}
-
-.flash{font-family:var(--mono);font-size:.72rem;padding:10px 14px;border:2px solid #000;margin-bottom:14px}
-.flash.ok{background:var(--iron-plate);color:var(--h6);border-color:var(--patina)}
-.flash.warn{background:var(--iron-plate);color:var(--ember);border-color:var(--ember)}
-
-.msg-shell{display:grid;grid-template-columns:300px 1fr;gap:0;border:2px solid #000;min-height:600px}
-.msg-sidebar{background:var(--iron-edge);border-right:2px solid #000;overflow-y:auto}
-.msg-sidebar-in{padding:0}
-.msg-thread{display:block;width:100%;padding:12px 14px;background:transparent;border:none;border-bottom:1px solid var(--iron);cursor:pointer;text-align:left;color:var(--paper-dim);font-family:var(--body);font-size:.82rem;transition:background .12s}
-.msg-thread:hover{background:var(--iron-plate)}
-.msg-thread.active{background:var(--iron-plate);border-left:3px solid var(--ember)}
-.msg-thread .th-name{font-weight:600;color:var(--paper);margin-bottom:3px}
-.msg-thread .th-subject{font-size:.74rem;color:var(--paper-dim)}
-.msg-thread .th-meta{font-family:var(--mono);font-size:.58rem;color:var(--ash);margin-top:4px}
-.msg-thread .th-badge{display:inline-block;min-width:20px;height:18px;background:var(--crack);color:#fff;font-family:var(--mono);font-size:.56rem;font-weight:700;border-radius:9px;text-align:center;line-height:18px;padding:0 5px;margin-left:6px}
-
-.msg-main{padding:0;display:flex;flex-direction:column;background:var(--iron)}
-.msg-list{flex:1;overflow-y:auto;padding:16px 20px;max-height:460px}
-.msg-bubble{margin-bottom:14px;max-width:80%}
-.msg-bubble.mine{margin-left:auto}
-.msg-bubble .b-head{font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;color:var(--ash);margin-bottom:4px}
-.msg-bubble .b-body{background:var(--iron-plate);border:2px solid #000;padding:10px 14px;font-size:.84rem;color:var(--paper-dim);line-height:1.55}
-.msg-bubble.mine .b-body{background:var(--iron-edge);color:var(--paper)}
-.msg-bubble .b-time{font-family:var(--mono);font-size:.54rem;color:var(--ash);margin-top:4px;text-align:right}
-
-.msg-form{border-top:2px solid #000;padding:14px 20px;background:var(--iron-plate)}
-.msg-form textarea{width:100%;min-height:80px;background:var(--iron);border:2px solid #000;color:var(--paper);font-family:var(--body);font-size:.82rem;padding:10px 12px;resize:vertical;margin-bottom:8px}
-.msg-form textarea:focus{outline:none;border-color:var(--ember)}
-.msg-form .form-row{display:flex;gap:10px;align-items:flex-end}
-.msg-form select{background:var(--iron);border:2px solid #000;color:var(--paper);font-family:var(--mono);font-size:.7rem;padding:8px 10px}
-.msg-form input[type="text"]{background:var(--iron);border:2px solid #000;color:var(--paper);font-family:var(--body);font-size:.82rem;padding:8px 10px;flex:1}
-
-.empty-state{text-align:center;padding:48px 20px;color:var(--paper-dim)}
-.empty-state .big{font-family:var(--disp);font-weight:800;font-size:1.6rem;text-transform:uppercase;color:var(--paper);margin-bottom:8px}
-.empty-state p{font-family:var(--mono);font-size:.72rem;max-width:48ch;margin:0 auto;line-height:1.6}
-
-.foot{background:var(--iron-edge);border-top:2px solid #000;padding:24px 18px;margin-top:36px}
-.foot-in{max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
-.foot-b{font-family:var(--disp);font-weight:900;font-size:1.3rem;text-transform:uppercase;color:var(--paper)}
-
-@media(max-width:768px){
-  .msg-shell{grid-template-columns:1fr}
-  .msg-sidebar{border-right:none;border-bottom:2px solid #000;max-height:200px}
-  .msg-list{max-height:300px}
-}
-</style>
+<?php echo ope_rol_head_base(); ?>
+<!-- estilos en docs/themes/ope.css (scope: ope-pg-mensajes) -->
 </head>
-<body>
+<body class="ope-pg-mensajes">
 
-<?php echo iforge_rol_navbar_html(); ?>
+<?php echo ope_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

@@ -4,7 +4,7 @@
  * ----------------------------------------------
  * Muestra el expediente real de un personaje (mybb_rol_personajes), leyendo
  * los datos guardados por el wizard crear-personaje.php. Dirección visual
- * "Foundry Brutalism", coherente con personajes.php.
+ * "One Piece Eternal", coherente con personajes.php.
  *
  * Acceso:
  *   ficha.php?pid=N   → ficha del personaje N
@@ -19,7 +19,7 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'ficha.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/iforge_rol_data.php';
+require_once MYBB_ROOT . 'inc/ope_rol_data.php';
 
 $bburl    = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
@@ -27,21 +27,13 @@ $loggedin = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int) ($mybb->user['uid'] ?? 0);
 $username = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
-// Nivel de staff (expuesto por el plugin, con respaldo directo).
-$staff_level = 0;
-if ($loggedin) {
-    if (isset($mybb->user['iforge_staff_level'])) {
-        $staff_level = (int) $mybb->user['iforge_staff_level'];
-    } elseif ($db->table_exists('rol_cuentas')) {
-        $cq = $db->simple_select('rol_cuentas', 'staff_level', "uid = {$uid}", array('limit' => 1));
-        if ($db->num_rows($cq)) {
-            $staff_level = (int) $db->fetch_field($cq, 'staff_level');
-        }
-    }
-}
+// Staff del PERSONAJE ACTIVO (el staff es por personaje). Un colaborador+ puede
+// ver expedientes no aprobados; con un personaje sin rol activo, no.
+$staff_arr   = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0);
+$staff_level = (int) $staff_arr['rank'];
 
 // Iniciales para el botón de usuario (navbar).
-$display_name = (string) ($mybb->user['iforge_display_name'] ?? ($mybb->user['username'] ?? ''));
+$display_name = (string) ($mybb->user['ope_display_name'] ?? ($mybb->user['username'] ?? ''));
 $display_name_e = htmlspecialchars_uni($display_name);
 
 // ── Resolver el personaje a mostrar ──
@@ -75,15 +67,325 @@ if ($pj) {
 }
 $es_propietario = $pj && $loggedin && (int) $pj['uid'] === $uid;
 
-// ── Datos de rol ──
-$RANK_SCALE  = iforge_rol_rank_scale();      // letra => num
-$RANK_BY_NUM = array_flip($RANK_SCALE);      // num => letra
-$STAT_GROUPS = iforge_rol_stats();
-$RAZAS       = iforge_rol_razas();
-$FACCIONES   = iforge_rol_facciones();
-$ARMAS       = iforge_rol_armas();
+// ── Gestión (propietario): guardar Avatar / Icono / Firma ──
+$gestion_ok = ($mybb->get_input('g') === '1');
+if ($es_propietario && $mybb->request_method === 'post'
+    && verify_post_check($mybb->get_input('my_post_key'), true)
+    && $mybb->get_input('gaccion') === 'perfil') {
 
-function iforge_heat_var(string $rango): string
+    $valid_url = static function ($u) { return $u === '' || (bool) preg_match('~^https?://~i', $u); };
+
+    $n_avatar = trim((string) $mybb->get_input('avatar'));
+    $n_icono  = trim((string) $mybb->get_input('icono'));
+    $n_firma  = (string) $mybb->get_input('firma');
+    if (!$valid_url($n_avatar)) $n_avatar = (string) $pj['avatar'];
+    if (!$valid_url($n_icono))  $n_icono  = (string) ($pj['icono'] ?? '');
+    $n_firma = function_exists('mb_substr') ? mb_substr($n_firma, 0, 3000) : substr($n_firma, 0, 3000);
+
+    $db->update_query('rol_personajes', array(
+        'avatar'   => $db->escape_string($n_avatar),
+        'icono'    => $db->escape_string($n_icono),
+        'firma'    => $db->escape_string($n_firma),
+        'lastedit' => TIME_NOW,
+    ), 'pid = ' . (int) $pj['pid']);
+
+    header('Location: ' . $bburl . '/ficha.php?pid=' . (int) $pj['pid'] . '&g=1');
+    exit;
+}
+
+// ── Gestión (propietario): guardar descripciones de cronología ──
+if ($es_propietario && $mybb->request_method === 'post'
+    && verify_post_check($mybb->get_input('my_post_key'), true)
+    && $mybb->get_input('gaccion') === 'cronologia'
+    && $db->table_exists('rol_cronologia')) {
+
+    $pid_c   = (int) $pj['pid'];
+    $descs   = $mybb->get_input('descripcion');
+    if (is_array($descs)) {
+        // TIDs válidos: temas donde el personaje realmente participó.
+        $valid = array();
+        $vq = $db->query("SELECT DISTINCT tid FROM " . TABLE_PREFIX . "posts
+                          WHERE ope_pid = {$pid_c} AND visible = 1");
+        while ($vr = $db->fetch_array($vq)) { $valid[(int) $vr['tid']] = true; }
+
+        foreach ($descs as $tid_k => $txt) {
+            $tid_k = (int) $tid_k;
+            if ($tid_k < 1 || empty($valid[$tid_k])) continue;
+            $txt = trim((string) $txt);
+            $txt = function_exists('mb_substr') ? mb_substr($txt, 0, 2000) : substr($txt, 0, 2000);
+
+            $ex = $db->simple_select('rol_cronologia', 'tid',
+                "pid = {$pid_c} AND tid = {$tid_k}", array('limit' => 1));
+            if ($txt === '') {
+                if ($db->num_rows($ex)) {
+                    $db->delete_query('rol_cronologia', "pid = {$pid_c} AND tid = {$tid_k}");
+                }
+                continue;
+            }
+            $row = array(
+                'descripcion' => $db->escape_string($txt),
+                'dateline'    => TIME_NOW,
+            );
+            if ($db->num_rows($ex)) {
+                $db->update_query('rol_cronologia', $row, "pid = {$pid_c} AND tid = {$tid_k}");
+            } else {
+                $row['pid'] = $pid_c;
+                $row['tid'] = $tid_k;
+                $db->insert_query('rol_cronologia', $row);
+            }
+        }
+    }
+
+    header('Location: ' . $bburl . '/ficha.php?pid=' . (int) $pj['pid'] . '&g=1#cronologia');
+    exit;
+}
+
+// ── Gestión (propietario): mapa de relaciones (añadir/editar/borrar/posición) ──
+if ($es_propietario && $mybb->request_method === 'post'
+    && verify_post_check($mybb->get_input('my_post_key'), true)
+    && in_array($mybb->get_input('gaccion'), array('rel_add', 'rel_edit', 'rel_del', 'rel_pos'), true)
+    && $db->table_exists('rol_relaciones')) {
+
+    $pid_r    = (int) $pj['pid'];
+    $gaccion  = $mybb->get_input('gaccion');
+    $tipos_ok = array_keys(ope_rel_tipos());
+
+    if ($gaccion === 'rel_add') {
+        $destino = $mybb->get_input('destino_pid', MyBB::INPUT_INT);
+        $etq     = trim((string) $mybb->get_input('etiqueta'));
+        $tipo    = (string) $mybb->get_input('tipo');
+        $desc    = trim((string) $mybb->get_input('descripcion'));
+        if (!in_array($tipo, $tipos_ok, true)) $tipo = 'otro';
+        $etq  = function_exists('mb_substr') ? mb_substr($etq, 0, 120) : substr($etq, 0, 120);
+        $desc = function_exists('mb_substr') ? mb_substr($desc, 0, 1500) : substr($desc, 0, 1500);
+
+        // Destino: personaje aprobado, distinto de sí mismo, sin duplicar.
+        $ok = false;
+        if ($destino > 0 && $destino !== $pid_r) {
+            $dq = $db->simple_select('rol_personajes', 'pid',
+                "pid = {$destino} AND estado = 'aprobado'", array('limit' => 1));
+            if ($db->num_rows($dq)) {
+                $ex = $db->simple_select('rol_relaciones', 'rid',
+                    "pid = {$pid_r} AND destino_pid = {$destino}", array('limit' => 1));
+                if (!$db->num_rows($ex)) $ok = true;
+            }
+        }
+        if ($ok) {
+            $db->insert_query('rol_relaciones', array(
+                'pid'         => $pid_r,
+                'destino_pid' => $destino,
+                'etiqueta'    => $db->escape_string($etq),
+                'tipo'        => $db->escape_string($tipo),
+                'descripcion' => $db->escape_string($desc),
+                'px'          => 0,
+                'py'          => 0,
+                'dateline'    => TIME_NOW,
+            ));
+        }
+    } elseif ($gaccion === 'rel_edit') {
+        $rid  = $mybb->get_input('rid', MyBB::INPUT_INT);
+        $etq  = trim((string) $mybb->get_input('etiqueta'));
+        $tipo = (string) $mybb->get_input('tipo');
+        $desc = trim((string) $mybb->get_input('descripcion'));
+        if (!in_array($tipo, $tipos_ok, true)) $tipo = 'otro';
+        $etq  = function_exists('mb_substr') ? mb_substr($etq, 0, 120) : substr($etq, 0, 120);
+        $desc = function_exists('mb_substr') ? mb_substr($desc, 0, 1500) : substr($desc, 0, 1500);
+        if ($rid > 0) {
+            $db->update_query('rol_relaciones', array(
+                'etiqueta'    => $db->escape_string($etq),
+                'tipo'        => $db->escape_string($tipo),
+                'descripcion' => $db->escape_string($desc),
+            ), "rid = {$rid} AND pid = {$pid_r}");
+        }
+    } elseif ($gaccion === 'rel_del') {
+        $rid = $mybb->get_input('rid', MyBB::INPUT_INT);
+        if ($rid > 0) {
+            $db->delete_query('rol_relaciones', "rid = {$rid} AND pid = {$pid_r}");
+        }
+    } elseif ($gaccion === 'rel_pos') {
+        $pxs = $mybb->get_input('px', MyBB::INPUT_ARRAY);
+        $pys = $mybb->get_input('py', MyBB::INPUT_ARRAY);
+        if (is_array($pxs)) {
+            foreach ($pxs as $rid_k => $vx) {
+                $rid_k = (int) $rid_k;
+                if ($rid_k < 1) continue;
+                $vx = (int) $vx;
+                $vy = isset($pys[$rid_k]) ? (int) $pys[$rid_k] : 0;
+                // Clamp al lienzo (viewBox 0..1000 x 0..640).
+                if ($vx < 0) $vx = 0; if ($vx > 1000) $vx = 1000;
+                if ($vy < 0) $vy = 0; if ($vy > 640)  $vy = 640;
+                $db->update_query('rol_relaciones',
+                    array('px' => $vx, 'py' => $vy),
+                    "rid = {$rid_k} AND pid = {$pid_r}");
+            }
+        }
+    }
+
+    // rel_pos vuelve al mapa; el resto reabre el modal en la pestaña de relaciones.
+    if ($gaccion === 'rel_pos') {
+        header('Location: ' . $bburl . '/ficha.php?pid=' . $pid_r . '#relaciones-map');
+    } else {
+        header('Location: ' . $bburl . '/ficha.php?pid=' . $pid_r . '&g=1#relaciones');
+    }
+    exit;
+}
+
+// ── Gestión (propietario): plantillas de post (crear/editar/borrar) ──
+if ($es_propietario && $mybb->request_method === 'post'
+    && verify_post_check($mybb->get_input('my_post_key'), true)
+    && in_array($mybb->get_input('gaccion'), array('tpl_add', 'tpl_edit', 'tpl_del'), true)
+    && $db->table_exists('rol_post_templates')) {
+
+    $pid_t   = (int) $pj['pid'];
+    $gaccion = $mybb->get_input('gaccion');
+
+    if ($gaccion === 'tpl_del') {
+        $tpl_id = $mybb->get_input('tpl_id', MyBB::INPUT_INT);
+        if ($tpl_id > 0) {
+            $db->delete_query('rol_post_templates', "tpl_id = {$tpl_id} AND pid = {$pid_t}");
+        }
+    } else {
+        $nombre = trim((string) $mybb->get_input('nombre'));
+        $cuerpo = (string) $mybb->get_input('cuerpo');
+        $nombre = function_exists('mb_substr') ? mb_substr($nombre, 0, 120) : substr($nombre, 0, 120);
+        $cuerpo = function_exists('mb_substr') ? mb_substr($cuerpo, 0, 20000) : substr($cuerpo, 0, 20000);
+        if ($nombre === '') $nombre = 'Plantilla';
+
+        if ($gaccion === 'tpl_add') {
+            // disporder = último + 1
+            $ord = 0;
+            $oq = $db->simple_select('rol_post_templates', 'MAX(disporder) AS mx', "pid = {$pid_t}");
+            if ($db->num_rows($oq)) $ord = (int) $db->fetch_field($oq, 'mx') + 1;
+            $db->insert_query('rol_post_templates', array(
+                'pid'      => $pid_t,
+                'nombre'   => $db->escape_string($nombre),
+                'cuerpo'   => $db->escape_string($cuerpo),
+                'disporder'=> $ord,
+                'dateline' => TIME_NOW,
+            ));
+        } else { // tpl_edit
+            $tpl_id = $mybb->get_input('tpl_id', MyBB::INPUT_INT);
+            if ($tpl_id > 0) {
+                $db->update_query('rol_post_templates', array(
+                    'nombre' => $db->escape_string($nombre),
+                    'cuerpo' => $db->escape_string($cuerpo),
+                ), "tpl_id = {$tpl_id} AND pid = {$pid_t}");
+            }
+        }
+    }
+
+    header('Location: ' . $bburl . '/ficha.php?pid=' . $pid_t . '&g=1#templates');
+    exit;
+}
+
+// ── Gestión (propietario): atributos (stats efectivas) ──
+if ($es_propietario && $mybb->request_method === 'post'
+    && verify_post_check($mybb->get_input('my_post_key'), true)
+    && $mybb->get_input('gaccion') === 'attrs') {
+
+    $datos_j = json_decode((string) $pj['datos'], true);
+    if (!is_array($datos_j)) $datos_j = array();
+    $stats = is_array($datos_j['stats_efectivas'] ?? null) ? $datos_j['stats_efectivas'] : array();
+
+    $in = $mybb->get_input('attr', MyBB::INPUT_ARRAY);
+    if (is_array($in)) {
+        foreach (ope_rol_stat_keys() as $k) {
+            if (!array_key_exists($k, $in)) continue;
+            $v = (int) $in[$k];
+            if ($v < 1) $v = 1;
+            if ($v > 10) $v = 10;
+            $stats[$k] = $v;
+        }
+    }
+    $datos_j['stats_efectivas'] = $stats;
+    $datos_j['rango_suma']      = array_sum(array_map('intval', $stats));
+
+    $db->update_query('rol_personajes', array(
+        'datos'    => $db->escape_string(json_encode($datos_j, JSON_UNESCAPED_UNICODE)),
+        'lastedit' => TIME_NOW,
+    ), 'pid = ' . (int) $pj['pid']);
+
+    header('Location: ' . $bburl . '/ficha.php?pid=' . (int) $pj['pid'] . '&g=1#atributos');
+    exit;
+}
+
+// ── Gestión (propietario): equipo (encima / almacén) ──
+if ($es_propietario && $mybb->request_method === 'post'
+    && verify_post_check($mybb->get_input('my_post_key'), true)
+    && in_array($mybb->get_input('gaccion'), array('equip_add', 'equip_move', 'equip_del'), true)) {
+
+    $inv = json_decode((string) $pj['inventario'], true);
+    if (!is_array($inv)) $inv = array();
+    if (!isset($inv['encima']) || !is_array($inv['encima']))   $inv['encima']  = array();
+    if (!isset($inv['almacen']) || !is_array($inv['almacen'])) $inv['almacen'] = array();
+
+    $gaccion = $mybb->get_input('gaccion');
+    $valid_loc = static function ($l) { return $l === 'encima' || $l === 'almacen'; };
+
+    if ($gaccion === 'equip_add') {
+        $dest = (string) $mybb->get_input('dest');
+        if (!$valid_loc($dest)) $dest = 'encima';
+        $n = trim((string) $mybb->get_input('nombre'));
+        $d = trim((string) $mybb->get_input('descripcion'));
+        $n = function_exists('mb_substr') ? mb_substr($n, 0, 120) : substr($n, 0, 120);
+        $d = function_exists('mb_substr') ? mb_substr($d, 0, 500) : substr($d, 0, 500);
+        if ($n !== '') {
+            $inv[$dest][] = array('n' => $n, 'd' => $d);
+        }
+    } elseif ($gaccion === 'equip_del') {
+        $from = (string) $mybb->get_input('from');
+        $idx  = $mybb->get_input('idx', MyBB::INPUT_INT);
+        if ($valid_loc($from) && isset($inv[$from][$idx])) {
+            array_splice($inv[$from], $idx, 1);
+        }
+    } elseif ($gaccion === 'equip_move') {
+        $from = (string) $mybb->get_input('from');
+        $idx  = $mybb->get_input('idx', MyBB::INPUT_INT);
+        if ($valid_loc($from) && isset($inv[$from][$idx])) {
+            $to = $from === 'encima' ? 'almacen' : 'encima';
+            $item = $inv[$from][$idx];
+            array_splice($inv[$from], $idx, 1);
+            $inv[$to][] = $item;
+        }
+    }
+
+    // Reindexa para evitar huecos en los arrays.
+    $inv['encima']  = array_values($inv['encima']);
+    $inv['almacen'] = array_values($inv['almacen']);
+
+    $db->update_query('rol_personajes', array(
+        'inventario' => $db->escape_string(json_encode($inv, JSON_UNESCAPED_UNICODE)),
+        'lastedit'   => TIME_NOW,
+    ), 'pid = ' . (int) $pj['pid']);
+
+    header('Location: ' . $bburl . '/ficha.php?pid=' . (int) $pj['pid'] . '&g=1#equipo');
+    exit;
+}
+
+// ── Datos de rol ──
+$RANK_SCALE  = ope_rol_rank_scale();      // letra => num
+$RANK_BY_NUM = array_flip($RANK_SCALE);      // num => letra
+$STAT_GROUPS = ope_rol_stats();
+$RAZAS       = ope_rol_razas();
+$FACCIONES   = ope_rol_facciones();
+$ARMAS       = ope_rol_armas();
+
+/** Tipos de relación válidos (slug => etiqueta visible). */
+function ope_rel_tipos(): array
+{
+    return array(
+        'aliado'      => 'Aliado',
+        'rival'       => 'Rival',
+        'familia'     => 'Familia',
+        'romance'     => 'Romance',
+        'mentor'      => 'Mentor',
+        'tripulacion' => 'Tripulaci&oacute;n',
+        'enemigo'     => 'Enemigo',
+        'otro'        => 'Otro',
+    );
+}
+
+function ope_heat_var(string $rango): string
 {
     $map = array(
         'F' => '--h1', 'E' => '--h1', 'D' => '--h2', 'C' => '--h3', 'B' => '--h4',
@@ -91,14 +393,14 @@ function iforge_heat_var(string $rango): string
     );
     return $map[strtoupper(trim($rango))] ?? '--h1';
 }
-function iforge_heat_val(int $v): string
+function ope_heat_val(int $v): string
 {
     if ($v < 1) $v = 1;
     if ($v > 9) $v = 9;
     return '--h' . $v;
 }
 /** Formato corto para cifras grandes de berries (4.850.000 → "4.9M"). */
-function iforge_short_money(int $n): string
+function ope_short_money(int $n): string
 {
     $abs = abs($n);
     if ($abs >= 1000000) {
@@ -116,6 +418,10 @@ $inventario = $pj ? (json_decode((string) $pj['inventario'], true) ?: array()) :
 $economia   = $pj ? (json_decode((string) $pj['economia'], true) ?: array()) : array();
 $bio        = $pj ? (json_decode((string) $pj['bio'], true) ?: array()) : array();
 
+// Color por facción: slug canónico para teñir el expediente (fuente: plugin ope_rol).
+$fac_slug  = $pj ? ope_rol_faccion_slug($datos['faccion'] ?? '') : '';
+$fac_class = $fac_slug !== '' ? ' fac-' . $fac_slug : '';
+
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
 <html lang="es">
@@ -123,253 +429,16 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; <?php echo $pj ? htmlspecialchars_uni($pj['nombre']) : 'Ficha'; ?></title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --iron:#1b1d22; --iron-plate:#24272e; --iron-hi:#31353d; --iron-edge:#0d0e11;
-  --rivet:#565b64;
-  --ink:#161512; --ink-2:#4a463d; --ash:#7f7a6d; --paper:#e9e6dd; --paper-dim:#a9a599;
-  --ember:#e0641f; --ember-hi:#f2842f; --patina:#5f8a6a; --patina-hi:#7aa886; --crack:#c14a29;
-  --h1:#6b6f78; --h2:#9a6b4e; --h3:#c14a29; --h4:#e0641f; --h5:#ef8b1e;
-  --h6:#f4b02f; --h7:#f8cf4f; --h8:#fbe488; --h9:#fdf4cf;
-  --disp:'Big Shoulders Display',Impact,sans-serif;
-  --mono:'Space Mono',Menlo,Consolas,monospace;
-  --body:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{background:var(--iron);color:var(--paper);font-family:var(--body);font-size:15px;line-height:1.55;padding-top:52px;
-  background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:26px 26px}
-a{color:var(--ember-hi);text-decoration:none}
-a:hover{color:var(--h6)}
-::selection{background:var(--ember);color:var(--iron)}
-img,svg{display:block}
-:focus-visible{outline:3px solid var(--ember-hi);outline-offset:2px}
-.wrap{max-width:1300px;margin:0 auto;padding:0 18px}
-.mono{font-family:var(--mono)}
-
-/* NAVBAR */
-#iforge-navbar{position:fixed;inset:0 0 auto 0;height:52px;z-index:1000;background:var(--iron-edge);border-bottom:2px solid #000}
-.iforge-nav{max-width:1300px;margin:0 auto;height:100%;padding:0 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
-.iforge-nav-logo{font-family:var(--disp);font-weight:900;font-size:1.45rem;letter-spacing:1px;color:var(--paper);text-transform:uppercase;line-height:1;display:flex;align-items:center;gap:9px}
-.iforge-nav-logo::before{content:"";width:11px;height:11px;background:var(--ember);box-shadow:0 0 10px var(--ember);flex:0 0 auto}
-.iforge-nav-logo:hover{color:#fff}
-.iforge-nav-links{display:flex;gap:2px}
-.iforge-nav-link{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--paper-dim);text-transform:uppercase;letter-spacing:1px;padding:7px 11px;border:1px solid transparent}
-.iforge-nav-link:hover,.iforge-nav-link.on{color:var(--iron);background:var(--ember);border-color:#000}
-.iforge-nav-right{display:flex;align-items:center;gap:10px}
-.iforge-nav-cta{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--iron);background:var(--paper);padding:7px 12px;border:2px solid #000;transition:transform .12s,box-shadow .12s}
-.iforge-nav-cta:hover{transform:translate(-1px,-1px);color:var(--iron);box-shadow:2px 2px 0 #000}
-.iforge-user-menu{position:relative}
-.iforge-user-name{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper);background:var(--iron-plate);border:2px solid #000;padding:7px 12px;cursor:pointer;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.iforge-user-name:hover{border-color:var(--ember)}
-.iforge-dropdown{display:none;position:absolute;right:0;top:44px;background:var(--iron-plate);border:2px solid #000;min-width:200px;z-index:100}
-.iforge-dropdown.open{display:block}
-.iforge-dropdown-item{display:block;padding:10px 14px;font-family:var(--mono);font-size:.68rem;color:var(--paper-dim);border-bottom:1px solid var(--iron-edge)}
-.iforge-dropdown-item:last-child{border-bottom:none}
-.iforge-dropdown-item:hover{background:var(--iron-hi);color:var(--paper)}
-.iforge-dropdown-divider{border:none;border-top:1px solid var(--iron-edge);margin:0}
-.iforge-btn-ghost.iforge-btn-sm{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:7px 12px;border:2px solid var(--rivet);color:var(--paper);background:transparent}
-.iforge-btn-ghost.iforge-btn-sm:hover{color:var(--iron);background:var(--paper);border-color:#000}
-@media(max-width:640px){.iforge-nav-links{display:none}}
-
-/* BREADCRUMB */
-.breadcrumb{background:var(--iron-plate);border-bottom:2px solid #000}
-.breadcrumb-in{max-width:1300px;margin:0 auto;padding:9px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.breadcrumb-in a{color:var(--paper-dim)}
-.breadcrumb-in a:hover{color:var(--ember-hi)}
-.breadcrumb-in .sep{color:var(--rivet)}
-.breadcrumb-in b{color:var(--paper)}
-
-/* BOTONES */
-.btn{font-family:var(--mono);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 20px;border:2px solid #000;cursor:pointer;transition:transform .12s,box-shadow .12s;display:inline-block}
-.btn-hot{background:var(--ember);color:var(--iron)}
-.btn-hot:hover{background:var(--ember-hi);color:var(--iron);transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-ghost{background:transparent;color:var(--paper);border-color:var(--rivet)}
-.btn-ghost:hover{color:var(--iron);background:var(--paper);border-color:#000;transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
-.btn-sm{padding:7px 13px;font-size:.7rem}
-
-/* PLACAS */
-.plate{border:2px solid #000;background:var(--iron-plate);margin-bottom:12px}
-.plate-h{background:var(--iron-edge);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:2px solid #000}
-.plate-h .t{font-family:var(--disp);font-weight:800;font-size:1.1rem;text-transform:uppercase;color:var(--paper);letter-spacing:.5px}
-.plate-h .c{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
-.plate-b{padding:13px}
-
-/* FOOTER */
-.foot{background:var(--iron-edge);border-top:2px solid #000;padding:24px 18px;margin-top:36px}
-.foot-in{max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
-.foot-b{font-family:var(--disp);font-weight:900;font-size:1.3rem;text-transform:uppercase;color:var(--paper)}
-.foot-links{display:flex;gap:16px;flex-wrap:wrap}
-.foot-links a{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
-.foot-links a:hover{color:var(--ember-hi)}
-.foot-c{font-family:var(--mono);font-size:.62rem;color:var(--ash)}
-
-/* LAYOUT FICHA */
-.forge{display:grid;grid-template-columns:320px 1fr;gap:22px;align-items:start;padding-top:16px}
-@media(max-width:960px){.forge{grid-template-columns:1fr;gap:14px}}
-.pcol{position:sticky;top:66px}
-@media(max-width:960px){.pcol{position:static}}
-.forge-portrait{position:relative;border:3px solid #000;background:var(--iron-edge);overflow:hidden}
-.fp-frame{position:relative;aspect-ratio:4/5;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.fp-glow{position:absolute;inset:0;background:radial-gradient(85% 60% at 50% 34%,rgba(239,139,30,.42),rgba(224,100,31,.12) 45%,transparent 70%)}
-.fp-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center}
-.fp-initial{position:relative;font-family:var(--disp);font-weight:900;font-size:7rem;color:var(--iron-hi);text-shadow:0 3px 0 #000;z-index:2}
-.fp-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:22px 22px;pointer-events:none}
-.fp-temper{position:absolute;left:0;top:0;bottom:0;width:9px;background:linear-gradient(to top,var(--h1),var(--h3),var(--h5),var(--h7),var(--h9));border-right:2px solid #000;z-index:3}
-.fp-rank{position:absolute;top:0;right:0;z-index:4;font-family:var(--disp);font-weight:900;font-size:1.5rem;color:var(--iron);padding:4px 12px;border-left:2px solid #000;border-bottom:2px solid #000}
-.fp-lv{position:absolute;z-index:4;left:9px;top:0;font-family:var(--mono);font-size:.58rem;font-weight:700;color:var(--iron);background:var(--h6);padding:3px 8px;border-right:2px solid #000;border-bottom:2px solid #000}
-.fp-nameplate{position:absolute;left:0;right:0;bottom:0;z-index:4;background:linear-gradient(to top,var(--iron-edge),rgba(13,14,17,.86) 70%,transparent);padding:26px 12px 12px}
-.fp-nameplate b{display:block;font-family:var(--disp);font-weight:900;font-size:1.9rem;line-height:.9;text-transform:uppercase;color:var(--paper);text-shadow:0 2px 0 #000}
-.fp-nameplate span{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.5px;color:var(--h6)}
-.pcol .under{border:2px solid #000;border-top:none;background:var(--iron-plate);padding:12px}
-.pcol .acts{display:flex;gap:7px}
-.pcol .acts .btn{flex:1;text-align:center;padding:9px 6px;font-size:.66rem}
-.estado-chip{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:4px 9px;border:2px solid #000;color:var(--iron);display:inline-block;margin-bottom:10px}
-
-/* IDENTIDAD */
-.idbanner{margin-bottom:14px}
-.eyebrow{font-family:var(--mono);font-size:.66rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ember-hi);display:flex;flex-wrap:wrap;gap:6px 12px;margin-bottom:8px}
-.eyebrow .sep{color:var(--rivet)}
-.idbanner h1{font-family:var(--disp);font-weight:900;font-size:clamp(2.6rem,7vw,4.6rem);line-height:.85;letter-spacing:-1px;text-transform:uppercase;color:var(--paper);text-shadow:0 2px 0 #000}
-.idbanner .desig{font-size:.92rem;color:var(--paper-dim);margin-top:10px}
-.idtags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
-.tag{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:4px 10px;border:2px solid #000}
-.tag.rank{background:var(--ember);color:var(--iron)}
-.tag.line{background:var(--iron);color:var(--paper);border-color:var(--rivet)}
-.tag.act{background:var(--patina);color:var(--iron)}
-
-/* CRISOL */
-.pgroup{margin-bottom:14px}.pgroup:last-child{margin-bottom:0}
-.pgroup-h{display:flex;align-items:center;gap:9px;margin-bottom:6px}
-.pgroup-h .n{font-family:var(--disp);font-weight:800;font-size:1.05rem;text-transform:uppercase;letter-spacing:.5px}
-.pgroup-h .bar{flex:1;height:2px;background:var(--rivet)}
-.pgroup-h .avg{font-family:var(--mono);font-size:.6rem;color:var(--paper-dim)}
-.stat{display:grid;grid-template-columns:44px 1fr 30px 34px;gap:9px;align-items:center;padding:5px 0}
-.stat .ab{font-family:var(--mono);font-size:.66rem;font-weight:700;color:var(--paper-dim)}
-.stat .track{height:18px;background:var(--iron);border:2px solid #000;position:relative;overflow:hidden}
-.stat .fill{height:100%;transition:width .9s cubic-bezier(.2,.8,.2,1)}
-.stat .nm{position:absolute;left:7px;top:50%;transform:translateY(-50%);font-family:var(--body);font-size:.68rem;font-weight:600;color:var(--paper);mix-blend-mode:difference;white-space:nowrap}
-.stat .rk{font-family:var(--disp);font-weight:900;font-size:1.15rem;text-align:center;line-height:1}
-.stat .vl{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--paper);text-align:right}
-
-/* GRID de 2 columnas para paneles */
-.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
-@media(max-width:820px){.cols{grid-template-columns:1fr}}
-
-/* filas simples */
-.mrow{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--iron-edge);font-size:.82rem}
-.mrow:last-child{border-bottom:none}
-.mrow .l{font-family:var(--mono);font-size:.64rem;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim)}
-.mrow .v{font-weight:600;color:var(--paper);text-align:right}
-
-/* rasgos (virtudes/defectos) */
-.trait{display:flex;gap:9px;padding:8px 0;border-bottom:1px solid var(--iron-edge)}
-.trait:last-child{border-bottom:none}
-.trait .d{width:9px;height:9px;margin-top:5px;flex:0 0 auto}
-.trait .d.v{background:var(--patina-hi)}.trait .d.x{background:var(--crack)}
-.trait .b{font-weight:600;color:var(--paper);font-size:.82rem}
-.trait small{display:block;color:var(--paper-dim);font-size:.74rem;line-height:1.45;margin-top:2px}
-.trait .id{margin-left:auto;font-family:var(--mono);font-size:.58rem;font-weight:700;color:var(--iron);background:var(--h6);padding:2px 6px;height:fit-content;white-space:nowrap}
-.trait .id.x{background:var(--crack);color:var(--paper)}
-
-/* economía */
-.coin{display:flex;align-items:center;gap:9px;background:var(--iron);border:2px solid #000;padding:9px 12px;font-family:var(--mono);font-size:.8rem}
-.coin .dot{width:14px;height:14px;border:2px solid #000;flex:0 0 auto;background:var(--h6)}
-.coin b{margin-left:auto;font-family:var(--disp);font-weight:800;font-size:1.2rem;color:var(--h6)}
-
-/* prosa bio */
-.prose p{margin-bottom:11px;font-size:.92rem;color:var(--paper);line-height:1.65;white-space:pre-line}.prose p:last-child{margin-bottom:0}
-.prose .lead{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--h6);margin-bottom:6px}
-
-/* estado vacío */
-.pj-empty{border:2px dashed var(--rivet);background:var(--iron-plate);padding:40px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:16px}
-.pj-empty .big{font-family:var(--disp);font-weight:800;font-size:1.9rem;text-transform:uppercase;color:var(--paper);line-height:1}
-.pj-empty p{font-family:var(--mono);font-size:.76rem;color:var(--paper-dim);line-height:1.6;max-width:54ch}
-.pj-empty .acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
-
-/* MEDALLONES sobre el retrato */
-.fp-vitals{position:absolute;z-index:5;right:8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px}
-.fp-med{width:56px;height:56px;border-radius:50%;background:var(--iron);border:3px solid #000;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 12px rgba(0,0,0,.6)}
-.fp-med .v{font-family:var(--disp);font-weight:900;font-size:1.05rem;line-height:.9;color:var(--h6)}
-.fp-med .l{font-family:var(--mono);font-size:.44rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim);margin-top:1px}
-
-/* RESUMEN (temperatura de forja + medias por pilar) */
-.summary{display:grid;grid-template-columns:auto repeat(3,1fr);gap:8px;margin-top:14px}
-.sum-temp{border:2px solid #000;background:var(--iron);padding:8px 14px;display:flex;flex-direction:column;justify-content:center}
-.sum-temp .l{font-family:var(--mono);font-size:.54rem;text-transform:uppercase;color:var(--paper-dim)}
-.sum-temp .big{font-family:var(--disp);font-weight:900;font-size:2.1rem;line-height:.9}
-.sum-cell{border:2px solid #000;background:var(--iron-plate);padding:7px 9px;position:relative}
-.sum-cell::after{content:"";position:absolute;top:4px;right:4px;width:4px;height:4px;background:var(--rivet)}
-.sum-cell .l{font-family:var(--mono);font-size:.54rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
-.sum-cell .v{font-family:var(--disp);font-weight:800;font-size:1.35rem;line-height:1;color:var(--h6)}
-.sum-cell .f{font-family:var(--mono);font-size:.5rem;color:var(--ash)}
-@media(max-width:560px){.summary{grid-template-columns:1fr 1fr}}
-
-/* ESCALA DE CALOR (rangos reales F..M+) */
-.heatscale{display:flex;gap:2px;margin:14px 0}
-.hs{flex:1;text-align:center;font-family:var(--mono);font-size:.56rem;font-weight:700;color:var(--iron);padding:5px 2px;border:2px solid #000;opacity:.55}
-.hs b{display:block;font-family:var(--disp);font-weight:900;font-size:.82rem;line-height:1.1}
-.hs.on{opacity:1;outline:2px solid var(--paper);outline-offset:-4px}
-
-/* TABS */
-.tabs{display:flex;flex-wrap:wrap;gap:2px;border-bottom:2px solid #000;margin:18px 0 14px}
-.tab{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:9px 16px;background:var(--iron-plate);color:var(--paper-dim);border:2px solid #000;border-bottom:none;cursor:pointer;position:relative;top:2px}
-.tab:hover{color:var(--paper)}
-.tab[aria-selected="true"]{background:var(--ember);color:var(--iron);top:0}
-.panel{display:none}
-.panel.on{display:block}
-
-/* CRISOL: layout expositor + temperatura de forja */
-.expo{display:grid;grid-template-columns:1fr 260px;gap:12px;align-items:start}
-@media(max-width:1080px){.expo{grid-template-columns:1fr}}
-.forge-temp{margin-top:12px;border:2px solid #000;background:var(--iron);padding:10px 12px;display:flex;align-items:center;gap:12px}
-.forge-temp .lbl{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;color:var(--paper-dim)}
-.forge-temp .big{font-family:var(--disp);font-weight:900;font-size:2rem;line-height:1}
-.forge-temp .meter{flex:1;height:12px;border:2px solid #000;background:var(--iron-edge);overflow:hidden}
-.forge-temp .meter i{display:block;height:100%;background:linear-gradient(90deg,var(--h1),var(--h3),var(--h5),var(--h7),var(--h9))}
-
-/* CRÓNICA */
-.bio{display:grid;grid-template-columns:220px 1fr;gap:12px}
-@media(max-width:820px){.bio{grid-template-columns:1fr}}
-.subtabs{display:flex;flex-wrap:wrap;border:2px solid #000;margin-bottom:11px;width:fit-content}
-.subtab{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;padding:6px 12px;background:var(--iron-plate);color:var(--paper-dim);cursor:pointer;border-left:2px solid #000}
-.subtab:first-child{border-left:none}
-.subtab[aria-selected="true"]{background:var(--ember);color:var(--iron)}
-.tl{display:flex;flex-direction:column}
-.tl-i{position:relative;padding:5px 0 5px 15px;font-size:.78rem;border-left:2px solid var(--rivet)}
-.tl-i:last-child{border-left-color:transparent}
-.tl-i::before{content:"";position:absolute;left:-5px;top:8px;width:8px;height:8px;background:var(--h5);border:2px solid #000}
-.tl-i b{display:block;font-family:var(--mono);color:var(--h6);font-size:.62rem}
-.tl-i span{color:var(--paper-dim)}
-
-/* COMBATE: pasivas raciales */
-.of{display:flex;align-items:flex-start;gap:9px;background:var(--iron);border:2px solid #000;padding:9px 11px;margin-bottom:7px}
-.of .ico{width:32px;height:32px;flex:0 0 auto;background:var(--iron-plate);border:2px solid #000;display:flex;align-items:center;justify-content:center}
-.of .ico svg{width:16px;height:16px;stroke:var(--h6);fill:none;stroke-width:2}
-.of .body{flex:1;min-width:0}
-.of .n{font-family:var(--body);font-weight:700;font-size:.84rem;color:var(--paper)}
-.of .n small{display:block;font-family:var(--mono);font-size:.68rem;font-weight:400;color:var(--paper-dim);margin-top:3px;line-height:1.4}
-.of .lv{font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;color:var(--iron);background:var(--h6);padding:2px 7px;white-space:nowrap;height:fit-content}
-
-/* EQUIPO */
-.slot{display:flex;align-items:center;gap:11px;background:var(--iron);border:2px solid #000;padding:11px 13px;margin-bottom:8px}
-.slot .ic{width:34px;height:34px;flex:0 0 auto;background:var(--iron-plate);border:2px solid #000;display:flex;align-items:center;justify-content:center}
-.slot .ic svg{width:17px;height:17px;stroke:var(--h6);fill:none;stroke-width:2}
-.slot .b{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
-.slot .s{color:var(--paper);font-weight:600;font-size:.86rem}
-.slot.empty{border-style:dashed}.slot.empty .s{color:var(--ash);font-style:italic;font-weight:400}.slot.empty .ic svg{stroke:var(--ash)}
-</style>
+<?php echo ope_rol_head_base(); ?>
+<!-- estilos en docs/themes/ope.css (scope: ope-pg-ficha) -->
 </head>
-<body>
+<body class="ope-pg-ficha<?php echo $fac_class; ?>">
 
-<?php echo iforge_rol_navbar_html(); ?>
+<?php echo ope_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
-    <a href="<?php echo $bburl; ?>/index.php">Fragua</a>
+    <a href="<?php echo $bburl; ?>/index.php">Inicio</a>
     <span class="sep">&#8250;</span>
     <a href="<?php echo $bburl; ?>/personajes.php">Personaje</a>
     <span class="sep">&#8250;</span>
@@ -385,14 +454,14 @@ img,svg{display:block}
     <div class="big"><?php echo $pj ? 'Expediente no disponible' : 'Expediente no encontrado'; ?></div>
     <p>
 <?php if (!$pj): ?>
-      No hay ning&uacute;n personaje con ese identificador. Puede que a&uacute;n no lo hayas forjado o que el enlace sea incorrecto.
+      No hay ning&uacute;n personaje con ese identificador. Puede que a&uacute;n no lo hayas creado o que el enlace sea incorrecto.
 <?php else: ?>
       Este expediente est&aacute; en revisi&oacute;n o no es p&uacute;blico. Solo su due&ntilde;o y el staff pueden consultarlo.
 <?php endif; ?>
     </p>
     <div class="acts">
       <a href="<?php echo $bburl; ?>/personajes.php" class="btn btn-hot">Mis personajes</a>
-      <a href="<?php echo $bburl; ?>/index.php" class="btn btn-ghost">Volver a la fragua</a>
+      <a href="<?php echo $bburl; ?>/index.php" class="btn btn-ghost">Volver al inicio</a>
     </div>
   </div>
 <?php else:
@@ -400,7 +469,7 @@ img,svg{display:block}
     $nombre_e   = htmlspecialchars_uni($pj['nombre']);
     $rango      = (string) $pj['rango'];
     $rango_e    = htmlspecialchars_uni($rango);
-    $heat_rank  = iforge_heat_var($rango);
+    $heat_rank  = ope_heat_var($rango);
     $nivel      = (int) $pj['nivel'];
     $avatar     = trim((string) $pj['avatar']);
     $av_initial = function_exists('mb_substr') ? mb_strtoupper(mb_substr($pj['nombre'], 0, 1, 'UTF-8'), 'UTF-8') : strtoupper(substr($pj['nombre'], 0, 1));
@@ -434,6 +503,26 @@ img,svg{display:block}
     $objeto   = $inventario['objeto_personal'] ?? '';
     $berries  = (int) ($economia['berries'] ?? 0);
 
+    // Inventario libre: objetos "encima" y en "almacén" (defaults robustos).
+    $norm_items = static function ($list) {
+        $out = array();
+        if (is_array($list)) {
+            foreach ($list as $it) {
+                if (is_array($it)) {
+                    $n = trim((string) ($it['n'] ?? ''));
+                    $d = trim((string) ($it['d'] ?? ''));
+                } else {
+                    $n = trim((string) $it);
+                    $d = '';
+                }
+                if ($n !== '') $out[] = array('n' => $n, 'd' => $d);
+            }
+        }
+        return $out;
+    };
+    $inv_encima  = $norm_items($inventario['encima'] ?? null);
+    $inv_almacen = $norm_items($inventario['almacen'] ?? null);
+
     // Medias por pilar (Cuerpo/Mente/Espíritu) y temperatura de forja global,
     // reutilizadas tanto en la barra de resumen como en la pestaña Crisol.
     $group_calc = array();
@@ -449,12 +538,12 @@ img,svg{display:block}
         $group_calc[$gkey] = array(
             'avg'    => $g_avg,
             'letter' => $RANK_BY_NUM[(int) round($g_avg)] ?? 'F',
-            'heat'   => iforge_heat_val((int) round($g_avg)),
+            'heat'   => ope_heat_val((int) round($g_avg)),
         );
     }
     $forge_avg    = count($all_vals) ? array_sum($all_vals) / count($all_vals) : 1;
     $forge_letter = $RANK_BY_NUM[(int) round($forge_avg)] ?? 'F';
-    $forge_heat   = iforge_heat_val((int) round($forge_avg));
+    $forge_heat   = ope_heat_val((int) round($forge_avg));
 
     // Pasivas raciales: la primaria de la raza principal siempre se aplica;
     // la secundaria de esa misma raza SOLO si el personaje es puro (no
@@ -478,7 +567,7 @@ img,svg{display:block}
     // Rasgos: virtudes y defectos combinados en una sola lista (.trait).
     $rasgos = array();
     foreach ($virtudes as $vid => $v) {
-        $vdef = iforge_rol_find_virtud($vid);
+        $vdef = ope_rol_find_virtud($vid);
         $rasgos[] = array(
             'tipo'  => 'v',
             'nombre' => $v['nombre'] ?? $vid,
@@ -488,7 +577,7 @@ img,svg{display:block}
         );
     }
     foreach ($defectos as $did => $d) {
-        $ddef = iforge_rol_find_defecto($did);
+        $ddef = ope_rol_find_defecto($did);
         $rasgos[] = array(
             'tipo'  => 'x',
             'nombre' => $d['nombre'] ?? $did,
@@ -500,18 +589,132 @@ img,svg{display:block}
 
     // Cronología: solo eventos reales (forjado + última edición si difiere).
     $timeline = array();
-    $timeline[] = array('t' => 'Forjado', 'd' => my_date('d M Y', (int) $pj['dateline']));
+    $timeline[] = array('t' => 'Creado', 'd' => my_date('d M Y', (int) $pj['dateline']));
     $lastedit_ts = (int) ($pj['lastedit'] ?? 0);
     if ($lastedit_ts > 0 && $lastedit_ts !== (int) $pj['dateline']) {
         $timeline[] = array('t' => '&Uacute;ltima edici&oacute;n', 'd' => my_date('d M Y', $lastedit_ts));
     }
 
+    // ── Línea de tiempo de ROL: temas donde participó el personaje ──
+    // (posts.ope_pid = pid), agrupados por AÑO in-rol, excluyendo Off Topic.
+    $TAG_LABELS   = function_exists('ope_rol_thread_tags') ? ope_rol_thread_tags() : array();
+    $cron_years   = array();   // año => [entradas]  (para la timeline pública)
+    $cron_flat    = array();   // lista plana ordenada (para el modal de gestión)
+    $pid_tl       = (int) $pj['pid'];
+    $has_meta     = $db->table_exists('rol_thread_meta');
+    $has_cron     = $db->table_exists('rol_cronologia');
+    $pref         = TABLE_PREFIX;
+
+    $sel  = "SELECT t.tid, t.subject, t.fid, t.dateline AS tdate";
+    $sel .= $has_meta ? ", m.era, m.fecha_rol, m.tag" : ", NULL AS era, NULL AS fecha_rol, '' AS tag";
+    $sel .= $has_cron ? ", c.descripcion" : ", NULL AS descripcion";
+    $from  = " FROM {$pref}posts p INNER JOIN {$pref}threads t ON t.tid = p.tid";
+    if ($has_meta) $from .= " LEFT JOIN {$pref}rol_thread_meta m ON m.tid = t.tid";
+    if ($has_cron) $from .= " LEFT JOIN {$pref}rol_cronologia c ON c.tid = t.tid AND c.pid = {$pid_tl}";
+    $where = " WHERE p.ope_pid = {$pid_tl} AND p.visible = 1 AND t.visible = 1";
+    $grp   = " GROUP BY t.tid, t.subject, t.fid, t.dateline";
+    if ($has_meta) $grp .= ", m.era, m.fecha_rol, m.tag";
+    if ($has_cron) $grp .= ", c.descripcion";
+
+    $tq = $db->query($sel . $from . $where . $grp);
+    while ($tr = $db->fetch_array($tq)) {
+        $fid_t = (int) $tr['fid'];
+        if (function_exists('ope_rol_is_offtopic_fid') && ope_rol_is_offtopic_fid($fid_t)) {
+            continue;
+        }
+        $era  = ($tr['era'] === 'pasado') ? 'pasado' : (($tr['era'] === 'presente') ? 'presente' : '');
+        $anio = (int) $tr['fecha_rol'];
+        if ($anio <= 0) {
+            $anio = (int) my_date('Y', (int) $tr['tdate']);
+        }
+        $entry = array(
+            'tid'         => (int) $tr['tid'],
+            'subject'     => (string) $tr['subject'],
+            'era'         => $era,
+            'anio'        => $anio,
+            'tag'         => (string) $tr['tag'],
+            'tdate'       => (int) $tr['tdate'],
+            'descripcion' => (string) ($tr['descripcion'] ?? ''),
+        );
+        $cron_years[$anio][] = $entry;
+        $cron_flat[] = $entry;
+    }
+    // Años de más reciente a más antiguo; dentro de cada año, por fecha real.
+    krsort($cron_years);
+    foreach ($cron_years as $yk => &$yarr) {
+        usort($yarr, function ($a, $b) { return $a['tdate'] <=> $b['tdate']; });
+    }
+    unset($yarr);
+    // Plano para el modal: por año desc y fecha asc.
+    usort($cron_flat, function ($a, $b) {
+        if ($a['anio'] !== $b['anio']) return $b['anio'] <=> $a['anio'];
+        return $a['tdate'] <=> $b['tdate'];
+    });
+
+    // ── Mapa de relaciones: vínculos dirigidos desde este personaje ──
+    $REL_TIPOS   = ope_rel_tipos();
+    $relaciones  = array();
+    $rel_pid     = (int) $pj['pid'];
+    if ($db->table_exists('rol_relaciones')) {
+        $rq = $db->simple_select('rol_relaciones', '*', "pid = {$rel_pid}", array('order_by' => 'dateline', 'order_dir' => 'asc'));
+        while ($rr = $db->fetch_array($rq)) {
+            $other = ope_rol_char((int) $rr['destino_pid']);
+            if (!$other) continue; // destino borrado: se ignora
+            $tipo = isset($REL_TIPOS[$rr['tipo']]) ? $rr['tipo'] : 'otro';
+            $ico  = trim((string) ($other['icono'] ?? ''));
+            if ($ico === '') $ico = trim((string) ($other['avatar'] ?? ''));
+            $relaciones[] = array(
+                'rid'      => (int) $rr['rid'],
+                'dest_pid' => (int) $rr['destino_pid'],
+                'nombre'   => (string) $other['nombre'],
+                'icono'    => $ico,
+                'inicial'  => function_exists('mb_substr') ? mb_strtoupper(mb_substr((string) $other['nombre'], 0, 1)) : strtoupper(substr((string) $other['nombre'], 0, 1)),
+                'fac_slug' => (string) ($other['faccion_slug'] ?? ''),
+                'etiqueta' => (string) $rr['etiqueta'],
+                'tipo'     => $tipo,
+                'tipo_lbl' => $REL_TIPOS[$tipo],
+                'desc'     => (string) ($rr['descripcion'] ?? ''),
+                'px'       => (int) $rr['px'],
+                'py'       => (int) $rr['py'],
+            );
+        }
+    }
+
+    // Plantillas de post del personaje (para el editor del modal, solo propietario).
+    $tpls_list = ($es_propietario && function_exists('ope_rol_char_templates'))
+        ? ope_rol_char_templates((int) $pj['pid'])
+        : array();
+
+    // Personajes aprobados seleccionables como destino (excluye a sí mismo).
+    $rel_choices = array();
+    if ($es_propietario && $db->table_exists('rol_personajes')) {
+        $cq = $db->simple_select('rol_personajes', 'pid, nombre',
+            "estado = 'aprobado' AND pid <> {$rel_pid}", array('order_by' => 'nombre', 'order_dir' => 'asc'));
+        while ($cr = $db->fetch_array($cq)) {
+            $rel_choices[] = array('pid' => (int) $cr['pid'], 'nombre' => (string) $cr['nombre']);
+        }
+    }
+
+    // Coordenadas de dibujo: usa px/py guardados; si están a 0, autodistribuye.
+    $REL_CX = 500; $REL_CY = 320; $REL_R = 235;
+    $rel_n = count($relaciones);
+    foreach ($relaciones as $i => &$rl) {
+        if ($rl['px'] > 0 || $rl['py'] > 0) {
+            $rl['dx'] = $rl['px']; $rl['dy'] = $rl['py'];
+        } else {
+            $ang = ($rel_n > 0) ? (2 * M_PI * $i / $rel_n) - M_PI_2 : 0;
+            $rl['dx'] = (int) round($REL_CX + $REL_R * cos($ang));
+            $rl['dy'] = (int) round($REL_CY + $REL_R * sin($ang));
+        }
+    }
+    unset($rl);
+
     // Crónica: solo se muestran los subtabs con contenido real.
+    // 'relaciones' se muestra ahora en la pestaña Relaciones (como nota bajo el mapa).
     $bio_map = array(
         'concepto'   => 'Concepto',
         'pasado'     => 'Pasado',
         'motivacion' => 'Motivaci&oacute;n',
-        'relaciones' => 'Relaciones',
     );
     $bio_sections = array();
     foreach ($bio_map as $bkey => $blabel) {
@@ -536,13 +739,14 @@ img,svg{display:block}
   <div class="pcol">
     <div class="forge-portrait">
       <div class="fp-frame">
-        <div class="fp-glow" aria-hidden="true"></div>
 <?php if ($avatar !== ''): ?>
         <img class="fp-img" src="<?php echo htmlspecialchars_uni($avatar); ?>" alt="<?php echo $nombre_e; ?>">
+        <div class="fp-shade" aria-hidden="true"></div>
 <?php else: ?>
+        <div class="fp-glow" aria-hidden="true"></div>
         <span class="fp-initial"><?php echo htmlspecialchars_uni($av_initial); ?></span>
-<?php endif; ?>
         <div class="fp-grid" aria-hidden="true"></div>
+<?php endif; ?>
         <span class="fp-temper" style="background:var(<?php echo $heat_rank; ?>)" aria-hidden="true"></span>
         <span class="fp-lv">Nivel <?php echo $nivel; ?></span>
         <span class="fp-rank" style="background:var(<?php echo $heat_rank; ?>)"><?php echo $rango_e; ?></span>
@@ -550,7 +754,7 @@ img,svg{display:block}
           <div class="fp-med"><span class="v"><?php echo $rango_e; ?></span><span class="l">Rango</span></div>
           <div class="fp-med"><span class="v"><?php echo $nivel; ?></span><span class="l">Nivel</span></div>
           <div class="fp-med"><span class="v"><?php echo $pc_bal; ?></span><span class="l">PC</span></div>
-          <div class="fp-med"><span class="v"><?php echo htmlspecialchars_uni(iforge_short_money($berries)); ?></span><span class="l">Berries</span></div>
+          <div class="fp-med"><span class="v"><?php echo htmlspecialchars_uni(ope_short_money($berries)); ?></span><span class="l">Berries</span></div>
         </div>
         <div class="fp-nameplate">
           <b><?php echo $nombre_e; ?></b>
@@ -562,7 +766,9 @@ img,svg{display:block}
       <span class="estado-chip" style="background:<?php echo $est_col; ?>;<?php echo $est_col === 'var(--crack)' ? 'color:var(--paper)' : ''; ?>"><?php echo $est_lbl; ?></span>
 <?php if ($es_propietario): ?>
       <div class="acts">
-        <a class="btn btn-hot" href="<?php echo $bburl; ?>/personajes.php">Mis personajes</a>
+        <button type="button" class="btn btn-hot" id="ope-gestion-open" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:5px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Gesti&oacute;n
+        </button>
       </div>
 <?php endif; ?>
     </div>
@@ -574,7 +780,7 @@ img,svg{display:block}
       <div class="eyebrow">
         <span>Expediente N.&ordm; <?php echo str_pad((string) $pj['pid'], 5, '0', STR_PAD_LEFT); ?></span>
         <span class="sep">&middot;</span>
-        <span>Forjado <?php echo my_date('d M Y', (int) $pj['dateline']); ?></span>
+        <span>Creado <?php echo my_date('d M Y', (int) $pj['dateline']); ?></span>
       </div>
       <h1><?php echo $nombre_e; ?></h1>
       <p class="desig">
@@ -593,7 +799,7 @@ img,svg{display:block}
 <?php endif; ?>
       </div>
       <div class="summary">
-        <div class="sum-temp"><span class="l">Temp. forja</span><span class="big" style="color:var(<?php echo $forge_heat; ?>)"><?php echo htmlspecialchars_uni($forge_letter); ?></span></div>
+        <div class="sum-temp"><span class="l">Poder</span><span class="big" style="color:var(<?php echo $forge_heat; ?>)"><?php echo htmlspecialchars_uni($forge_letter); ?></span></div>
 <?php foreach ($STAT_GROUPS as $gkey => $grupo): $gc = $group_calc[$gkey]; ?>
         <div class="sum-cell">
           <div class="l"><?php echo htmlspecialchars_uni($grupo['label']); ?></div>
@@ -604,27 +810,28 @@ img,svg{display:block}
       </div>
     </div>
 
-    <div class="heatscale" aria-label="Escala de calor equivalente al rango, F a M+">
+    <div class="heatscale" aria-label="Escala de poder equivalente al rango, F a M+">
 <?php foreach ($RANK_SCALE as $letra => $num):
         $hs_on = (strcasecmp($rango, $letra) === 0) ? ' on' : '';
-        $hs_heat = iforge_heat_var($letra);
+        $hs_heat = ope_heat_var($letra);
 ?>
       <div class="hs<?php echo $hs_on; ?>" style="background:var(<?php echo $hs_heat; ?>)"><b><?php echo htmlspecialchars_uni($letra); ?></b><?php echo $num; ?></div>
 <?php endforeach; ?>
     </div>
 
     <div class="tabs" role="tablist" aria-label="Secciones del expediente">
-      <button type="button" class="tab" role="tab" aria-selected="true" data-tab="crisol">Crisol</button>
+      <button type="button" class="tab" role="tab" aria-selected="true" data-tab="crisol">Atributos</button>
       <button type="button" class="tab" role="tab" aria-selected="false" data-tab="cronica">Cr&oacute;nica</button>
       <button type="button" class="tab" role="tab" aria-selected="false" data-tab="combate">Combate</button>
       <button type="button" class="tab" role="tab" aria-selected="false" data-tab="equipo">Equipo</button>
+      <button type="button" class="tab" role="tab" aria-selected="false" data-tab="relaciones">Relaciones</button>
     </div>
 
     <!-- CRISOL -->
     <section class="panel on" id="tab-crisol" role="tabpanel">
       <div class="expo">
         <div class="plate">
-          <div class="plate-h"><span class="t">El Crisol</span><span class="c">stats efectivas &middot; suma <?php echo $suma; ?></span></div>
+          <div class="plate-h"><span class="t">Atributos</span><span class="c">stats efectivas &middot; suma <?php echo $suma; ?></span></div>
           <div class="plate-b">
 <?php foreach ($STAT_GROUPS as $gkey => $grupo):
             $rows = $grupo['stats'];
@@ -639,7 +846,7 @@ img,svg{display:block}
 <?php foreach ($rows as $ab => $nm):
               $v = (int) ($stats_ef[$ab] ?? 1);
               $letter = $RANK_BY_NUM[$v] ?? 'F';
-              $heat = iforge_heat_val($v);
+              $heat = ope_heat_val($v);
               $pct = max(6, min(100, ($v / 10) * 100));
 ?>
               <div class="stat">
@@ -652,7 +859,7 @@ img,svg{display:block}
             </div>
 <?php endforeach; ?>
             <div class="forge-temp">
-              <div><div class="lbl">Temperatura de forja</div><div class="big" style="color:var(<?php echo $forge_heat; ?>)"><?php echo htmlspecialchars_uni($forge_letter); ?></div></div>
+              <div><div class="lbl">Nivel de poder</div><div class="big" style="color:var(<?php echo $forge_heat; ?>)"><?php echo htmlspecialchars_uni($forge_letter); ?></div></div>
               <div class="meter"><i style="width:<?php echo max(6, min(100, ($forge_avg / 10) * 100)); ?>%"></i></div>
               <div class="lbl"><?php echo number_format($forge_avg, 2); ?> / 10</div>
             </div>
@@ -707,18 +914,20 @@ img,svg{display:block}
             <button type="button" class="subtab" role="tab" aria-selected="<?php echo $bio_first ? 'true' : 'false'; ?>" data-bio="<?php echo htmlspecialchars_uni($bkey); ?>"><?php echo $bsec['label']; ?></button>
 <?php $bio_first = false; endforeach; ?>
           </div>
+          <div class="plate bio-panel">
 <?php
             $bio_first = true;
             foreach ($bio_sections as $bkey => $bsec):
 ?>
-          <div class="plate"><div class="plate-b prose" data-bio-c="<?php echo htmlspecialchars_uni($bkey); ?>"<?php echo $bio_first ? '' : ' hidden'; ?>>
-            <p><?php echo nl2br(htmlspecialchars_uni($bsec['text'])); ?></p>
-          </div></div>
+            <div class="plate-b prose" data-bio-c="<?php echo htmlspecialchars_uni($bkey); ?>"<?php echo $bio_first ? '' : ' hidden'; ?>>
+              <p><?php echo nl2br(htmlspecialchars_uni($bsec['text'])); ?></p>
+            </div>
 <?php
                 $bio_first = false;
             endforeach;
-          endif;
 ?>
+          </div>
+<?php endif; ?>
 
           <div class="plate">
             <div class="plate-h"><span class="t">Rasgos</span><span class="c">// <?php echo $pc_gas; ?> PC &middot; +<?php echo $pc_dev; ?> PC</span></div>
@@ -739,12 +948,48 @@ img,svg{display:block}
           </div>
 
           <div class="plate">
-            <div class="plate-h"><span class="t">L&iacute;nea de tiempo</span></div>
+            <div class="plate-h"><span class="t">Origen</span></div>
             <div class="plate-b"><div class="tl">
 <?php foreach ($timeline as $ev): ?>
               <div class="tl-i"><b><?php echo $ev['t']; ?></b><span><?php echo $ev['d']; ?></span></div>
 <?php endforeach; ?>
             </div></div>
+          </div>
+
+          <div class="plate">
+            <div class="plate-h"><span class="t">L&iacute;nea de tiempo</span><span class="c">// historias por a&ntilde;o</span></div>
+            <div class="plate-b">
+<?php if (empty($cron_years)): ?>
+              <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">Este personaje a&uacute;n no ha participado en ninguna historia.</p>
+<?php else: ?>
+              <div class="tl-tabs" role="tablist">
+<?php $tl_first = true; foreach ($cron_years as $y => $arr): ?>
+                <button type="button" class="tl-tab" role="tab" aria-selected="<?php echo $tl_first ? 'true' : 'false'; ?>" data-year="<?php echo (int) $y; ?>"><?php echo (int) $y; ?></button>
+<?php $tl_first = false; endforeach; ?>
+              </div>
+<?php $tl_first = true; foreach ($cron_years as $y => $arr): ?>
+              <div class="tl-year" data-year-c="<?php echo (int) $y; ?>"<?php echo $tl_first ? '' : ' hidden'; ?>>
+                <div class="tl">
+<?php foreach ($arr as $e):
+    $tag_lbl  = $e['tag'] !== '' ? ($TAG_LABELS[$e['tag']] ?? $e['tag']) : '';
+    $tag_slug = $e['tag'] !== '' ? strtolower($e['tag']) : '';
+?>
+                  <div class="tl-i">
+                    <a class="tl-title" href="<?php echo $bburl; ?>/showthread.php?tid=<?php echo (int) $e['tid']; ?>"><?php echo htmlspecialchars_uni($e['subject']); ?></a>
+                    <span class="tl-badges">
+<?php if ($e['era'] !== ''): ?><span class="tl-era tl-era-<?php echo $e['era']; ?>"><?php echo $e['era'] === 'pasado' ? 'Pasado' : 'Presente'; ?></span><?php endif; ?>
+<?php if ($tag_lbl !== ''): ?><span class="tl-tag tl-tag-<?php echo $tag_slug; ?>"><?php echo htmlspecialchars_uni($tag_lbl); ?></span><?php endif; ?>
+                    </span>
+<?php if (trim($e['descripcion']) !== ''): ?>
+                    <p class="tl-desc"><?php echo nl2br(htmlspecialchars_uni($e['descripcion'])); ?></p>
+<?php endif; ?>
+                  </div>
+<?php endforeach; ?>
+                </div>
+              </div>
+<?php $tl_first = false; endforeach; ?>
+<?php endif; ?>
+            </div>
           </div>
         </div>
       </div>
@@ -801,19 +1046,527 @@ img,svg{display:block}
 <?php endif; ?>
         </div>
       </div>
+
+      <div class="ope-equip-cols">
+        <div class="plate">
+          <div class="plate-h"><span class="t">Lleva encima</span><span class="c">// <?php echo count($inv_encima); ?> obj.</span></div>
+          <div class="plate-b">
+<?php if (empty($inv_encima)): ?>
+            <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">No lleva nada m&aacute;s encima.</p>
+<?php else: foreach ($inv_encima as $it): ?>
+            <div class="ope-equip-row">
+              <span class="ope-equip-n"><?php echo htmlspecialchars_uni($it['n']); ?></span>
+<?php if ($it['d'] !== ''): ?><span class="ope-equip-d"><?php echo htmlspecialchars_uni($it['d']); ?></span><?php endif; ?>
+            </div>
+<?php endforeach; endif; ?>
+          </div>
+        </div>
+        <div class="plate">
+          <div class="plate-h"><span class="t">Almac&eacute;n</span><span class="c">// <?php echo count($inv_almacen); ?> obj.</span></div>
+          <div class="plate-b">
+<?php if (empty($inv_almacen)): ?>
+            <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">Almac&eacute;n vac&iacute;o.</p>
+<?php else: foreach ($inv_almacen as $it): ?>
+            <div class="ope-equip-row">
+              <span class="ope-equip-n"><?php echo htmlspecialchars_uni($it['n']); ?></span>
+<?php if ($it['d'] !== ''): ?><span class="ope-equip-d"><?php echo htmlspecialchars_uni($it['d']); ?></span><?php endif; ?>
+            </div>
+<?php endforeach; endif; ?>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RELACIONES -->
+    <section class="panel" id="tab-relaciones" role="tabpanel">
+      <div class="plate">
+        <div class="plate-h">
+          <span class="t">Relaciones</span><span class="c">// mapa de v&iacute;nculos</span>
+<?php if ($es_propietario): ?>
+          <button type="button" class="ope-rel-editbtn" id="ope-rel-edit-open">Editar relaciones</button>
+<?php endif; ?>
+        </div>
+        <div class="plate-b">
+<?php if (empty($relaciones)): ?>
+          <div class="ope-rel-empty" id="relaciones-map">
+            <div class="ope-rel-empty-ic" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="2.4"/><circle cx="5" cy="17" r="2.4"/><circle cx="19" cy="17" r="2.4"/><path d="M12 8.4l-5.6 6.7M12 8.4l5.6 6.7M7 17h10"/></svg>
+            </div>
+            <p>A&uacute;n no hay v&iacute;nculos registrados en este expediente.</p>
+<?php if ($es_propietario): ?>
+            <button type="button" class="btn btn-hot" id="ope-rel-edit-open2">A&ntilde;adir la primera relaci&oacute;n</button>
+<?php endif; ?>
+          </div>
+<?php else:
+        $rel_svg_cx = $REL_CX; $rel_svg_cy = $REL_CY;
+        $c_ico = trim((string) ($pj['icono'] ?? ''));
+        if ($c_ico === '') $c_ico = trim((string) $pj['avatar']);
+?>
+          <div class="ope-relmap-wrap" id="relaciones-map">
+<?php if ($es_propietario): ?>
+          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" id="ope-relpos-form">
+            <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+            <input type="hidden" name="gaccion" value="rel_pos">
+<?php endif; ?>
+            <svg class="ope-relmap<?php echo $es_propietario ? ' is-editable' : ''; ?>" viewBox="0 0 1000 640" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Mapa de relaciones de <?php echo $nombre_e; ?>">
+              <defs>
+                <clipPath id="ope-rel-clip-c"><circle cx="0" cy="0" r="46"/></clipPath>
+                <clipPath id="ope-rel-clip-n"><circle cx="0" cy="0" r="34"/></clipPath>
+              </defs>
+              <!-- Aristas centro -> nodo -->
+<?php foreach ($relaciones as $rl): ?>
+              <g class="ope-reledge rel-<?php echo $rl['tipo']; ?>">
+                <line x1="<?php echo $rel_svg_cx; ?>" y1="<?php echo $rel_svg_cy; ?>" x2="<?php echo $rl['dx']; ?>" y2="<?php echo $rl['dy']; ?>"></line>
+<?php
+            $mx = (int) round(($rel_svg_cx + $rl['dx']) / 2);
+            $my = (int) round(($rel_svg_cy + $rl['dy']) / 2);
+            $lbl = trim($rl['etiqueta']) !== '' ? $rl['etiqueta'] : $rl['tipo_lbl'];
+?>
+                <g class="ope-rellabel" transform="translate(<?php echo $mx; ?>,<?php echo $my; ?>)">
+                  <text text-anchor="middle" dy="4"><?php echo htmlspecialchars_uni($lbl); ?></text>
+                </g>
+              </g>
+<?php endforeach; ?>
+              <!-- Nodos de personajes relacionados -->
+<?php foreach ($relaciones as $rl):
+            $fc = $rl['fac_slug'] !== '' ? ' fac-' . $rl['fac_slug'] : '';
+?>
+              <g class="ope-relnode<?php echo $fc; ?>" data-rid="<?php echo $rl['rid']; ?>" transform="translate(<?php echo $rl['dx']; ?>,<?php echo $rl['dy']; ?>)"<?php if (!empty($rl['desc'])): ?> data-desc="<?php echo htmlspecialchars_uni($rl['desc']); ?>"<?php endif; ?>>
+                <circle class="ope-relnode-bg" cx="0" cy="0" r="34"></circle>
+<?php if ($rl['icono'] !== ''): ?>
+                <image href="<?php echo htmlspecialchars_uni($rl['icono']); ?>" x="-34" y="-34" width="68" height="68" clip-path="url(#ope-rel-clip-n)" preserveAspectRatio="xMidYMid slice"></image>
+<?php else: ?>
+                <text class="ope-relnode-ini" text-anchor="middle" dy="9"><?php echo htmlspecialchars_uni($rl['inicial']); ?></text>
+<?php endif; ?>
+                <circle class="ope-relnode-ring" cx="0" cy="0" r="34" fill="none"></circle>
+                <a href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo $rl['dest_pid']; ?>" class="ope-relnode-link">
+                  <text class="ope-relnode-name" text-anchor="middle" y="52"><?php echo htmlspecialchars_uni($rl['nombre']); ?></text>
+                </a>
+<?php if ($es_propietario): ?>
+                <input type="hidden" name="px[<?php echo $rl['rid']; ?>]" value="<?php echo $rl['dx']; ?>">
+                <input type="hidden" name="py[<?php echo $rl['rid']; ?>]" value="<?php echo $rl['dy']; ?>">
+<?php endif; ?>
+              </g>
+<?php endforeach; ?>
+              <!-- Nodo central: personaje actual -->
+              <g class="ope-relnode ope-relnode-center<?php echo $fac_class; ?>" transform="translate(<?php echo $rel_svg_cx; ?>,<?php echo $rel_svg_cy; ?>)">
+                <circle class="ope-relnode-bg" cx="0" cy="0" r="46"></circle>
+<?php if ($c_ico !== ''): ?>
+                <image href="<?php echo htmlspecialchars_uni($c_ico); ?>" x="-46" y="-46" width="92" height="92" clip-path="url(#ope-rel-clip-c)" preserveAspectRatio="xMidYMid slice"></image>
+<?php else: ?>
+                <text class="ope-relnode-ini big" text-anchor="middle" dy="11"><?php echo htmlspecialchars_uni($inicial ?? mb_substr($pj['nombre'], 0, 1)); ?></text>
+<?php endif; ?>
+                <circle class="ope-relnode-ring" cx="0" cy="0" r="46" fill="none"></circle>
+                <text class="ope-relnode-name center" text-anchor="middle" y="66"><?php echo $nombre_e; ?></text>
+              </g>
+            </svg>
+<?php if ($es_propietario): ?>
+            <div class="ope-relmap-actions">
+              <span class="ope-relmap-hint">Arrastra los nodos para recolocarlos y guarda.</span>
+              <button type="submit" class="btn btn-hot" id="ope-relpos-save" disabled>Guardar posiciones</button>
+            </div>
+          </form>
+<?php endif; ?>
+          </div>
+          <div class="ope-rel-legend">
+<?php foreach ($REL_TIPOS as $ts => $tl): ?>
+            <span class="ope-rel-leg rel-<?php echo $ts; ?>"><i></i><?php echo $tl; ?></span>
+<?php endforeach; ?>
+          </div>
+<?php endif; ?>
+<?php
+        $rel_nota = trim((string) ($bio['relaciones'] ?? ''));
+        if ($rel_nota !== ''):
+?>
+          <div class="ope-rel-nota">
+            <div class="ope-rel-nota-h">// nota de v&iacute;nculos</div>
+            <div class="prose"><p><?php echo nl2br(htmlspecialchars_uni($rel_nota)); ?></p></div>
+          </div>
+<?php endif; ?>
+        </div>
+      </div>
     </section>
   </div>
 </div>
 <?php endif; ?>
 </div>
 
-<footer class="foot">
-  <div class="foot-in">
-    <div class="foot-b">I-Forge</div>
-    <div class="foot-links"><a href="<?php echo $bburl; ?>/index.php">Fragua</a><a href="<?php echo $bburl; ?>/personajes.php">Personaje</a><a href="<?php echo $bburl; ?>/tramites.php">Tr&aacute;mites</a><a href="<?php echo $bburl; ?>/guias.php">Gu&iacute;as</a></div>
-    <div class="foot-c">Direcci&oacute;n "foundry brutalism"</div>
+<?php if ($es_propietario):
+    $g_avatar = htmlspecialchars_uni((string) $pj['avatar']);
+    $g_icono  = htmlspecialchars_uni((string) ($pj['icono'] ?? ''));
+    $g_firma  = htmlspecialchars_uni((string) ($pj['firma'] ?? ''));
+?>
+<!-- ══ MODAL DE GESTIÓN ══ -->
+<div class="ope-modal-ov" id="ope-gestion" role="dialog" aria-modal="true" aria-labelledby="ope-gestion-title" hidden>
+  <div class="ope-modal">
+    <div class="ope-modal-h">
+      <div class="ope-modal-tt">
+        <span class="ope-modal-eye">// gesti&oacute;n de personaje</span>
+        <h2 id="ope-gestion-title"><?php echo $nombre_e; ?></h2>
+      </div>
+      <button type="button" class="ope-modal-x" id="ope-gestion-close" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="ope-modal-body">
+      <nav class="ope-modal-rail" role="tablist" aria-label="Herramientas de gesti&oacute;n">
+        <button type="button" class="ope-mtab" role="tab" aria-selected="true" data-mtab="perfil">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/></svg></span>
+          <span>Avatar / Icono / Firma</span>
+        </button>
+        <button type="button" class="ope-mtab" role="tab" aria-selected="false" data-mtab="templates">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16"/><path d="M8 9h8M8 13h5"/></svg></span>
+          <span>Templates de post</span>
+        </button>
+        <button type="button" class="ope-mtab" role="tab" aria-selected="false" data-mtab="atributos">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+          <span>Atributos</span>
+        </button>
+        <button type="button" class="ope-mtab" role="tab" aria-selected="false" data-mtab="equipo">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14h18V6l-3-4zM3 6h18M10 10a2 2 0 0 0 4 0"/></svg></span>
+          <span>Equipo</span>
+        </button>
+        <button type="button" class="ope-mtab" role="tab" aria-selected="false" data-mtab="cronologia">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+          <span>Cronolog&iacute;a</span>
+        </button>
+        <button type="button" class="ope-mtab" role="tab" aria-selected="false" data-mtab="relaciones">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="6" r="2.4"/><circle cx="5" cy="17" r="2.4"/><circle cx="19" cy="17" r="2.4"/><path d="M12 8.4l-5.6 6.7M12 8.4l5.6 6.7"/></svg></span>
+          <span>Relaciones</span>
+        </button>
+      </nav>
+
+      <div class="ope-modal-content">
+<?php if ($gestion_ok): ?>
+        <div class="ope-mflash">Cambios guardados correctamente.</div>
+<?php endif; ?>
+
+        <!-- Panel: Avatar / Icono / Firma -->
+        <section class="ope-mpanel on" data-mpanel="perfil" role="tabpanel">
+          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">
+            <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+            <input type="hidden" name="gaccion" value="perfil">
+            <div class="ope-mgrid">
+              <div class="ope-field">
+                <label>Avatar (retrato de la ficha)</label>
+                <div class="ope-field-help">URL de imagen. Se muestra en la ficha y en tus mensajes.</div>
+                <input type="url" name="avatar" value="<?php echo $g_avatar; ?>" placeholder="https://...">
+              </div>
+              <div class="ope-mprev">
+<?php if ($g_avatar !== ''): ?>
+                <img src="<?php echo $g_avatar; ?>" alt="Avatar" id="ope-prev-avatar">
+<?php else: ?>
+                <div class="ope-mprev-empty" id="ope-prev-avatar-empty"><?php echo htmlspecialchars_uni($inicial ?? mb_substr($pj['nombre'], 0, 1)); ?></div>
+<?php endif; ?>
+              </div>
+            </div>
+            <div class="ope-mgrid">
+              <div class="ope-field">
+                <label>Icono de post</label>
+                <div class="ope-field-help">Imagen peque&ntilde;a opcional junto al nombre en cada mensaje.</div>
+                <input type="url" name="icono" value="<?php echo $g_icono; ?>" placeholder="https://...">
+              </div>
+              <div class="ope-mprev">
+<?php if ($g_icono !== ''): ?>
+                <img src="<?php echo $g_icono; ?>" alt="Icono">
+<?php else: ?>
+                <div class="ope-mprev-empty small">64&times;64</div>
+<?php endif; ?>
+              </div>
+            </div>
+            <div class="ope-field">
+              <label>Firma</label>
+              <div class="ope-field-help">Admite BBCode: <code>[b]</code>, <code>[i]</code>, <code>[img]url[/img]</code>, <code>[color=#41A4E0]</code>&hellip; Aparecer&aacute; bajo cada mensaje de este personaje con un separador <b>One Piece Eternal</b>.</div>
+              <textarea name="firma" rows="6" placeholder="[b]Dorr Kaskan[/b] &mdash; herrero de Elbaf&#10;[img]https://...[/img]"><?php echo $g_firma; ?></textarea>
+            </div>
+            <div class="ope-msep" aria-hidden="true"><span>One Piece Eternal</span></div>
+            <div class="ope-modal-actions">
+              <button type="submit" class="btn btn-hot">Guardar cambios</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Panel: Templates -->
+        <section class="ope-mpanel" data-mpanel="templates" role="tabpanel">
+          <div class="ope-field-help" style="margin-bottom:12px">Crea plantillas reutilizables (BBCode y spoilers anidados). Aparecer&aacute;n como botones sobre el editor al crear temas o responder, y se insertan en la posici&oacute;n del cursor.</div>
+
+          <!-- Crear nueva plantilla -->
+          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" class="ope-tpl-form" data-tpl-form>
+            <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+            <input type="hidden" name="gaccion" value="tpl_add">
+            <div class="ope-field">
+              <label>Nombre de la plantilla</label>
+              <input type="text" name="nombre" maxlength="120" placeholder="Ej.: Ficha de combate" required>
+            </div>
+            <div class="ope-field">
+              <label>Cuerpo</label>
+              <div class="ope-tpl-tools">
+                <button type="button" class="ope-tpl-tool" data-ins="[spoiler=T&iacute;tulo][/spoiler]">+ Spoiler</button>
+                <button type="button" class="ope-tpl-tool" data-ins="[b][/b]">B</button>
+                <button type="button" class="ope-tpl-tool" data-ins="[i][/i]"><em>i</em></button>
+                <button type="button" class="ope-tpl-tool" data-ins="[img][/img]">Imagen</button>
+              </div>
+              <textarea name="cuerpo" rows="7" placeholder="[spoiler=Estado]HP: 100/100&#10;[spoiler=Detalles]...[/spoiler][/spoiler]"></textarea>
+            </div>
+            <div class="ope-modal-actions"><button type="submit" class="btn btn-hot">A&ntilde;adir plantilla</button></div>
+          </form>
+
+          <div class="ope-msep" aria-hidden="true"><span>Mis plantillas</span></div>
+<?php if (empty($tpls_list)): ?>
+          <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">A&uacute;n no tienes plantillas. Crea la primera arriba.</p>
+<?php else: foreach ($tpls_list as $tp): ?>
+          <div class="ope-tpl-item">
+            <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" class="ope-tpl-form" data-tpl-form>
+              <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+              <input type="hidden" name="gaccion" value="tpl_edit">
+              <input type="hidden" name="tpl_id" value="<?php echo (int) $tp['tpl_id']; ?>">
+              <div class="ope-field">
+                <label>Nombre</label>
+                <input type="text" name="nombre" maxlength="120" value="<?php echo htmlspecialchars_uni($tp['nombre']); ?>">
+              </div>
+              <div class="ope-field">
+                <label>Cuerpo</label>
+                <div class="ope-tpl-tools">
+                  <button type="button" class="ope-tpl-tool" data-ins="[spoiler=T&iacute;tulo][/spoiler]">+ Spoiler</button>
+                  <button type="button" class="ope-tpl-tool" data-ins="[b][/b]">B</button>
+                  <button type="button" class="ope-tpl-tool" data-ins="[i][/i]"><em>i</em></button>
+                  <button type="button" class="ope-tpl-tool" data-ins="[img][/img]">Imagen</button>
+                </div>
+                <textarea name="cuerpo" rows="6"><?php echo htmlspecialchars_uni($tp['cuerpo']); ?></textarea>
+              </div>
+              <div class="ope-rel-item-acts"><button type="submit" class="btn btn-ghost">Guardar</button></div>
+            </form>
+            <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" onsubmit="return confirm('&iquest;Eliminar esta plantilla?');">
+              <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+              <input type="hidden" name="gaccion" value="tpl_del">
+              <input type="hidden" name="tpl_id" value="<?php echo (int) $tp['tpl_id']; ?>">
+              <button type="submit" class="ope-rel-del">Eliminar</button>
+            </form>
+          </div>
+<?php endforeach; endif; ?>
+        </section>
+
+        <!-- Panel: Atributos -->
+        <section class="ope-mpanel" data-mpanel="atributos" role="tabpanel">
+          <div class="ope-field-help" style="margin-bottom:12px">Edici&oacute;n directa de las stats efectivas (1&ndash;10). El sistema de puntos y coste de subida se detallar&aacute; m&aacute;s adelante; por ahora ajustas los valores a mano.</div>
+          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">
+            <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+            <input type="hidden" name="gaccion" value="attrs">
+<?php foreach ($STAT_GROUPS as $gkey => $grupo): ?>
+            <div class="ope-attr-group">
+              <div class="ope-attr-gh"><?php echo htmlspecialchars_uni($grupo['label']); ?></div>
+              <div class="ope-attr-grid">
+<?php foreach ($grupo['stats'] as $ab => $nm):
+                  $cur = (int) ($stats_ef[$ab] ?? 1);
+                  if ($cur < 1) $cur = 1; if ($cur > 10) $cur = 10;
+?>
+                <label class="ope-attr-cell">
+                  <span class="ope-attr-ab"><?php echo htmlspecialchars_uni($ab); ?></span>
+                  <span class="ope-attr-nm"><?php echo htmlspecialchars_uni($nm); ?></span>
+                  <input type="number" name="attr[<?php echo $ab; ?>]" min="1" max="10" step="1" value="<?php echo $cur; ?>">
+                </label>
+<?php endforeach; ?>
+              </div>
+            </div>
+<?php endforeach; ?>
+            <div class="ope-modal-actions" style="margin-top:14px"><button type="submit" class="btn btn-hot">Guardar atributos</button></div>
+          </form>
+        </section>
+
+        <!-- Panel: Equipo -->
+        <section class="ope-mpanel" data-mpanel="equipo" role="tabpanel">
+          <div class="ope-field-help" style="margin-bottom:12px">Gestiona qu&eacute; objetos llevas <b>encima</b> y cu&aacute;les dejas en el <b>almac&eacute;n</b>. El l&iacute;mite de carga se definir&aacute; m&aacute;s adelante; por ahora no hay tope.</div>
+
+          <!-- Añadir objeto -->
+          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" class="ope-equip-addform">
+            <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+            <input type="hidden" name="gaccion" value="equip_add">
+            <div class="ope-mgrid">
+              <div class="ope-field">
+                <label>Objeto</label>
+                <input type="text" name="nombre" maxlength="120" placeholder="Ej.: Cuerda, Den Den Mushi..." required>
+              </div>
+              <div class="ope-field">
+                <label>Ubicaci&oacute;n</label>
+                <select name="dest">
+                  <option value="encima">Lo lleva encima</option>
+                  <option value="almacen">Al almac&eacute;n</option>
+                </select>
+              </div>
+            </div>
+            <div class="ope-field">
+              <label>Descripci&oacute;n (opcional)</label>
+              <input type="text" name="descripcion" maxlength="500" placeholder="Detalle breve del objeto">
+            </div>
+            <div class="ope-modal-actions"><button type="submit" class="btn btn-hot">A&ntilde;adir objeto</button></div>
+          </form>
+
+<?php
+          $equip_cols = array(
+              'encima'  => array('Lleva encima', $inv_encima,  'Al almac&eacute;n'),
+              'almacen' => array('Almac&eacute;n', $inv_almacen, 'Sacar (llevar)'),
+          );
+          foreach ($equip_cols as $loc => $col):
+              list($col_lbl, $col_items, $move_lbl) = $col;
+?>
+          <div class="ope-msep" aria-hidden="true"><span><?php echo $col_lbl; ?></span></div>
+<?php if (empty($col_items)): ?>
+          <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">Vac&iacute;o.</p>
+<?php else: foreach ($col_items as $i => $it): ?>
+          <div class="ope-equip-item">
+            <div class="ope-equip-item-b">
+              <span class="ope-equip-n"><?php echo htmlspecialchars_uni($it['n']); ?></span>
+<?php if ($it['d'] !== ''): ?><span class="ope-equip-d"><?php echo htmlspecialchars_uni($it['d']); ?></span><?php endif; ?>
+            </div>
+            <div class="ope-equip-acts">
+              <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">
+                <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+                <input type="hidden" name="gaccion" value="equip_move">
+                <input type="hidden" name="from" value="<?php echo $loc; ?>">
+                <input type="hidden" name="idx" value="<?php echo (int) $i; ?>">
+                <button type="submit" class="btn btn-ghost"><?php echo $move_lbl; ?></button>
+              </form>
+              <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" onsubmit="return confirm('&iquest;Eliminar objeto?');">
+                <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+                <input type="hidden" name="gaccion" value="equip_del">
+                <input type="hidden" name="from" value="<?php echo $loc; ?>">
+                <input type="hidden" name="idx" value="<?php echo (int) $i; ?>">
+                <button type="submit" class="ope-rel-del">Eliminar</button>
+              </form>
+            </div>
+          </div>
+<?php endforeach; endif; ?>
+<?php endforeach; ?>
+        </section>
+
+        <!-- Panel: Cronología -->
+        <section class="ope-mpanel" data-mpanel="cronologia" role="tabpanel">
+<?php if (empty($cron_flat)): ?>
+          <div class="ope-msoon">
+            <h3>Gestionar cronolog&iacute;a</h3>
+            <p>Todav&iacute;a no has participado en ninguna historia. Cuando publiques o respondas temas (fuera de Off Topic), aparecer&aacute;n aqu&iacute; para que les pongas una descripci&oacute;n.</p>
+          </div>
+<?php else: ?>
+          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">
+            <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+            <input type="hidden" name="gaccion" value="cronologia">
+            <div class="ope-field-help" style="margin-bottom:12px">A&ntilde;ade una nota personal a cada historia de tu l&iacute;nea de tiempo. Se mostrar&aacute; bajo el t&iacute;tulo del tema en la ficha.</div>
+            <div class="ope-cron-list">
+<?php foreach ($cron_flat as $e):
+    $tag_lbl2  = $e['tag'] !== '' ? ($TAG_LABELS[$e['tag']] ?? $e['tag']) : '';
+    $tag_slug2 = $e['tag'] !== '' ? strtolower($e['tag']) : '';
+?>
+              <div class="ope-cron-item">
+                <div class="ope-cron-head">
+                  <span class="ope-cron-t"><?php echo htmlspecialchars_uni($e['subject']); ?></span>
+                  <span class="ope-cron-y"><?php echo (int) $e['anio']; ?></span>
+<?php if ($e['era'] !== ''): ?><span class="tl-era tl-era-<?php echo $e['era']; ?>"><?php echo $e['era'] === 'pasado' ? 'Pasado' : 'Presente'; ?></span><?php endif; ?>
+<?php if ($tag_lbl2 !== ''): ?><span class="tl-tag tl-tag-<?php echo $tag_slug2; ?>"><?php echo htmlspecialchars_uni($tag_lbl2); ?></span><?php endif; ?>
+                </div>
+                <textarea name="descripcion[<?php echo (int) $e['tid']; ?>]" rows="3" placeholder="Describe qu&eacute; ocurri&oacute; en esta historia..."><?php echo htmlspecialchars_uni($e['descripcion']); ?></textarea>
+              </div>
+<?php endforeach; ?>
+            </div>
+            <div class="ope-modal-actions" style="margin-top:14px">
+              <button type="submit" class="btn btn-hot">Guardar cronolog&iacute;a</button>
+            </div>
+          </form>
+<?php endif; ?>
+        </section>
+
+        <!-- Panel: Relaciones -->
+        <section class="ope-mpanel" data-mpanel="relaciones" role="tabpanel">
+          <div class="ope-field-help" style="margin-bottom:12px">Vincula a este personaje con otros. El nodo se colorea con la facci&oacute;n del otro personaje y la l&iacute;nea con el tipo de v&iacute;nculo.</div>
+
+<?php if (empty($rel_choices)): ?>
+          <div class="ope-msoon"><p>No hay otros personajes aprobados con los que crear v&iacute;nculos todav&iacute;a.</p></div>
+<?php else: ?>
+          <!-- Añadir relación -->
+          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" class="ope-rel-addform">
+            <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+            <input type="hidden" name="gaccion" value="rel_add">
+            <div class="ope-mgrid">
+              <div class="ope-field">
+                <label>Personaje</label>
+                <select name="destino_pid" required>
+                  <option value="">&mdash; elige un personaje &mdash;</option>
+<?php foreach ($rel_choices as $rc): ?>
+                  <option value="<?php echo $rc['pid']; ?>"><?php echo htmlspecialchars_uni($rc['nombre']); ?></option>
+<?php endforeach; ?>
+                </select>
+              </div>
+              <div class="ope-field">
+                <label>Tipo de v&iacute;nculo</label>
+                <select name="tipo">
+<?php foreach ($REL_TIPOS as $ts => $tl): ?>
+                  <option value="<?php echo $ts; ?>"<?php echo $ts === 'aliado' ? ' selected' : ''; ?>><?php echo $tl; ?></option>
+<?php endforeach; ?>
+                </select>
+              </div>
+            </div>
+            <div class="ope-field">
+              <label>Nombre de la relaci&oacute;n</label>
+              <div class="ope-field-help">Ej.: &laquo;Capit&aacute;n&raquo;, &laquo;Hermano de sangre&raquo;, &laquo;Rival eterno&raquo;.</div>
+              <input type="text" name="etiqueta" maxlength="120" placeholder="Capit&aacute;n">
+            </div>
+            <div class="ope-field">
+              <label>Descripci&oacute;n</label>
+              <textarea name="descripcion" rows="3" placeholder="Historia o matiz de esta relaci&oacute;n..."></textarea>
+            </div>
+            <div class="ope-modal-actions"><button type="submit" class="btn btn-hot">A&ntilde;adir relaci&oacute;n</button></div>
+          </form>
+<?php endif; ?>
+
+          <!-- Relaciones existentes -->
+          <div class="ope-msep" aria-hidden="true"><span>V&iacute;nculos actuales</span></div>
+<?php if (empty($relaciones)): ?>
+          <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">Sin v&iacute;nculos registrados todav&iacute;a.</p>
+<?php else: foreach ($relaciones as $rl): ?>
+          <div class="ope-rel-item rel-<?php echo $rl['tipo']; ?>">
+            <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">
+              <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+              <input type="hidden" name="gaccion" value="rel_edit">
+              <input type="hidden" name="rid" value="<?php echo $rl['rid']; ?>">
+              <div class="ope-rel-item-h">
+                <span class="ope-rel-item-node<?php echo $rl['fac_slug'] !== '' ? ' fac-' . $rl['fac_slug'] : ''; ?>"><?php echo htmlspecialchars_uni($rl['inicial']); ?></span>
+                <a class="ope-rel-item-name" href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo $rl['dest_pid']; ?>"><?php echo htmlspecialchars_uni($rl['nombre']); ?></a>
+              </div>
+              <div class="ope-mgrid">
+                <div class="ope-field">
+                  <label>Nombre de la relaci&oacute;n</label>
+                  <input type="text" name="etiqueta" maxlength="120" value="<?php echo htmlspecialchars_uni($rl['etiqueta']); ?>">
+                </div>
+                <div class="ope-field">
+                  <label>Tipo</label>
+                  <select name="tipo">
+<?php foreach ($REL_TIPOS as $ts => $tl): ?>
+                    <option value="<?php echo $ts; ?>"<?php echo $ts === $rl['tipo'] ? ' selected' : ''; ?>><?php echo $tl; ?></option>
+<?php endforeach; ?>
+                  </select>
+                </div>
+              </div>
+              <div class="ope-field">
+                <label>Descripci&oacute;n</label>
+                <textarea name="descripcion" rows="2"><?php echo htmlspecialchars_uni($rl['desc']); ?></textarea>
+              </div>
+              <div class="ope-rel-item-acts">
+                <button type="submit" class="btn btn-ghost">Guardar</button>
+              </div>
+            </form>
+            <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" onsubmit="return confirm('&iquest;Eliminar este v&iacute;nculo?');">
+              <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+              <input type="hidden" name="gaccion" value="rel_del">
+              <input type="hidden" name="rid" value="<?php echo $rl['rid']; ?>">
+              <button type="submit" class="ope-rel-del">Eliminar</button>
+            </form>
+          </div>
+<?php endforeach; endif; ?>
+        </section>
+      </div>
+    </div>
   </div>
-</footer>
+</div>
+<?php endif; ?>
+
+<?php include __DIR__ . '/inc/footer_custom.php'; ?>
 
 <script>
 document.querySelectorAll('.tab').forEach(function (t) {
@@ -832,6 +1585,174 @@ document.querySelectorAll('.subtab').forEach(function (s) {
     document.querySelectorAll('[data-bio-c]').forEach(function (c) { c.hidden = (c.dataset.bioC !== s.dataset.bio); });
   });
 });
+// Pestañas por año de la línea de tiempo.
+document.querySelectorAll('.tl-tab').forEach(function (s) {
+  s.addEventListener('click', function () {
+    document.querySelectorAll('.tl-tab').forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+    s.setAttribute('aria-selected', 'true');
+    document.querySelectorAll('[data-year-c]').forEach(function (c) { c.hidden = (c.dataset.yearC !== s.dataset.year); });
+  });
+});
+
+// ── Modal de gestión ──
+(function () {
+  var ov = document.getElementById('ope-gestion');
+  if (!ov) return;
+  var openBtn = document.getElementById('ope-gestion-open');
+  var closeBtn = document.getElementById('ope-gestion-close');
+  function open() { ov.hidden = false; document.body.style.overflow = 'hidden'; }
+  function close() { ov.hidden = true; document.body.style.overflow = ''; }
+  if (openBtn) openBtn.addEventListener('click', open);
+  if (closeBtn) closeBtn.addEventListener('click', close);
+  ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !ov.hidden) close(); });
+
+  // Pestañas del modal.
+  ov.querySelectorAll('.ope-mtab').forEach(function (t) {
+    t.addEventListener('click', function () {
+      ov.querySelectorAll('.ope-mtab').forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+      t.setAttribute('aria-selected', 'true');
+      ov.querySelectorAll('.ope-mpanel').forEach(function (p) {
+        p.classList.toggle('on', p.dataset.mpanel === t.dataset.mtab);
+      });
+    });
+  });
+
+  // Previsualización en vivo del avatar.
+  var avIn = ov.querySelector('input[name="avatar"]');
+  var avImg = document.getElementById('ope-prev-avatar');
+  var avEmpty = document.getElementById('ope-prev-avatar-empty');
+  if (avIn) avIn.addEventListener('input', function () {
+    var v = avIn.value.trim();
+    if (!/^https?:\/\//i.test(v)) return;
+    if (!avImg && avEmpty) { avImg = document.createElement('img'); avImg.id = 'ope-prev-avatar'; avImg.alt = 'Avatar'; avEmpty.replaceWith(avImg); avEmpty = null; }
+    if (avImg) avImg.src = v;
+  });
+
+  // Abre una pestaña concreta del modal.
+  function openTab(name) {
+    var tab = ov.querySelector('.ope-mtab[data-mtab="' + name + '"]');
+    if (tab) tab.click();
+  }
+
+  // Botones "Editar relaciones" (cabecera del mapa y estado vacío).
+  ['ope-rel-edit-open', 'ope-rel-edit-open2'].forEach(function (id) {
+    var b = document.getElementById(id);
+    if (b) b.addEventListener('click', function () { open(); openTab('relaciones'); });
+  });
+
+  // Herramientas de inserción BBCode/spoiler en los editores de plantillas.
+  ov.addEventListener('click', function (e) {
+    var t = e.target.closest('.ope-tpl-tool');
+    if (!t) return;
+    var form = t.closest('form');
+    var ta = form && form.querySelector('textarea[name="cuerpo"]');
+    if (!ta) return;
+    var ins = t.getAttribute('data-ins') || '';
+    var s = ta.selectionStart || 0, en = ta.selectionEnd || 0, v = ta.value;
+    var m = /^(\[[^\]]*\])(\[\/[^\]]*\])$/.exec(ins);
+    var caret;
+    if (m) {
+      // Envuelve la selección o coloca el cursor entre las etiquetas.
+      var sel = v.slice(s, en);
+      ta.value = v.slice(0, s) + m[1] + sel + m[2] + v.slice(en);
+      caret = s + m[1].length + sel.length;
+    } else {
+      ta.value = v.slice(0, s) + ins + v.slice(en);
+      caret = s + ins.length;
+    }
+    ta.focus();
+    try { ta.setSelectionRange(caret, caret); } catch (x) {}
+  });
+
+  // Si venimos de guardar (?g=1), abre el modal directamente.
+  if (/[?&]g=1(&|$)/.test(location.search)) {
+    open();
+    if (location.hash === '#cronologia') openTab('cronologia');
+    if (location.hash === '#relaciones') openTab('relaciones');
+    if (location.hash === '#templates') openTab('templates');
+    if (location.hash === '#atributos') openTab('atributos');
+    if (location.hash === '#equipo') openTab('equipo');
+  }
+})();
+
+// ── Mapa de relaciones: activar pestaña + arrastre de nodos ──
+(function () {
+  var svg = document.querySelector('.ope-relmap');
+  if (!svg) return;
+
+  // Si venimos de guardar posiciones, muestra la pestaña Relaciones.
+  if (location.hash === '#relaciones-map') {
+    var relTab = document.querySelector('.tab[data-tab="relaciones"]');
+    if (relTab) relTab.click();
+  }
+
+  if (!svg.classList.contains('is-editable')) return;
+  var saveBtn = document.getElementById('ope-relpos-save');
+  var pt = svg.createSVGPoint();
+  var dragging = null;
+
+  function toSvg(evt) {
+    pt.x = evt.clientX; pt.y = evt.clientY;
+    var m = svg.getScreenCTM();
+    if (!m) return { x: 0, y: 0 };
+    var p = pt.matrixTransform(m.inverse());
+    return { x: p.x, y: p.y };
+  }
+  function clamp(v, min, max) { return v < min ? min : (v > max ? max : v); }
+
+  svg.querySelectorAll('.ope-relnode[data-rid]').forEach(function (node) {
+    node.addEventListener('pointerdown', function (e) {
+      // No arrastres al pulsar el enlace del nombre.
+      if (e.target.closest('.ope-relnode-link')) return;
+      e.preventDefault();
+      dragging = node;
+      node.classList.add('is-dragging');
+      node.setPointerCapture(e.pointerId);
+    });
+  });
+
+  svg.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    var p = toSvg(e);
+    var x = Math.round(clamp(p.x, 40, 960));
+    var y = Math.round(clamp(p.y, 40, 600));
+    dragging.setAttribute('transform', 'translate(' + x + ',' + y + ')');
+    var rid = dragging.getAttribute('data-rid');
+    var hx = dragging.querySelector('input[name="px[' + rid + ']"]');
+    var hy = dragging.querySelector('input[name="py[' + rid + ']"]');
+    if (hx) hx.value = x;
+    if (hy) hy.value = y;
+    updateEdges();
+    if (saveBtn) saveBtn.disabled = false;
+  });
+  function endDrag(e) {
+    if (!dragging) return;
+    dragging.classList.remove('is-dragging');
+    dragging = null;
+  }
+  svg.addEventListener('pointerup', endDrag);
+  svg.addEventListener('pointercancel', endDrag);
+
+  // Recalcula posición de aristas/etiquetas a partir de los nodos.
+  function updateEdges() {
+    var cx = 500, cy = 320;
+    var nodes = svg.querySelectorAll('.ope-relnode[data-rid]');
+    var edges = svg.querySelectorAll('.ope-reledge');
+    nodes.forEach(function (node, i) {
+      var t = node.getAttribute('transform') || '';
+      var m = /translate\(\s*(-?\d+\.?\d*)[ ,]+(-?\d+\.?\d*)\)/.exec(t);
+      if (!m) return;
+      var x = parseFloat(m[1]), y = parseFloat(m[2]);
+      var edge = edges[i];
+      if (!edge) return;
+      var ln = edge.querySelector('line');
+      if (ln) { ln.setAttribute('x2', x); ln.setAttribute('y2', y); }
+      var lbl = edge.querySelector('.ope-rellabel');
+      if (lbl) lbl.setAttribute('transform', 'translate(' + Math.round((cx + x) / 2) + ',' + Math.round((cy + y) / 2) + ')');
+    });
+  }
+})();
 </script>
 
 </body>

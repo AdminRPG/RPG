@@ -3,31 +3,31 @@
  * Shared helpers for I-Forge theme sync (repo <-> MyBB DB).
  *
  * Canonical sources in docs/themes/:
- *   - iforge.css                      (stylesheet)
- *   - iforge-foundry-shared.xml       (auxiliary MyBB templates)
- *   - iforge-foundry-index.xml
- *   - iforge-foundry-forumdisplay.xml
- *   - iforge-foundry-showthread.xml
- *   - iforge-foundry-forms.xml
+ *   - ope.css                      (stylesheet)
+ *   - ope-shared.xml       (auxiliary MyBB templates)
+ *   - ope-index.xml
+ *   - ope-forumdisplay.xml
+ *   - ope-showthread.xml
+ *   - ope-forms.xml
  *
- * iforge-child-theme.xml is GENERATED (build-xml) for Admin CP import only.
+ * ope-child-theme.xml is GENERATED (build-xml) for Admin CP import only.
  */
 
-define('IFORGE_THEME_ROOT', dirname(__DIR__) . '/docs/themes');
-define('IFORGE_CSS_FILE', IFORGE_THEME_ROOT . '/iforge.css');
-define('IFORGE_CHILD_XML', IFORGE_THEME_ROOT . '/iforge-child-theme.xml');
-define('IFORGE_CHILD_BUNDLE_XML', IFORGE_THEME_ROOT . '/iforge-child-theme.bundle.xml');
+define('OPE_THEME_ROOT', dirname(__DIR__) . '/docs/themes');
+define('OPE_CSS_FILE', OPE_THEME_ROOT . '/ope.css');
+define('OPE_CHILD_XML', OPE_THEME_ROOT . '/ope-child-theme.xml');
+define('OPE_CHILD_BUNDLE_XML', OPE_THEME_ROOT . '/ope-child-theme.bundle.xml');
 
 /** Import order: earlier files are overridden by later ones on name collision. */
-define('IFORGE_TEMPLATE_XML_FILES', [
-    IFORGE_THEME_ROOT . '/iforge-foundry-shared.xml',
-    IFORGE_THEME_ROOT . '/iforge-foundry-forms.xml',
-    IFORGE_THEME_ROOT . '/iforge-foundry-showthread.xml',
-    IFORGE_THEME_ROOT . '/iforge-foundry-forumdisplay.xml',
-    IFORGE_THEME_ROOT . '/iforge-foundry-index.xml',
+define('OPE_TEMPLATE_XML_FILES', [
+    OPE_THEME_ROOT . '/ope-shared.xml',
+    OPE_THEME_ROOT . '/ope-forms.xml',
+    OPE_THEME_ROOT . '/ope-showthread.xml',
+    OPE_THEME_ROOT . '/ope-forumdisplay.xml',
+    OPE_THEME_ROOT . '/ope-index.xml',
 ]);
 
-function iforge_db_connect(): mysqli
+function ope_db_connect(): mysqli
 {
     $db = new mysqli('127.0.0.1', 'root', '', 'mybb_foro');
     if ($db->connect_error) {
@@ -38,7 +38,7 @@ function iforge_db_connect(): mysqli
     return $db;
 }
 
-function iforge_resolve_theme(mysqli $db): array
+function ope_resolve_theme(mysqli $db): array
 {
     $result = $db->query("SELECT tid, name, properties FROM mybb_themes WHERE name = 'I-Forge RPG' OR name = 'RPG' ORDER BY tid DESC LIMIT 1");
     $theme = $result ? $result->fetch_assoc() : null;
@@ -60,13 +60,13 @@ function iforge_resolve_theme(mysqli $db): array
     ];
 }
 
-function iforge_read_css(): string
+function ope_read_css(): string
 {
-    if (!is_file(IFORGE_CSS_FILE)) {
-        fwrite(STDERR, "Missing canonical CSS: " . IFORGE_CSS_FILE . "\n");
+    if (!is_file(OPE_CSS_FILE)) {
+        fwrite(STDERR, "Missing canonical CSS: " . OPE_CSS_FILE . "\n");
         exit(1);
     }
-    $css = file_get_contents(IFORGE_CSS_FILE);
+    $css = file_get_contents(OPE_CSS_FILE);
     if ($css === false || $css === '') {
         fwrite(STDERR, "Could not read CSS file or it is empty.\n");
         exit(1);
@@ -75,10 +75,10 @@ function iforge_read_css(): string
 }
 
 /** @return array<string, array{file:string, version:string, content:string}> */
-function iforge_load_repo_templates(): array
+function ope_load_repo_templates(): array
 {
     $templates = [];
-    foreach (IFORGE_TEMPLATE_XML_FILES as $path) {
+    foreach (OPE_TEMPLATE_XML_FILES as $path) {
         if (!is_file($path)) {
             fwrite(STDERR, "Missing template XML: $path\n");
             exit(1);
@@ -100,19 +100,19 @@ function iforge_load_repo_templates(): array
 }
 
 /** @return array<string, string> template name => owning filename */
-function iforge_template_ownership_map(): array
+function ope_template_ownership_map(): array
 {
     $map = [];
-    foreach (iforge_load_repo_templates() as $name => $meta) {
+    foreach (ope_load_repo_templates() as $name => $meta) {
         $map[$name] = $meta['file'];
     }
     return $map;
 }
 
-function iforge_import_css(mysqli $db, int $tid, bool $quiet = false): void
+function ope_import_css(mysqli $db, int $tid, bool $quiet = false): void
 {
-    $css = iforge_read_css();
-    $name = 'iforge.css';
+    $css = ope_read_css();
+    $name = 'ope.css';
     $now = time();
 
     $stmt = $db->prepare('SELECT sid FROM mybb_themestylesheets WHERE tid = ? AND name = ?');
@@ -144,17 +144,17 @@ function iforge_import_css(mysqli $db, int $tid, bool $quiet = false): void
     if (!is_dir($theme_dir)) {
         @mkdir($theme_dir, 0777, true);
     }
-    $cache_path = "{$theme_dir}/iforge.css";
+    $cache_path = "{$theme_dir}/ope.css";
     if (@file_put_contents($cache_path, $css) === false) {
         fwrite(STDERR, "  WARNING: could not write $cache_path\n");
     } elseif (!$quiet) {
-        echo "  CSS: cache written -> cache/themes/theme{$tid}/iforge.css\n";
+        echo "  CSS: cache written -> cache/themes/theme{$tid}/ope.css\n";
     }
 }
 
-function iforge_import_templates(mysqli $db, int $templateset, bool $quiet = false): int
+function ope_import_templates(mysqli $db, int $templateset, bool $quiet = false): int
 {
-    $repo = iforge_load_repo_templates();
+    $repo = ope_load_repo_templates();
     $count = 0;
 
     foreach ($repo as $title => $meta) {
@@ -191,16 +191,16 @@ function iforge_import_templates(mysqli $db, int $templateset, bool $quiet = fal
     return $count;
 }
 
-function iforge_clear_theme_caches(mysqli $db): void
+function ope_clear_theme_caches(mysqli $db): void
 {
     $db->query("DELETE FROM mybb_datacache WHERE title IN ('themes', 'themestylesheets', 'templates', 'default_theme')");
     $db->query("UPDATE mybb_datacache SET cache = '' WHERE title LIKE '%stylesheet%' OR title LIKE '%theme%'");
 }
 
-function iforge_export_css(mysqli $db, int $tid): void
+function ope_export_css(mysqli $db, int $tid): void
 {
     $stmt = $db->prepare('SELECT stylesheet FROM mybb_themestylesheets WHERE tid = ? AND name = ?');
-    $name = 'iforge.css';
+    $name = 'ope.css';
     $stmt->bind_param('is', $tid, $name);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -208,7 +208,7 @@ function iforge_export_css(mysqli $db, int $tid): void
     $stmt->close();
 
     if (!$row || $row['stylesheet'] === '') {
-        fwrite(STDERR, "No iforge.css in database for tid=$tid\n");
+        fwrite(STDERR, "No ope.css in database for tid=$tid\n");
         exit(1);
     }
 
@@ -216,14 +216,14 @@ function iforge_export_css(mysqli $db, int $tid): void
     if (substr($css, -1) !== "\n") {
         $css .= "\n";
     }
-    if (file_put_contents(IFORGE_CSS_FILE, $css) === false) {
-        fwrite(STDERR, "Could not write " . IFORGE_CSS_FILE . "\n");
+    if (file_put_contents(OPE_CSS_FILE, $css) === false) {
+        fwrite(STDERR, "Could not write " . OPE_CSS_FILE . "\n");
         exit(1);
     }
-    echo "Exported CSS -> docs/themes/iforge.css (" . strlen($css) . " bytes)\n";
+    echo "Exported CSS -> docs/themes/ope.css (" . strlen($css) . " bytes)\n";
 }
 
-function iforge_update_template_in_xml_file(string $path, string $title, string $content, string $version = '1839'): bool
+function ope_update_template_in_xml_file(string $path, string $title, string $content, string $version = '1839'): bool
 {
     $dom = new DOMDocument('1.0', 'UTF-8');
     $dom->preserveWhiteSpace = false;
@@ -248,9 +248,9 @@ function iforge_update_template_in_xml_file(string $path, string $title, string 
     return $dom->save($path) !== false;
 }
 
-function iforge_export_templates(mysqli $db, int $templateset): void
+function ope_export_templates(mysqli $db, int $templateset): void
 {
-    $ownership = iforge_template_ownership_map();
+    $ownership = ope_template_ownership_map();
     $by_file = [];
     foreach ($ownership as $name => $file) {
         $by_file[$file][] = $name;
@@ -260,7 +260,7 @@ function iforge_export_templates(mysqli $db, int $templateset): void
     $missing = 0;
 
     foreach ($by_file as $file => $names) {
-        $path = IFORGE_THEME_ROOT . '/' . $file;
+        $path = OPE_THEME_ROOT . '/' . $file;
         sort($names);
         foreach ($names as $title) {
             $stmt = $db->prepare('SELECT template, version FROM mybb_templates WHERE title = ? AND sid = ?');
@@ -276,7 +276,7 @@ function iforge_export_templates(mysqli $db, int $templateset): void
                 continue;
             }
 
-            if (!iforge_update_template_in_xml_file($path, $title, $row['template'], $row['version'] ?? '1839')) {
+            if (!ope_update_template_in_xml_file($path, $title, $row['template'], $row['version'] ?? '1839')) {
                 echo "  FAIL (not in XML): $title -> $file\n";
                 $missing++;
                 continue;
@@ -286,20 +286,20 @@ function iforge_export_templates(mysqli $db, int $templateset): void
         echo "  $file: " . count($names) . " templates checked\n";
     }
 
-    echo "Exported $updated templates to docs/themes/iforge-foundry-*.xml";
+    echo "Exported $updated templates to docs/themes/ope-*.xml";
     if ($missing > 0) {
         echo " ($missing skipped/failed)";
     }
     echo "\n";
 }
 
-function iforge_verify_sync(mysqli $db, int $tid, int $templateset): int
+function ope_verify_sync(mysqli $db, int $tid, int $templateset): int
 {
     $errors = 0;
 
-    $repoCss = iforge_read_css();
+    $repoCss = ope_read_css();
     $stmt = $db->prepare('SELECT stylesheet FROM mybb_themestylesheets WHERE tid = ? AND name = ?');
-    $name = 'iforge.css';
+    $name = 'ope.css';
     $stmt->bind_param('is', $tid, $name);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -310,13 +310,13 @@ function iforge_verify_sync(mysqli $db, int $tid, int $templateset): int
         echo "DRIFT CSS: missing in database\n";
         $errors++;
     } elseif (md5($repoCss) !== md5($row['stylesheet'])) {
-        echo "DRIFT CSS: docs/themes/iforge.css != database\n";
+        echo "DRIFT CSS: docs/themes/ope.css != database\n";
         $errors++;
     } else {
         echo "OK   CSS: in sync\n";
     }
 
-    $repo = iforge_load_repo_templates();
+    $repo = ope_load_repo_templates();
     foreach ($repo as $title => $meta) {
         $stmt = $db->prepare('SELECT template, version FROM mybb_templates WHERE title = ? AND sid = ?');
         $stmt->bind_param('si', $title, $templateset);
@@ -341,10 +341,10 @@ function iforge_verify_sync(mysqli $db, int $tid, int $templateset): int
     return $errors;
 }
 
-function iforge_child_theme_properties(): array
+function ope_child_theme_properties(): array
 {
-    if (is_file(IFORGE_CHILD_XML)) {
-        $xml = simplexml_load_file(IFORGE_CHILD_XML);
+    if (is_file(OPE_CHILD_XML)) {
+        $xml = simplexml_load_file(OPE_CHILD_XML);
         if ($xml && $xml->properties) {
             $props = [];
             foreach ($xml->properties->children() as $child) {
@@ -373,7 +373,7 @@ function iforge_child_theme_properties(): array
         'borderwidth' => '0',
         'editortheme' => 'mybb.css',
         'disporder' => [
-            'iforge.css' => '1',
+            'ope.css' => '1',
             'global.css' => '2',
             'usercp.css' => '3',
             'modcp.css' => '4',
@@ -385,18 +385,18 @@ function iforge_child_theme_properties(): array
     ];
 }
 
-function iforge_build_child_theme_xml(): void
+function ope_build_child_theme_xml(): void
 {
-    $css = iforge_read_css();
-    $repo = iforge_load_repo_templates();
-    $props = iforge_child_theme_properties();
+    $css = ope_read_css();
+    $repo = ope_load_repo_templates();
+    $props = ope_child_theme_properties();
 
     $dom = new DOMDocument('1.0', 'UTF-8');
     $dom->formatOutput = true;
 
     $comment = $dom->createComment(
         ' GENERATED by scripts/sync-theme.php build-xml — do not edit manually. '
-        . 'Edit docs/themes/iforge.css and docs/themes/iforge-foundry-*.xml, then run: php scripts/sync-theme.php import '
+        . 'Edit docs/themes/ope.css and docs/themes/ope-*.xml, then run: php scripts/sync-theme.php import '
     );
     $dom->appendChild($comment);
 
@@ -420,7 +420,7 @@ function iforge_build_child_theme_xml(): void
 
     $sheetsEl = $dom->createElement('stylesheets');
     $sheet = $dom->createElement('stylesheet');
-    $sheet->setAttribute('name', 'iforge.css');
+    $sheet->setAttribute('name', 'ope.css');
     $sheet->setAttribute('version', '1839');
     $sheet->appendChild($dom->createCDATASection($css));
     $sheetsEl->appendChild($sheet);
@@ -438,11 +438,11 @@ function iforge_build_child_theme_xml(): void
     $themeEl->appendChild($tempsEl);
 
     $dom->appendChild($themeEl);
-    if ($dom->save(IFORGE_CHILD_BUNDLE_XML) === false) {
-        fwrite(STDERR, "Could not write " . IFORGE_CHILD_BUNDLE_XML . "\n");
+    if ($dom->save(OPE_CHILD_BUNDLE_XML) === false) {
+        fwrite(STDERR, "Could not write " . OPE_CHILD_BUNDLE_XML . "\n");
         exit(1);
     }
 
-    echo "Built " . IFORGE_CHILD_BUNDLE_XML . " (" . count($repo) . " templates, " . strlen($css) . " bytes CSS)\n";
-    echo "Import that file in Admin CP if needed. Do not edit it — edit iforge.css and iforge-foundry-*.xml instead.\n";
+    echo "Built " . OPE_CHILD_BUNDLE_XML . " (" . count($repo) . " templates, " . strlen($css) . " bytes CSS)\n";
+    echo "Import that file in Admin CP if needed. Do not edit it — edit ope.css and ope-*.xml instead.\n";
 }
