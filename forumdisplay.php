@@ -181,7 +181,7 @@ if ($ope_world_cards !== '')
 	$ope_subheading = (mb_stripos($foruminfo['name'], 'mundo') !== false) ? 'Regiones' : 'Islas';
 	$subforums = '
 	<div class="ope-shead"><h2>'.$ope_subheading.'</h2><span class="ope-shead-code">// navega el mundo</span><span class="ope-shead-rule"></span></div>
-	<div class="ope-regions" style="margin-bottom:22px">
+	<div class="ope-regions mb-22">
 		'.$ope_world_cards.'
 	</div>';
 }
@@ -1690,7 +1690,7 @@ $ope_stories = '';
 if (!$ope_is_sea)
 {
 	$ope_fhead = '
-  <section class="ope-plate" style="margin-top:22px">
+  <section class="ope-plate mt-22">
     <div class="ope-fhead">
       <div class="ope-fhead-in">
         <div>

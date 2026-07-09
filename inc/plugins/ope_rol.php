@@ -317,7 +317,7 @@ function ope_rol_navbar_html()
     };
 
     $links   = '<a href="' . $bburl . '/personajes.php" class="ope-nav-link' . $isOn(array('personajes.php', 'ficha.php', 'crear-personaje.php')) . '">Personaje</a>';
-    $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php', 'notificar-tema.php')) . '">Tr&aacute;mites</a>';
+    $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php', 'notificar-tema.php', 'tablon-misiones.php', 'aceptar-mision.php', 'tienda.php')) . '">Tr&aacute;mites</a>';
     // Mundo Vivo: sección desplegable (Periódicos + Estado del mundo).
     $mvOn = $isOn(array('periodicos.php', 'estado-mundo.php'));
     $links  .= '<div class="ope-nav-dd">'
@@ -327,6 +327,16 @@ function ope_rol_navbar_html()
              . '<a href="' . $bburl . '/estado-mundo.php" class="ope-dropdown-item">Estado del mundo</a>'
              . '</div></div>';
     $links  .= '<a href="' . $bburl . '/guias.php" class="ope-nav-link' . $isOn(array('guias.php')) . '">Gu&iacute;as</a>';
+    $bibOn = $isOn(array('biblioteca-personajes.php','biblioteca-akuma.php','biblioteca-npc.php','biblioteca-estilos.php','biblioteca-bestiario.php'));
+    $links  .= '<div class="ope-nav-dd">'
+             . '<button type="button" class="ope-nav-link ope-nav-dd-btn' . $bibOn . '" onclick="this.nextElementSibling.classList.toggle(\'open\')" aria-expanded="false">Bibliotecas<span class="ope-dd-caret" aria-hidden="true">&#9662;</span></button>'
+             . '<div class="ope-dropdown ope-nav-dd-menu">'
+             . '<a href="' . $bburl . '/biblioteca-personajes.php" class="ope-dropdown-item">Biblioteca personajes</a>'
+             . '<a href="' . $bburl . '/biblioteca-akuma.php" class="ope-dropdown-item">Biblioteca akuma no mi</a>'
+             . '<a href="' . $bburl . '/biblioteca-npc.php" class="ope-dropdown-item">Biblioteca NPC</a>'
+             . '<a href="' . $bburl . '/biblioteca-estilos.php" class="ope-dropdown-item">Biblioteca estilos</a>'
+             . '<a href="' . $bburl . '/biblioteca-bestiario.php" class="ope-dropdown-item">Biblioteca bestiario</a>'
+             . '</div></div>';
     if ($isStaff) {
         $links .= '<a href="' . $bburl . '/zona-staff.php" class="ope-nav-link' . $isOn(array('zona-staff.php')) . '">Zona Staff</a>';
     }
@@ -1154,7 +1164,7 @@ function ope_rol_postbit_side(array $char, array $post)
     $snap = ope_rol_post_snapshot($pid_post, $char);
 
     if (empty($snap['items'])) {
-        $mochila_body = '<p class="mono" style="font-size:.76rem;color:var(--paper-dim)">No llevaba nada encima en este post.</p>';
+        $mochila_body = '<p class="mono fs-76 c-dim">No llevaba nada encima en este post.</p>';
     } else {
         $mochila_body = '<div class="ope-snap-items">';
         foreach ($snap['items'] as $it) {

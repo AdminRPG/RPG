@@ -55,7 +55,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 <?php if (!$actual): ?>
   <section class="reveal"><div class="plate"><div class="plate-b">
-    <p class="tram-intro" style="margin:0">Todavía no se ha publicado ningún número de <b>Eternal News</b>. Vuelve tras el primer cierre de mes.</p>
+    <p class="tram-intro m-0">Todavía no se ha publicado ningún número de <b>Eternal News</b>. Vuelve tras el primer cierre de mes.</p>
   </div></div></section>
 <?php else: ?>
   <section class="reveal">

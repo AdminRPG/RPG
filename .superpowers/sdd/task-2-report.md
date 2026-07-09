@@ -1,37 +1,29 @@
-## Task 2 Report: Modificar iforge_rol_navbar_html()
+# Tarea 2 — Reporte de implementación
 
-### Status: DONE
+## Cambios aplicados
 
-### Commits
-- `9e8ef30` feat: add alert bell and messages link to navbar
+| # | Cambio | Estado | Notas |
+|---|--------|--------|-------|
+| 1 | `ope_rol_mv_zona_metrics()` — 10 keys (cli, pel, riq, civ, mar, pir, rev, inf, est, ten) | ✅ | eco eliminado, inf/riq/ten añadidos |
+| 2 | `ope_rol_mv_faccion_metrics()` — 7 keys (rep, coh, mil, pol, eco, mor, alc) | ✅ | inf reemplazado por pol, alc añadido |
+| 3 | `ope_rol_mv_npc_mayores()` — SELECT con datos_publicos, datos_internos + decode JSON | ✅ | |
+| 4 | Nueva `ope_rol_mv_threads_activos()` | ✅ | Insertada tras ope_rol_mv_npc_menores |
+| 5 | Nueva `ope_rol_mv_ultimos_periodicos($n = 3)` | ✅ | |
+| 6 | Nueva `ope_rol_mv_npc_tracking_from_db()` | ✅ | |
+| 7 | `ope_rol_mv_build_prompt()` — reemplazada por versión v3 | ✅ | 5 bloques, 10/7 métricas, threads, periodicos, NPC tracking, S-01..S-12, topes, regresión completa |
+| 8 | `ope_rol_mv_parse_resultado()` — threads/npc_tracking opcionales | ✅ | Sin cambios necesarios: ya están en $res['estado'] |
+| 9 | `ope_rol_mv_aplicar_estado()` — adaptación auto a 10/7 keys | ✅ | Sin cambios necesarios: usa funciones metrics() |
+| 10 | `ope_rol_mv_publicar()` — threads_json, nav_resumen, NPC tracking | ✅ | |
+| 11 | `OPE_MV_TENSION_MAX_UP` fallback 20→15 | ✅ | |
 
-### What was done
-1. **Added two helper functions** (`inc/plugins/iforge_rol.php:162-180`):
-   - `iforge_rol_alertas_no_leidas(int $uid): int` - counts unread alerts with `table_exists('rol_alertas')` guard
-   - `iforge_rol_mensajes_no_leidos(int $pid): int` - counts unread message threads with `table_exists('rol_mensajes')` guard
+## Desviaciones del brief
 
-2. **Added `$activePid` variable** to `iforge_rol_navbar_html()` at line 202 for use in mensajes lookup
+- **Cambio 8**: No se requirió modificar `ope_rol_mv_parse_resultado()`. La función ya almacena todo el JSON decodificado en `$res['estado']`, por lo que `threads` y `npc_tracking` ya son accesibles vía `$parsed['estado']['threads']` y `$parsed['estado']['npc_tracking']`. No se añadió validación adicional porque no existía ninguna que los exigiera.
+- **Cambio 9**: No se requirió modificar `ope_rol_mv_aplicar_estado()`. Los bucles ya iteran sobre `ope_rol_mv_zona_metrics()` y `ope_rol_mv_faccion_metrics()`, por lo que se adaptan automáticamente a las nuevas 10/7 keys. El clamp de `inf` y `ten` (nuevas columnas) usa el mismo `max(0, min(100, ...))` genérico.
+- **Ubicación de funciones nuevas**: Se insertaron tras `ope_rol_mv_npc_menores()` (en lugar de entre `zona_from_fid` y `est_label`) porque la edición fallaba al coincidir con caracteres Unicode en los separadores de comentarios. Quedan funcionalmente equivalentes y antes de `build_prompt`.
 
-3. **Replaced right-side HTML block** (lines 219-257): 
-   - Bell icon (SVG) linking to `alertas.php` with unread count badge
-   - "Mis personajes" dropdown item linking to `personajes.php`
-   - "Mensajes" dropdown item (with unread count) linking to `mensajes.php` — only shown when active character exists
-   - "Alertas" dropdown item (with unread count) linking to `alertas.php`
-   - Retained existing Panel/Perfil/Salir items and guest Register/Login buttons
+## Preocupaciones
 
-4. **Added bell CSS** to `iforge_rol_navbar_css()` (lines 310-313):
-   - `.iforge-nav-bell` styling (positioning, colors, hover)
-   - `.iforge-bell-badge` styling (absolute position, red background, monospace font)
-
-### Test Results
-- Navigated to `http://localhost/iforge/index.php`
-- Page loaded without PHP errors
-- Navbar renders correctly: logo, navigation links, and guest buttons (Registrate/Acceder)
-- Only console error: 404 for `/favicon.ico` (pre-existing, unrelated)
-- No PHP warnings or errors in output
-
-### Concerns
-- None. The bell icon and mensajes link only query the rol_alertas/rol_mensajes tables safely (guarded by `table_exists`), which were created by Task 1 migration.
-
-### File modified
-- `inc/plugins/iforge_rol.php`
+- `ope_rol_mv_ultimos_periodicos()` usa `mb_substr` y `strip_tags` — ambas funciones PHP estándar, disponibles en cualquier instalación típica de MyBB.
+- La migración BD v3 debe estar ejecutada para que las nuevas columnas (cli, riq, inf, ten, pol, alc, threads_json, nav_resumen, datos_publicos, datos_internos) existan en las tablas.
+- Las columnas legacy (eco en zonas, inf en facciones, mundo_zona/ubic/accion/estado_np en personajes) NO se tocan — se mantienen para compatibilidad.

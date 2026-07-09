@@ -415,7 +415,7 @@ header('Content-Type: text/html; charset=utf-8');
   <section class="zs-group reveal">
     <div class="zs-group-h">
       <span class="lbl">Personajes</span>
-      <span class="need" style="background:var(--h6);color:var(--iron)"><?php echo count($listado); ?> resultado(s)</span>
+      <span class="need bg-h6"><?php echo count($listado); ?> resultado(s)</span>
       <span class="rule"></span>
     </div>
 <?php if (empty($listado)): ?>
@@ -531,7 +531,7 @@ header('Content-Type: text/html; charset=utf-8');
           </select>
         </label>
       </div>
-      <p class="mono" style="font-size:.68rem;color:var(--paper-dim);margin-top:8px">La "D." en el nombre se otorga eligiendo la virtud <b style="color:var(--paper)">Voluntad de D.</b> en Virtudes y Defectos, no es un campo aparte.</p>
+      <p class="mono fs-68 c-dim mt-8">La "D." en el nombre se otorga eligiendo la virtud <b class="c-paper">Voluntad de D.</b> en Virtudes y Defectos, no es un campo aparte.</p>
     </div>
 
     <div class="gp-section">
@@ -547,7 +547,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="gp-section-h">Virtudes y defectos <span class="gp-hint">// cat&aacute;logo real, igual que en la creaci&oacute;n</span></div>
       <div class="gp-grid">
         <div class="gp-field gp-full">
-          <div class="pc-bar" id="pcBar">Balance PC: <span class="pc-num" id="pcNum"><?php echo $pc_balance; ?></span> <span class="mono" style="font-size:.62rem;color:var(--ash)">(<?php echo (int)$PC_BASE; ?> base &minus; coste virtudes + devuelto por defectos &middot; el staff puede saltarse el l&iacute;mite)</span></div>
+          <div class="pc-bar" id="pcBar">Balance PC: <span class="pc-num" id="pcNum"><?php echo $pc_balance; ?></span> <span class="mono fs-62 c-ash">(<?php echo (int)$PC_BASE; ?> base &minus; coste virtudes + devuelto por defectos &middot; el staff puede saltarse el l&iacute;mite)</span></div>
 
           <div class="vd-grid">
             <div class="vd-col" data-vdcol="virtudes">
@@ -628,7 +628,7 @@ header('Content-Type: text/html; charset=utf-8');
         <label class="gp-field"><span>Berries</span><input type="number" name="berries" min="0" value="<?php echo (int)($economia['berries'] ?? 0); ?>"></label>
       </div>
 <?php if (!empty($inventario['arma']) || !empty($inventario['objeto_personal'])): ?>
-      <p class="mono" style="font-size:.68rem;color:var(--paper-dim);margin-top:8px">Equipo heredado del sistema antiguo (solo lectura): <?php echo htmlspecialchars_uni(trim(($inventario['arma'] ?? '') . ' — ' . ($inventario['objeto_personal'] ?? ''), ' —')); ?></p>
+      <p class="mono fs-68 c-dim mt-8">Equipo heredado del sistema antiguo (solo lectura): <?php echo htmlspecialchars_uni(trim(($inventario['arma'] ?? '') . ' — ' . ($inventario['objeto_personal'] ?? ''), ' —')); ?></p>
 <?php endif; ?>
     </div>
 
@@ -662,7 +662,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="gp-field gp-wide">
         <span><?php echo $col_lbl; ?> (<?php echo count($col_items); ?>)</span>
 <?php if (empty($col_items)): ?>
-        <p class="mono" style="font-size:.74rem;color:var(--paper-dim);margin:6px 0">Vac&iacute;o.</p>
+        <p class="mono fs-74 c-dim my-6">Vac&iacute;o.</p>
 <?php else: foreach ($col_items as $i => $it): ?>
         <div class="gp-inv-item">
           <div class="gp-inv-item-b">
@@ -683,7 +683,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endforeach; ?>
     </div>
 
-    <form method="post" action="<?php echo $bburl; ?>/gestionar-personaje.php?pid=<?php echo (int) $pj['pid']; ?>" class="gp-grid" style="margin-top:10px;border-top:2px solid #000;padding-top:14px">
+    <form method="post" action="<?php echo $bburl; ?>/gestionar-personaje.php?pid=<?php echo (int) $pj['pid']; ?>" class="gp-grid mt-10 gp-form-inv-add">
       <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
       <input type="hidden" name="action" value="inv_add">
       <label class="gp-field"><span>Nombre del objeto</span><input type="text" name="item_nombre" maxlength="100" required></label>
@@ -695,11 +695,11 @@ header('Content-Type: text/html; charset=utf-8');
           <option value="almacen">Almac&eacute;n</option>
         </select>
       </label>
-      <div class="gp-field" style="justify-content:flex-end">
+      <div class="gp-field jc-fe">
         <button type="submit" class="btn btn-hot btn-sm">A&ntilde;adir objeto</button>
       </div>
     </form>
-    <p class="gp-hint" style="display:block;margin-top:10px">Sistema de cartas/t&eacute;cnicas: pendiente de implementar. Cuando exista, se gestionar&aacute; tambi&eacute;n desde aqu&iacute;.</p>
+    <p class="gp-hint mt-10">Sistema de cartas/t&eacute;cnicas: pendiente de implementar. Cuando exista, se gestionar&aacute; tambi&eacute;n desde aqu&iacute;.</p>
   </section>
 
 <?php endif; ?>

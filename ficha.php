@@ -917,7 +917,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if ($desc_fisica !== ''): ?>
               <p><?php echo nl2br(htmlspecialchars_uni($desc_fisica)); ?></p>
 <?php else: ?>
-              <p class="mono" style="color:var(--paper-dim)">Sin descripci&oacute;n f&iacute;sica todav&iacute;a.<?php echo $puede_gestionar ? ' Edítala desde Gesti&oacute;n.' : ''; ?></p>
+              <p class="mono c-dim">Sin descripci&oacute;n f&iacute;sica todav&iacute;a.<?php echo $puede_gestionar ? ' Edítala desde Gesti&oacute;n.' : ''; ?></p>
 <?php endif; ?>
             </div>
           </div>
@@ -929,7 +929,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if ($personalidad !== ''): ?>
               <p><?php echo nl2br(htmlspecialchars_uni($personalidad)); ?></p>
 <?php else: ?>
-              <p class="mono" style="color:var(--paper-dim)">Sin personalidad registrada todav&iacute;a.<?php echo $puede_gestionar ? ' Edítala desde Gesti&oacute;n.' : ''; ?></p>
+              <p class="mono c-dim">Sin personalidad registrada todav&iacute;a.<?php echo $puede_gestionar ? ' Edítala desde Gesti&oacute;n.' : ''; ?></p>
 <?php endif; ?>
             </div>
           </div>
@@ -948,13 +948,13 @@ header('Content-Type: text/html; charset=utf-8');
             <div class="plate-h"><span class="t">Otros datos</span></div>
             <div class="plate-b prose">
 <?php if (!$otros_has): ?>
-              <p class="mono" style="color:var(--paper-dim)">Sin datos de cr&oacute;nica todav&iacute;a.</p>
+              <p class="mono c-dim">Sin datos de cr&oacute;nica todav&iacute;a.</p>
 <?php else: foreach ($otros_map as $ok => $ol):
                 $otxt = trim((string) ($bio[$ok] ?? ''));
                 if ($otxt === '') continue;
 ?>
               <p class="lead"><?php echo $ol; ?></p>
-              <p style="margin-bottom:14px"><?php echo nl2br(htmlspecialchars_uni($otxt)); ?></p>
+              <p class="mb-14"><?php echo nl2br(htmlspecialchars_uni($otxt)); ?></p>
 <?php endforeach; endif; ?>
             </div>
           </div>
@@ -963,7 +963,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div class="plate-h"><span class="t">L&iacute;nea de tiempo</span><span class="c">// historias por a&ntilde;o</span></div>
             <div class="plate-b">
 <?php if (empty($cron_years)): ?>
-              <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">Este personaje a&uacute;n no ha participado en ninguna historia.</p>
+              <p class="mono fs-76 c-dim">Este personaje a&uacute;n no ha participado en ninguna historia.</p>
 <?php else: ?>
               <div class="tl-tabs" role="tablist">
 <?php $tl_first = true; foreach ($cron_years as $y => $arr): ?>
@@ -1003,7 +1003,7 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="plate-h"><span class="t">Pasivas</span></div>
         <div class="plate-b">
 <?php if (empty($pasivas)): ?>
-          <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">Sin raza asignada.</p>
+          <p class="mono fs-76 c-dim">Sin raza asignada.</p>
 <?php else: foreach ($pasivas as $pas): ?>
           <div class="of">
             <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-14h-7z"/></svg></span>
@@ -1019,11 +1019,11 @@ header('Content-Type: text/html; charset=utf-8');
       <!-- Deck de cartas de técnica (INI-03) -->
       <div class="plate">
         <div class="plate-h"><span class="t">Deck</span><span class="c">// <?php echo count($deck_tecnicas); ?> carta(s)</span></div>
-        <div class="plate-b" style="text-align:left">
+        <div class="plate-b tal">
 <?php if (empty($deck_tecnicas)): ?>
           <div class="ope-soon-box">
             <span class="ope-soon-tag">Deck vac&iacute;o</span>
-            <p class="mono" style="font-size:.76rem;color:var(--paper-dim);margin-top:8px">Este personaje a&uacute;n no ha aprendido ninguna carta de t&eacute;cnica.</p>
+            <p class="mono fs-76 c-dim mt-8">Este personaje a&uacute;n no ha aprendido ninguna carta de t&eacute;cnica.</p>
           </div>
 <?php else: ?>
 <?php echo ope_rol_tecnica_card_css(); ?>
@@ -1045,7 +1045,7 @@ header('Content-Type: text/html; charset=utf-8');
             <span class="v"><?php echo $pc_bal; ?> <small>sin gastar</small></span>
           </div>
 <?php if (empty($rasgos)): ?>
-          <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">Sin virtudes ni defectos registrados.</p>
+          <p class="mono fs-76 c-dim">Sin virtudes ni defectos registrados.</p>
 <?php else: foreach ($rasgos as $rasgo): ?>
           <div class="trait">
             <span class="d <?php echo $rasgo['tipo']; ?>"></span>
@@ -1086,15 +1086,15 @@ header('Content-Type: text/html; charset=utf-8');
             <b class="ope-berries-v"><?php echo number_format($berries, 0, ',', '.'); ?></b>
           </div>
 <?php if ($pack_def !== null): ?>
-          <div class="ope-pack-inicial" style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--concrete-line)">
-            <span class="mono" style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim)"><?php echo htmlspecialchars_uni($pack_def['nombre']); ?></span>
-            <p class="mono" style="font-size:.7rem;color:var(--ash);line-height:1.5;margin-top:4px"><?php echo implode(' &middot; ', array_map('htmlspecialchars_uni', $pack_def['contenido'])); ?></p>
+          <div class="ope-pack-inicial mt-10 pt-10 bt-dash">
+            <span class="mono fs-62 fw-700 ttu ls-5 c-dim"><?php echo htmlspecialchars_uni($pack_def['nombre']); ?></span>
+            <p class="mono fs-7 c-ash lh-15 mt-4"><?php echo implode(' &middot; ', array_map('htmlspecialchars_uni', $pack_def['contenido'])); ?></p>
           </div>
 <?php elseif ($arma_legacy !== '' || $obj_legacy !== ''): ?>
-          <div class="ope-pack-inicial" style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--concrete-line)">
-            <span class="mono" style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim)">Equipo inicial (ficha antigua)</span>
-<?php if ($arma_legacy !== ''): ?><p class="mono" style="font-size:.7rem;color:var(--ash);margin-top:4px"><b style="color:var(--paper-dim)">Arma:</b> <?php echo htmlspecialchars_uni($arma_legacy); ?></p><?php endif; ?>
-<?php if ($obj_legacy !== ''): ?><p class="mono" style="font-size:.7rem;color:var(--ash)"><b style="color:var(--paper-dim)">Objeto:</b> <?php echo htmlspecialchars_uni($obj_legacy); ?></p><?php endif; ?>
+          <div class="ope-pack-inicial mt-10 pt-10 bt-dash">
+            <span class="mono fs-62 fw-700 ttu ls-5 c-dim">Equipo inicial (ficha antigua)</span>
+<?php if ($arma_legacy !== ''): ?><p class="mono fs-7 c-ash mt-4"><b class="c-dim">Arma:</b> <?php echo htmlspecialchars_uni($arma_legacy); ?></p><?php endif; ?>
+<?php if ($obj_legacy !== ''): ?><p class="mono fs-7 c-ash"><b class="c-dim">Objeto:</b> <?php echo htmlspecialchars_uni($obj_legacy); ?></p><?php endif; ?>
           </div>
 <?php endif; ?>
         </div>
@@ -1107,7 +1107,7 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="plate-b">
             <p class="ope-inv-hint">Pulsa un objeto para ver su informaci&oacute;n. Los objetos grandes ocupan varios slots.<?php echo $puede_gestionar ? ' Para mover objetos usa Gesti&oacute;n &rsaquo; Equipo.' : ''; ?></p>
 <?php if (empty($inv_encima)): ?>
-            <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">No llevas nada encima.</p>
+            <p class="mono fs-76 c-dim">No llevas nada encima.</p>
 <?php endif; ?>
             <div class="ope-slotgrid">
 <?php foreach ($inv_encima as $i => $it):
@@ -1131,7 +1131,7 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="plate-b">
             <p class="ope-inv-hint">Pulsa un objeto para ver su informaci&oacute;n.</p>
 <?php if (empty($inv_almacen)): ?>
-            <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">Almac&eacute;n vac&iacute;o.</p>
+            <p class="mono fs-76 c-dim">Almac&eacute;n vac&iacute;o.</p>
 <?php else: ?>
             <div class="ope-store">
 <?php foreach ($inv_almacen as $i => $it):
@@ -1151,7 +1151,7 @@ header('Content-Type: text/html; charset=utf-8');
       <!-- Detalle del objeto pulsado (se rellena por JS; no mueve nada) -->
       <div class="plate ope-inv-detail" id="ope-inv-detail" hidden>
         <div class="plate-h"><span class="t" id="ope-inv-detail-name">&mdash;</span><span class="c" id="ope-inv-detail-size"></span></div>
-        <div class="plate-b prose"><p id="ope-inv-detail-desc" class="mono" style="color:var(--paper-dim)"></p></div>
+        <div class="plate-b prose"><p id="ope-inv-detail-desc" class="mono c-dim"></p></div>
       </div>
     </section>
 
@@ -1356,7 +1356,7 @@ header('Content-Type: text/html; charset=utf-8');
 
         <!-- Panel: Templates -->
         <section class="ope-mpanel" data-mpanel="templates" role="tabpanel">
-          <div class="ope-field-help" style="margin-bottom:12px">Crea plantillas reutilizables (BBCode y spoilers anidados). Aparecer&aacute;n como botones sobre el editor al crear temas o responder, y se insertan en la posici&oacute;n del cursor.</div>
+          <div class="ope-field-help mb-12">Crea plantillas reutilizables (BBCode y spoilers anidados). Aparecer&aacute;n como botones sobre el editor al crear temas o responder, y se insertan en la posici&oacute;n del cursor.</div>
 
           <!-- Crear nueva plantilla -->
           <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" class="ope-tpl-form" data-tpl-form>
@@ -1381,7 +1381,7 @@ header('Content-Type: text/html; charset=utf-8');
 
           <div class="ope-msep" aria-hidden="true"><span>Mis plantillas</span></div>
 <?php if (empty($tpls_list)): ?>
-          <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">A&uacute;n no tienes plantillas. Crea la primera arriba.</p>
+          <p class="mono fs-76 c-dim">A&uacute;n no tienes plantillas. Crea la primera arriba.</p>
 <?php else: foreach ($tpls_list as $tp): ?>
           <div class="ope-tpl-item">
             <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" class="ope-tpl-form" data-tpl-form>
@@ -1416,7 +1416,7 @@ header('Content-Type: text/html; charset=utf-8');
 
         <!-- Panel: Atributos -->
         <section class="ope-mpanel" data-mpanel="atributos" role="tabpanel">
-          <div class="ope-field-help" style="margin-bottom:12px">Edici&oacute;n directa de las stats efectivas (1&ndash;10). El sistema de puntos y coste de subida se detallar&aacute; m&aacute;s adelante; por ahora ajustas los valores a mano.</div>
+          <div class="ope-field-help mb-12">Edici&oacute;n directa de las stats efectivas (1&ndash;10). El sistema de puntos y coste de subida se detallar&aacute; m&aacute;s adelante; por ahora ajustas los valores a mano.</div>
           <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">
             <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
             <input type="hidden" name="gaccion" value="attrs">
@@ -1437,13 +1437,13 @@ header('Content-Type: text/html; charset=utf-8');
               </div>
             </div>
 <?php endforeach; ?>
-            <div class="ope-modal-actions" style="margin-top:14px"><button type="submit" class="btn btn-hot">Guardar atributos</button></div>
+            <div class="ope-modal-actions mt-14"><button type="submit" class="btn btn-hot">Guardar atributos</button></div>
           </form>
         </section>
 
         <!-- Panel: Equipo -->
         <section class="ope-mpanel" data-mpanel="equipo" role="tabpanel">
-          <div class="ope-field-help" style="margin-bottom:12px">Gestiona qu&eacute; objetos llevas <b>encima</b> y cu&aacute;les dejas en el <b>almac&eacute;n</b>. El l&iacute;mite de carga se definir&aacute; m&aacute;s adelante; por ahora no hay tope.</div>
+          <div class="ope-field-help mb-12">Gestiona qu&eacute; objetos llevas <b>encima</b> y cu&aacute;les dejas en el <b>almac&eacute;n</b>. El l&iacute;mite de carga se definir&aacute; m&aacute;s adelante; por ahora no hay tope.</div>
 
 <?php
           $equip_cols = array(
@@ -1455,7 +1455,7 @@ header('Content-Type: text/html; charset=utf-8');
 ?>
           <div class="ope-msep" aria-hidden="true"><span><?php echo $col_lbl; ?></span></div>
 <?php if (empty($col_items)): ?>
-          <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">Vac&iacute;o.</p>
+          <p class="mono fs-76 c-dim">Vac&iacute;o.</p>
 <?php else: foreach ($col_items as $i => $it): ?>
           <div class="ope-equip-item">
             <div class="ope-equip-item-b">
@@ -1487,7 +1487,7 @@ header('Content-Type: text/html; charset=utf-8');
           <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">
             <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
             <input type="hidden" name="gaccion" value="cronologia">
-            <div class="ope-field-help" style="margin-bottom:12px">A&ntilde;ade una nota personal a cada historia de tu l&iacute;nea de tiempo. Se mostrar&aacute; bajo el t&iacute;tulo del tema en la ficha.</div>
+            <div class="ope-field-help mb-12">A&ntilde;ade una nota personal a cada historia de tu l&iacute;nea de tiempo. Se mostrar&aacute; bajo el t&iacute;tulo del tema en la ficha.</div>
             <div class="ope-cron-list">
 <?php foreach ($cron_flat as $e):
     $tag_lbl2  = $e['tag'] !== '' ? ($TAG_LABELS[$e['tag']] ?? $e['tag']) : '';
@@ -1504,7 +1504,7 @@ header('Content-Type: text/html; charset=utf-8');
               </div>
 <?php endforeach; ?>
             </div>
-            <div class="ope-modal-actions" style="margin-top:14px">
+            <div class="ope-modal-actions mt-14">
               <button type="submit" class="btn btn-hot">Guardar cronolog&iacute;a</button>
             </div>
           </form>
@@ -1513,7 +1513,7 @@ header('Content-Type: text/html; charset=utf-8');
 
         <!-- Panel: Relaciones -->
         <section class="ope-mpanel" data-mpanel="relaciones" role="tabpanel">
-          <div class="ope-field-help" style="margin-bottom:12px">Vincula a este personaje con otros. El nodo se colorea con la facci&oacute;n del otro personaje y la l&iacute;nea con el tipo de v&iacute;nculo.</div>
+          <div class="ope-field-help mb-12">Vincula a este personaje con otros. El nodo se colorea con la facci&oacute;n del otro personaje y la l&iacute;nea con el tipo de v&iacute;nculo.</div>
 
 <?php if (empty($rel_choices)): ?>
           <div class="ope-msoon"><p>No hay otros personajes aprobados con los que crear v&iacute;nculos todav&iacute;a.</p></div>
@@ -1557,7 +1557,7 @@ header('Content-Type: text/html; charset=utf-8');
           <!-- Relaciones existentes -->
           <div class="ope-msep" aria-hidden="true"><span>V&iacute;nculos actuales</span></div>
 <?php if (empty($relaciones)): ?>
-          <p class="mono" style="font-size:.76rem;color:var(--paper-dim)">Sin v&iacute;nculos registrados todav&iacute;a.</p>
+          <p class="mono fs-76 c-dim">Sin v&iacute;nculos registrados todav&iacute;a.</p>
 <?php else: foreach ($relaciones as $rl): ?>
           <div class="ope-rel-item rel-<?php echo $rl['tipo']; ?>">
             <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">

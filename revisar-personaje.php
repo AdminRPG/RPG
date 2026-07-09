@@ -279,8 +279,8 @@ header('Content-Type: text/html; charset=utf-8');
   <?php endif; ?>
 
   <!-- BÚSQUEDA / GESTIÓN DE TODOS LOS EXPEDIENTES -->
-  <div class="shead" style="margin-top:28px">
-    <h2 style="font-family:var(--disp);font-weight:800;font-size:1.4rem;text-transform:uppercase;color:var(--paper)">Todos los expedientes</h2>
+  <div class="shead mt-28">
+    <h2 class="fw-800 fs-14 ttu c-paper">Todos los expedientes</h2>
     <span class="rule"></span>
   </div>
   <form method="get" action="<?php echo $bburl; ?>/revisar-personaje.php" class="rp-search">
@@ -339,7 +339,7 @@ header('Content-Type: text/html; charset=utf-8');
         <!-- COL IZQUIERDA -->
         <div>
           <!-- IDENTIDAD -->
-          <div class="sheet-block" style="margin-bottom:14px">
+          <div class="sheet-block mb-14">
             <div class="sheet-block-h">Identidad</div>
             <div class="sheet-block-b">
               <div class="stat-row"><span class="sn">Raza</span><span class="sl"><?php echo htmlspecialchars_uni(ucfirst($datos['raza_principal'] ?? '?')); ?><?php echo !empty($datos['hibrido']) ? ' / ' . htmlspecialchars_uni(ucfirst($datos['raza_secundaria'] ?? '')) : ''; ?></span></div>
@@ -350,13 +350,13 @@ header('Content-Type: text/html; charset=utf-8');
               <div class="stat-row"><span class="sn">Género</span><span class="sl"><?php echo htmlspecialchars_uni($datos['genero'] ?? '?'); ?></span></div>
               <div class="stat-row"><span class="sn">Facción</span><span class="sl"><?php echo htmlspecialchars_uni(ucfirst($datos['faccion'] ?? '?')); ?></span></div>
               <?php if (!empty($datos['virtudes']['V-LIN-01']) || !empty($datos['tiene_d'])): ?>
-                <div class="stat-row"><span class="sn">D.</span><span class="sl" style="color:var(--ember-hi);font-weight:700">Portador de la D.</span></div>
+                <div class="stat-row"><span class="sn">D.</span><span class="sl c-ember fw-700">Portador de la D.</span></div>
               <?php endif; ?>
             </div>
           </div>
 
           <!-- STATS -->
-          <div class="sheet-block" style="margin-bottom:14px">
+          <div class="sheet-block mb-14">
             <div class="sheet-block-h">Stats · Rango <?php echo htmlspecialchars_uni($pj['rango'] ?? '?'); ?></div>
             <div class="sheet-block-b">
               <?php 
@@ -365,7 +365,7 @@ header('Content-Type: text/html; charset=utf-8');
               $stats = $datos['stats_efectivas'] ?? $datos['stats_base'] ?? array();
               if (!empty($stats)):
                 foreach ($pilares as $pilarName => $keys): ?>
-                  <div style="font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;color:var(--ash);margin:8px 0 4px"><?php echo $pilarName; ?></div>
+                  <div class="rp-pilar-label fs-58 fw-700 ttu c-ash"><?php echo $pilarName; ?></div>
                   <?php foreach ($keys as $k):
                     $v = (int)($stats[$k] ?? 0);
                     $rangos = ['F','E','D','C','B','A','S','SS','M','M+'];
@@ -380,7 +380,7 @@ header('Content-Type: text/html; charset=utf-8');
                   <?php endforeach;
                 endforeach;
               else: ?>
-                <p style="color:var(--paper-dim);font-size:.82rem">Sin datos de stats.</p>
+                <p class="c-dim fs-82">Sin datos de stats.</p>
               <?php endif; ?>
             </div>
           </div>
@@ -389,7 +389,7 @@ header('Content-Type: text/html; charset=utf-8');
         <!-- COL DERECHA -->
         <div>
           <!-- VIRTUDES Y DEFECTOS -->
-          <div class="sheet-block" style="margin-bottom:14px">
+          <div class="sheet-block mb-14">
             <div class="sheet-block-h">Virtudes <?php echo !empty($datos['pc_gastado']) ? '(+' . (int)$datos['pc_gastado'] . ' PC)' : ''; ?></div>
             <div class="sheet-block-b">
               <?php if (!empty($datos['virtudes'])): ?>
@@ -399,12 +399,12 @@ header('Content-Type: text/html; charset=utf-8');
                   <?php endforeach; ?>
                 </div>
               <?php else: ?>
-                <p style="color:var(--paper-dim);font-size:.78rem">Sin virtudes.</p>
+                <p class="c-dim fs-78">Sin virtudes.</p>
               <?php endif; ?>
             </div>
           </div>
 
-          <div class="sheet-block" style="margin-bottom:14px">
+          <div class="sheet-block mb-14">
             <div class="sheet-block-h">Defectos <?php echo !empty($datos['pc_devuelto']) ? '(+' . (int)$datos['pc_devuelto'] . ' PC)' : ''; ?></div>
             <div class="sheet-block-b">
               <?php if (!empty($datos['defectos'])): ?>
@@ -414,13 +414,13 @@ header('Content-Type: text/html; charset=utf-8');
                   <?php endforeach; ?>
                 </div>
               <?php else: ?>
-                <p style="color:var(--paper-dim);font-size:.78rem">Sin defectos.</p>
+                <p class="c-dim fs-78">Sin defectos.</p>
               <?php endif; ?>
             </div>
           </div>
 
           <!-- EQUIPO -->
-          <div class="sheet-block" style="margin-bottom:14px">
+          <div class="sheet-block mb-14">
             <div class="sheet-block-h">Equipo · <?php echo htmlspecialchars_uni(number_format((int)($economia['berries'] ?? 0))); ?> berries</div>
             <div class="sheet-block-b">
               <?php
@@ -428,14 +428,14 @@ header('Content-Type: text/html; charset=utf-8');
                 $rp_pack    = $rp_packs[$inventario['pack_equipo'] ?? ''] ?? null;
               ?>
               <?php if ($rp_pack !== null): ?>
-                <div class="stat-row"><span class="sl">Pack</span><span class="sv" style="color:var(--paper-dim)"><?php echo htmlspecialchars_uni($rp_pack['nombre']); ?></span></div>
-                <p style="color:var(--paper-dim);font-size:.72rem;margin-top:4px"><?php echo htmlspecialchars_uni(implode(' · ', $rp_pack['contenido'])); ?></p>
+                <div class="stat-row"><span class="sl">Pack</span><span class="sv c-dim"><?php echo htmlspecialchars_uni($rp_pack['nombre']); ?></span></div>
+                <p class="c-dim fs-72 mt-6"><?php echo htmlspecialchars_uni(implode(' · ', $rp_pack['contenido'])); ?></p>
               <?php else: ?>
                 <?php if (!empty($inventario['arma'])): ?>
-                  <div class="stat-row"><span class="sl">Arma</span><span class="sv" style="color:var(--paper-dim)"><?php echo htmlspecialchars_uni($inventario['arma']); ?></span></div>
+                  <div class="stat-row"><span class="sl">Arma</span><span class="sv c-dim"><?php echo htmlspecialchars_uni($inventario['arma']); ?></span></div>
                 <?php endif; ?>
                 <?php if (!empty($inventario['objeto_personal'])): ?>
-                  <div class="stat-row"><span class="sl">Objeto personal</span><span class="sv" style="color:var(--paper-dim)"><?php echo htmlspecialchars_uni($inventario['objeto_personal']); ?></span></div>
+                  <div class="stat-row"><span class="sl">Objeto personal</span><span class="sv c-dim"><?php echo htmlspecialchars_uni($inventario['objeto_personal']); ?></span></div>
                 <?php endif; ?>
               <?php endif; ?>
             </div>
@@ -445,7 +445,7 @@ header('Content-Type: text/html; charset=utf-8');
 
       <!-- BIO -->
       <?php if (!empty($bio)): ?>
-        <div class="sheet-block" style="margin-top:14px">
+        <div class="sheet-block mt-14">
           <div class="sheet-block-h">Historia y personalidad</div>
           <div class="sheet-block-b">
             <div class="text-block">
@@ -474,7 +474,7 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="ab-label">Rechazar ficha</div>
           <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">Rechazar</button>
         </div>
-        <div style="flex:1;min-width:250px">
+        <div class="flex-1 minw-250">
           <div class="ab-label">Moderar (enviar cambios solicitados por MD)</div>
           <textarea name="mensaje_staff" placeholder="Describe los cambios necesarios..."></textarea>
         </div>
@@ -490,8 +490,8 @@ header('Content-Type: text/html; charset=utf-8');
     <form method="post" action="<?php echo $bburl; ?>/revisar-personaje.php?pid=<?php echo $pid; ?>">
       <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
       <div class="actions-bar-in">
-        <div class="ab-label" style="width:100%;margin-bottom:6px">Gesti&oacute;n del expediente</div>
-        <div style="flex:1;min-width:220px">
+        <div class="ab-label fw mb-6">Gesti&oacute;n del expediente</div>
+        <div class="flex-1 minw-220">
           <div class="ab-label">Motivo (opcional, para devolver o eliminar)</div>
           <textarea name="mensaje_staff" placeholder="Motivo..." rows="2"></textarea>
         </div>

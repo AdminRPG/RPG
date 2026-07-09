@@ -165,7 +165,7 @@ header('Content-Type: text/html; charset=utf-8');
   <section class="zs-group reveal">
     <div class="zs-group-h">
       <span class="lbl">NPCs sin asignar</span>
-      <span class="need" style="background:var(--h6);color:var(--iron)"><?php echo count($sin_asignar); ?> disponible(s)</span>
+      <span class="need bg-h6"><?php echo count($sin_asignar); ?> disponible(s)</span>
       <span class="rule"></span>
     </div>
 
@@ -199,7 +199,7 @@ header('Content-Type: text/html; charset=utf-8');
   <section class="zs-group reveal">
     <div class="zs-group-h">
       <span class="lbl">NPCs asignados</span>
-      <span class="need" style="background:var(--patina);color:var(--iron)"><?php echo count($asignados); ?> asignado(s)</span>
+      <span class="need bg-patina"><?php echo count($asignados); ?> asignado(s)</span>
       <span class="rule"></span>
     </div>
 
@@ -216,7 +216,7 @@ header('Content-Type: text/html; charset=utf-8');
           <span class="zs-staffname"><?php echo htmlspecialchars_uni($npc['nombre']); ?></span>
           <span class="zs-staffowner">// <?php echo htmlspecialchars_uni($npc['rango']); ?> &middot; Nivel <?php echo (int) $npc['nivel']; ?></span>
         </div>
-        <span class="zs-staffnarr" style="color:var(--patina-hi)">&#8618; <?php echo htmlspecialchars_uni($npc['username']); ?></span>
+        <span class="zs-staffnarr c-patina">&#8618; <?php echo htmlspecialchars_uni($npc['username']); ?></span>
         <button type="submit" class="btn btn-ghost btn-sm">Desasignar</button>
       </form>
 <?php endforeach; ?>

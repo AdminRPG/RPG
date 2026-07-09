@@ -188,7 +188,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if (!$table_ok): ?>
   <section class="reveal">
     <div class="gc-warn">Faltan las tablas de cartas. Ejec&uacute;talas una vez con:<br>
-      <code style="color:var(--ember-hi)">php scripts/migrate-rol-tecnicas.php</code></div>
+      <code class="c-ember">php scripts/migrate-rol-tecnicas.php</code></div>
   </section>
 <?php endif; ?>
 
@@ -198,9 +198,9 @@ header('Content-Type: text/html; charset=utf-8');
 
 <?php if (!$pj): ?>
   <section class="reveal">
-    <p class="zs-intro">Elige el personaje al que quieres <b>asignar cartas</b> ya creadas. &iquest;Todav&iacute;a no has creado cartas? Hazlo en <a href="<?php echo $bburl; ?>/crear-cartas.php" style="color:var(--ember-hi)">Crear cartas</a>.</p>
+    <p class="zs-intro">Elige el personaje al que quieres <b>asignar cartas</b> ya creadas. &iquest;Todav&iacute;a no has creado cartas? Hazlo en <a href="<?php echo $bburl; ?>/crear-cartas.php">Crear cartas</a>.</p>
 <?php if ($hi_carta > 0): ?>
-    <div class="zs-flash" style="background:var(--h6);color:var(--iron)">Selecciona el personaje al que asignar la carta elegida.</div>
+    <div class="zs-flash bg-h6">Selecciona el personaje al que asignar la carta elegida.</div>
 <?php endif; ?>
     <form method="get" action="<?php echo $bburl; ?>/asignar-cartas.php" class="zs-search">
       <input type="text" name="q" value="<?php echo htmlspecialchars_uni($buscar); ?>" placeholder="Buscar personaje por nombre&hellip;">
@@ -212,7 +212,7 @@ header('Content-Type: text/html; charset=utf-8');
   <section class="zs-group reveal">
     <div class="zs-group-h">
       <span class="lbl">Personajes</span>
-      <span class="need" style="background:var(--h6);color:var(--iron)"><?php echo count($listado); ?> resultado(s)</span>
+      <span class="need bg-h6"><?php echo count($listado); ?> resultado(s)</span>
       <span class="rule"></span>
     </div>
 <?php if (empty($listado)): ?>
@@ -236,7 +236,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php else: ?>
 
   <section class="reveal">
-    <p class="zs-intro" style="margin-bottom:10px">
+    <p class="zs-intro mb-10">
       Deck de <b><?php echo htmlspecialchars_uni($pj['nombre']); ?></b>
       (pid <?php echo (int) $pj['pid']; ?>) &middot; rango <b><?php echo htmlspecialchars_uni($pj['rango']); ?></b>
       &middot; <b><?php echo count($deck); ?></b> carta(s) asignada(s).
@@ -252,7 +252,7 @@ header('Content-Type: text/html; charset=utf-8');
   <section class="zs-group reveal" id="deck">
     <div class="zs-group-h">
       <span class="lbl">Deck actual</span>
-      <span class="need" style="background:var(--patina);color:var(--iron)"><?php echo count($deck); ?> carta(s)</span>
+      <span class="need bg-patina"><?php echo count($deck); ?> carta(s)</span>
       <span class="rule"></span>
     </div>
 <?php if (empty($deck)): ?>
@@ -283,13 +283,13 @@ header('Content-Type: text/html; charset=utf-8');
   </section>
 
   <!-- Biblioteca para asignar -->
-  <section class="zs-group reveal" id="biblioteca" style="margin-top:8px">
+  <section class="zs-group reveal mt-8" id="biblioteca">
     <div class="zs-group-h">
       <span class="lbl">Biblioteca de cartas</span>
-      <span class="need" style="background:var(--h6);color:var(--iron)"><?php echo count($lib); ?> disponible(s)</span>
+      <span class="need bg-h6"><?php echo count($lib); ?> disponible(s)</span>
       <span class="rule"></span>
     </div>
-    <form method="get" action="<?php echo $bburl; ?>/asignar-cartas.php" class="zs-search" style="margin-bottom:14px">
+    <form method="get" action="<?php echo $bburl; ?>/asignar-cartas.php" class="zs-search">
       <input type="hidden" name="pid" value="<?php echo (int)$pj['pid']; ?>">
       <input type="text" name="lq" value="<?php echo htmlspecialchars_uni($libq); ?>" placeholder="Buscar carta por nombre&hellip;">
       <select name="ltier" class="zs-staffsel">
@@ -301,7 +301,7 @@ header('Content-Type: text/html; charset=utf-8');
       <button type="submit" class="btn btn-hot btn-sm">Filtrar</button>
     </form>
 <?php if (empty($lib)): ?>
-    <div class="empty-state"><div class="big">Biblioteca vac&iacute;a</div><p>No hay cartas creadas (o no coinciden con el filtro). Crea cartas en <a href="<?php echo $bburl; ?>/crear-cartas.php" style="color:var(--ember-hi)">Crear cartas</a>.</p></div>
+    <div class="empty-state"><div class="big">Biblioteca vac&iacute;a</div><p>No hay cartas creadas (o no coinciden con el filtro). Crea cartas en <a href="<?php echo $bburl; ?>/crear-cartas.php">Crear cartas</a>.</p></div>
 <?php else: ?>
     <div class="gc-libgrid">
 <?php foreach ($lib as $carta): $ya = isset($asignados_origen[(int)$carta['id']]); $hl = ($hi_carta === (int)$carta['id']); ?>
@@ -315,7 +315,7 @@ header('Content-Type: text/html; charset=utf-8');
             <button type="submit" class="btn btn-hot btn-sm"><?php echo $ya ? 'Asignar otra copia' : 'Asignar al deck'; ?></button>
           </form>
           <a href="<?php echo $bburl; ?>/crear-cartas.php?edit=<?php echo (int)$carta['id']; ?>#editor" class="btn btn-ghost btn-sm">Editar carta</a>
-<?php if ($ya): ?><span class="zs-staffnarr" style="color:var(--patina-hi)">&#10003; ya en deck</span><?php endif; ?>
+<?php if ($ya): ?><span class="zs-staffnarr c-patina">&#10003; ya en deck</span><?php endif; ?>
         </div>
       </div>
 <?php endforeach; ?>

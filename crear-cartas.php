@@ -174,7 +174,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if (!$table_ok): ?>
   <section class="reveal">
     <div class="gc-warn">Falta la tabla <b>mybb_rol_cartas</b>. Ejec&uacute;tala una vez con:<br>
-      <code style="color:var(--ember-hi)">php scripts/migrate-rol-tecnicas.php</code></div>
+      <code class="c-ember">php scripts/migrate-rol-tecnicas.php</code></div>
   </section>
 <?php endif; ?>
 
@@ -183,7 +183,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endif; ?>
 
   <section class="reveal">
-    <p class="zs-intro">Aqu&iacute; <b>creas cartas</b> para la biblioteca com&uacute;n: no pertenecen a ning&uacute;n personaje todav&iacute;a. Una vez creadas, se asignan al deck de un personaje desde <a href="<?php echo $bburl; ?>/asignar-cartas.php" style="color:var(--ember-hi)">Asignar cartas</a>.</p>
+    <p class="zs-intro">Aqu&iacute; <b>creas cartas</b> para la biblioteca com&uacute;n: no pertenecen a ning&uacute;n personaje todav&iacute;a. Una vez creadas, se asignan al deck de un personaje desde <a href="<?php echo $bburl; ?>/asignar-cartas.php">Asignar cartas</a>.</p>
     <div class="gp-actions">
       <a href="<?php echo $bburl; ?>/asignar-cartas.php" class="btn btn-ghost btn-sm">Ir a asignar cartas</a>
       <button type="button" class="btn btn-hot btn-sm gc-help-btn" id="gcHelpOpen">
@@ -196,7 +196,7 @@ header('Content-Type: text/html; charset=utf-8');
   <div class="gc-layout">
     <!-- Formulario -->
     <div>
-      <form method="post" action="<?php echo $bburl; ?>/crear-cartas.php" class="gp-form" id="gcForm" style="margin-bottom:0">
+      <form method="post" action="<?php echo $bburl; ?>/crear-cartas.php" class="gp-form mb-0" id="gcForm">
         <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
         <input type="hidden" name="action" value="save_carta">
         <input type="hidden" name="carta_id" value="<?php echo $edit ? (int) $edit['id'] : 0; ?>">
@@ -265,7 +265,7 @@ header('Content-Type: text/html; charset=utf-8');
             <label class="gp-field gp-full"><span>Descripci&oacute;n narrativa</span><textarea name="descripcion" id="fDesc" rows="4" maxlength="4000" placeholder="Qu&eacute; se ve, c&oacute;mo se ejecuta, qu&eacute; sensaci&oacute;n transmite&hellip;"><?php echo $edit ? htmlspecialchars_uni($edit['descripcion']) : ''; ?></textarea></label>
           </div>
 
-          <div class="gp-submit" style="display:flex;gap:10px;flex-wrap:wrap">
+          <div class="gp-submit df gap-10 fww">
             <button type="submit" class="btn btn-hot"><?php echo $edit ? 'Guardar cambios' : 'Crear carta en biblioteca'; ?></button>
 <?php if ($edit): ?>
             <a href="<?php echo $bburl; ?>/crear-cartas.php#editor" class="btn btn-ghost">Cancelar edici&oacute;n</a>
@@ -278,18 +278,18 @@ header('Content-Type: text/html; charset=utf-8');
     <!-- Vista previa -->
     <div class="gc-preview-col">
       <p class="gc-preview-lbl">// vista previa en vivo</p>
-      <div class="ope-tk-deck" style="grid-template-columns:1fr"><div id="gcPreview"></div></div>
+      <div class="ope-tk-deck gc-deck-single"><div id="gcPreview"></div></div>
     </div>
   </div>
 
   <!-- Biblioteca -->
-  <section class="zs-group reveal" id="biblioteca" style="margin-top:26px">
+  <section class="zs-group reveal mt-26" id="biblioteca">
     <div class="zs-group-h">
       <span class="lbl">Biblioteca de cartas</span>
-      <span class="need" style="background:var(--patina);color:var(--iron)"><?php echo count($lib); ?> carta(s)</span>
+      <span class="need bg-patina"><?php echo count($lib); ?> carta(s)</span>
       <span class="rule"></span>
     </div>
-    <form method="get" action="<?php echo $bburl; ?>/crear-cartas.php" class="zs-search" style="margin-bottom:14px">
+    <form method="get" action="<?php echo $bburl; ?>/crear-cartas.php" class="zs-search">
       <input type="text" name="q" value="<?php echo htmlspecialchars_uni($buscar); ?>" placeholder="Buscar carta por nombre&hellip;">
       <select name="tier_f" class="zs-staffsel">
         <option value="0">Todos los tiers</option>

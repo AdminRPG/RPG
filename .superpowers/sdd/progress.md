@@ -1,8 +1,5 @@
-ï»¿Task 1: complete (commits b89f9b7e..148314a, review clean)
-Task 2: complete (commits 148314a..9e8ef30, review approved with scope creep note)
-Task 3: complete (commits 9e8ef30..9e67993, review approved)
-Task 4: complete (commits 9e67993..9d53637, review fixed)
-Task 5: complete (commits 9d53637..f4c7afc)
-Task 6: complete (commits f4c7afc..ee6c45f)
-Task 7: complete (commits ee6c45f..1a0010a)
-Task 8: complete (commits ee6c45f..1a0010a)
+Progreso: implementación Mundo Vivo v3
+Task 1: complete (migration script created)
+Task 2: complete (ope_rol_mundo.php core updated)
+Task 3: complete (mundo-vivo.php panel updated)
+Task 4: complete (estado-mundo.php public page updated)

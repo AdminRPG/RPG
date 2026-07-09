@@ -169,12 +169,12 @@ header('Content-Type: text/html; charset=utf-8');
       <!-- SIDEBAR: lista de hilos -->
       <div class="msg-sidebar">
         <div class="msg-sidebar-in">
-          <div style="padding:10px 14px;border-bottom:2px solid #000;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--ash)">Conversaciones</span>
-            <button onclick="document.getElementById('newMsgForm').style.display='block';document.getElementById('threadView').style.display='none'" class="btn btn-ghost btn-sm" style="font-size:.6rem;padding:4px 8px">+ Nuevo</button>
+          <div class="msg-sidebar-h p-10-14 df jc-sb ai-center">
+            <span class="mono fs-6 fw-700 ttu c-ash">Conversaciones</span>
+            <button onclick="document.getElementById('newMsgForm').style.display='block';document.getElementById('threadView').style.display='none'" class="btn btn-ghost btn-sm btn-xtrasm fs-6">+ Nuevo</button>
           </div>
           <?php if (empty($hilos)): ?>
-            <div style="padding:20px;text-align:center;font-family:var(--mono);font-size:.64rem;color:var(--ash)">Sin mensajes aún.</div>
+            <div class="p-20 tac mono fs-64 c-ash">Sin mensajes aún.</div>
           <?php else: ?>
             <?php foreach ($hilos as $h):
               // Contexto pequeño: ICONO del otro personaje (fallback a inicial).
@@ -236,9 +236,9 @@ header('Content-Type: text/html; charset=utf-8');
           </div>
 
           <!-- Nuevo mensaje -->
-          <form method="post" action="<?php echo $bburl; ?>/mensajes.php" class="msg-form" id="newMsgForm" style="display:block">
+          <form method="post" action="<?php echo $bburl; ?>/mensajes.php" class="msg-form" id="newMsgForm">
             <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
-            <div class="form-row" style="margin-bottom:8px">
+            <div class="form-row mb-8">
               <select name="destino_pid" required>
                 <option value="">Destinatario...</option>
                 <?php foreach ($personajes_destino as $dp): ?>

@@ -467,15 +467,35 @@ function ope_rol_mv_faccion_metric_label($key, $v)
 // ─────────────────────────────────────────────────────────────────────────
 
 /**
- * Clasifica automáticamente un evento según su título y resumen.
+ * Clasifica automáticamente un evento según su título y resumen, mediante SCORING
+ * (cuenta coincidencias por categoría y elige la de mayor puntuación) en vez de la
+ * primera que matchee — evita el sesgo hacia las categorías que se comprueban antes
+ * cuando un evento toca varios temas a la vez (p. ej. "pirata" + "fiesta").
+ *
+ * El PE (Peso del Evento) es DETERMINISTA, no aleatorio: se deriva de señales
+ * objetivas del propio texto (cuántas palabras clave coinciden, si aparecen términos
+ * de escala grande/pequeña). Así, el mismo evento siempre produce el mismo resultado.
+ *
+ * IMPORTANTE: esto NO se envía a la IA en el prompt (ver ope_rol_mv_build_prompt) —
+ * un resumen de un jugador es demasiado variable para que un scoring por palabras
+ * clave lo pondere de forma fiable. Solo se usa para persistir un valor de referencia
+ * en `rol_mv_eventos` que el panel de staff muestra como pista visual orientativa. La
+ * IA clasifica cada evento por su cuenta a partir del resumen (y del hilo original si
+ * lo necesita), sin conocer ni depender de esta estimación mecánica.
+ *
  * @param string $titulo  Título del evento.
  * @param string $resumen Resumen del evento.
  * @return array ['tipo_suceso' => 'S-XX', 'pe_estimado' => int]
  */
 function ope_rol_mv_auto_classify_evento($titulo, $resumen)
 {
-    $texto = mb_strtolower(($titulo ?? '') . ' ' . ($resumen ?? ''), 'UTF-8');
-    $texto = strtr($texto, 'áéíóúüñÁÉÍÓÚÜÑ', 'aeiouunaeiouun');
+    $tituloN = mb_strtolower((string) ($titulo ?? ''), 'UTF-8');
+    $resumenN = mb_strtolower((string) ($resumen ?? ''), 'UTF-8');
+    $tr = 'áéíóúüñÁÉÍÓÚÜÑ';
+    $to = 'aeiouunaeiouun';
+    $tituloN = strtr($tituloN, $tr, $to);
+    $resumenN = strtr($resumenN, $tr, $to);
+    $texto = $tituloN . ' ' . $resumenN;
 
     $reglas = array(
         'S-01' => array('tormenta','clima','maremoto','huracan','tsunami','calma','viento','marea','vendaval','tifon','monzon','tempestad','lluvia'),
@@ -492,17 +512,40 @@ function ope_rol_mv_auto_classify_evento($titulo, $resumen)
         'S-12' => array('desastre','catastrofe','incendio','terremoto','erupcion','hundimiento','explosion','colapso'),
     );
 
-    // Buscar coincidencias exactas de palabras clave
+    // Puntuar cada categoría: coincidencia en el título pesa el doble que en el resumen.
+    $scores = array();
     foreach ($reglas as $codigo => $palabras) {
+        $score = 0;
         foreach ($palabras as $p) {
-            if (mb_strpos($texto, $p) !== false) {
-                return array('tipo_suceso' => $codigo, 'pe_estimado' => rand(3, 6));
-            }
+            if (mb_strpos($tituloN, $p) !== false) $score += 2;
+            if (mb_strpos($resumenN, $p) !== false) $score += 1;
         }
+        if ($score > 0) $scores[$codigo] = $score;
     }
 
-    // Default si no matchea nada
-    return array('tipo_suceso' => 'S-02', 'pe_estimado' => 4);
+    if (empty($scores)) {
+        // Sin ninguna coincidencia: categoría neutra por defecto, PE mínimo (evento anecdótico).
+        return array('tipo_suceso' => 'S-02', 'pe_estimado' => 2);
+    }
+
+    arsort($scores); // mayor puntuación primero; en caso de empate, gana la de código más bajo (orden estable de $reglas)
+    reset($scores);
+    $codigo = key($scores);
+    $mejorScore = current($scores);
+
+    // Señales de escala: términos que indican que el suceso es grande/pequeño (PE 1-10).
+    $palabrasGrandes = array('mundial','global','masacre','invasion','guerra','imperio','flota entera','cataclismo','yonko','almirante','emperador','revolucion total');
+    $palabrasChicas  = array('rumor','anecdota','pequeno','menor','local','taberna','discusion');
+    $bonusGrande = 0;
+    foreach ($palabrasGrandes as $pg) { if (mb_strpos($texto, $pg) !== false) { $bonusGrande = 2; break; } }
+    $bonusChico = 0;
+    foreach ($palabrasChicas as $pc) { if (mb_strpos($texto, $pc) !== false) { $bonusChico = -1; break; } }
+
+    // PE = base 3 + (score de la categoría ganadora, con tope) + bonus de escala.
+    $pe = 3 + min(3, $mejorScore - 1) + $bonusGrande + $bonusChico;
+    $pe = max(1, min(10, $pe));
+
+    return array('tipo_suceso' => $codigo, 'pe_estimado' => $pe);
 }
 
 /**
@@ -520,6 +563,59 @@ function ope_rol_mv_auto_classify_pendientes($ciclo_id)
             'tipo_suceso' => $cl['tipo_suceso'],
             'pe_estimado' => $cl['pe_estimado'],
         ), 'evento_id=' . (int)$r['evento_id']);
+    }
+}
+
+/**
+ * Resuelve un slug de zona a partir de lo que la IA devuelva en 'ubicacion_zona'
+ * (puede venir como slug 'east-blue' o como nombre 'East Blue'). Si no se reconoce,
+ * devuelve '' y NO se sobrescribe la zona actual del NPC (mejor no tocar que borrar
+ * un dato bueno con uno irreconocible).
+ */
+function ope_rol_mv_resolver_zona_slug($valor)
+{
+    global $db;
+    $valor = trim((string) $valor);
+    if ($valor === '') return '';
+    $zonas = ope_rol_mv_zonas();
+    if (isset($zonas[$valor])) return $valor; // ya es un slug válido
+    $norm = mb_strtolower($valor, 'UTF-8');
+    foreach ($zonas as $slug => $z) {
+        if (mb_strtolower((string) $z['nombre'], 'UTF-8') === $norm) return $slug;
+    }
+    return '';
+}
+
+/**
+ * Sincroniza la ubicación/acción PÚBLICA de un NPC mayor (mundo_zona, mundo_accion,
+ * mundo_estado_np) a partir del tracking devuelto por la IA. Sin esto, el panel de
+ * "Estado del Mundo" y ope_rol_mv_auto_nav_resumen() muestran SIEMPRE la ubicación
+ * con la que se creó el NPC, aunque la IA lo mueva por el mundo cada mes.
+ */
+function ope_rol_mv_sync_npc_ubicacion($pid, array $tracking)
+{
+    global $db;
+    $pid = (int) $pid;
+    if ($pid < 1) return;
+    $upd = array();
+    $slug = ope_rol_mv_resolver_zona_slug($tracking['ubicacion_zona'] ?? '');
+    if ($slug !== '') $upd['mundo_zona'] = $db->escape_string($slug);
+    if (isset($tracking['plan_activo']) && trim((string) $tracking['plan_activo']) !== '') {
+        $upd['mundo_accion'] = $db->escape_string(trim((string) $tracking['plan_activo']));
+    }
+    $salud = isset($tracking['salud']) ? (int) $tracking['salud'] : 100;
+    $moral = isset($tracking['moral']) ? (int) $tracking['moral'] : 100;
+    if ($salud <= 0) {
+        $upd['mundo_estado_np'] = 'Muerto';
+    } elseif ($salud < 40) {
+        $upd['mundo_estado_np'] = 'Herido';
+    } elseif ($moral < 30) {
+        $upd['mundo_estado_np'] = 'Moral baja';
+    } else {
+        $upd['mundo_estado_np'] = 'Activo';
+    }
+    if (!empty($upd)) {
+        $db->update_query('rol_personajes', $upd, "pid = {$pid}");
     }
 }
 
@@ -557,11 +653,13 @@ function ope_rol_mv_build_prompt($ciclo)
         return '';
     }
     $tablero   = ope_rol_mv_tablero();
-    $eventos   = ope_rol_mv_eventos((int) $ciclo['ciclo_id'], 'incluido');
-    if (empty($eventos)) {
-        $eventos = ope_rol_mv_eventos((int) $ciclo['ciclo_id']);
-    }
+    // v4: se incluyen TODOS los eventos notificados del ciclo, sin curación manual de
+    // "incluir/descartar" ni preclasificación mecánica — la IA recibe solo título,
+    // enlace y resumen de cada uno, y decide ella misma tipo/peso (ver instrucción
+    // en la sección "EVENTOS NOTIFICADOS ESTE MES" más abajo).
+    $eventos   = ope_rol_mv_eventos((int) $ciclo['ciclo_id']);
     $misiones  = ope_rol_mv_misiones((int) $ciclo['ciclo_id']);
+    $misionesEnCurso = array_values(array_filter($misiones, function ($m) { return $m['estado'] === 'en_curso'; }));
     $npcs      = ope_rol_mv_npc_mayores();
     $menores   = ope_rol_mv_npc_menores((int) $ciclo['ciclo_id']);
     $threads   = ope_rol_mv_threads_activos();
@@ -590,12 +688,21 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "  (c) las INDICACIONES del staff (si las hay), que tienes OBLIGACIÓN de seguir.";
     $L[] = "";
     $L[] = "======================================================================";
-    $L[] = " 2 · TIENES ACCESO A LA BASE DE DATOS";
+    $L[] = " 2 · TIENES ACCESO (LECTURA) A LA BASE DE DATOS POR MCP";
     $L[] = "======================================================================";
     $L[] = "";
-    $L[] = "Puedes ejecutar consultas SQL sobre estas tablas (prefijo: mybb_) para obtener";
-    $L[] = "información adicional cuando la necesites. No hace falta que consultes todo cada";
-    $L[] = "vez — solo lo que necesites para resolver dudas:";
+    $L[] = "Si tienes herramientas MCP conectadas con acceso a esta base de datos, puedes";
+    $L[] = "consultarla en tiempo real (SELECT) sobre estas tablas (prefijo: mybb_) para";
+    $L[] = "verificar o ampliar cualquier dato de este prompt — por ejemplo si algo te parece";
+    $L[] = "desactualizado, ambiguo, o quieres más contexto histórico del que cabe aquí abajo.";
+    $L[] = "No hace falta que consultes todo cada vez — solo lo que necesites para resolver dudas.";
+    $L[] = "IMPORTANTE: es acceso de SOLO LECTURA a efectos de este ejercicio — NUNCA ejecutes";
+    $L[] = "INSERT/UPDATE/DELETE aunque técnicamente puedas, y NUNCA asumas que ya está \"guardado\"";
+    $L[] = "algo que no hayas devuelto también en los bloques de la sección 6. El único canal";
+    $L[] = "oficial de salida es tu respuesta de texto con los 6 bloques; el staff la pega en el";
+    $L[] = "panel y el sistema aplica los cambios él mismo (con topes de seguridad incluidos).";
+    $L[] = "Si NO tienes acceso MCP a esta base de datos, ignora esta sección y trabaja solo con";
+    $L[] = "los datos ya incluidos más abajo — están completos y son suficientes.";
     $L[] = "";
     $L[] = "  Tabla                     | Para qué consultarla";
     $L[] = "  -------------------------|------------------------------------------------------";
@@ -615,6 +722,11 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "                          |   jugadores), datos_internos (JSON solo staff/IA con";
     $L[] = "                          |   personalidad, metas, tracking: salud, moral, plan, ubicación)";
     $L[] = "  rol_mv_periodicos       | Periódicos anteriores (para mantener continuidad narrativa)";
+    $L[] = "  threads                 | El hilo COMPLETO de cada evento (JOIN por tid). Consúltala";
+    $L[] = "                          |   cuando el resumen de un evento no te baste para juzgar su";
+    $L[] = "                          |   peso real (ver sección 4 más abajo, es importante)";
+    $L[] = "  posts (WHERE tid=...)   | Los mensajes de ese hilo, en orden, para leer qué pasó de";
+    $L[] = "                          |   verdad antes de clasificar el evento";
     $L[] = "";
     $L[] = "Cuándo consultar cada tabla:";
     $L[] = "  · Si dudas del histórico: rol_mv_ciclos WHERE estado='publicado' ORDER BY ciclo_id DESC LIMIT 3";
@@ -1132,11 +1244,24 @@ function ope_rol_mv_build_prompt($ciclo)
 
     // Eventos
     $L[] = "== EVENTOS NOTIFICADOS ESTE MES ==";
-    $L[] = "INSTRUCCIÓN: Los eventos son la materia prima del periódico. Analiza cada uno:";
-    $L[] = "su tipo (S-01 a S-12) y peso estimado (PE 1-10) determinan su relevancia. Los eventos";
-    $L[] = "deben influir en las métricas de la zona y facción correspondientes, y ser la base";
-    $L[] = "del contenido del periódico. Si hay pocos eventos, la IA debe generar contenido de";
-    $L[] = "relleno coherente (vida en las islas, economía, rumores).";
+    $L[] = "";
+    $L[] = "CÓMO PONDERAR ESTOS EVENTOS (léelo antes de clasificar):";
+    $L[] = "Cada evento viene de un trámite donde UN JUGADOR pega el enlace de su hilo y escribe";
+    $L[] = "un resumen libre de lo que pasó. Ese resumen puede ser parco, exagerado, quitarle";
+    $L[] = "importancia a algo grave, o simplemente no reflejar bien la escala real de lo ocurrido";
+    $L[] = "en el hilo. NO existe ninguna clasificación automática fiable de este sistema — cualquier";
+    $L[] = "cosa que se calcule por palabras clave es una heurística mecánica y puede estar mal.";
+    $L[] = "TÚ eres quien de verdad clasifica cada evento (tipo S-01 a S-12, PE 1-10), usando tu";
+    $L[] = "propio criterio narrativo. Si el resumen te basta para juzgar el peso con confianza,";
+    $L[] = "clasifica directamente. Si el resumen es ambiguo, muy corto, o notas que puede haber";
+    $L[] = "más contexto relevante (varios participantes, giros a mitad de hilo, un desenlace que";
+    $L[] = "no se cuenta bien) y tienes forma de comprobarlo — acceso MCP de lectura a las tablas";
+    $L[] = "`threads`/`posts` filtrando por el `tid` del evento, o capacidad de abrir la URL del";
+    $L[] = "enlace — HAZLO antes de decidir. Es preferible que te tomes ese paso extra a que un";
+    $L[] = "evento importante quede infravalorado (o uno menor, sobrevalorado) por un resumen flojo.";
+    $L[] = "Los eventos son la materia prima del periódico: deben influir en las métricas de la";
+    $L[] = "zona y facción correspondientes, y ser la base del contenido. Si hay pocos eventos,";
+    $L[] = "genera contenido de relleno coherente (vida en las islas, economía, rumores).";
     $L[] = "";
     if (empty($eventos)) {
         $L[] = "(Ninguno.)";
@@ -1150,17 +1275,9 @@ function ope_rol_mv_build_prompt($ciclo)
                     $rango = ' | personaje: ' . $rr['nombre'] . ' (rango ' . ($rr['rango'] !== '' ? $rr['rango'] : '?') . ')';
                 }
             }
-            // Auto-clasificar si no tiene tipo_suceso/pe_estimado
-            $ts = $e['tipo_suceso'] ?? '';
-            $pe = isset($e['pe_estimado']) ? (int)$e['pe_estimado'] : 0;
-            if (empty($ts) || $pe < 1) {
-                $cl = ope_rol_mv_auto_classify_evento($e['titulo'], $e['resumen']);
-                if (empty($ts)) $ts = $cl['tipo_suceso'];
-                if ($pe < 1)   $pe = $cl['pe_estimado'];
-            }
-            $L[] = "- [$ts|PE=$pe] [" . ($e['zona_slug'] !== '' ? $e['zona_slug'] : 'zona?') . "] " . $e['titulo'] . $rango;
+            $L[] = "- [" . ($e['zona_slug'] !== '' ? $e['zona_slug'] : 'zona?') . "] " . $e['titulo'] . $rango . " (tid:" . (int) $e['tid'] . ")";
             $L[] = "  Enlace: " . $e['enlace'];
-            $L[] = "  Resumen: " . trim(preg_replace('/\s+/', ' ', (string) $e['resumen']));
+            $L[] = "  Resumen (del jugador): " . trim(preg_replace('/\s+/', ' ', (string) $e['resumen']));
         }
     }
     $L[] = "";
@@ -1171,7 +1288,7 @@ function ope_rol_mv_build_prompt($ciclo)
         $L[] = "(Ninguna.)";
     } else {
         foreach ($misiones as $m) {
-            $L[] = "- [" . strtoupper(str_replace('_', ' ', $m['estado'])) . "] " . $m['titulo'] . " (" . ($m['zona_slug'] !== '' ? $m['zona_slug'] : 'zona?') . ")";
+            $L[] = "- (id:" . (int) $m['mision_id'] . ") [" . strtoupper(str_replace('_', ' ', $m['estado'])) . "] " . $m['titulo'] . " (" . ($m['zona_slug'] !== '' ? $m['zona_slug'] : 'zona?') . ")";
             if (trim((string) $m['resumen']) !== '') {
                 $L[] = "  " . trim(preg_replace('/\s+/', ' ', (string) $m['resumen']));
             }
@@ -1181,9 +1298,20 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "INSTRUCCIÓN: Analiza el estado de cada misión. Las COMPLETADAS han tenido un impacto";
     $L[] = "directo en el mundo: ajusta las métricas de zonas y facciones afectadas, genera";
     $L[] = "consecuencias narrativas coherentes y menciónalas en el periódico. Las FALLIDAS también";
-    $L[] = "dejan huella (tensión, bajas, oportunidades perdidas). Las EN CURSO deben avanzar o";
-    $L[] = "complicarse según lo que haya ocurrido este mes.";
+    $L[] = "dejan huella (tensión, bajas, oportunidades perdidas).";
     $L[] = "";
+    if (!empty($misionesEnCurso)) {
+        $L[] = "IMPORTANTE — RESOLUCIÓN OBLIGATORIA: el staff YA NO marca a mano si una misión EN CURSO";
+        $L[] = "se completó o falló. TÚ debes decidirlo leyendo los eventos, hilos y periódicos de este";
+        $L[] = "ciclo, y devolver tu decisión para CADA una de estas misiones EN CURSO en el bloque";
+        $L[] = "===MISIONES_RESUELTAS=== (ver formato de respuesta). Si de verdad no hay ninguna pista";
+        $L[] = "sobre una misión concreta, mantenla 'en_curso' explícitamente (no la omitas).";
+        $L[] = "Misiones EN CURSO que requieren resolución este ciclo:";
+        foreach ($misionesEnCurso as $m) {
+            $L[] = "  - id:" . (int) $m['mision_id'] . " — " . $m['titulo'];
+        }
+        $L[] = "";
+    }
 
     // NPCs mayores
     $L[] = "== NPCs MAYORES (con ficha) ==";
@@ -1246,7 +1374,7 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "###############################################################################";
     $L[] = "==  FORMATO DE RESPUESTA (OBLIGATORIO)  ==";
     $L[] = "###############################################################################";
-    $L[] = "Responde EXACTAMENTE con estos CINCO bloques, cada uno entre sus marcadores ===X=== ... ===FIN===, y SIN ningún texto fuera de ellos (ni saludos ni explicaciones).";
+    $L[] = "Responde EXACTAMENTE con estos SEIS bloques, cada uno entre sus marcadores ===X=== ... ===FIN===, y SIN ningún texto fuera de ellos (ni saludos ni explicaciones).";
     $L[] = "";
     $L[] = "-------------------------------------------------------------------------------";
     $L[] = "BLOQUE 1 — ESTADO_JSON (el nuevo Tablero). JSON válido, sin comentarios ni comas colgantes.";
@@ -1294,7 +1422,18 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "===FIN===";
     $L[] = "";
     $L[] = "-------------------------------------------------------------------------------";
-    $L[] = "BLOQUE 4 — MISIONES que SURGEN de lo ocurrido este mes (ganchos para que los jugadores actúen el mes que viene). Propón 2-5, coherentes con los eventos, los arcos y las tensiones. El staff decidirá cuáles publicar.";
+    $L[] = "BLOQUE 4 — MISIONES_RESUELTAS. Resuelve el estado de CADA misión EN CURSO listada arriba";
+    $L[] = "en '== MISIONES DEL MES ==' con id numérico. Decide 'completada', 'fallida' o 'en_curso'";
+    $L[] = "(si sigue igual) para cada una, basándote en los eventos/hilos de este ciclo. Si no hay";
+    $L[] = "ninguna misión EN CURSO este ciclo, deja el bloque vacío (solo los marcadores).";
+    $L[] = "Un guion por línea, con estos campos separados por ' | ':";
+    $L[] = "===MISIONES_RESUELTAS===";
+    $L[] = "- id: 12 | estado: completada | resumen: (qué ocurrió, en 1-2 frases, para guardarlo en el historial)";
+    $L[] = "- id: 13 | estado: en_curso | resumen: (por qué sigue abierta / qué falta)";
+    $L[] = "===FIN===";
+    $L[] = "";
+    $L[] = "-------------------------------------------------------------------------------";
+    $L[] = "BLOQUE 5 — MISIONES que SURGEN de lo ocurrido este mes (ganchos para que los jugadores actúen el mes que viene). Propón 2-5, coherentes con los eventos, los arcos y las tensiones. El staff YA NO las filtra: al publicar, TODAS las de este bloque se crean automáticamente como misiones 'en_curso' del próximo ciclo — no propongas más de las que de verdad tengan sentido.";
     $L[] = "Un guion por línea, con estos campos separados por ' | ':";
     $L[] = "===MISIONES===";
     $L[] = "- titulo: (título corto) | zona: east-blue | facciones: marine,pirata | dificultad: (baja|media|alta) | resumen: (qué ocurre y qué se pide a los jugadores)";
@@ -1302,7 +1441,7 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "===FIN===";
     $L[] = "";
     $L[] = "-------------------------------------------------------------------------------";
-    $L[] = "BLOQUE 5 — IMAGENES. Un id por línea. Prompts en INGLÉS, estilo ilustración/anime One Piece, cinematográficos. Si intervienen personajes de jugador o NPCs concretos, añade '(use reference image of <nombre>)'. Incluye SIEMPRE 'portada' y una imagen por cada figure que uses en el periódico. El id debe COINCIDIR con el data-img del figure correspondiente.";
+    $L[] = "BLOQUE 6 — IMAGENES. Un id por línea. Prompts en INGLÉS, estilo ilustración/anime One Piece, cinematográficos. Si intervienen personajes de jugador o NPCs concretos, añade '(use reference image of <nombre>)'. Incluye SIEMPRE 'portada' y una imagen por cada figure que uses en el periódico. El id debe COINCIDIR con el data-img del figure correspondiente.";
     $L[] = "===IMAGENES===";
     $L[] = "- id: portada | tamaño: 1200x675 | prompt: ...";
     $L[] = "- id: (otro-id-usado-en-figure) | tamaño: 800x600 | prompt: ...";
@@ -1310,9 +1449,13 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "";
     $L[] = "-------------------------------------------------------------------------------";
     $L[] = "INSTRUCCIONES ESPECÍFICAS ADICIONALES:";
-    $L[] = "  a) NO puedes negarte a generar ninguno de los 5 bloques. Si no hay datos suficientes, genera ese bloque con contenido mínimo coherente.";
+    $L[] = "  a) NO puedes negarte a generar ninguno de los 6 bloques. Si no hay datos suficientes, genera ese bloque con contenido mínimo coherente (o vacío en el caso de MISIONES_RESUELTAS si no hay nada que resolver).";
     $L[] = "  b) Si el staff incluye la palabra \"REGENERAR\" en las indicaciones, debes IGNORAR el contexto de generaciones anteriores y regenerar todo desde cero.";
     $L[] = "  c) Ante cualquier ambigüedad entre estas instrucciones y las indicaciones del staff, las indicaciones del staff tienen prioridad.";
+    $L[] = "  d) TÚ NO ESCRIBES EN LA BASE DE DATOS. Aunque tengas herramientas MCP con acceso de lectura";
+    $L[] = "     (sección 2) para verificar cualquier dato en tiempo real, tu única salida es el texto de";
+    $L[] = "     estos 6 bloques: el staff pegará tu respuesta en el panel de Mundo Vivo y el propio sistema";
+    $L[] = "     aplicará los cambios (con topes anti-escalada de seguridad). No ejecutes INSERT/UPDATE/DELETE.";
     $L[] = "";
 
     return implode("\n", $L);
@@ -1373,6 +1516,44 @@ function ope_rol_mv_parse_misiones($txt)
 }
 
 /**
+ * Parsea el bloque ===MISIONES_RESUELTAS===. Cada línea:
+ *   - id: 12 | estado: completada|fallida|en_curso | resumen: ...
+ * Devuelve array de {id, estado, resumen}.
+ */
+function ope_rol_mv_parse_misiones_resueltas($txt)
+{
+    $out = array();
+    $txt = (string) $txt;
+    if ($txt === '') {
+        return $out;
+    }
+    $validos = array('completada', 'fallida', 'en_curso');
+    foreach (preg_split('/\r?\n/', $txt) as $line) {
+        $line = trim($line);
+        if ($line === '') continue;
+        $line = preg_replace('/^[\-\*\x{2022}]\s*/u', '', $line);
+        if ($line === '') continue;
+        $r = array('id' => 0, 'estado' => '', 'resumen' => '');
+        foreach (explode('|', $line) as $seg) {
+            $seg = trim($seg);
+            if ($seg === '' || strpos($seg, ':') === false) continue;
+            list($k, $v) = explode(':', $seg, 2);
+            $k = strtolower(trim($k));
+            $v = trim($v);
+            switch ($k) {
+                case 'id': $r['id'] = (int) preg_replace('/[^0-9]/', '', $v); break;
+                case 'estado': $r['estado'] = strtolower(str_replace(' ', '_', $v)); break;
+                case 'resumen': $r['resumen'] = $v; break;
+            }
+        }
+        if ($r['id'] > 0 && in_array($r['estado'], $validos, true)) {
+            $out[] = $r;
+        }
+    }
+    return $out;
+}
+
+/**
  * Parsea el bloque ===IMAGENES===. Cada línea:
  *   - id: portada | tamaño: 1200x675 | prompt: ...
  * Devuelve array de {id, tamano, prompt}.
@@ -1420,6 +1601,7 @@ function ope_rol_mv_parse_resultado($raw)
         'imagenes'      => '',
         'imagenes_list' => array(),
         'misiones'      => array(),
+        'misiones_resueltas' => array(),
         'errores'       => array(),
     );
 
@@ -1460,6 +1642,7 @@ function ope_rol_mv_parse_resultado($raw)
     $res['imagenes_list'] = ope_rol_mv_parse_imagenes($res['imagenes']);
 
     $res['misiones'] = ope_rol_mv_parse_misiones(ope_rol_mv_extract_block($raw, 'MISIONES'));
+    $res['misiones_resueltas'] = ope_rol_mv_parse_misiones_resueltas(ope_rol_mv_extract_block($raw, 'MISIONES_RESUELTAS'));
 
     return $res;
 }
@@ -1603,23 +1786,121 @@ function ope_rol_mv_inject_imagenes($html, $urls)
 // Publicación
 // ─────────────────────────────────────────────────────────────────────────
 
-/** Aplica el estado parseado al tablero. */
-function ope_rol_mv_aplicar_estado($estado)
+/**
+ * Tope duro de variación por ciclo para métricas de zona/facción (AV-13 §5.3 / §2.4).
+ * Ninguna métrica puede moverse más de esto en un solo ciclo, sin importar lo que
+ * devuelva la IA. Es un guardarraíl de código, no una instrucción de texto: por eso
+ * funciona igual aunque la IA se equivoque, alucine o el staff no revise los números.
+ */
+if (!defined('OPE_MV_METRIC_MAX_DELTA')) {
+    define('OPE_MV_METRIC_MAX_DELTA', 15);
+}
+
+/**
+ * Calcula el nuevo valor de una métrica aplicando el tope de variación por ciclo.
+ * Devuelve array [nuevo_valor, delta_aplicado, delta_propuesto, capado(bool)].
+ */
+function ope_rol_mv_clamp_metric($actual, $propuesto, $min, $max, $maxDelta = OPE_MV_METRIC_MAX_DELTA)
+{
+    $actual = (int) $actual;
+    $propuesto = max($min, min($max, (int) $propuesto));
+    $deltaProp = $propuesto - $actual;
+    $deltaApl = max(-$maxDelta, min($maxDelta, $deltaProp));
+    $nuevo = max($min, min($max, $actual + $deltaApl));
+    return array($nuevo, $deltaApl, $deltaProp, ($deltaApl !== $deltaProp));
+}
+
+/**
+ * Calcula, SIN escribir nada en la base de datos, qué topes se aplicarían si se
+ * publicara $estado tal cual. Se usa en la vista previa para que el staff vea ANTES
+ * de publicar si la IA se ha salido de rango en algo (mismo cálculo que
+ * ope_rol_mv_aplicar_estado(), pero de solo lectura).
+ */
+function ope_rol_mv_calcular_caps_previstos($estado)
 {
     global $db;
+    $caps = array();
+    if (!is_array($estado)) return $caps;
+    $zMetricKeys = array_keys(ope_rol_mv_zona_metrics());
+    $fMetricKeys = array_keys(ope_rol_mv_faccion_metrics());
+    $zActual = ope_rol_mv_zonas();
+    $fActual = ope_rol_mv_facciones();
+
+    if (!empty($estado['zonas']) && is_array($estado['zonas'])) {
+        foreach ($estado['zonas'] as $slug => $z) {
+            if (!is_array($z)) continue;
+            $base = $zActual[$slug] ?? array();
+            foreach ($zMetricKeys as $k) {
+                if (!isset($z[$k])) continue;
+                list(, $deltaApl, $deltaProp, $capado) = ope_rol_mv_clamp_metric($base[$k] ?? 0, $z[$k], 0, 100);
+                if ($capado) $caps[] = array('ambito' => 'zona', 'slug' => $slug, 'metrica' => strtoupper($k), 'propuesto_delta' => $deltaProp, 'aplicado_delta' => $deltaApl);
+            }
+        }
+    }
+    if (!empty($estado['facciones']) && is_array($estado['facciones'])) {
+        foreach ($estado['facciones'] as $slug => $f) {
+            if (!is_array($f)) continue;
+            $base = $fActual[$slug] ?? array();
+            foreach ($fMetricKeys as $k) {
+                if (!isset($f[$k])) continue;
+                $min = ($k === 'rep') ? -100 : 0;
+                list(, $deltaApl, $deltaProp, $capado) = ope_rol_mv_clamp_metric($base[$k] ?? 0, $f[$k], $min, 100);
+                if ($capado) $caps[] = array('ambito' => 'faccion', 'slug' => $slug, 'metrica' => strtoupper($k), 'propuesto_delta' => $deltaProp, 'aplicado_delta' => $deltaApl);
+            }
+        }
+    }
+    $capUp = defined('OPE_MV_TENSION_MAX_UP') ? (int) OPE_MV_TENSION_MAX_UP : 15;
+    if (!empty($estado['tension']) && is_array($estado['tension'])) {
+        foreach ($estado['tension'] as $zslug => $pares) {
+            if (!is_array($pares)) continue;
+            foreach ($pares as $par => $info) {
+                $propuesto = is_array($info) ? (isset($info['valor']) ? (int) $info['valor'] : null) : (is_numeric($info) ? (int) $info : null);
+                if ($propuesto === null) continue;
+                $propuesto = max(0, min(100, $propuesto));
+                $cq = $db->simple_select('rol_mv_tension', 'valor', "zona_slug = '" . $db->escape_string((string) $zslug) . "' AND par = '" . $db->escape_string((string) $par) . "'", array('limit' => 1));
+                if (!$db->num_rows($cq)) continue;
+                $cur = (int) $db->fetch_field($cq, 'valor');
+                $deltaProp = $propuesto - $cur;
+                if ($propuesto > $cur + $capUp) {
+                    $caps[] = array('ambito' => 'tension', 'slug' => $zslug, 'metrica' => str_replace('|', ' vs ', $par), 'propuesto_delta' => $deltaProp, 'aplicado_delta' => $capUp);
+                }
+            }
+        }
+    }
+    return $caps;
+}
+
+/**
+ * Aplica el estado parseado al tablero, con topes anti-escalada aplicados en código
+ * (no solo como instrucción de texto en el prompt). Si se pasa $capsLog (array por
+ * referencia), se rellena con cada tope que haya recortado la propuesta de la IA,
+ * para poder mostrarlo en la vista previa / auditoría.
+ */
+function ope_rol_mv_aplicar_estado($estado, &$capsLog = null)
+{
+    global $db;
+    if (!is_array($capsLog)) $capsLog = array();
     if (!is_array($estado)) {
         return;
     }
     $zMetricKeys = array_keys(ope_rol_mv_zona_metrics());
     $fMetricKeys = array_keys(ope_rol_mv_faccion_metrics());
+    $zActual = ope_rol_mv_zonas();
+    $fActual = ope_rol_mv_facciones();
 
     // Zonas
     if (!empty($estado['zonas']) && is_array($estado['zonas'])) {
         foreach ($estado['zonas'] as $slug => $z) {
             if (!is_array($z)) continue;
+            $base = $zActual[$slug] ?? array();
             $upd = array();
             foreach ($zMetricKeys as $k) {
-                if (isset($z[$k])) $upd[$k] = max(0, min(100, (int) $z[$k]));
+                if (!isset($z[$k])) continue;
+                list($nuevo, $deltaApl, $deltaProp, $capado) = ope_rol_mv_clamp_metric($base[$k] ?? 0, $z[$k], 0, 100);
+                $upd[$k] = $nuevo;
+                if ($capado) {
+                    $capsLog[] = array('ambito' => 'zona', 'slug' => $slug, 'metrica' => strtoupper($k), 'propuesto_delta' => $deltaProp, 'aplicado_delta' => $deltaApl);
+                }
             }
             if (isset($z['notas'])) $upd['notas'] = $db->escape_string((string) $z['notas']);
             if (!empty($upd)) {
@@ -1631,10 +1912,16 @@ function ope_rol_mv_aplicar_estado($estado)
     if (!empty($estado['facciones']) && is_array($estado['facciones'])) {
         foreach ($estado['facciones'] as $slug => $f) {
             if (!is_array($f)) continue;
+            $base = $fActual[$slug] ?? array();
             $upd = array();
             foreach ($fMetricKeys as $k) {
                 if (!isset($f[$k])) continue;
-                $upd[$k] = ($k === 'rep') ? max(-100, min(100, (int) $f[$k])) : max(0, min(100, (int) $f[$k]));
+                $min = ($k === 'rep') ? -100 : 0;
+                list($nuevo, $deltaApl, $deltaProp, $capado) = ope_rol_mv_clamp_metric($base[$k] ?? 0, $f[$k], $min, 100);
+                $upd[$k] = $nuevo;
+                if ($capado) {
+                    $capsLog[] = array('ambito' => 'faccion', 'slug' => $slug, 'metrica' => strtoupper($k), 'propuesto_delta' => $deltaProp, 'aplicado_delta' => $deltaApl);
+                }
             }
             if (isset($f['notas'])) $upd['notas'] = $db->escape_string((string) $f['notas']);
             if (!empty($upd)) {
@@ -1664,7 +1951,9 @@ function ope_rol_mv_aplicar_estado($estado)
                     $cq = $db->simple_select('rol_mv_tension', 'valor', "zona_slug = '" . $db->escape_string((string) $zslug) . "' AND par = '" . $db->escape_string((string) $par) . "'", array('limit' => 1));
                     if ($db->num_rows($cq)) {
                         $cur = (int) $db->fetch_field($cq, 'valor');
+                        $deltaProp = $upd['valor'] - $cur;
                         if ($upd['valor'] > $cur + $capUp) {
+                            $capsLog[] = array('ambito' => 'tension', 'slug' => $zslug, 'metrica' => str_replace('|', ' vs ', $par), 'propuesto_delta' => $deltaProp, 'aplicado_delta' => $capUp);
                             $upd['valor'] = $cur + $capUp;
                         }
                     }
@@ -1676,7 +1965,7 @@ function ope_rol_mv_aplicar_estado($estado)
             }
         }
     }
-    // Arcos: reemplazo completo si se proporcionan
+    // Arcos: reemplazo completo si se proporcionan (fin de aplicar caps de tensión, sigue igual)
     if (isset($estado['arcos']) && is_array($estado['arcos'])) {
         $db->delete_query('rol_mv_arcos');
         foreach ($estado['arcos'] as $a) {
@@ -1691,6 +1980,74 @@ function ope_rol_mv_aplicar_estado($estado)
             ));
         }
     }
+}
+
+/**
+ * Aplica las resoluciones de misiones EN CURSO que la IA devolvió en
+ * ===MISIONES_RESUELTAS===. El staff ya no elige a mano "completada/fallida": lo
+ * decide la IA leyendo los eventos del ciclo, y esto solo escribe su decisión.
+ * Devuelve el número de misiones resueltas.
+ */
+function ope_rol_mv_aplicar_misiones_resueltas(array $resoluciones)
+{
+    global $db;
+    $n = 0;
+    foreach ($resoluciones as $r) {
+        $mid = (int) ($r['id'] ?? 0);
+        $estado = (string) ($r['estado'] ?? '');
+        if ($mid < 1 || !in_array($estado, array('completada', 'fallida', 'en_curso'), true)) continue;
+        $upd = array('estado' => $estado);
+        if (trim((string) ($r['resumen'] ?? '')) !== '') {
+            $upd['notas_resolucion'] = $db->escape_string(trim((string) $r['resumen']));
+        }
+        $db->update_query('rol_mv_misiones', $upd, "mision_id = {$mid}");
+        $n++;
+    }
+    return $n;
+}
+
+/**
+ * Inserta como misiones 'en_curso' del ciclo indicado las propuestas nuevas que la
+ * IA devolvió en ===MISIONES===. Antes este paso estaba deshabilitado ("Disponible
+ * en una fase posterior") y las misiones no se creaban de ninguna forma automática;
+ * ahora se crean solas al publicar, sin que el staff tenga que redactarlas ni pegarlas.
+ * Devuelve el número de misiones creadas.
+ */
+function ope_rol_mv_crear_misiones_nuevas(array $misiones, $ciclo_id)
+{
+    global $db;
+    $ciclo_id = (int) $ciclo_id;
+    if ($ciclo_id < 1) return 0;
+    $zonas = ope_rol_mv_zonas();
+    $n = 0;
+    foreach ($misiones as $m) {
+        $titulo = trim((string) ($m['titulo'] ?? ''));
+        if ($titulo === '') continue;
+        $zonaSlug = ope_rol_mv_resolver_zona_slug((string) ($m['zona'] ?? ''));
+        if ($zonaSlug === '' && isset($zonas[(string) ($m['zona'] ?? '')])) {
+            $zonaSlug = (string) $m['zona'];
+        }
+        $rango = in_array((string)($m['rango'] ?? ''), array('S','A','B','C','D'), true) ? $m['rango'] : 'D';
+        $pel = min(5, max(1, (int)($m['peligrosidad'] ?? 1)));
+        $mod = in_array((string)($m['modalidad'] ?? ''), array('solo','grupo','cualquiera'), true) ? $m['modalidad'] : 'cualquiera';
+        $db->insert_query('rol_mv_misiones', array(
+            'ciclo_id'        => $ciclo_id,
+            'titulo'          => $db->escape_string($titulo),
+            'resumen'         => $db->escape_string((string) ($m['resumen'] ?? '')),
+            'descripcion_larga' => $db->escape_string((string) ($m['descripcion_larga'] ?? $m['resumen'] ?? '')),
+            'rango'           => $db->escape_string($rango),
+            'peligrosidad'    => $pel,
+            'zona_slug'       => $db->escape_string($zonaSlug),
+            'facciones'       => $db->escape_string((string) ($m['facciones'] ?? '')),
+            'recompensa'      => $db->escape_string((string) ($m['recompensa'] ?? '')),
+            'modalidad'       => $db->escape_string($mod),
+            'enlace'          => '',
+            'estado'          => 'en_curso',
+            'dateline'        => (int) TIME_NOW,
+        ));
+        $n++;
+    }
+    return $n;
 }
 
 /**
@@ -1715,8 +2072,10 @@ function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
         $parsed['noticia']['cuerpo'] = ope_rol_mv_inject_imagenes($parsed['noticia']['cuerpo'], $imgUrls);
     }
 
-    // 1) Aplicar estado al tablero
-    ope_rol_mv_aplicar_estado($parsed['estado']);
+    // 1) Aplicar estado al tablero (con topes anti-escalada server-side; $capsLog
+    //    recoge cualquier valor que la IA haya propuesto y que se haya recortado).
+    $capsLog = array();
+    ope_rol_mv_aplicar_estado($parsed['estado'], $capsLog);
 
     // 1b) Threads y navegación (v3)
     $threads_json = '';
@@ -1725,11 +2084,13 @@ function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
     }
     $nav_resumen = (string)($parsed['nav_resumen'] ?? '');
 
-    // 1c) Actualizar NPC tracking desde npc_tracking (v3)
+    // 1c) Actualizar NPC tracking desde npc_tracking (v3) + sincronizar su ubicación
+    //     pública (mundo_zona/mundo_accion/mundo_estado_np) para que de verdad se
+    //     "muevan" por el mundo sin que el staff tenga que tocar nada.
     if (isset($parsed['estado']['npc_tracking']) && is_array($parsed['estado']['npc_tracking'])) {
         foreach ($parsed['estado']['npc_tracking'] as $pid => $tracking) {
             $pid = (int)$pid;
-            if ($pid < 1) continue;
+            if ($pid < 1 || !is_array($tracking)) continue;
             $q = $db->simple_select('rol_personajes', 'datos_internos', "pid = $pid", array('limit' => 1));
             if (!$db->num_rows($q)) continue;
             $di = json_decode((string)$db->fetch_field($q, 'datos_internos'), true);
@@ -1741,11 +2102,20 @@ function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
             $di['tracking']['meta_actual'] = (string)($tracking['meta_actual'] ?? $di['tracking']['meta_actual'] ?? '');
             $di['tracking']['ultimo_ciclo'] = $ciclo['periodo'];
             $db->update_query('rol_personajes', array('datos_internos' => $db->escape_string(json_encode($di, JSON_UNESCAPED_UNICODE))), "pid = $pid");
+            ope_rol_mv_sync_npc_ubicacion($pid, $di['tracking']);
         }
     }
 
-    // 2) Snapshot del tablero ya actualizado
+    // 2) Snapshot del tablero ya actualizado. IMPORTANTE: incluye 'threads' dentro del
+    //    propio snapshot, porque ope_rol_mv_threads_activos() los lee desde
+    //    estado_json['threads'] del último ciclo publicado. Guardarlos SOLO en la columna
+    //    threads_json (aparte) los deja invisibles para el siguiente ciclo.
     $snapshot = ope_rol_mv_tablero();
+    $snapshot['threads'] = is_array($parsed['estado']['threads'] ?? null) ? $parsed['estado']['threads'] : array();
+    // También se archiva el npc_tracking devuelto este ciclo (aunque la fuente de verdad
+    // "viva" es rol_personajes.datos_internos): así el histórico de un ciclo pasado es
+    // autocontenido y consultable por MCP sin tener que cruzar tablas.
+    $snapshot['npc_tracking'] = is_array($parsed['estado']['npc_tracking'] ?? null) ? $parsed['estado']['npc_tracking'] : array();
     $snapshot_json = json_encode($snapshot, JSON_UNESCAPED_UNICODE);
 
     // 3) Guardar en el ciclo
@@ -1779,10 +2149,145 @@ function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
         'dateline'    => (int) TIME_NOW,
     ));
 
-    // 5) Abrir el mes siguiente si no existe
-    ope_rol_mv_ciclo_actual();
+    // 5) Misiones: la IA resuelve las EN CURSO de este ciclo (===MISIONES_RESUELTAS===)...
+    $resueltas = ope_rol_mv_aplicar_misiones_resueltas($parsed['misiones_resueltas'] ?? array());
 
-    return array('ok' => true);
+    // 6) Abrir el mes siguiente si no existe
+    $siguiente = ope_rol_mv_ciclo_actual();
+
+    // ...y las nuevas que propone (===MISIONES===) se crean solas para el mes que
+    //    viene: ya no hace falta un botón de "Publicar misiones" ni que el staff las
+    //    redacte o filtre a mano.
+    $creadas = 0;
+    if ($siguiente && !empty($parsed['misiones'])) {
+        $creadas = ope_rol_mv_crear_misiones_nuevas($parsed['misiones'], (int) $siguiente['ciclo_id']);
+    }
+
+    // 7) Auditoría: registrar qué se aplicó, qué se recortó por topes, y qué pasó con
+    //    las misiones — para poder revisar cualquier publicación después sin tener que
+    //    fiarse solo de la memoria del staff que la hizo.
+    ope_rol_mv_audit_log($ciclo_id, $capsLog, $resueltas, $creadas);
+
+    // 8) Avisar a los Web Masters de que hay periódico nuevo (best-effort: si falla el
+    //    envío de MP, la publicación ya se ha guardado igualmente).
+    ope_rol_mv_notificar_publicacion($ciclo, $capsLog);
+
+    return array('ok' => true, 'caps' => $capsLog, 'misiones_resueltas' => $resueltas, 'misiones_creadas' => $creadas);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Fase 3 — Auditoría y red de seguridad para publicación desatendida
+// ─────────────────────────────────────────────────────────────────────────
+
+/**
+ * Registra cada publicación en rol_mv_audit: quién publicó, qué topes se aplicaron
+ * (si la IA propuso algo fuera de rango) y qué pasó con las misiones. Es el rastro
+ * que permite revisar cualquier ciclo pasado sin depender de que alguien se acuerde.
+ * No lanza error si la tabla no existe todavía (instalaciones sin migrar a v4).
+ */
+function ope_rol_mv_audit_log($ciclo_id, array $capsLog, $misionesResueltas = 0, $misionesCreadas = 0)
+{
+    global $db, $mybb;
+    if (!$db->table_exists('rol_mv_audit')) {
+        return;
+    }
+    $db->insert_query('rol_mv_audit', array(
+        'ciclo_id'            => (int) $ciclo_id,
+        'uid_publicador'      => (int) ($mybb->user['uid'] ?? 0),
+        'caps_aplicados_json' => $db->escape_string(json_encode($capsLog, JSON_UNESCAPED_UNICODE)),
+        'caps_aplicados_n'    => count($capsLog),
+        'misiones_resueltas'  => (int) $misionesResueltas,
+        'misiones_creadas'    => (int) $misionesCreadas,
+        'dateline'            => (int) TIME_NOW,
+    ));
+}
+
+/** Lista de entradas de auditoría, más recientes primero. */
+function ope_rol_mv_audit_list($limit = 20)
+{
+    global $db;
+    $out = array();
+    if (!$db->table_exists('rol_mv_audit')) {
+        return $out;
+    }
+    $q = $db->simple_select('rol_mv_audit', '*', '', array('order_by' => 'audit_id', 'order_dir' => 'DESC', 'limit' => (int) $limit));
+    while ($row = $db->fetch_array($q)) {
+        $row['caps_aplicados'] = json_decode((string) $row['caps_aplicados_json'], true);
+        if (!is_array($row['caps_aplicados'])) $row['caps_aplicados'] = array();
+        $out[] = $row;
+    }
+    return $out;
+}
+
+/**
+ * Envía un mensaje privado a todos los Web Masters avisando de que hay periódico
+ * nuevo, con un resumen de si la IA se salió de los topes en algo. Es "best effort":
+ * cualquier fallo (datahandler no disponible, sin destinatarios, etc.) se ignora en
+ * silencio porque la publicación en sí YA se ha guardado y no debe bloquearse por esto.
+ */
+function ope_rol_mv_notificar_publicacion($ciclo, array $capsLog = array())
+{
+    global $db, $mybb;
+    if (!function_exists('is_moderator')) {
+        // fuera de contexto normal de foro (p.ej. CLI); no hay nada que notificar.
+        return false;
+    }
+    if (!$db->table_exists('rol_personajes')) {
+        return false;
+    }
+    $uids = array();
+    $q = $db->simple_select('rol_personajes', 'DISTINCT uid', "staff_rol = 'webmaster' AND uid > 0");
+    while ($row = $db->fetch_array($q)) {
+        $uids[] = (int) $row['uid'];
+    }
+    $uids = array_values(array_unique(array_diff($uids, array((int) ($mybb->user['uid'] ?? 0)))));
+    if (empty($uids)) {
+        return false;
+    }
+
+    $pmFile = MYBB_ROOT . 'inc/datahandlers/pm.php';
+    if (!is_file($pmFile)) {
+        return false;
+    }
+    require_once $pmFile;
+    if (!class_exists('PM_DataHandler')) {
+        return false;
+    }
+
+    $periodo = ope_rol_mv_periodo_label($ciclo['periodo'] ?? '');
+    $subject = 'Mundo Vivo publicado — ' . $periodo;
+    $msg = "Se ha publicado el periódico de {$periodo}.\n\n";
+    if (!empty($capsLog)) {
+        $msg .= "⚠ Se aplicaron " . count($capsLog) . " tope(s) anti-escalada porque la IA propuso cambios mayores de lo permitido en un ciclo:\n";
+        foreach ($capsLog as $c) {
+            $msg .= " - [{$c['ambito']}] {$c['slug']} · {$c['metrica']}: propuesto " . ($c['propuesto_delta'] >= 0 ? '+' : '') . $c['propuesto_delta'] . ", aplicado " . ($c['aplicado_delta'] >= 0 ? '+' : '') . "{$c['aplicado_delta']}\n";
+        }
+        $msg .= "\nRevisa el periódico y el panel de Mundo Vivo si algo no cuadra.\n";
+    } else {
+        $msg .= "Sin avisos: todos los cambios estaban dentro de los topes normales.\n";
+    }
+
+    try {
+        $pmhandler = new PM_DataHandler();
+        $pmhandler->admin_override = true;
+        $pmhandler->set_data(array(
+            'subject' => $subject,
+            'message' => $msg,
+            'touid'   => $uids,
+            'toid'    => array(),
+            'fromid'  => (int) ($mybb->user['uid'] ?? 0),
+            'do'      => '',
+            'pmid'    => 0,
+            'options' => array('signature' => 0, 'disablesmilies' => 0, 'savecopy' => 1, 'readreceipt' => 0),
+        ));
+        if ($pmhandler->validate_pm()) {
+            $pmhandler->insert_pm();
+            return true;
+        }
+    } catch (\Throwable $e) {
+        // silencioso a propósito: la publicación ya se guardó, esto es solo un aviso.
+    }
+    return false;
 }
 
 // ─────────────────────────────────────────────────────────────────────────

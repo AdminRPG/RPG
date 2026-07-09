@@ -984,6 +984,7 @@ body.ope-pg-personajes .reveal.vis{opacity:1;transform:none}
 
 /* ---------------- LOCAL: roster ---------------- */
 body.ope-pg-personajes .pj-intro{font-size:.92rem;color:var(--paper-dim);max-width:70ch;margin:-6px 0 18px;line-height:1.55}
+.ope-pg-personajes .pj-intro.npc-view{margin-top:-8px}
 body.ope-pg-personajes .pj-intro b{color:var(--paper);font-weight:600}
 body.ope-pg-personajes .pj-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
 body.ope-pg-personajes .pj-count{font-family:var(--mono);font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--paper-dim)}
@@ -1648,6 +1649,169 @@ body.ope-pg-tramites .hbit .hl{font-family:var(--mono);font-size:.6rem;font-weig
 body.ope-pg-tramites .hbit .hv{font-family:var(--disp);font-weight:800;font-size:1.15rem;color:var(--paper);line-height:1.1;margin-top:3px}
 body.ope-pg-tramites .hbit .hv small{font-family:var(--mono);font-size:.6rem;color:var(--ash);font-weight:400}
 
+/* ---- tablon-misiones.php (Tablón de Misiones) ---- */
+.ope-pg-tablon-misiones{--board-bg:#7a4a20;--board-line:#6a3d18}
+body.ope-pg-tablon-misiones .wrap{max-width:1400px}
+body.ope-pg-tablon-misiones .tm-filters{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+body.ope-pg-tablon-misiones .tm-fil-group{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+body.ope-pg-tablon-misiones .tm-fil-label{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--paper-dim);min-width:60px;padding-top:7px}
+body.ope-pg-tablon-misiones .tm-fil-chips{display:flex;gap:6px;flex-wrap:wrap}
+body.ope-pg-tablon-misiones .tm-chip{font-family:var(--mono);font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);background:var(--iron);border:2px solid #000;padding:5px 11px;cursor:pointer;transition:background .14s,color .14s,transform .1s}
+body.ope-pg-tablon-misiones .tm-chip:hover{color:var(--paper);transform:translateY(-1px)}
+body.ope-pg-tablon-misiones .tm-chip.on{background:var(--ember);color:#160f06}
+body.ope-pg-tablon-misiones .tm-empty{text-align:center;padding:48px 18px;color:var(--paper-dim)}
+body.ope-pg-tablon-misiones .tm-empty-icon{opacity:.3;margin-bottom:14px}
+body.ope-pg-tablon-misiones .tm-empty p{font-family:var(--mono);font-size:.78rem;max-width:50ch;margin:0 auto;line-height:1.6}
+body.ope-pg-tablon-misiones .tm-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:20px 16px;padding:28px 22px;background:var(--board-bg);border:3px solid #000;position:relative;min-height:380px}
+body.ope-pg-tablon-misiones .tm-board::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 36px,var(--board-line) 36px,var(--board-line) 38px),repeating-linear-gradient(90deg,transparent,transparent 36px,var(--board-line) 36px,var(--board-line) 38px);pointer-events:none;opacity:.4}
+body.ope-pg-tablon-misiones .tm-card{background:#fef9e8;border:2px solid #c8b88a;border-bottom-width:3px;position:relative;transform:rotate(var(--rot,0deg));transition:transform .25s,box-shadow .25s;height:fit-content;box-shadow:1px 2px 6px rgba(0,0,0,.3);display:flex;flex-direction:column;cursor:pointer}
+body.ope-pg-tablon-misiones .tm-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(200,184,138,.15));pointer-events:none}
+body.ope-pg-tablon-misiones .tm-card:hover{transform:rotate(0deg) scale(1.03);z-index:3;box-shadow:2px 4px 14px rgba(0,0,0,.35)}
+body.ope-pg-tablon-misiones .tm-card.hidden{display:none}
+body.ope-pg-tablon-misiones .tm-pin{position:absolute;top:-10px;left:50%;margin-left:-8px;width:16px;height:16px;background:radial-gradient(circle at 35% 35%,#e8e8e8,#a0a0a0 60%,#606060);border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,.4);z-index:2;border:1px solid #888}
+body.ope-pg-tablon-misiones .tm-card-hd{display:flex;align-items:center;gap:8px;width:100%;padding:11px 12px 6px;position:relative;z-index:1;flex-wrap:wrap;pointer-events:none}
+body.ope-pg-tablon-misiones .tm-rank{font-family:var(--disp);font-weight:900;font-size:1.1rem;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:#fff;background:var(--rc,#6b7280);flex-shrink:0;border:2px solid #000;line-height:1}
+body.ope-pg-tablon-misiones .tm-hd-t{font-family:var(--disp);font-weight:800;font-size:1rem;text-transform:uppercase;line-height:1.05;color:#2d2a1e;flex:1;min-width:0;word-break:break-word}
+body.ope-pg-tablon-misiones .tm-hd-zone{font-family:var(--mono);font-size:.52rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8a7f6a;padding:1px 5px;border:1px solid #d4c8a8;background:rgba(255,255,255,.4)}
+body.ope-pg-tablon-misiones .tm-card-desc{padding:2px 12px 10px;font-size:.78rem;color:#5a5548;line-height:1.4;position:relative;z-index:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+body.ope-pg-tablon-misiones .tm-bg-lbl{font-family:var(--mono);font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8a7f6a}
+body.ope-pg-tablon-misiones .tm-dim{color:#9a9080;font-style:italic}
+
+/* ---- Paginación ---- */
+body.ope-pg-tablon-misiones .tm-pages{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:20px;flex-wrap:wrap}
+body.ope-pg-tablon-misiones .tm-page{font-family:var(--mono);font-size:.7rem;font-weight:700;padding:6px 12px;border:2px solid #000;background:var(--iron);color:var(--paper-dim);text-decoration:none;transition:background .12s,color .12s,transform .1s}
+body.ope-pg-tablon-misiones .tm-page:hover{color:var(--paper);transform:translateY(-1px)}
+body.ope-pg-tablon-misiones .tm-page.on{background:var(--ember);color:#160f06}
+body.ope-pg-tablon-misiones .tm-page-na{opacity:.3;pointer-events:none}
+
+/* ---- Overlay / Detalle ---- */
+body.ope-pg-tablon-misiones .tm-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.65);backdrop-filter:blur(2px);overflow:hidden;display:none}
+body.ope-pg-tablon-misiones .tm-overlay:not([hidden]){display:flex;align-items:center;justify-content:center}
+body.ope-pg-tablon-misiones .tm-detail{background:#fef9e8;border:3px solid #000;max-width:680px;width:92vw;max-height:88vh;overflow-y:auto;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.5);transform-origin:var(--from-x,50%) var(--from-y,50%);opacity:0;transform:scale(.3) rotate(8deg);transition:opacity .4s cubic-bezier(.22,1,.36,1),transform .5s cubic-bezier(.22,1,.36,1)}
+body.ope-pg-tablon-misiones .tm-detail.tm-d-in{opacity:1;transform:scale(1) rotate(0deg)}
+body.ope-pg-tablon-misiones .tm-d-close{position:absolute;top:10px;right:12px;width:32px;height:32px;background:var(--iron);border:2px solid #000;color:var(--paper);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:3;font-family:var(--mono);transition:background .12s}
+body.ope-pg-tablon-misiones .tm-d-close:hover{background:var(--ember);color:#160f06}
+body.ope-pg-tablon-misiones .tm-d-header{display:flex;align-items:center;gap:14px;padding:20px 20px 14px;border-bottom:2px solid #c8b88a}
+body.ope-pg-tablon-misiones .tm-d-rank{width:36px;height:36px;font-size:1.4rem;flex-shrink:0}
+body.ope-pg-tablon-misiones .tm-d-hd-text{flex:1}
+body.ope-pg-tablon-misiones .tm-d-titulo{font-family:var(--disp);font-weight:800;font-size:1.6rem;text-transform:uppercase;line-height:1;color:#2d2a1e}
+body.ope-pg-tablon-misiones .tm-d-meta{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8a7f6a;margin-top:5px}
+body.ope-pg-tablon-misiones .tm-d-desc{padding:16px 20px;border-bottom:1.5px dashed #d4c8a8}
+body.ope-pg-tablon-misiones .tm-d-desc p{font-size:.9rem;color:#3a3528;line-height:1.65;margin:5px 0 0}
+body.ope-pg-tablon-misiones .tm-d-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 20px}
+@media(max-width:500px){body.ope-pg-tablon-misiones .tm-d-grid{grid-template-columns:1fr}}
+body.ope-pg-tablon-misiones .tm-d-item{display:flex;flex-direction:column;gap:2px}
+body.ope-pg-tablon-misiones .tm-d-val{font-size:.88rem;color:#2d2a1e}
+body.ope-pg-tablon-misiones .tm-dots{display:flex;gap:3px;align-items:center}
+body.ope-pg-tablon-misiones .tm-dot{width:10px;height:10px;border-radius:50%;border:1.5px solid #b0a898;background:transparent;display:inline-block}
+body.ope-pg-tablon-misiones .tm-dot.on{background:#dc2626;border-color:#dc2626;box-shadow:0 0 3px rgba(220,38,38,.4)}
+body.ope-pg-tablon-misiones .tm-d-frm{padding:0 20px 20px}
+body.ope-pg-tablon-misiones .tm-d-frm .btn{width:100%;justify-content:center}
+body.ope-pg-tablon-misiones .tm-d-note{padding:12px 20px 20px;font-family:var(--mono);font-size:.62rem;color:#8a7f6a;font-style:italic}
+body.ope-pg-tablon-misiones .tm-no-scroll{overflow:hidden}
+/* ---- tienda.php (RPG shop) ---- */
+/* Breadcrumb (como en todas las páginas) */
+body.ope-pg-tienda .breadcrumb{background:var(--iron-plate);border-bottom:2px solid #000}
+body.ope-pg-tienda .breadcrumb-in{max-width:1300px;margin:0 auto;padding:9px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+body.ope-pg-tienda .breadcrumb-in a{color:var(--paper-dim)}
+body.ope-pg-tienda .breadcrumb-in a:hover{color:var(--ember-hi)}
+body.ope-pg-tienda .breadcrumb-in .sep{color:var(--rivet)}
+body.ope-pg-tienda .breadcrumb-in b{color:var(--paper)}
+/* Header */
+body.ope-pg-tienda .shead{display:flex;align-items:baseline;gap:14px;margin:8px 0 14px}
+body.ope-pg-tienda .shead h1{font-family:var(--disp);font-weight:800;font-size:2rem;text-transform:uppercase;color:var(--paper);line-height:1;margin:0}
+body.ope-pg-tienda .shead .code{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ember-hi);letter-spacing:1px}
+body.ope-pg-tienda .shead .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--rivet) 0 6px,transparent 6px 12px)}
+
+/* Layout: storefront + product area */
+body.ope-pg-tienda .ts-shop{display:flex;gap:16px;align-items:stretch}
+@media(max-width:800px){body.ope-pg-tienda .ts-shop{flex-direction:column}}
+
+/* ── LEFT: Storefront image (50 %) ── */
+body.ope-pg-tienda .ts-front{flex:0 0 40%;position:relative;border:2px solid #000;overflow:hidden;display:flex;align-items:center;justify-content:center;aspect-ratio:3/4;max-height:480px}
+@media(max-width:800px){body.ope-pg-tienda .ts-front{flex:none;width:100%;aspect-ratio:auto;min-height:160px}}
+body.ope-pg-tienda .ts-front-bg{position:absolute;inset:0;transition:opacity .4s}
+body.ope-pg-tienda .ts-front[data-tienda="armeria"] .ts-front-bg{background:radial-gradient(ellipse at 30% 40%,#4a2010,#1a0e06 70%)}
+body.ope-pg-tienda .ts-front[data-tienda="astilleros"] .ts-front-bg{background:radial-gradient(ellipse at 30% 40%,#10304a,#060e1a 70%)}
+body.ope-pg-tienda .ts-front[data-tienda="general"] .ts-front-bg{background:radial-gradient(ellipse at 30% 40%,#3a3a10,#0e1a06 70%)}
+body.ope-pg-tienda .ts-front-in{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px}
+body.ope-pg-tienda .ts-front-picto{color:var(--ember);width:72px;height:72px;filter:drop-shadow(0 0 10px rgba(200,120,50,.25))}
+body.ope-pg-tienda .ts-front[data-tienda="astilleros"] .ts-front-picto{color:var(--h6);filter:drop-shadow(0 0 10px rgba(50,120,200,.25))}
+body.ope-pg-tienda .ts-front[data-tienda="general"] .ts-front-picto{color:var(--patina);filter:drop-shadow(0 0 10px rgba(120,200,50,.25))}
+body.ope-pg-tienda .ts-front-nom{font-family:var(--disp);font-weight:900;font-size:1.6rem;text-transform:uppercase;color:var(--paper);line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+body.ope-pg-tienda .ts-front-tag{font-family:var(--mono);font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--paper-dim)}
+
+/* ── RIGHT: product area ── */
+body.ope-pg-tienda .ts-right{flex:1;min-width:0;display:flex;flex-direction:column}
+
+/* Top bar: tabs + cart (compact) */
+body.ope-pg-tienda .ts-topbar{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+body.ope-pg-tienda .ts-tabs{display:flex;gap:0;border:2px solid #000;background:var(--iron)}
+body.ope-pg-tienda .ts-tab{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:6px 14px;border:none;background:var(--iron);color:var(--paper-dim);cursor:pointer;transition:background .12s,color .12s;border-right:1px solid #000}
+body.ope-pg-tienda .ts-tab:last-child{border-right:none}
+body.ope-pg-tienda .ts-tab:hover{color:var(--paper)}
+body.ope-pg-tienda .ts-tab.on{background:var(--ember);color:#160f06}
+body.ope-pg-tienda .ts-cart-btn{margin-left:auto;position:relative;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--iron);border:2px solid #000;cursor:pointer;color:var(--paper-dim);transition:color .12s,background .12s}
+body.ope-pg-tienda .ts-cart-btn:hover{color:var(--paper);background:var(--iron-edge)}
+body.ope-pg-tienda .ts-cart-badge{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;background:var(--ember);color:#160f06;font-family:var(--mono);font-size:.5rem;font-weight:700;border:1.5px solid #000;display:flex;align-items:center;justify-content:center;line-height:1;display:none;pointer-events:none}
+
+/* Product grid: 4 cols (compact) */
+body.ope-pg-tienda .ts-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:700px){body.ope-pg-tienda .ts-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:480px){body.ope-pg-tienda .ts-grid{grid-template-columns:1fr 1fr}}
+body.ope-pg-tienda .ts-item{border:2px solid #000;background:var(--iron-plate);display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px 8px;cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .12s;text-align:center}
+body.ope-pg-tienda .ts-item:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 #000;border-color:var(--ember)}
+body.ope-pg-tienda .ts-item-icon{width:40px;height:40px;color:var(--paper-dim);transition:color .12s}
+body.ope-pg-tienda .ts-item:hover .ts-item-icon{color:var(--ember-hi)}
+body.ope-pg-tienda .ts-item-nom{font-family:var(--disp);font-weight:800;font-size:.68rem;text-transform:uppercase;color:var(--paper);line-height:1.05}
+body.ope-pg-tienda .ts-empty{grid-column:1/-1;padding:30px 16px;text-align:center;font-family:var(--mono);font-size:.68rem;color:var(--ash);border:2px dashed var(--rivet)}
+
+/* ── Product detail modal ── */
+body.ope-pg-tienda .ts-modal{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px}
+body.ope-pg-tienda .ts-modal[hidden]{display:none}
+body.ope-pg-tienda .ts-modal-bg{position:absolute;inset:0;background:rgba(6,12,20,.78);backdrop-filter:blur(3px)}
+body.ope-pg-tienda .ts-modal-box{position:relative;max-width:520px;width:100%;background:var(--iron-plate);border:2px solid #000;box-shadow:10px 10px 0 rgba(0,0,0,.4);padding:28px 26px 24px;overflow:auto;max-height:90vh}
+body.ope-pg-tienda .ts-modal-x{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--paper-dim);font-size:1.4rem;cursor:pointer;line-height:1}
+body.ope-pg-tienda .ts-modal-x:hover{color:var(--ember-hi)}
+body.ope-pg-tienda .ts-modal-icon{text-align:center;margin-bottom:16px}
+body.ope-pg-tienda .ts-modal-icon-in{width:120px;height:120px;margin:0 auto;color:var(--ember-hi);filter:drop-shadow(0 0 16px rgba(200,120,50,.25))}
+body.ope-pg-tienda .ts-modal-nom{font-family:var(--disp);font-weight:800;font-size:1.5rem;text-transform:uppercase;color:var(--paper);line-height:1.05;margin:0 0 4px}
+body.ope-pg-tienda .ts-modal-pre{font-family:var(--disp);font-weight:800;font-size:1.1rem;color:var(--ember-hi);display:block;margin-bottom:14px}
+body.ope-pg-tienda .ts-modal-desc{font-size:.88rem;color:var(--paper-dim);line-height:1.6;margin:0 0 14px}
+body.ope-pg-tienda .ts-modal-dets{display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;font-family:var(--mono);font-size:.7rem;color:var(--ash);border:1px solid var(--rivet);padding:10px 14px;margin:0 0 18px}
+@media(max-width:480px){body.ope-pg-tienda .ts-modal-dets{grid-template-columns:1fr}}
+body.ope-pg-tienda .ts-modal-dets dt{font-weight:700;color:var(--paper-dim)}
+body.ope-pg-tienda .ts-modal-dets dd{margin:0}
+body.ope-pg-tienda .ts-modal-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+body.ope-pg-tienda .ts-qty{display:flex;align-items:center;gap:0;border:2px solid #000}
+body.ope-pg-tienda .ts-qty button{width:36px;height:36px;border:none;background:var(--iron);color:var(--paper);font-size:1.1rem;cursor:pointer;font-family:var(--mono);font-weight:700;transition:background .1s}
+body.ope-pg-tienda .ts-qty button:hover{background:var(--iron-edge)}
+body.ope-pg-tienda .ts-qty input{width:44px;height:36px;border:none;border-left:2px solid #000;border-right:2px solid #000;background:var(--iron-plate);color:var(--paper);text-align:center;font-family:var(--disp);font-weight:800;font-size:1rem;outline:none}
+body.ope-pg-tienda .ts-qty input::-webkit-inner-spin-button{-webkit-appearance:none}
+
+/* ── Cart slide-out ── */
+body.ope-pg-tienda .ts-cart{position:fixed;top:0;right:0;bottom:0;z-index:3001;width:340px;max-width:90vw;background:var(--iron-plate);border-left:2px solid #000;box-shadow:-8px 0 0 rgba(0,0,0,.3);display:flex;flex-direction:column}
+body.ope-pg-tienda .ts-cart[hidden]{display:none}
+body.ope-pg-tienda .ts-cart-top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:2px solid #000;background:var(--iron-edge)}
+body.ope-pg-tienda .ts-cart-h{font-family:var(--disp);font-weight:800;font-size:1.1rem;text-transform:uppercase;color:var(--paper)}
+body.ope-pg-tienda .ts-cart-x{background:none;border:none;color:var(--paper-dim);font-size:1.2rem;cursor:pointer;line-height:1}
+body.ope-pg-tienda .ts-cart-x:hover{color:var(--ember-hi)}
+body.ope-pg-tienda .ts-cart-body{flex:1;overflow:auto;padding:10px 0}
+body.ope-pg-tienda .ts-cart-empty{text-align:center;padding:40px 16px;font-family:var(--mono);font-size:.7rem;color:var(--ash)}
+body.ope-pg-tienda .ts-cart-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--rivet)}
+body.ope-pg-tienda .ts-cart-item-icon{width:32px;height:32px;flex:0 0 auto;color:var(--paper-dim)}
+body.ope-pg-tienda .ts-cart-item-info{flex:1;min-width:0}
+body.ope-pg-tienda .ts-cart-item-nom{font-family:var(--disp);font-weight:800;font-size:.75rem;text-transform:uppercase;color:var(--paper);line-height:1.1}
+body.ope-pg-tienda .ts-cart-item-meta{font-family:var(--mono);font-size:.6rem;color:var(--ash);margin-top:2px}
+body.ope-pg-tienda .ts-cart-item-sub{font-family:var(--disp);font-weight:800;font-size:.8rem;color:var(--ember-hi);white-space:nowrap}
+body.ope-pg-tienda .ts-cart-item-x{background:none;border:none;color:var(--ash);font-size:.9rem;cursor:pointer;padding:4px;line-height:1}
+body.ope-pg-tienda .ts-cart-item-x:hover{color:var(--ember-hi)}
+body.ope-pg-tienda .ts-cart-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-top:2px solid #000;background:var(--iron-edge)}
+body.ope-pg-tienda .ts-cart-total{font-family:var(--disp);font-weight:800;font-size:1rem;color:var(--ember-hi)}
+body.ope-pg-tienda .ts-cart-foot .btn-hot:disabled{background:var(--rivet);color:var(--paper-dim);cursor:not-allowed;transform:none;box-shadow:none}
+body.ope-pg-tienda .ti-notice{font-size:.72rem;color:var(--paper-dim)}
+body.ts-no-scroll{overflow:hidden}
+body.ope-pg-biblioteca .bib-empty{padding:24px 0;text-align:center}
 /* ---- guias.php ---- */
 /* Estilos de esta página — base global (:root, body, fondo) en docs/themes/ope.css */
 
@@ -1869,6 +2033,11 @@ body.ope-pg-zona-staff .empty-state{text-align:center;padding:36px 20px;color:va
 body.ope-pg-zona-staff .empty-state .big{font-family:var(--disp);font-weight:800;font-size:1.4rem;text-transform:uppercase;color:var(--paper);margin-bottom:8px}
 body.ope-pg-zona-staff .empty-state p{font-family:var(--mono);font-size:.72rem;max-width:52ch;margin:0 auto;line-height:1.55}
 @media(prefers-reduced-motion:reduce){body.ope-pg-zona-staff *,body.ope-pg-zona-staff *::before,body.ope-pg-zona-staff *::after{animation:none!important;transition:none!important}body.ope-pg-zona-staff .reveal{opacity:1;transform:none}}
+
+/* Scoped utilities for zona-staff pages */
+body.ope-pg-zona-staff .bg-h6{background:var(--h6)}
+body.ope-pg-zona-staff .mb-10{margin-bottom:10px}
+body.ope-pg-zona-staff .c-patina{color:var(--patina-hi)}
 
 /* ---- crear-personaje.php ---- */
 /* Estilos de esta página — base global (:root, body, fondo) en docs/themes/ope.css */
@@ -2304,6 +2473,11 @@ body.ope-pg-gestionar-personaje .gp-inv-n{font-family:var(--disp);font-weight:70
 body.ope-pg-gestionar-personaje .gp-inv-d{font-family:var(--mono);font-size:.68rem;color:var(--paper-dim)}
 body.ope-pg-gestionar-personaje .gp-inv-size{font-family:var(--mono);font-size:.58rem;color:var(--ash);text-transform:uppercase}
 body.ope-pg-gestionar-personaje .gp-inv-item form{margin:0}
+body.ope-pg-gestionar-personaje .gp-form-inv-add{border-top:2px solid #000;padding-top:14px}
+
+/* Scoped utilities for gestionar-personaje pages */
+body.ope-pg-gestionar-personaje .mb-0{margin-bottom:0}
+body.ope-pg-gestionar-personaje .gc-deck-single{grid-template-columns:1fr}
 
 /* ---- revisar-personaje: búsqueda ---- */
 body.ope-pg-revisar-personaje .rp-search{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
@@ -2521,9 +2695,23 @@ body.ope-pg-mundo-vivo .mv-imgcard-h code{font-family:var(--mono);font-size:.72r
 body.ope-pg-mundo-vivo .mv-imgcard-sz{font-family:var(--mono);font-size:.6rem;color:var(--ash)}
 body.ope-pg-mundo-vivo .mv-imgcard-prompt{font-family:var(--mono);font-size:.68rem;color:var(--paper-dim);margin:0 0 7px;line-height:1.5}
 body.ope-pg-mundo-vivo .mv-imgcard-url{margin-bottom:0}
+/* -- Tablero de solo lectura (v4: lo actualiza la IA, el staff solo lo consulta) -- */
+body.ope-pg-mundo-vivo .mv-zona-vals-ro{gap:8px}
+body.ope-pg-mundo-vivo .mv-valchip{font-family:var(--mono);font-size:.62rem;font-weight:700;color:var(--paper-dim);background:var(--iron-plate);border:1px solid var(--rivet);padding:3px 8px;display:inline-flex;align-items:center;gap:5px}
+body.ope-pg-mundo-vivo .mv-valchip b{color:var(--ember-hi);font-size:.72rem}
+body.ope-pg-mundo-vivo .mv-tenrow-v span{color:var(--paper-dim)}
+body.ope-pg-mundo-vivo .mv-tenrow-v b{color:var(--ember-hi)}
+/* -- Auditoría (Fase 3: red de seguridad para publicación desatendida) -- */
+body.ope-pg-mundo-vivo .mv-audit-warn{color:var(--ember-hi)}
+body.ope-pg-mundo-vivo .mv-audit-caps{margin:6px 0 0;padding-left:18px;font-family:var(--mono);font-size:.68rem;color:var(--paper-dim);line-height:1.6}
+body.ope-pg-mundo-vivo .mv-flash.mv-warn .mv-audit-caps{color:#ffd9b0}
 
 /* ---- gestionar-noticias ---- */
-body.ope-pg-gestionar-noticias .gn-row2{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin:6px 0}
+body.ope-pg-gestionar-noticias .gn-row2,
+body.ope-pg-gestionar-misiones .gn-row2{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin:6px 0}
+body.ope-pg-gestionar-misiones .gn-row2 .mv-input{margin-bottom:0}
+body.ope-pg-gestionar-misiones select.mv-input{appearance:auto;cursor:pointer;height:39px}
+body.ope-pg-gestionar-misiones .mv-ev-acts{min-width:80px}
 body.ope-pg-gestionar-noticias .mv-check{font-family:var(--mono);font-size:.7rem;color:var(--paper-dim);display:flex;align-items:center;gap:7px}
 body.ope-pg-gestionar-noticias .mv-lbl-inline{display:flex;align-items:center;gap:8px;margin:0}
 body.ope-pg-gestionar-noticias .mv-empty{color:var(--ash);font-family:var(--mono);font-size:.78rem;margin:0}
@@ -2537,19 +2725,19 @@ body.ope-pg-gestionar-noticias .mv-ev-acts{display:flex;flex-direction:column;ga
 body.ope-pg-gestionar-noticias .mv-ev-acts form{margin:0}
 body.ope-pg-gestionar-noticias .mv-save-bar{display:flex;gap:10px;align-items:center;padding:6px 0 2px}
 
-/* ---- notificar-tema ---- */
-body.ope-pg-notificar-tema .nt-form label.nt-lbl{display:block;font-family:var(--mono);font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);margin:10px 0 5px}
-body.ope-pg-notificar-tema .nt-input,body.ope-pg-notificar-tema .nt-textarea{background:var(--iron);color:var(--paper);border:2px solid #000;padding:10px 12px;font-family:var(--mono);font-size:.8rem;width:100%}
-body.ope-pg-notificar-tema .nt-textarea{resize:vertical;line-height:1.55}
-body.ope-pg-notificar-tema .nt-input:focus,body.ope-pg-notificar-tema .nt-textarea:focus{outline:none;border-color:var(--ember)}
-body.ope-pg-notificar-tema .nt-hint{font-family:var(--mono);font-size:.62rem;color:var(--ash);margin:4px 0 0}
-body.ope-pg-notificar-tema .nt-actions{margin-top:14px}
-body.ope-pg-notificar-tema .nt-list{list-style:none;margin:0;padding:0}
-body.ope-pg-notificar-tema .nt-item{border:1px solid var(--rivet);background:var(--iron);padding:11px 13px;margin-bottom:8px}
-body.ope-pg-notificar-tema .nt-item-t{font-family:var(--disp);font-weight:700;color:var(--paper);text-decoration:none}
-body.ope-pg-notificar-tema .nt-item-t:hover{color:var(--ember-hi)}
-body.ope-pg-notificar-tema .nt-item-meta{display:block;font-family:var(--mono);font-size:.6rem;color:var(--patina-hi);text-transform:uppercase;margin:2px 0 6px}
-body.ope-pg-notificar-tema .nt-item-res{font-size:.82rem;color:var(--paper-dim);margin:0;line-height:1.5}
+/* ---- notificar-tema / tienda ---- */
+body.ope-pg-notificar-tema .nt-form label.nt-lbl,body.ope-pg-tienda .nt-lbl{display:block;font-family:var(--mono);font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);margin:10px 0 5px}
+body.ope-pg-notificar-tema .nt-input,body.ope-pg-notificar-tema .nt-textarea,body.ope-pg-tienda .nt-input,body.ope-pg-tienda .nt-textarea{background:var(--iron);color:var(--paper);border:2px solid #000;padding:10px 12px;font-family:var(--mono);font-size:.8rem;width:100%}
+body.ope-pg-notificar-tema .nt-textarea,body.ope-pg-tienda .nt-textarea{resize:vertical;line-height:1.55}
+body.ope-pg-notificar-tema .nt-input:focus,body.ope-pg-notificar-tema .nt-textarea:focus,body.ope-pg-tienda .nt-input:focus,body.ope-pg-tienda .nt-textarea:focus{outline:none;border-color:var(--ember)}
+body.ope-pg-notificar-tema .nt-hint,body.ope-pg-tienda .nt-hint{font-family:var(--mono);font-size:.62rem;color:var(--ash);margin:4px 0 0}
+body.ope-pg-notificar-tema .nt-actions,body.ope-pg-tienda .nt-actions{margin-top:14px}
+body.ope-pg-notificar-tema .nt-list,body.ope-pg-tienda .nt-list{list-style:none;margin:0;padding:0}
+body.ope-pg-notificar-tema .nt-item,body.ope-pg-tienda .nt-item{border:1px solid var(--rivet);background:var(--iron);padding:11px 13px;margin-bottom:8px}
+body.ope-pg-notificar-tema .nt-item-t,body.ope-pg-tienda .nt-item-t{font-family:var(--disp);font-weight:700;color:var(--paper);text-decoration:none}
+body.ope-pg-notificar-tema .nt-item-t:hover,body.ope-pg-tienda .nt-item-t:hover{color:var(--ember-hi)}
+body.ope-pg-notificar-tema .nt-item-meta,body.ope-pg-tienda .nt-item-meta{display:block;font-family:var(--mono);font-size:.6rem;color:var(--patina-hi);text-transform:uppercase;margin:2px 0 6px}
+body.ope-pg-notificar-tema .nt-item-res,body.ope-pg-tienda .nt-item-res{font-size:.82rem;color:var(--paper-dim);margin:0;line-height:1.5}
 
 /* ---- Estado del mundo ---- */
 body.ope-pg-estado-mundo .em-hero{background-size:cover;background-position:center;border-bottom:3px solid #000;padding:46px 18px 40px;margin-bottom:6px}
@@ -2702,3 +2890,138 @@ body.ope-pg-periodicos .pe-archive li a span{display:block;font-family:var(--bod
 .ope-news-modal-body{color:var(--paper-dim);line-height:1.65;font-size:.92rem}
 .ope-news-modal-body p{margin:0 0 12px}
 .ope-news-modal-body a{color:var(--ember-hi)}
+
+/* ---- revisar-personaje: utility extras ---- */
+body.ope-pg-revisar-personaje .shead h2 {
+  font-family: var(--disp);
+}
+body.ope-pg-revisar-personaje .rp-pilar-label {
+  font-family: var(--mono);
+  margin: 8px 0 4px;
+}
+
+/* ========================
+   === UTILIDADES GENÉRICAS
+   ======================== */
+/* Padding */
+.pt-10{padding-top:10px}
+/* Margin */
+.mt-4{margin-top:4px}
+/* Line height */
+.lh-15{line-height:1.5}
+/* Colores */
+.c-dim{color:var(--paper-dim)}
+.c-ember{color:var(--ember-hi)}
+.c-patina{color:var(--patina-hi)}
+.c-ash{color:var(--ash)}
+.c-paper{color:var(--paper)}
+.c-iron{color:var(--iron)}
+.c-h6{color:var(--h6)}
+
+/* Display */
+.dn{display:none}
+.df{display:flex}
+.dib{display:inline-block}
+.fw{width:100%}
+.flex-1{flex:1}
+.tal{text-align:left}
+.tac{text-align:center}
+.gap-8{gap:8px}
+.gap-10{gap:10px}
+.fww{flex-wrap:wrap}
+
+/* Márgenes */
+.m-0{margin:0}
+.mt-6{margin-top:6px}
+.mt-8{margin-top:8px}
+.mt-10{margin-top:10px}
+.mt-14{margin-top:14px}
+.mt-16{margin-top:16px}
+.mt-22{margin-top:22px}
+.mt-26{margin-top:26px}
+.mt-28{margin-top:28px}
+.mb-0{margin-bottom:0}
+.mb-6{margin-bottom:6px}
+.mb-8{margin-bottom:8px}
+.mb-10{margin-bottom:10px}
+.mb-12{margin-bottom:12px}
+.mb-14{margin-bottom:14px}
+.mb-16{margin-bottom:16px}
+.mb-22{margin-bottom:22px}
+.mb-26{margin-bottom:26px}
+.my-6{margin:6px 0}
+.my-8{margin:8px 0}
+.my-10{margin:10px 0}
+
+/* Font y texto */
+.fw-700{font-weight:700}
+.fw-800{font-weight:800}
+.ttu{text-transform:uppercase}
+.ls-5{letter-spacing:.5px}
+.lh-165{line-height:1.65}
+.fs-58{font-size:.58rem}
+.fs-6{font-size:.6rem}
+.fs-62{font-size:.62rem}
+.fs-64{font-size:.64rem}
+.fs-68{font-size:.68rem}
+.fs-7{font-size:.7rem}
+.fs-72{font-size:.72rem}
+.fs-74{font-size:.74rem}
+.fs-75{font-size:.75rem}
+.fs-76{font-size:.76rem}
+.fs-78{font-size:.78rem}
+.fs-82{font-size:.82rem}
+.fs-92{font-size:.92rem}
+.fs-14{font-size:1.4rem}
+
+/* Layout helpers */
+.ai-center{align-items:center}
+.jc-sb{justify-content:space-between}
+.jc-fe{justify-content:flex-end}
+.minw-220{min-width:220px}
+.minw-250{min-width:250px}
+
+/* Bordes */
+.bt-dash{border-top:1px dashed var(--concrete-line)}
+.b-2-h6{border:2px solid var(--h6)}
+.b-2-ember{border:2px solid var(--ember)}
+
+/* Backgrounds */
+.bg-plate{background:var(--iron-plate)}
+.bg-h6{background:var(--h6)}
+.bg-patina{background:var(--patina)}
+.bg-crack{background:var(--crack)}
+
+/* Paddings compuestos */
+.p-12-16{padding:12px 16px}
+.p-10-14{padding:10px 14px}
+.p-14-18{padding:14px 18px}
+.p-20{padding:20px}
+.p-24-26{padding:24px 26px}
+
+/* Combinaciones muy comunes */
+.bg-plate-b2h6{background:var(--iron-plate);border:2px solid var(--h6)}
+
+/* ---- Página crear-npc ---- */
+body.ope-pg-crear-npc .gap-14{gap:14px}
+body.ope-pg-crear-npc .b-2-patina{border:2px solid var(--patina)}
+
+/* ---- Utility classes for crear-personaje.php ---- */
+body.ope-pg-crear-personaje .intro-mono{font-family:var(--mono);font-size:.78rem;color:var(--paper-dim);max-width:76ch;margin-bottom:16px}
+body.ope-pg-crear-personaje .stats-hint{font-family:var(--mono);font-size:.72rem;color:var(--paper-dim);margin-bottom:10px}
+body.ope-pg-crear-personaje .pc-hint{font-family:var(--mono);font-size:.62rem;color:var(--ash)}
+body.ope-pg-crear-personaje .historia-textarea{min-height:160px}
+body.ope-pg-crear-personaje .mb-14{margin-bottom:14px}
+
+/* ---- Utility classes for crear-npc.php ---- */
+body.ope-pg-crear-npc .np-historia-textarea{min-height:160px}
+.maxw-76ch{max-width:76ch}
+
+/* ---- mensajes.php extras ---- */
+body.ope-pg-mensajes .msg-sidebar-h{border-bottom:2px solid #000}
+body.ope-pg-mensajes .btn-xtrasm{padding:4px 8px}
+
+/* ---- mundo-vivo.php extras ---- */
+body.ope-pg-mundo-vivo .mv-json-dump{background:#f5f5f5;padding:.5rem;border-radius:4px;max-height:200px;overflow:auto}
+.mt-05{margin-top:.5rem}
+.mt-075{margin-top:.75rem}

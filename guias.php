@@ -284,63 +284,63 @@ header('Content-Type: text/html; charset=utf-8');
               <div class="pname">Humano</div>
               <div class="ptype">Primaria · Adaptabilidad</div>
               <div class="peff">Puedes subir <strong>dos stats</strong> de F a E al crear el personaje en lugar de una.</div>
-              <div class="ptype" style="margin-top:8px">Secundaria · Mayoría Silenciosa</div>
+              <div class="ptype mt-8">Secundaria · Mayoría Silenciosa</div>
               <div class="peff">+10% a la ganancia de Reputación con cualquier facción.</div>
             </div>
             <div class="pasiva-card">
               <div class="pname">Skypiean</div>
               <div class="ptype">Primaria · Planeo Celestial</div>
               <div class="peff">Planeas distancias cortas. Niega el daño por caída. +1 AGI para acciones de movimiento.</div>
-              <div class="ptype" style="margin-top:8px">Secundaria · Herencia del Dial</div>
+              <div class="ptype mt-8">Secundaria · Herencia del Dial</div>
               <div class="peff">Empiezas con un Dial básico a elección. Puedes identificar cualquier Dial al verlo.</div>
             </div>
             <div class="pasiva-card">
               <div class="pname">Gyojin</div>
               <div class="ptype">Primaria · Sangre del Abismo</div>
               <div class="peff">Respiras bajo el agua. ×2 velocidad en agua. +1 VIG permanente.</div>
-              <div class="ptype" style="margin-top:8px">Secundaria · Gyojin Karate Innato</div>
+              <div class="ptype mt-8">Secundaria · Gyojin Karate Innato</div>
               <div class="peff">Carta Tier I "Gyojin Karate: Puño de Agua" gratis. +1 FUE en contacto con agua.</div>
             </div>
             <div class="pasiva-card">
               <div class="pname">Gigante</div>
               <div class="ptype">Primaria · Fuerza Colosal</div>
               <div class="peff">+2 FUE permanente. ×1.5 daño cuerpo a cuerpo. ×2 alcance. -1 AGI permanente.</div>
-              <div class="ptype" style="margin-top:8px">Secundaria · Piel de Batalla</div>
+              <div class="ptype mt-8">Secundaria · Piel de Batalla</div>
               <div class="peff">+1 VIG permanente. Las heridas leves no te afectan en combate.</div>
             </div>
             <div class="pasiva-card">
               <div class="pname">Mink</div>
               <div class="ptype">Primaria · Electro</div>
               <div class="peff">Descargas eléctricas al contacto. Daño escala con AGI. +25% daño contra objetivos metálicos.</div>
-              <div class="ptype" style="margin-top:8px">Secundaria · Instinto Salvaje</div>
+              <div class="ptype mt-8">Secundaria · Instinto Salvaje</div>
               <div class="peff">+1 PER para rastrear, detectar emboscadas y percibir intenciones hostiles.</div>
             </div>
             <div class="pasiva-card">
               <div class="pname">Lunarian</div>
               <div class="ptype">Primaria · Llamarada</div>
               <div class="peff">Envuelves partes de tu cuerpo en fuego a voluntad (1 PA). Daño por contacto. +1 VIG mientras está activa.</div>
-              <div class="ptype" style="margin-top:8px">Secundaria · Los Últimos</div>
+              <div class="ptype mt-8">Secundaria · Los Últimos</div>
               <div class="peff">Wanted automático de 100M. +1 VOL contra Marines. -50% REP en territorio del Gobierno.</div>
             </div>
             <div class="pasiva-card">
               <div class="pname">Sirena / Sireno</div>
               <div class="ptype">Primaria · Gracia Marina</div>
               <div class="peff">×3 velocidad en agua. Te comunicas telepáticamente con peces y criaturas marinas no hostiles. +1 SEN.</div>
-              <div class="ptype" style="margin-top:8px">Secundaria · Canto Hipnótico</div>
+              <div class="ptype mt-8">Secundaria · Canto Hipnótico</div>
               <div class="peff">+1 CAR para persuasión o distracción mediante tu voz. Calmas criaturas marinas hostiles.</div>
             </div>
             <div class="pasiva-card">
               <div class="pname">Bucaneer</div>
               <div class="ptype">Primaria · Sangre de Gigante</div>
               <div class="peff">+1 FUE y +1 VIG permanentes. Empuñas armas de categoría superior sin penalización.</div>
-              <div class="ptype" style="margin-top:8px">Secundaria · Estirpe Marcada</div>
+              <div class="ptype mt-8">Secundaria · Estirpe Marcada</div>
               <div class="peff">Wanted de 50M. +1 VOL contra opresión. Reconocido por otros Bucaneers.</div>
             </div>
             <div class="pasiva-card">
               <div class="pname">Tontatta</div>
               <div class="ptype">Primaria · Diminuto y Letal</div>
               <div class="peff">-1 FUE permanente. +2 AGI y +2 DES permanentes. Los enemigos tienen -10 a PER para detectarte.</div>
-              <div class="ptype" style="margin-top:8px">Secundaria · Manos de Artesano</div>
+              <div class="ptype mt-8">Secundaria · Manos de Artesano</div>
               <div class="peff">Un Oficio gratis con su primera especialización. Creas objetos en la mitad de tiempo.</div>
             </div>
           </div>

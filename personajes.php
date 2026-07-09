@@ -275,7 +275,7 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
 
 <?php if ($vista === 'npcs'): ?>
-    <p class="pj-intro" style="margin-top:-8px">NPCs asignados a tu cuenta de narrador. Activa uno para <b>postear como &eacute;l</b> en el foro.</p>
+    <p class="pj-intro npc-view">NPCs asignados a tu cuenta de narrador. Activa uno para <b>postear como &eacute;l</b> en el foro.</p>
 <?php endif; ?>
 
 <?php if ($tiene_visible): ?>

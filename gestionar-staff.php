@@ -149,7 +149,7 @@ header('Content-Type: text/html; charset=utf-8');
   <section class="zs-group reveal">
     <div class="zs-group-h">
       <span class="lbl">Personajes</span>
-      <span class="need" style="background:var(--patina);color:var(--iron)"><?php echo count($staff_chars); ?> personaje(s)</span>
+      <span class="need bg-patina"><?php echo count($staff_chars); ?> personaje(s)</span>
       <span class="rule"></span>
     </div>
 <?php if ($staff_ok): ?>

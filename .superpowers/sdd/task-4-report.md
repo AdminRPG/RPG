@@ -1,30 +1,34 @@
-### Task 4 Report: revisar-personaje.php
+# Tarea 4 — Reporte de implementación
 
-**Status:** DONE
+**Archivo:** `estado-mundo.php` (295 líneas, +45 netas)
 
-**Commits created:**
-- `21c6e50` feat: página de revisión de expedientes para staff con aprobar/moderar/rechazar
+## Cambios realizados
 
-**Test summary:**
-- `php -l` syntax check: passed (no errors)
-- Page loads at `http://localhost/iforge/revisar-personaje.php?pid=1` (Dorr Kaskan)
-- Sheet shows: avatar initial, nombre, owner, dateline, estado badge (Aprobado)
-- Identity block renders: Raza (Gigante), Edad, Género (Masculino), Facción (Pirata)
-- Stats block renders: 3 pillars (Cuerpo/Mente/Espíritu) with 12 attributes + ranks
-- Virtues block renders: Tribu Racial (+2 PC)
-- Defectos block renders: Fealdad (+1 PC)
-- Equipo block renders: 50,000 berries, Arma (contundente), Objeto personal
-- Historia block renders: Concepto, Motivación, Relaciones
-- Actions bar correctly hidden (character status is "aprobado", not "revision")
-- Navbar, breadcrumb, footer all render correctly
+### 1. Render de zonas — 10 métricas en modal ✅
+No requiere cambios. El bucle `foreach ($zMetrics as $k => $m)` en el modal (línea 208) ya itera dinámicamente sobre las 10 keys que devuelve `ope_rol_mv_zona_metrics()`. El teaser de tarjetas sigue usando 3 hardcodeadas (`est`, `mar`, `pir`) — es intencional.
 
----
+### 2. Render de facciones — 7 métricas en tarjetas ✅
+No requiere cambios. El bucle `foreach ($fMetrics as $k => $m)` (línea 118) ya itera dinámicamente sobre las 7 keys.
 
-**Fix round — Task 4 follow-up:**
-**Status:** DONE
-**Commit:** `9d5363745990bf6ae238a2d34eea5a9138831777`
-**Fixes applied:**
-1. **Staff access guard** — Added `if ($staff_level < 1)` check after character load block (line ~42). Redirects non-staff to `/zona-staff.php`.
-2. **CSS variable `--red-hi`** — Added `--red-hi:#ff5a49;` to `:root` block. Previously referenced by `.btn-danger:hover` but undefined.
-3. **Dead code removed** — Dropped `$initials` / `$initials_e` computation (old lines 139-144). Avatar uses character name initial, not viewer's initials.
-- `php -l` syntax check: passed (no errors).
+### 3. NPCs mayores — datos_publicos ✅
+- **Filtro** (línea 167): añadido `|| !empty($n['datos_publicos'])` al `array_filter`.
+- **Render** (líneas 173-191): extrae `datos_publicos` como `$pub`, calcula `$ubicPublica` con preferencia a `ubicacion_publica`, muestra título, descripción (truncada a 200 chars) y mantiene `mundo_accion`.
+
+### 4. Tensión — top 3 + details ✅
+- División en `$zt_top3` (array_slice, 0-3) y `$zt_rest` (desde índice 3).
+- Top 3 se renderizan directamente.
+- Resto dentro de `<details class="em-ten-more"><summary>Ver todas las tensiones (N más)</summary>...</details>`.
+
+### 5. Nueva sección: Hilos del mundo ✅
+- Líneas 146-164, después de arcos.
+- Usa `ope_rol_mv_threads_activos()`, filtra por estado `activo`/`reabierto`.
+- Render con clases `.em-arcos`/`.em-arco`/`.em-arco-st` existentes.
+- Muestra título, tipo, descripción y facciones implicadas.
+
+### 6. Enlace al último periódico ✅
+- Línea 82: el nombre del periodo en el hero ahora es un `<a href="periodicos.php?c=CICLO_ID">`.
+
+## Reglas
+- Estilo existente mantenido (clases em-*, reveal, hero).
+- No se modificó CSS.
+- No se rompió funcionalidad existente.

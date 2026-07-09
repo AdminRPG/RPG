@@ -148,9 +148,9 @@ header('Content-Type: text/html; charset=utf-8');
   </section>
 
 <?php if (!$loggedin): ?>
-  <section class="reveal"><div class="plate"><div class="plate-b"><p class="tram-intro" style="margin:0">Debes <a href="<?php echo $bburl; ?>/member.php?action=login">iniciar sesión</a> con un personaje activo para notificar temas.</p></div></div></section>
+   <section class="reveal"><div class="plate"><div class="plate-b"><p class="tram-intro m-0">Debes <a href="<?php echo $bburl; ?>/member.php?action=login">iniciar sesión</a> con un personaje activo para notificar temas.</p></div></div></section>
 <?php elseif ($activePid <= 0): ?>
-  <section class="reveal"><div class="plate"><div class="plate-b"><p class="tram-intro" style="margin:0">Necesitas un <b>personaje activo</b> para notificar temas.</p></div></div></section>
+  <section class="reveal"><div class="plate"><div class="plate-b"><p class="tram-intro m-0">Necesitas un <b>personaje activo</b> para notificar temas.</p></div></div></section>
 <?php else: ?>
 
 <?php if ($flash !== ''): ?>
@@ -190,7 +190,7 @@ header('Content-Type: text/html; charset=utf-8');
       </div>
       <div class="plate-b">
 <?php if (empty($mis_eventos)): ?>
-        <p class="tram-intro" style="margin:0">Aún no has notificado ningún tema este mes.</p>
+        <p class="tram-intro m-0">Aún no has notificado ningún tema este mes.</p>
 <?php else: ?>
         <ul class="nt-list">
 <?php foreach ($mis_eventos as $e): ?>

@@ -423,14 +423,14 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endif; ?>
 
 <?php if ($editando): ?>
-  <div style="margin-bottom:14px;padding:12px 16px;border:2px solid var(--h6);background:var(--iron-plate);display:flex;align-items:center;justify-content:space-between;gap:12px">
-    <span style="font-family:var(--mono);font-size:.68rem;color:var(--paper-dim)">Est&aacute;s editando la ficha de <b style="color:var(--paper)"><?php echo htmlspecialchars_uni($editando['nombre']); ?></b>. Los cambios se enviar&aacute;n a revisi&oacute;n de nuevo.</span>
+  <div class="mb-14 p-12-16 b-2-h6 bg-plate df ai-center jc-sb gap-12">
+    <span class="mono fs-68 c-dim">Est&aacute;s editando la ficha de <b class="c-paper"><?php echo htmlspecialchars_uni($editando['nombre']); ?></b>. Los cambios se enviar&aacute;n a revisi&oacute;n de nuevo.</span>
     <a href="<?php echo $bburl; ?>/personajes.php" class="btn btn-ghost btn-sm">Cancelar</a>
   </div>
 <?php endif; ?>
 
-  <p class="mono" style="font-size:.78rem;color:var(--paper-dim);max-width:76ch;margin-bottom:16px">
-    Sigue los <b style="color:var(--paper)">7 pasos</b> del foro: raza, concepto, estadísticas, virtudes/defectos, facción, equipo e historia. Rellena todo en una sola sesión — al enviar, tu ficha entra en <b style="color:var(--h6)">revisión</b> del staff.
+  <p class="intro-mono">
+    Sigue los <b class="c-paper">7 pasos</b> del foro: raza, concepto, estadísticas, virtudes/defectos, facción, equipo e historia. Rellena todo en una sola sesión — al enviar, tu ficha entra en <b class="c-ember">revisión</b> del staff.
   </p>
 
   <div class="wiz-progress" id="wizProgress"></div>
@@ -460,11 +460,11 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endforeach; ?>
           </div>
 
-          <div class="field" style="margin-top:16px">
+          <div class="field mt-16">
             <label class="flabel"><input type="checkbox" id="esHibrido" name="es_hibrido" value="1"> ¿Es un híbrido de dos razas?</label>
             <p class="hint">Un híbrido obtiene SOLO las pasivas primarias de ambas razas (ninguna secundaria).</p>
           </div>
-          <div class="field" id="razaSecundariaWrap" style="display:none">
+          <div class="field dn" id="razaSecundariaWrap">
             <label class="flabel">Raza secundaria</label>
             <select name="raza_secundaria" id="razaSecundaria">
               <option value="">— elige —</option>
@@ -475,7 +475,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endforeach; ?>
             </select>
           </div>
-          <div class="field" id="subOpcionWrap" style="display:none">
+          <div class="field dn" id="subOpcionWrap">
             <label class="flabel" id="subOpcionLabel">Pasiva secundaria</label>
             <div id="subOpcionGrid" class="race-grid"></div>
             <p class="hint">Solo se elige si tu raza es <b>pura</b> (sin híbrido): sustituye la pasiva secundaria genérica.</p>
@@ -496,7 +496,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div class="field"><label class="flabel">Género</label><input type="text" name="genero" maxlength="40" value="<?php echo htmlspecialchars_uni($old['genero'] ?? ''); ?>"></div>
           </div>
           <div class="field"><label class="flabel">Concepto / aspecto *</label><textarea name="concepto" required maxlength="600" placeholder="Quién es, qué aspecto tiene, qué lo mueve..."><?php echo htmlspecialchars_uni($old['concepto'] ?? ''); ?></textarea></div>
-          <p class="hint">¿Quieres que tu personaje tenga una "D." en su nombre? Elige la virtud <b style="color:var(--paper)">Voluntad de D.</b> en el siguiente paso (Virtudes y Defectos).</p>
+          <p class="hint">¿Quieres que tu personaje tenga una "D." en su nombre? Elige la virtud <b class="c-paper">Voluntad de D.</b> en el siguiente paso (Virtudes y Defectos).</p>
         </div>
       </div>
     </div>
@@ -506,7 +506,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">3. Estadísticas</span><span class="c">// F(1) a M+(10)</span></div>
         <div class="plate-b">
-          <p class="mono" style="font-size:.72rem;color:var(--paper-dim);margin-bottom:10px">Todas empiezan en <b style="color:var(--paper)">F</b>. Las pasivas raciales ya modifican el valor efectivo. Después puedes subir <b id="maxBumpsLabel" style="color:var(--h6)">1 estadística</b> un rango más.</p>
+          <p class="stats-hint">Todas empiezan en <b class="c-paper">F</b>. Las pasivas raciales ya modifican el valor efectivo. Después puedes subir <b class="c-ember" id="maxBumpsLabel">1 estadística</b> un rango más.</p>
           <div id="statsContainer"></div>
           <div class="wiz-sum-bar"><span>Suma total: <b id="statSum">0</b></span><span>Rango del personaje: <b id="statRank">F</b></span></div>
         </div>
@@ -518,7 +518,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">4. Virtudes y defectos</span><span class="c">// 6 PC iniciales</span></div>
         <div class="plate-b">
-          <div class="pc-bar" id="pcBar">PC disponibles: <span class="pc-num" id="pcNum">6</span> <span class="mono" style="font-size:.62rem;color:var(--ash)">(6 base − coste virtudes + devuelto por defectos)</span></div>
+          <div class="pc-bar" id="pcBar">PC disponibles: <span class="pc-num" id="pcNum">6</span> <span class="pc-hint">(6 base − coste virtudes + devuelto por defectos)</span></div>
 
           <div class="vd-grid">
             <div class="vd-col" data-vdcol="virtudes">
@@ -590,7 +590,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">5. Facción inicial</span><span class="c">// punto de partida</span></div>
         <div class="plate-b">
-          <p class="hint" style="margin-bottom:12px"><b>Periodo de Gracia PvP</b> — durante tus primeros 15 días (off-rol) como jugador nuevo no puedes ser objetivo de una Invasión (PvP). Pasado ese tiempo, los mares son libres: atacar a alguien mucho más débil tiene consecuencias (Wanted, persecución Marine, represalias de facción).</p>
+          <p class="hint mb-12"><b>Periodo de Gracia PvP</b> — durante tus primeros 15 días (off-rol) como jugador nuevo no puedes ser objetivo de una Invasión (PvP). Pasado ese tiempo, los mares son libres: atacar a alguien mucho más débil tiene consecuencias (Wanted, persecución Marine, represalias de facción).</p>
           <div class="fac-grid">
 <?php foreach ($FACCIONES as $fid => $f): ?>
             <label class="fac-card">
@@ -610,7 +610,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">6. Equipo inicial</span><span class="c">// elige tu Pack</span></div>
         <div class="plate-b">
-          <p class="hint" style="margin-bottom:12px">Elige el Pack de Equipo Inicial que mejor se adapte al concepto de tu personaje. Todos incluyen vestimenta básica de viaje, raciones para 5 días y <b style="color:var(--paper)">50.000 berries</b> iniciales.</p>
+          <p class="hint mb-12">Elige el Pack de Equipo Inicial que mejor se adapte al concepto de tu personaje. Todos incluyen vestimenta básica de viaje, raciones para 5 días y <b class="c-paper">50.000 berries</b> iniciales.</p>
           <div class="race-grid" id="packGrid">
 <?php foreach ($PACKS as $pid => $p): ?>
             <label class="race-card">
@@ -634,7 +634,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">7. Historia</span><span class="c">// pasado, motivación, relaciones</span></div>
         <div class="plate-b">
-          <div class="field"><label class="flabel">Pasado *</label><textarea name="historia_pasado" required style="min-height:160px" placeholder="De dónde viene, qué le ha pasado antes de empezar a rolear..."><?php echo htmlspecialchars_uni($old['historia_pasado'] ?? ''); ?></textarea></div>
+          <div class="field"><label class="flabel">Pasado *</label><textarea name="historia_pasado" required class="historia-textarea" placeholder="De dónde viene, qué le ha pasado antes de empezar a rolear..."><?php echo htmlspecialchars_uni($old['historia_pasado'] ?? ''); ?></textarea></div>
           <div class="field"><label class="flabel">Motivación</label><textarea name="historia_motivacion" placeholder="Qué busca, qué lo empuja a moverse por el mundo..."><?php echo htmlspecialchars_uni($old['historia_motivacion'] ?? ''); ?></textarea></div>
           <div class="field"><label class="flabel">Relaciones</label><textarea name="historia_relaciones" placeholder="Vínculos, familia, tripulación, enemigos..."><?php echo htmlspecialchars_uni($old['historia_relaciones'] ?? ''); ?></textarea></div>
         </div>
@@ -653,7 +653,7 @@ header('Content-Type: text/html; charset=utf-8');
       <button type="button" class="btn btn-ghost" id="wizPrev">&larr; Anterior</button>
       <div class="wiz-err" id="wizErr"></div>
       <button type="button" class="btn btn-hot" id="wizNext">Siguiente &rarr;</button>
-      <button type="submit" class="btn btn-hot" id="wizSubmit" style="display:none">Enviar a revisión</button>
+      <button type="submit" class="btn btn-hot dn" id="wizSubmit">Enviar a revisión</button>
     </div>
   </form>
 

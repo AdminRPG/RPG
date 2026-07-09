@@ -148,6 +148,11 @@ $zonas = array(
         'body'  => 'Gestiona el feed de <b>&Uacute;ltimas noticias</b> de la portada: crea entradas manuales, edita las existentes, act&iacute;valas o desact&iacute;valas de la rotaci&oacute;n y ordena su prioridad. Las noticias de Mundo Vivo se a&ntilde;aden autom&aacute;ticamente.',
         'meta'  => $mv_noticias_activas . ' en rotaci&oacute;n', 'cta' => 'Gestionar', 'badge' => 0, 'href' => $bburl . '/gestionar-noticias.php',
         'icon'  => '<path d="M4 4h16v14a2 2 0 0 1-2 2H4Z"/><path d="M4 20a2 2 0 0 1-2-2V8"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/>'),
+    array('grp' => 'administrador', 'code' => 'STF-10',
+        'title' => 'Gestionar misiones',
+        'body'  => 'Administra las misiones del <b>Tabl&oacute;n</b>: crea, edita, activa, desactiva o elimina misiones del ciclo actual. Controla estado, rango, peligrosidad, recompensa y facciones implicadas.',
+        'meta'  => '', 'cta' => 'Ir al panel', 'badge' => 0, 'href' => $bburl . '/gestionar-misiones.php',
+        'icon'  => '<path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6Z"/><path d="M12 8v4l2 2"/>'),
 );
 
 header('Content-Type: text/html; charset=utf-8');

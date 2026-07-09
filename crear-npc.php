@@ -324,9 +324,9 @@ header('Content-Type: text/html; charset=utf-8');
   </section>
 
 <?php if ($show_flash): ?>
-  <div class="flash ok" style="margin-bottom:16px;padding:14px 18px;border:2px solid var(--patina);background:var(--iron-plate);display:flex;align-items:center;justify-content:space-between;gap:14px">
-    <span style="font-family:var(--mono);font-size:.72rem;color:var(--patina-hi)">El NPC <b style="color:var(--paper)"><?php echo $creado_nombre; ?></b> se ha creado con estado <b>aprobado</b> y est&aacute; listo para ser asignado.</span>
-    <span style="display:flex;gap:8px">
+  <div class="flash ok mb-16 p-14-18 b-2-patina bg-plate df ai-center jc-sb gap-14">
+    <span class="mono fs-72 c-patina">El NPC <b class="c-paper"><?php echo $creado_nombre; ?></b> se ha creado con estado <b>aprobado</b> y est&aacute; listo para ser asignado.</span>
+    <span class="df gap-8">
       <a href="<?php echo $bburl; ?>/crear-npc.php" class="btn btn-hot btn-sm">Crear otro</a>
       <a href="<?php echo $bburl; ?>/zona-staff.php" class="btn btn-ghost btn-sm">Zona Staff</a>
     </span>
@@ -339,8 +339,8 @@ header('Content-Type: text/html; charset=utf-8');
   </div>
 <?php endif; ?>
 
-  <p class="mono" style="font-size:.78rem;color:var(--paper-dim);max-width:76ch;margin-bottom:16px">
-    Sigue los <b style="color:var(--paper)">7 pasos</b> para crear un personaje no jugador. El NPC se crea con estado <b style="color:var(--patina)">aprobado</b> directamente (sin revisi&oacute;n) y sin due&ntilde;o. Podr&aacute; asignarse a un Narrador desde Zona Staff.
+  <p class="mono fs-78 c-dim mb-16 maxw-76ch">
+    Sigue los <b class="c-paper">7 pasos</b> para crear un personaje no jugador. El NPC se crea con estado <b class="c-patina">aprobado</b> directamente (sin revisi&oacute;n) y sin due&ntilde;o. Podr&aacute; asignarse a un Narrador desde Zona Staff.
   </p>
 
   <div class="wiz-progress" id="wizProgress"></div>
@@ -370,7 +370,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endforeach; ?>
           </div>
 
-          <div class="field" style="margin-top:16px">
+          <div class="field mt-16">
             <label class="flabel"><input type="checkbox" id="esHibrido" name="es_hibrido" value="1"<?php echo !empty($old['es_hibrido']) ? ' checked' : ''; ?>> ¿Es un híbrido de dos razas?</label>
             <p class="hint">Un híbrido obtiene SOLO las pasivas primarias de ambas razas (ninguna secundaria).</p>
           </div>
@@ -385,7 +385,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endforeach; ?>
             </select>
           </div>
-          <div class="field" id="subOpcionWrap" style="display:none">
+          <div class="field dn" id="subOpcionWrap">
             <label class="flabel" id="subOpcionLabel">Pasiva secundaria</label>
             <div id="subOpcionGrid" class="race-grid"></div>
             <p class="hint">Solo se elige si la raza es <b>pura</b> (sin híbrido): sustituye la pasiva secundaria genérica.</p>
@@ -405,7 +405,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div class="field"><label class="flabel">Edad</label><input type="text" name="edad" maxlength="20" value="<?php echo htmlspecialchars_uni($old['edad'] ?? ''); ?>"></div>
             <div class="field"><label class="flabel">Género</label><input type="text" name="genero" maxlength="40" value="<?php echo htmlspecialchars_uni($old['genero'] ?? ''); ?>"></div>
           </div>
-          <p class="hint">¿Quieres que el NPC tenga una "D." en su nombre? Elige la virtud <b style="color:var(--paper)">Voluntad de D.</b> en el siguiente paso (Virtudes y Defectos).</p>
+          <p class="hint">¿Quieres que el NPC tenga una "D." en su nombre? Elige la virtud <b class="c-paper">Voluntad de D.</b> en el siguiente paso (Virtudes y Defectos).</p>
           <div class="field"><label class="flabel">Concepto / aspecto *</label><textarea name="concepto" required maxlength="600" placeholder="Quién es, qué aspecto tiene, qué lo mueve..."><?php echo htmlspecialchars_uni($old['concepto'] ?? ''); ?></textarea></div>
         </div>
       </div>
@@ -416,7 +416,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">3. Estadísticas</span><span class="c">// F(1) a M+(10)</span></div>
         <div class="plate-b">
-          <p class="mono" style="font-size:.72rem;color:var(--paper-dim);margin-bottom:10px">Todas empiezan en <b style="color:var(--paper)">F</b>. Las pasivas raciales ya modifican el valor efectivo. Después puedes subir <b id="maxBumpsLabel" style="color:var(--h6)">1 estadística</b> un rango más.</p>
+          <p class="mono fs-72 c-dim mb-10">Todas empiezan en <b class="c-paper">F</b>. Las pasivas raciales ya modifican el valor efectivo. Después puedes subir <b id="maxBumpsLabel" class="c-h6">1 estadística</b> un rango más.</p>
           <div id="statsContainer"></div>
           <div class="wiz-sum-bar"><span>Suma total: <b id="statSum">0</b></span><span>Rango del personaje: <b id="statRank">F</b></span></div>
         </div>
@@ -428,7 +428,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">4. Virtudes y defectos</span><span class="c">// 6 PC iniciales</span></div>
         <div class="plate-b">
-          <div class="pc-bar" id="pcBar">PC disponibles: <span class="pc-num" id="pcNum">6</span> <span class="mono" style="font-size:.62rem;color:var(--ash)">(6 base − coste virtudes + devuelto por defectos)</span></div>
+          <div class="pc-bar" id="pcBar">PC disponibles: <span class="pc-num" id="pcNum">6</span> <span class="mono fs-62 c-ash">(6 base − coste virtudes + devuelto por defectos)</span></div>
 
           <div class="vd-grid">
             <div class="vd-col" data-vdcol="virtudes">
@@ -519,7 +519,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">6. Equipo inicial</span><span class="c">// elige el Pack</span></div>
         <div class="plate-b">
-          <p class="hint" style="margin-bottom:12px">Elige el Pack de Equipo Inicial que mejor se adapte al concepto del NPC. Todos incluyen vestimenta básica de viaje, raciones para 5 días y <b style="color:var(--paper)">50.000 berries</b> iniciales.</p>
+          <p class="hint mb-12">Elige el Pack de Equipo Inicial que mejor se adapte al concepto del NPC. Todos incluyen vestimenta básica de viaje, raciones para 5 días y <b class="c-paper">50.000 berries</b> iniciales.</p>
           <div class="race-grid" id="packGrid">
 <?php foreach ($PACKS as $pid => $p): ?>
             <label class="race-card">
@@ -543,7 +543,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">7. Historia</span><span class="c">// pasado, motivación, relaciones</span></div>
         <div class="plate-b">
-          <div class="field"><label class="flabel">Pasado *</label><textarea name="historia_pasado" required style="min-height:160px" placeholder="De dónde viene, qué le ha pasado antes de empezar a rolear..."><?php echo htmlspecialchars_uni($old['historia_pasado'] ?? ''); ?></textarea></div>
+          <div class="field"><label class="flabel">Pasado *</label><textarea name="historia_pasado" required class="np-historia-textarea" placeholder="De dónde viene, qué le ha pasado antes de empezar a rolear..."<?php echo htmlspecialchars_uni($old['historia_pasado'] ?? ''); ?></textarea></div>
           <div class="field"><label class="flabel">Motivación</label><textarea name="historia_motivacion" placeholder="Qué busca, qué lo empuja a moverse por el mundo..."><?php echo htmlspecialchars_uni($old['historia_motivacion'] ?? ''); ?></textarea></div>
           <div class="field"><label class="flabel">Relaciones</label><textarea name="historia_relaciones" placeholder="Vínculos, familia, tripulación, enemigos..."><?php echo htmlspecialchars_uni($old['historia_relaciones'] ?? ''); ?></textarea></div>
         </div>
@@ -562,7 +562,7 @@ header('Content-Type: text/html; charset=utf-8');
       <button type="button" class="btn btn-ghost" id="wizPrev">&larr; Anterior</button>
       <div class="wiz-err" id="wizErr"></div>
       <button type="button" class="btn btn-hot" id="wizNext">Siguiente &rarr;</button>
-      <button type="submit" class="btn btn-hot" id="wizSubmit" style="display:none">Crear NPC</button>
+      <button type="submit" class="btn btn-hot dn" id="wizSubmit">Crear NPC</button>
     </div>
   </form>
 
