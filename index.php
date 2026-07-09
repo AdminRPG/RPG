@@ -633,8 +633,7 @@ $ope_rol_season_color = $rol_seasons[$rol_season_idx][1];
 $ope_rol_day = $rol_day_in_season;
 $ope_rol_year = $rol_year;
 $ope_rol_progress = round(($rol_day_in_season / 65) * 100);
-$rol_year_roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X'];
-$ope_rol_year_label = $rol_year <= 10 ? $rol_year_roman[$rol_year - 1] : (string)$rol_year;
+$ope_rol_year_label = function_exists('ope_rol_year_label') ? ope_rol_year_label($rol_year) : (string)$rol_year;
 
 $curiosidades = (isset($ope_home['curiosidades']) && is_array($ope_home['curiosidades'])) ? array_values($ope_home['curiosidades']) : [];
 $lore = (isset($ope_home['lore']) && is_array($ope_home['lore'])) ? $ope_home['lore'] : ['titulo' => '', 'texto' => ''];
@@ -644,6 +643,28 @@ if ($curiosidades_json === false) {
     $curiosidades_json = '[]';
 }
 $ope_curiosidad = !empty($curiosidades) ? htmlspecialchars_uni($curiosidades[0]) : '';
+
+// I-Forge: Últimas noticias (Mundo Vivo + manuales). Rotación + clic despliega.
+$ope_noticias = function_exists('ope_rol_mv_noticias_activas') ? ope_rol_mv_noticias_activas(8) : array();
+$ope_noticias_data = array();
+foreach ($ope_noticias as $n) {
+    $ope_noticias_data[] = array(
+        'titulo'  => (string)$n['titulo'],
+        'resumen' => (string)($n['resumen'] !== '' ? $n['resumen'] : $n['titulo']),
+        'cuerpo'  => (string)$n['cuerpo_html'],
+    );
+}
+$ope_has_news = !empty($ope_noticias_data);
+if (!$ope_has_news) {
+    foreach ($curiosidades as $c) {
+        $ope_noticias_data[] = array('titulo' => '', 'resumen' => (string)$c, 'cuerpo' => '');
+    }
+}
+$ope_noticias_json = json_encode($ope_noticias_data, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+if ($ope_noticias_json === false) { $ope_noticias_json = '[]'; }
+$ope_noticia_kicker = $ope_has_news ? '// últimas noticias' : '// curiosidad';
+$ope_noticia_first_title = !empty($ope_noticias_data) ? htmlspecialchars_uni($ope_noticias_data[0]['titulo']) : '';
+$ope_noticia_first_text = !empty($ope_noticias_data) ? htmlspecialchars_uni($ope_noticias_data[0]['resumen']) : '';
 
 $ope_lore_title = htmlspecialchars_uni($lore['titulo'] ?? '');
 $ope_lore_text = htmlspecialchars_uni($lore['texto'] ?? '');

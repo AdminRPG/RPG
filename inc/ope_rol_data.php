@@ -102,11 +102,42 @@ if (!function_exists('ope_rol_razas')) {
                 'resumen' => 'La raza más numerosa. Presente en los Cuatro Mares y la Grand Line. Su fuerza es la adaptabilidad.',
                 'primaria_nombre' => 'Adaptabilidad',
                 'primaria_desc' => 'Al crear el personaje, puedes subir DOS stats de F a E en lugar de una.',
-                'secundaria_nombre' => 'Mayoría Silenciosa',
-                'secundaria_desc' => '+10% a la ganancia de Reputación con cualquier facción.',
+                'secundaria_nombre' => 'Herencia Tribal',
+                'secundaria_desc' => 'Elige: Humano Genérico (Mayoría Silenciosa) o una Tribu Real (Ashinaga, Tenaga, Kubinaga, Kuja).',
                 'mod' => array(),
                 'mod_secundaria' => array(),
                 'extra_stat_bump' => true,
+                // Elección obligatoria al crear (solo si es PURO, ver INI-01): sustituye
+                // la pasiva secundaria genérica por la de la tribu elegida.
+                'sub_opciones_label' => 'Herencia Tribal',
+                'sub_opciones' => array(
+                    'generico' => array(
+                        'nombre' => 'Mayoría Silenciosa',
+                        'desc' => '+10% a la ganancia de Reputación con cualquier facción.',
+                        'mod' => array(),
+                    ),
+                    'ashinaga' => array(
+                        'nombre' => 'Zancada Larga (Tribu Ashinaga)',
+                        'desc' => '+50% velocidad de movimiento terrestre. +1 AGI efectiva en ataques de patada o salto.',
+                        'mod' => array(),
+                    ),
+                    'tenaga' => array(
+                        'nombre' => 'Doble Articulación (Tribu Tenaga)',
+                        'desc' => '+1m de alcance cuerpo a cuerpo con armas de mano. +1 DES efectiva con herramientas de precisión, ganzúas o instrumentos.',
+                        'mod' => array(),
+                    ),
+                    'kubinaga' => array(
+                        'nombre' => 'Visión Elevada (Tribu Kubinaga)',
+                        'desc' => '+1 PER efectiva para avistar amenazas a distancia. Inmune a penalizadores de flanqueo básico y -5 a la dificultad para detectar emboscadas por la espalda.',
+                        'mod' => array(),
+                    ),
+                    'kuja' => array(
+                        'nombre' => 'Haki de las Guerreras (Tribu Kuja)',
+                        'desc' => 'Solo mujeres. Empiezas con la virtud "Haki de Armadura Latente" gratis (sin gastar PC). Tus flechas/arcos pueden canalizar VOL para daño espiritual menor (Tier I).',
+                        'mod' => array(),
+                        'solo_femenino' => true,
+                    ),
+                ),
             ),
             'skypiean' => array(
                 'nombre' => 'Skypiean',
@@ -133,10 +164,26 @@ if (!function_exists('ope_rol_razas')) {
                 'resumen' => 'Colosos de Elbaf. Cultura guerrera basada en el honor, el duelo y la fuerza.',
                 'primaria_nombre' => 'Fuerza Colosal',
                 'primaria_desc' => '+2 FUE permanente. ×1.5 daño cuerpo a cuerpo. ×2 alcance. -1 AGI permanente.',
-                'secundaria_nombre' => 'Piel de Batalla',
-                'secundaria_desc' => '+1 VIG permanente. Las heridas leves no te afectan en combate.',
+                'secundaria_nombre' => 'Linaje Colosal',
+                'secundaria_desc' => 'Elige: Gigante Común (Piel de Batalla) o Gigante Ancestral (Cuerpo Devastador).',
                 'mod' => array('FUE' => 2, 'AGI' => -1),
                 'mod_secundaria' => array('VIG' => 1),
+                // Elección obligatoria al crear (solo si es PURO, ver INI-01).
+                'sub_opciones_label' => 'Linaje Colosal',
+                'sub_opciones' => array(
+                    'comun' => array(
+                        'nombre' => 'Piel de Batalla (Gigante Común)',
+                        'desc' => '+1 VIG permanente. Las heridas leves no te afectan en combate.',
+                        'mod' => array('VIG' => 1),
+                    ),
+                    'ancestral' => array(
+                        'nombre' => 'Cuerpo Devastador (Gigante Ancestral)',
+                        'desc' => 'Tamaño de 30 a 60 m, con cuernos. Tu penalización racial de AGI aumenta a -2 (en lugar de -1). Tu multiplicador de daño cuerpo a cuerpo sube a ×2.0 (en lugar de ×1.5) y tus ataques ignoran el 50% de la resistencia física de estructuras, defensas pesadas y barcos.',
+                        // -1 AGI extra que se SUMA a la penalización -1 ya aplicada por la
+                        // pasiva primaria: total efectivo -2 AGI para el Ancestral.
+                        'mod' => array('AGI' => -1),
+                    ),
+                ),
             ),
             'mink' => array(
                 'nombre' => 'Mink',
@@ -212,13 +259,13 @@ if (!function_exists('ope_rol_facciones')) {
                 'ventaja' => 'Identidad secreta gratuita. Acceso a red de contactos revolucionarios.',
             ),
             'gobierno' => array(
-                'nombre' => 'Gobierno',
-                'desc' => 'Agente del Gobierno Mundial: Cipher Pol, burocracia y operaciones encubiertas.',
-                'ventaja' => 'Credenciales del Gobierno Mundial y acceso a recursos de Cipher Pol. Autoridad sobre Marines de menor rango.',
+                'nombre' => 'Gobierno Mundial',
+                'desc' => 'Agente, burócrata o oficial gubernamental de baja escala: Cipher Pol, burocracia y operaciones encubiertas.',
+                'ventaja' => '+1 rango inicial de Gobierno. Empiezas con una Acreditación Gubernamental oficial que permite libre tránsito por reinos afiliados.',
             ),
             'cazarrecompensas' => array(
-                'nombre' => 'Cazadores',
-                'desc' => 'Cazarrecompensas. Caza piratas y forajidos por dinero.',
+                'nombre' => 'Cazarrecompensas',
+                'desc' => 'Independiente. Caza piratas y forajidos por dinero.',
                 'ventaja' => '+1 nivel en el Gremio de Cazadores. +10% berries por capturas.',
             ),
             'civil' => array(
@@ -239,6 +286,72 @@ if (!function_exists('ope_rol_armas')) {
             'fuego' => array('nombre' => 'Arma de fuego (pistola)', 'detalle' => '1d6 + DES · 20m. Munición limitada (6 disparos).'),
             'rifle' => array('nombre' => 'Rifle / Francotirador', 'detalle' => '1d10 + DES · 100m. Munición limitada (1 disparo).'),
             'improvisada' => array('nombre' => 'Arma improvisada', 'detalle' => '1d4 + FUE · lo que tengas a mano.'),
+        );
+    }
+}
+
+if (!function_exists('ope_rol_packs_equipo')) {
+    /**
+     * Packs de Equipo Inicial (INI-01, Paso 6). Sustituyen la vieja pareja
+     * "arma a elección + objeto personal libre": ahora se elige UN pack
+     * cerrado que se adapta al concepto del personaje.
+     *
+     * Todos incluyen vestimenta básica de viaje, raciones para 5 días y
+     * 50,000 berries iniciales (ver ope_rol_berries_iniciales()).
+     *
+     * NOTA: 'contenido' es solo texto descriptivo por ahora. Falta la
+     * segunda fase (pendiente, fácil de añadir después): convertir cada
+     * entrada de 'contenido' en objetos concretos que se insertan
+     * automáticamente en el inventario ('encima'/'almacen') al crear el
+     * personaje. Por ahora el pack elegido solo queda registrado en el
+     * inventario, para no perder la elección hasta que se implemente eso.
+     */
+    function ope_rol_packs_equipo()
+    {
+        return array(
+            'combatiente' => array(
+                'nombre' => 'Pack del Combatiente',
+                'resumen' => 'Para quien resuelve las cosas con las manos (o un arma).',
+                'contenido' => array(
+                    '1 arma básica a elección de Rango F (espada de práctica, pistola simple, bastón reforzado)',
+                    'Armadura ligera de cuero (protección básica)',
+                    '2 vendas / artículos médicos de primeros auxilios',
+                ),
+            ),
+            'navegante' => array(
+                'nombre' => 'Pack del Navegante',
+                'resumen' => 'Para quien vive para el mar y la ruta hacia el siguiente horizonte.',
+                'contenido' => array(
+                    '1 Log Pose básica para la navegación en tu mar inicial',
+                    'Cartas marítimas locales',
+                    '1 catalejo de latón',
+                ),
+            ),
+            'erudito' => array(
+                'nombre' => 'Pack del Erudito / Médico',
+                'resumen' => 'Para quien cura o para quien investiga.',
+                'contenido' => array(
+                    '1 kit médico básico de campaña (antiséptico, suturas, vendajes) o un compendio de libros de investigación histórica/científica',
+                    'Diario de notas, tintero y pluma',
+                ),
+            ),
+            'artesano' => array(
+                'nombre' => 'Pack del Artesano / Ingeniero',
+                'resumen' => 'Para quien construye, repara o forja con sus propias manos.',
+                'contenido' => array(
+                    'Juego de herramientas especializado de tu oficio principal (carpintería, forja, cocina...)',
+                    'Algunos materiales básicos de trabajo o reparación',
+                ),
+            ),
+            'espia' => array(
+                'nombre' => 'Pack del Espía / Agente',
+                'resumen' => 'Para quien se mueve entre las sombras o entre la alta sociedad.',
+                'contenido' => array(
+                    'Ropa formal o atuendo de incógnito de alta calidad',
+                    'Un den den mushi portátil',
+                    'Un kit de ganzúas de precisión',
+                ),
+            ),
         );
     }
 }
@@ -426,5 +539,212 @@ if (!function_exists('ope_rol_find_defecto')) {
             if (isset($cat[$id])) return $cat[$id];
         }
         return null;
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// CARTAS DE TÉCNICA (INI-03) — catálogo de las 6 categorías de tags
+// y de los 5 tiers. Fuente única de verdad para el creador de cartas
+// (gestionar-cartas.php) y el render del deck en la ficha.
+// ─────────────────────────────────────────────────────────────
+
+if (!function_exists('ope_rol_tecnica_tags')) {
+    /**
+     * Las 6 categorías de tags de una carta de técnica.
+     *   key      → identificador de la categoría (se guarda en JSON)
+     *   nombre   → etiqueta visible
+     *   pregunta → ayuda contextual
+     *   multi    → true = varios tags; false = uno solo (radio)
+     *   max      → tope de tags cuando multi (0 = sin tope)
+     *   accent   → variable CSS de color de acento
+     *   tags     → id => etiqueta visible
+     */
+    function ope_rol_tecnica_tags()
+    {
+        return array(
+            'estilo' => array(
+                'nombre'   => 'Estilo',
+                'pregunta' => '¿De dónde proviene la técnica?',
+                'multi'    => true,
+                'max'      => 3,
+                'accent'   => 'var(--crack)',
+                'tags'     => array(
+                    'Propio' => 'Propio',
+                    'Haki'   => 'Haki',
+                    'Akuma'  => 'Akuma',
+                ),
+            ),
+            'tipo' => array(
+                'nombre'   => 'Tipo',
+                'pregunta' => '¿Qué función táctica cumple?',
+                'multi'    => false,
+                'max'      => 1,
+                'accent'   => 'var(--ember-hi)',
+                'tags'     => array(
+                    'Ofensiva'  => 'Ofensiva',
+                    'Defensiva' => 'Defensiva',
+                    'Soporte'   => 'Soporte',
+                    'Control'   => 'Control',
+                    'Movilidad' => 'Movilidad',
+                    'Utilidad'  => 'Utilidad',
+                ),
+            ),
+            'alcance' => array(
+                'nombre'   => 'Alcance',
+                'pregunta' => '¿Hasta dónde llega el efecto?',
+                'multi'    => false,
+                'max'      => 1,
+                'accent'   => 'var(--patina-hi)',
+                'tags'     => array(
+                    'Cuerpo a Cuerpo' => 'Cuerpo a Cuerpo',
+                    'Corto Alcance'   => 'Corto Alcance',
+                    'Medio Alcance'   => 'Medio Alcance',
+                    'Largo Alcance'   => 'Largo Alcance',
+                    'Área'            => 'Área',
+                    'Línea'           => 'Línea',
+                    'Personal'        => 'Personal',
+                ),
+            ),
+            'elemento' => array(
+                'nombre'   => 'Elemento',
+                'pregunta' => '¿Tiene afinidad elemental?',
+                'multi'    => false,
+                'max'      => 1,
+                'accent'   => 'var(--h6)',
+                'tags'     => array(
+                    'Ninguno'       => 'Ninguno',
+                    'Fuego'         => 'Fuego',
+                    'Hielo'         => 'Hielo',
+                    'Electricidad'  => 'Electricidad',
+                    'Agua'          => 'Agua',
+                    'Tierra'        => 'Tierra',
+                    'Aire / Viento' => 'Aire / Viento',
+                    'Luz'           => 'Luz',
+                    'Oscuridad'     => 'Oscuridad',
+                    'Planta'        => 'Planta',
+                    'Veneno'        => 'Veneno',
+                    'Sónico'        => 'Sónico',
+                    'Espiritual'    => 'Espiritual',
+                ),
+            ),
+            'estado' => array(
+                'nombre'   => 'Estado Alterado',
+                'pregunta' => '¿Qué efectos secundarios aplica al impactar?',
+                'multi'    => true,
+                'max'      => 3,
+                'accent'   => 'var(--ember)',
+                'tags'     => array(
+                    'Ninguno'      => 'Ninguno',
+                    'Aturdido'     => 'Aturdido',
+                    'Quemado'      => 'Quemado',
+                    'Paralizado'   => 'Paralizado',
+                    'Sangrado'     => 'Sangrado',
+                    'Cegado'       => 'Cegado',
+                    'Confuso'      => 'Confuso',
+                    'Derribado'    => 'Derribado',
+                    'Inmovilizado' => 'Inmovilizado',
+                    'Fortalecido'  => 'Fortalecido',
+                    'Protegido'    => 'Protegido',
+                    'Acelerado'    => 'Acelerado',
+                    'Curado'       => 'Curado',
+                    'Revitalizado' => 'Revitalizado',
+                ),
+            ),
+            'ejecucion' => array(
+                'nombre'   => 'Ejecución',
+                'pregunta' => '¿Cómo se activa o qué propiedad especial tiene?',
+                'multi'    => true,
+                'max'      => 0,
+                'accent'   => 'var(--patina)',
+                'tags'     => array(
+                    'Ninguno'     => 'Ninguno',
+                    'Cargada'     => 'Cargada',
+                    'Instantánea' => 'Instantánea',
+                    'Canalizada'  => 'Canalizada',
+                    'Reacción'    => 'Reacción',
+                    'Combo'       => 'Combo',
+                    'Perforante'  => 'Perforante',
+                    'Frenesí'     => 'Frenesí',
+                ),
+            ),
+        );
+    }
+}
+
+if (!function_exists('ope_rol_tecnica_tiers')) {
+    /**
+     * Los 5 tiers de carta. Cada uno trae su presupuesto de poder
+     * recomendado (para pistas y autocompletado en el creador).
+     */
+    function ope_rol_tecnica_tiers()
+    {
+        return array(
+            1 => array('romano' => 'I',   'rango' => 'F – D',    'pp' => 5,  'pa' => '1 – 2', 'en' => '5 – 10',  'reposo' => '0',            'dados' => '1d6 a 1d8 + stat', 'pa_def' => 1, 'en_def' => 8,  'reposo_def' => 0, 'dados_def' => '1d8 + FUE'),
+            2 => array('romano' => 'II',  'rango' => 'D – C',    'pp' => 8,  'pa' => '2',     'en' => '10 – 15', 'reposo' => '1',            'dados' => '1d10 a 2d6 + stat', 'pa_def' => 2, 'en_def' => 12, 'reposo_def' => 1, 'dados_def' => '1d10 + FUE'),
+            3 => array('romano' => 'III', 'rango' => 'B – A',    'pp' => 12, 'pa' => '2 – 3', 'en' => '15 – 25', 'reposo' => '1 – 2',        'dados' => '2d8 + stat', 'pa_def' => 3, 'en_def' => 20, 'reposo_def' => 2, 'dados_def' => '2d8 + FUE'),
+            4 => array('romano' => 'IV',  'rango' => 'S',        'pp' => 18, 'pa' => '3 – 4', 'en' => '25 – 40', 'reposo' => '2',            'dados' => '3d8 a 4d6 + stat', 'pa_def' => 4, 'en_def' => 32, 'reposo_def' => 2, 'dados_def' => '3d8 + FUE'),
+            5 => array('romano' => 'V',   'rango' => 'SS – M+',  'pp' => 25, 'pa' => '4 – 5', 'en' => '40 – 60', 'reposo' => '3 / Escena',   'dados' => '4d8 a 5d6 + stat', 'pa_def' => 5, 'en_def' => 50, 'reposo_def' => 3, 'dados_def' => '4d8 + FUE'),
+        );
+    }
+}
+
+if (!function_exists('ope_rol_tecnica_valida_tags')) {
+    /**
+     * Normaliza y valida un conjunto de tags contra el catálogo.
+     * Devuelve array('estilo'=>[...], 'tipo'=>'', ...) saneado y respetando
+     * multi/single y los topes 'max'. Descarta ids desconocidos.
+     */
+    function ope_rol_tecnica_valida_tags($in)
+    {
+        $cat = ope_rol_tecnica_tags();
+        $out = array();
+        foreach ($cat as $ck => $c) {
+            $valid = $c['tags'];
+            if ($c['multi']) {
+                $sel = isset($in[$ck]) && is_array($in[$ck]) ? $in[$ck] : array();
+                $clean = array();
+                foreach ($sel as $t) {
+                    if (isset($valid[$t]) && !in_array($t, $clean, true)) {
+                        $clean[] = $t;
+                    }
+                }
+                if ($c['max'] > 0) {
+                    $clean = array_slice($clean, 0, $c['max']);
+                }
+                $out[$ck] = $clean;
+            } else {
+                $t = isset($in[$ck]) ? (string) $in[$ck] : '';
+                $out[$ck] = isset($valid[$t]) ? $t : '';
+            }
+        }
+        return $out;
+    }
+}
+
+if (!function_exists('ope_rol_tecnica_tags_flat')) {
+    /**
+     * Convierte la estructura de tags en una lista plana con formato
+     * "[Categoría: Valor]" (como en la guía INI-03), lista para pintar chips.
+     * Cada item: array('cat'=>ck, 'accent'=>css, 'texto'=>'[Estilo: Propio]', 'valor'=>'Propio').
+     */
+    function ope_rol_tecnica_tags_flat($tags)
+    {
+        $cat = ope_rol_tecnica_tags();
+        $flat = array();
+        foreach ($cat as $ck => $c) {
+            $etq = $c['nombre'];
+            if ($c['multi']) {
+                $vals = isset($tags[$ck]) && is_array($tags[$ck]) ? $tags[$ck] : array();
+                foreach ($vals as $v) {
+                    $flat[] = array('cat' => $ck, 'accent' => $c['accent'], 'valor' => $v, 'texto' => '[' . $etq . ': ' . $v . ']');
+                }
+            } else {
+                $v = isset($tags[$ck]) ? (string) $tags[$ck] : '';
+                if ($v !== '') {
+                    $flat[] = array('cat' => $ck, 'accent' => $c['accent'], 'valor' => $v, 'texto' => '[' . $etq . ': ' . $v . ']');
+                }
+            }
+        }
+        return $flat;
     }
 }

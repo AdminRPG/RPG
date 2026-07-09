@@ -117,43 +117,37 @@
       <span class="ope-tag ope-tag-rank" style="background:var(--h3)">{$post['usertitle']}</span>
       {$post['groupimage']}
     </div>
-    <div class="ope-pa-stats">
-      <div class="ope-pa-srow"><span class="ope-pa-srow-l">{$lang->postbit_posts}</span><span class="ope-pa-srow-v">{$post['postnum']}</span></div>
-      <div class="ope-pa-srow"><span class="ope-pa-srow-l">{$lang->postbit_threads}</span><span class="ope-pa-srow-v">{$post['threadnum']}</span></div>
-      <div class="ope-pa-srow"><span class="ope-pa-srow-l">{$lang->postbit_joined}</span><span class="ope-pa-srow-v">{$post['userregdate']}</span></div>
-    </div>
+    {$post['ope_char_side']}
   </div>
 
   <div class="ope-post-body">
     <div class="ope-post-head">
-      <span>{$post['postdate']} &middot; {$post['posttime']}</span>
-      <span><a href="{$post['postlink']}#pid{$post['pid']}" class="ope-post-num">#{$post['postnum']}</a></span>
+      <div class="ope-post-head-row">
+        <span class="ope-post-date">{$post['postdate']} &middot; {$post['posttime']}</span>
+        <div class="ope-post-actions">
+          <a href="{$post['postlink']}#pid{$post['pid']}" class="ope-post-num">#{$post['postnum']}</a>
+          <a href="newreply.php?tid={$tid}&amp;pid={$post['pid']}" class="ope-btn ope-btn-sm ope-btn-ghost">Citar</a>
+          <a href="newreply.php?tid={$tid}" class="ope-btn ope-btn-sm ope-btn-ghost">Responder</a>
+          {$post['button_edit']}
+          {$post['button_report']}
+          {$post['button_warn']}
+          {$post['button_purgespammer']}
+          {$post['button_quickdelete']}
+          {$post['button_quickrestore']}
+        </div>
+      </div>
+      <div class="ope-post-head-ip" id="post_meta_{$post['pid']}">{$post['iplogged']}{$post['poststatus']}</div>
     </div>
     <div class="ope-post-content" id="pid_{$post['pid']}">
       {$post['message']}
     </div>
     {$post['signature']}
-    <div class="ope-post-actions">
-      <a href="newreply.php?tid={$tid}&amp;pid={$post['pid']}" class="ope-btn ope-btn-sm ope-btn-ghost">Citar</a>
-      <a href="newreply.php?tid={$tid}" class="ope-btn ope-btn-sm ope-btn-ghost">Responder</a>
-      {$post['button_edit']}
-      {$post['button_report']}
-      {$post['button_warn']}
-      {$post['button_purgespammer']}
-      {$post['button_quickdelete']}
-      {$post['button_quickrestore']}
-    </div>
-    {$post['editedmsg']}
     {$post['attachments']}
-    <div class="ope-post-meta" id="post_meta_{$post['pid']}">{$post['iplogged']}{$post['poststatus']}</div>
+    {$post['editedmsg']}
   </div>
 </article>]]></template>
 
-    <template name="postbit_author_user" version="1839"><![CDATA[<div class="ope-pa-stats">
-  <div class="ope-pa-srow"><span class="ope-pa-srow-l">{$lang->postbit_posts}</span><span class="ope-pa-srow-v">{$post['postnum']}</span></div>
-  <div class="ope-pa-srow"><span class="ope-pa-srow-l">{$lang->postbit_threads}</span><span class="ope-pa-srow-v">{$post['threadnum']}</span></div>
-  <div class="ope-pa-srow"><span class="ope-pa-srow-l">{$lang->postbit_joined}</span><span class="ope-pa-srow-v">{$post['userregdate']}</span></div>
-</div>]]></template>
+    <template name="postbit_author_user" version="1839"><![CDATA[]]></template>
 
     <template name="postbit_avatar" version="1839"><![CDATA[<div class="ope-avatar">
   <img src="{$post['avatar']}" alt="{$post['username']}" onerror="this.remove()" />
@@ -188,7 +182,7 @@
           <label style="font-family:var(--mono);font-size:.62rem"><input type="checkbox" class="checkbox" name="postoptions[disablesmilies]" value="1" /> {$lang->disable_smilies}</label>
           {$closeoption}
         </div>
-        <textarea name="message" id="message" placeholder="{$lang->quickreply_message}" aria-label="{$lang->message}" style="width:100%;min-height:120px;padding:12px;border:2px solid #000;background:var(--concrete);color:var(--ink);font-family:var(--body);font-size:.95rem;resize:vertical"></textarea>
+        <textarea name="message" id="message" placeholder="Escribe tu respuesta aqu&iacute;..." aria-label="{$lang->message}" style="width:100%;min-height:120px;padding:12px;border:2px solid #000;background:var(--concrete);color:var(--ink);font-family:var(--body);font-size:.95rem;resize:vertical"></textarea>
         <div class="editor_control_bar" style="width:100%;padding:4px;margin-top:3px;display:none" id="quickreply_multiquote">
           <span class="smalltext">{$lang->quickreply_multiquote_selected} <a href="./newreply.php?tid={$tid}&amp;load_all_quotes=1" onclick="return Thread.loadMultiQuoted();">{$lang->quickreply_multiquote_now}</a> {$lang->or} <a href="javascript:void(0)" onclick="Thread.clearMultiQuoted(); return false;">{$lang->quickreply_multiquote_deselect}</a>.</span>
         </div>
@@ -196,7 +190,7 @@
         <div class="ope-q-actions">
           <input type="submit" class="ope-btn ope-btn-hot" value="{$lang->post_reply}" tabindex="2" accesskey="s" id="quick_reply_submit" />
           <input type="submit" class="ope-btn ope-btn-ghost" name="previewpost" value="{$lang->preview_post}" tabindex="3" />
-          <span class="ope-q-note">{$lang->logged_in_as} <b>{$mybb->user['username']}</b></span>
+          <span class="ope-q-note">Conectado como <b>{$mybb->user['username']}</b></span>
         </div>
       </form>
     </div>
@@ -301,7 +295,7 @@
   <div class="ope-plate-b">
     <div style="display:flex;gap:8px">
       <input type="text" name="keywords" value="{$lang->enter_keywords}" onfocus="if(this.value=='{$lang->enter_keywords}'){this.value=''}" onblur="if(this.value==''){this.value='{$lang->enter_keywords}'}" style="padding:8px;border:2px solid #000;background:var(--concrete);color:var(--ink);font-family:var(--body);flex:1" />
-      <input type="submit" class="ope-btn ope-btn-hot" value="{$lang->search_forums}" />
+      <input type="submit" class="ope-btn ope-btn-hot" value="Buscar" />
     </div>
   </div>
 </form>]]></template>

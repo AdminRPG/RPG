@@ -41,6 +41,27 @@ if ($loggedin) {
 }
 $initials_e = htmlspecialchars_uni($initials);
 
+// ── Catálogo de trámites (data-driven; los filtros se generan a partir de esto) ──
+$tramites = array(
+    array(
+        'title'    => 'Notificar tema',
+        'code'     => 'TRA-01',
+        'cat'      => 'mundo',
+        'cat_lbl'  => 'Mundo Vivo',
+        'icon'     => '<path d="M4 4h16v12H5.2L4 17.2Z"/><path d="M8 9h8"/><path d="M8 12h5"/>',
+        'body'     => 'Env&iacute;a el enlace de un tema <b>en presente</b> del mes en vigor y un resumen de lo que ocurre. Alimenta el estado del mundo y el peri&oacute;dico <b>Eternal News</b>.',
+        'meta'     => '// eventos del mundo',
+        'link'     => 'notificar-tema.php',
+        'link_lbl' => 'Notificar',
+    ),
+);
+
+// Categorías presentes (para la barra de filtros), en orden de aparición.
+$cats = array();
+foreach ($tramites as $t) {
+    if (!isset($cats[$t['cat']])) $cats[$t['cat']] = $t['cat_lbl'];
+}
+
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
 <html lang="es">
@@ -71,18 +92,36 @@ header('Content-Type: text/html; charset=utf-8');
       <span class="code">// ventanillas de servicio</span>
       <span class="rule"></span>
     </div>
-    <p class="tram-intro">Aquí estarán las <b>ventanillas oficiales</b> del foro para gestionar tu personaje, tu economía y las peticiones al staff. Se irán habilitando conforme tengan su sistema listo.</p>
+    <p class="tram-intro">Ventanillas oficiales del foro. Usa los filtros para encontrar el trámite que necesitas; se irán sumando más conforme se habiliten nuevos sistemas.</p>
   </section>
 
   <section class="reveal">
-    <div class="plate">
-      <div class="plate-h">
-        <span class="t">Ventanillas en preparaci&oacute;n</span>
-        <span class="c">// pr&oacute;ximamente</span>
-      </div>
-      <div class="plate-b">
-        <p class="tram-intro" style="margin:0">Los tr&aacute;mites del foro (econom&iacute;a, solicitudes de personaje y peticiones al staff) se ir&aacute;n habilitando aqu&iacute; conforme tengan su sistema listo. De momento, para cualquier gesti&oacute;n contacta directamente con <b>el staff</b>.</p>
-      </div>
+    <div class="tram-bar">
+      <span class="bar-l">Filtrar:</span>
+      <button type="button" class="tram-chip on" data-filter="all">Todos</button>
+<?php foreach ($cats as $slug => $lbl): ?>
+      <button type="button" class="tram-chip" data-filter="<?php echo htmlspecialchars_uni($slug); ?>"><?php echo htmlspecialchars_uni($lbl); ?></button>
+<?php endforeach; ?>
+    </div>
+    <div class="cards">
+<?php foreach ($tramites as $t): ?>
+      <article class="card" data-cat="<?php echo htmlspecialchars_uni($t['cat']); ?>">
+        <div class="card-top">
+          <span class="card-ic"><svg viewBox="0 0 24 24"><?php echo $t['icon']; ?></svg></span>
+          <div class="card-head">
+            <div class="card-title"><?php echo htmlspecialchars_uni($t['title']); ?></div>
+            <div class="card-code"><?php echo htmlspecialchars_uni($t['code']); ?></div>
+          </div>
+          <span class="card-tag"><?php echo htmlspecialchars_uni($t['cat_lbl']); ?></span>
+        </div>
+        <div class="card-body"><?php echo $t['body']; ?></div>
+        <div class="card-foot">
+          <span class="card-meta"><?php echo htmlspecialchars_uni($t['meta']); ?></span>
+          <a href="<?php echo $bburl . '/' . htmlspecialchars_uni($t['link']); ?>" class="btn btn-ghost btn-sm"><?php echo htmlspecialchars_uni($t['link_lbl']); ?></a>
+        </div>
+      </article>
+<?php endforeach; ?>
+      <p class="tram-empty" hidden>No hay trámites en esta categoría por ahora.</p>
     </div>
   </section>
 
@@ -106,6 +145,26 @@ header('Content-Type: text/html; charset=utf-8');
 <?php include __DIR__ . '/inc/footer_custom.php'; ?>
 
 <script>
+// --- Filtro de trámites ---
+(function(){
+  var chips = document.querySelectorAll('.tram-chip');
+  var cards = document.querySelectorAll('.card[data-cat]');
+  var empty = document.querySelector('.tram-empty');
+  chips.forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var f = chip.getAttribute('data-filter');
+      chips.forEach(function(c){ c.classList.toggle('on', c === chip); });
+      var shown = 0;
+      cards.forEach(function(card){
+        var vis = (f === 'all' || card.getAttribute('data-cat') === f);
+        card.classList.toggle('hidden', !vis);
+        if (vis) shown++;
+      });
+      if (empty) empty.hidden = (shown !== 0);
+    });
+  });
+})();
+
 // --- Reveal on scroll ---
 if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
   const io = new IntersectionObserver(es => es.forEach(e => {

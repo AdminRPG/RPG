@@ -34,10 +34,13 @@ if ($pid > 0 && $db->table_exists('rol_personajes')) {
     $pj = $db->fetch_array($q);
 }
 
-// Sin personaje concreto → mostramos la COLA de expedientes en revisión.
+// Sin personaje concreto → cola de revisión + búsqueda de expedientes.
 $queue = array();
+$buscar = trim((string) $mybb->get_input('q'));
+$filtro_est = trim((string) $mybb->get_input('estado'));
 if (!$pj && $db->table_exists('rol_personajes')) {
-    $qq = $db->simple_select('rol_personajes', 'pid, nombre, uid, rango, dateline', "estado = 'revision'", array('order_by' => 'dateline', 'order_dir' => 'ASC', 'limit' => 100));
+    $npc_filter = $db->field_exists('es_npc', 'rol_personajes') ? ' AND es_npc = 0' : '';
+    $qq = $db->simple_select('rol_personajes', 'pid, nombre, uid, rango, dateline', "estado = 'revision'{$npc_filter}", array('order_by' => 'dateline', 'order_dir' => 'ASC', 'limit' => 100));
     while ($qr = $db->fetch_array($qq)) {
         $qr['owner'] = '?';
         if ((int)$qr['uid'] > 0) {
@@ -45,6 +48,28 @@ if (!$pj && $db->table_exists('rol_personajes')) {
             if ($db->num_rows($uq)) $qr['owner'] = $db->fetch_field($uq, 'username');
         }
         $queue[] = $qr;
+    }
+
+    // Búsqueda de todos los expedientes (gestión completa).
+    $browse = array();
+    $where = "estado <> 'eliminado'{$npc_filter}";
+    if ($buscar !== '') {
+        $where .= " AND nombre LIKE '%" . $db->escape_string_like($buscar) . "%'";
+    }
+    if ($filtro_est !== '' && in_array($filtro_est, array('borrador', 'revision', 'aprobado', 'rechazado', 'eliminado'), true)) {
+        $where = "estado = '" . $db->escape_string($filtro_est) . "'{$npc_filter}";
+        if ($buscar !== '') {
+            $where .= " AND nombre LIKE '%" . $db->escape_string_like($buscar) . "%'";
+        }
+    }
+    $bq = $db->simple_select('rol_personajes', 'pid, nombre, uid, rango, estado, dateline', $where, array('order_by' => 'nombre', 'order_dir' => 'ASC', 'limit' => 150));
+    while ($br = $db->fetch_array($bq)) {
+        $br['owner'] = '?';
+        if ((int)$br['uid'] > 0) {
+            $uq = $db->simple_select('users', 'username', 'uid = ' . (int)$br['uid'], array('limit' => 1));
+            if ($db->num_rows($uq)) $br['owner'] = $db->fetch_field($uq, 'username');
+        }
+        $browse[] = $br;
     }
 }
 
@@ -141,6 +166,44 @@ if ($pj && $loggedin && $staff_level >= 1 && $mybb->request_method === 'post') {
             }
             $flash = 'Mensaje de moderación enviado a ' . htmlspecialchars_uni($pj['nombre']) . '.';
             $pj['estado'] = 'revision'; // Sigue en revisión
+
+        } elseif ($action === 'return_revision' && $pj['estado'] !== 'revision' && $pj['estado'] !== 'eliminado') {
+            $db->update_query('rol_personajes', array('estado' => 'revision', 'activo' => 0, 'lastedit' => TIME_NOW), "pid = {$pid}");
+            if ((int)$pj['uid'] > 0 && $db->table_exists('rol_cuentas')) {
+                $db->update_query('rol_cuentas', array('personaje_activo' => 0), "uid = " . (int)$pj['uid'] . " AND personaje_activo = {$pid}");
+            }
+            if ($db->table_exists('rol_alertas') && (int)$pj['uid'] > 0) {
+                $db->insert_query('rol_alertas', array(
+                    'pid' => $pid, 'uid' => (int)$pj['uid'],
+                    'tipo' => 'personaje_revision',
+                    'titulo' => 'Expediente devuelto a revisión',
+                    'cuerpo' => 'Tu personaje "' . $db->escape_string($pj['nombre']) . '" ha sido devuelto a revisión por el staff.' . ($mensaje_staff !== '' ? ' Motivo: ' . $db->escape_string($mensaje_staff) : ''),
+                    'link' => $bburl . '/personajes.php',
+                    'leido' => 0, 'dateline' => TIME_NOW
+                ));
+            }
+            $flash = 'Ficha devuelta a revisión.';
+            $pj['estado'] = 'revision';
+            $pj['activo'] = 0;
+
+        } elseif ($action === 'soft_delete' && $pj['estado'] !== 'eliminado') {
+            $db->update_query('rol_personajes', array('estado' => 'eliminado', 'activo' => 0, 'lastedit' => TIME_NOW), "pid = {$pid}");
+            if ((int)$pj['uid'] > 0 && $db->table_exists('rol_cuentas')) {
+                $db->update_query('rol_cuentas', array('personaje_activo' => 0), "uid = " . (int)$pj['uid'] . " AND personaje_activo = {$pid}");
+            }
+            if ($db->table_exists('rol_alertas') && (int)$pj['uid'] > 0) {
+                $db->insert_query('rol_alertas', array(
+                    'pid' => $pid, 'uid' => (int)$pj['uid'],
+                    'tipo' => 'personaje_eliminado',
+                    'titulo' => 'Expediente eliminado',
+                    'cuerpo' => 'Tu personaje "' . $db->escape_string($pj['nombre']) . '" ha sido eliminado. Se ha liberado un hueco en tu cuenta.' . ($mensaje_staff !== '' ? ' Motivo: ' . $db->escape_string($mensaje_staff) : ''),
+                    'link' => $bburl . '/personajes.php',
+                    'leido' => 0, 'dateline' => TIME_NOW
+                ));
+            }
+            $flash = 'Ficha eliminada (soft-delete). Se ha liberado el hueco.';
+            $pj['estado'] = 'eliminado';
+            $pj['activo'] = 0;
         }
     }
 }
@@ -157,6 +220,7 @@ function _estado_label($estado) {
         case 'aprobado': return ['Aprobado', 'var(--patina-hi)'];
         case 'revision': return ['En revisión', 'var(--h6)'];
         case 'rechazado': return ['Rechazado', 'var(--crack)'];
+        case 'eliminado': return ['Eliminado', 'var(--ash)'];
         default: return ['Borrador', 'var(--rivet)'];
     }
 }
@@ -213,6 +277,43 @@ header('Content-Type: text/html; charset=utf-8');
       <?php endforeach; ?>
     </div>
   <?php endif; ?>
+
+  <!-- BÚSQUEDA / GESTIÓN DE TODOS LOS EXPEDIENTES -->
+  <div class="shead" style="margin-top:28px">
+    <h2 style="font-family:var(--disp);font-weight:800;font-size:1.4rem;text-transform:uppercase;color:var(--paper)">Todos los expedientes</h2>
+    <span class="rule"></span>
+  </div>
+  <form method="get" action="<?php echo $bburl; ?>/revisar-personaje.php" class="rp-search">
+    <input type="text" name="q" value="<?php echo htmlspecialchars_uni($buscar); ?>" placeholder="Buscar por nombre&hellip;">
+    <select name="estado">
+      <option value="">Activos (no eliminados)</option>
+      <option value="revision"<?php echo $filtro_est === 'revision' ? ' selected' : ''; ?>>En revisión</option>
+      <option value="aprobado"<?php echo $filtro_est === 'aprobado' ? ' selected' : ''; ?>>Aprobados</option>
+      <option value="rechazado"<?php echo $filtro_est === 'rechazado' ? ' selected' : ''; ?>>Rechazados</option>
+      <option value="borrador"<?php echo $filtro_est === 'borrador' ? ' selected' : ''; ?>>Borradores</option>
+      <option value="eliminado"<?php echo $filtro_est === 'eliminado' ? ' selected' : ''; ?>>Eliminados</option>
+    </select>
+    <button type="submit" class="btn btn-ghost btn-sm">Buscar</button>
+  </form>
+  <?php if (!empty($browse)): ?>
+    <div class="rp-queue">
+      <div class="rp-queue-h"><b><?php echo count($browse); ?></b> expediente(s) encontrado(s)</div>
+      <?php foreach ($browse as $br):
+        $est = _estado_label($br['estado']);
+        $b_ini = function_exists('mb_strtoupper') ? mb_strtoupper(mb_substr($br['nombre'], 0, 1, 'UTF-8'), 'UTF-8') : strtoupper(substr($br['nombre'], 0, 1)); ?>
+        <div class="rp-queue-item">
+          <span class="rp-q-av"><?php echo htmlspecialchars_uni($b_ini); ?></span>
+          <div class="rp-q-info">
+            <span class="rp-q-name"><?php echo htmlspecialchars_uni($br['nombre']); ?></span>
+            <span class="rp-q-meta">// <?php echo htmlspecialchars_uni($br['owner']); ?> &middot; <span style="color:<?php echo $est[1]; ?>"><?php echo $est[0]; ?></span> &middot; <?php echo htmlspecialchars_uni($br['rango']); ?></span>
+          </div>
+          <a href="<?php echo $bburl; ?>/revisar-personaje.php?pid=<?php echo (int)$br['pid']; ?>" class="btn btn-ghost btn-sm">Gestionar</a>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  <?php elseif ($buscar !== '' || $filtro_est !== ''): ?>
+    <div class="empty-state"><div class="big">Sin resultados</div></div>
+  <?php endif; ?>
 <?php else: ?>
 
   <?php if ($flash !== ''): ?>
@@ -248,7 +349,7 @@ header('Content-Type: text/html; charset=utf-8');
               <div class="stat-row"><span class="sn">Edad</span><span class="sl"><?php echo htmlspecialchars_uni($datos['edad'] ?? '?'); ?></span></div>
               <div class="stat-row"><span class="sn">Género</span><span class="sl"><?php echo htmlspecialchars_uni($datos['genero'] ?? '?'); ?></span></div>
               <div class="stat-row"><span class="sn">Facción</span><span class="sl"><?php echo htmlspecialchars_uni(ucfirst($datos['faccion'] ?? '?')); ?></span></div>
-              <?php if (!empty($datos['tiene_d'])): ?>
+              <?php if (!empty($datos['virtudes']['V-LIN-01']) || !empty($datos['tiene_d'])): ?>
                 <div class="stat-row"><span class="sn">D.</span><span class="sl" style="color:var(--ember-hi);font-weight:700">Portador de la D.</span></div>
               <?php endif; ?>
             </div>
@@ -322,11 +423,20 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="sheet-block" style="margin-bottom:14px">
             <div class="sheet-block-h">Equipo · <?php echo htmlspecialchars_uni(number_format((int)($economia['berries'] ?? 0))); ?> berries</div>
             <div class="sheet-block-b">
-              <?php if (!empty($inventario['arma'])): ?>
-                <div class="stat-row"><span class="sl">Arma</span><span class="sv" style="color:var(--paper-dim)"><?php echo htmlspecialchars_uni($inventario['arma']); ?></span></div>
-              <?php endif; ?>
-              <?php if (!empty($inventario['objeto_personal'])): ?>
-                <div class="stat-row"><span class="sl">Objeto personal</span><span class="sv" style="color:var(--paper-dim)"><?php echo htmlspecialchars_uni($inventario['objeto_personal']); ?></span></div>
+              <?php
+                $rp_packs   = ope_rol_packs_equipo();
+                $rp_pack    = $rp_packs[$inventario['pack_equipo'] ?? ''] ?? null;
+              ?>
+              <?php if ($rp_pack !== null): ?>
+                <div class="stat-row"><span class="sl">Pack</span><span class="sv" style="color:var(--paper-dim)"><?php echo htmlspecialchars_uni($rp_pack['nombre']); ?></span></div>
+                <p style="color:var(--paper-dim);font-size:.72rem;margin-top:4px"><?php echo htmlspecialchars_uni(implode(' · ', $rp_pack['contenido'])); ?></p>
+              <?php else: ?>
+                <?php if (!empty($inventario['arma'])): ?>
+                  <div class="stat-row"><span class="sl">Arma</span><span class="sv" style="color:var(--paper-dim)"><?php echo htmlspecialchars_uni($inventario['arma']); ?></span></div>
+                <?php endif; ?>
+                <?php if (!empty($inventario['objeto_personal'])): ?>
+                  <div class="stat-row"><span class="sl">Objeto personal</span><span class="sv" style="color:var(--paper-dim)"><?php echo htmlspecialchars_uni($inventario['objeto_personal']); ?></span></div>
+                <?php endif; ?>
               <?php endif; ?>
             </div>
           </div>
@@ -350,7 +460,7 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
   </div>
 
-  <!-- BARRA DE ACCIONES (solo si está en revisión) -->
+  <!-- BARRA DE ACCIONES DE REVISIÓN -->
   <?php if ($pj['estado'] === 'revision'): ?>
   <div class="actions-bar">
     <form method="post" action="<?php echo $bburl; ?>/revisar-personaje.php?pid=<?php echo $pid; ?>">
@@ -372,6 +482,28 @@ header('Content-Type: text/html; charset=utf-8');
       </div>
     </form>
   </div>
+  <?php endif; ?>
+
+  <!-- GESTIÓN DEL CICLO DE VIDA (aprobados, rechazados, etc.) -->
+  <?php if ($pj['estado'] !== 'eliminado'): ?>
+  <div class="actions-bar rp-lifecycle">
+    <form method="post" action="<?php echo $bburl; ?>/revisar-personaje.php?pid=<?php echo $pid; ?>">
+      <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+      <div class="actions-bar-in">
+        <div class="ab-label" style="width:100%;margin-bottom:6px">Gesti&oacute;n del expediente</div>
+        <div style="flex:1;min-width:220px">
+          <div class="ab-label">Motivo (opcional, para devolver o eliminar)</div>
+          <textarea name="mensaje_staff" placeholder="Motivo..." rows="2"></textarea>
+        </div>
+<?php if ($pj['estado'] !== 'revision'): ?>
+        <button type="submit" name="action" value="return_revision" class="btn btn-ghost btn-sm">Devolver a revisi&oacute;n</button>
+<?php endif; ?>
+        <button type="submit" name="action" value="soft_delete" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar este expediente? Se liberará el hueco del jugador.');">Eliminar</button>
+      </div>
+    </form>
+  </div>
+  <?php else: ?>
+  <div class="flash warn">Este expediente est&aacute; eliminado. El hueco del jugador ha sido liberado.</div>
   <?php endif; ?>
 
 <?php endif; /* fin: detalle vs cola */ ?>

@@ -67,8 +67,22 @@ function ope_estado_label(string $estado): array
         case 'aprobado':  return array('Aprobado', 'var(--patina-hi)');
         case 'revision':  return array('En revisi&oacute;n', 'var(--h6)');
         case 'rechazado': return array('Rechazado', 'var(--crack)');
+        case 'eliminado': return array('Eliminado', 'var(--ash)');
         default:          return array('Borrador', 'var(--rivet)');
     }
+}
+
+// ── Vista: personajes propios o NPCs asignados ──
+$vista = $mybb->get_input('vista');
+if ($vista !== 'npcs') {
+    $vista = 'personajes';
+}
+
+// ¿Cuenta narrador? (tiene algún personaje con staff_narrador=1)
+$es_narrador_cuenta = false;
+if ($loggedin && $db->table_exists('rol_personajes')) {
+    $nrq = $db->simple_select('rol_personajes', 'pid', "uid = {$uid} AND staff_narrador = 1", array('limit' => 1));
+    $es_narrador_cuenta = $db->num_rows($nrq) > 0;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -81,17 +95,20 @@ if ($loggedin && $mybb->request_method === 'post' && $db->table_exists('rol_pers
     $set_pid = $mybb->get_input('pid', MyBB::INPUT_INT);
 
     if ($action === 'set_active' && verify_post_check($mybb->get_input('my_post_key'), true) && $set_pid > 0) {
-        // Verifica que el personaje pertenece al usuario y está aprobado.
+        // Verifica que el personaje pertenece al usuario (jugador o NPC asignado).
+        $npc_clause = $db->field_exists('es_npc', 'rol_personajes') ? ', es_npc' : '';
         $vq = $db->simple_select(
             'rol_personajes',
-            'pid, estado, nombre',
+            'pid, estado, nombre' . $npc_clause,
             "pid = {$set_pid} AND uid = {$uid}",
             array('limit' => 1)
         );
         if ($db->num_rows($vq)) {
             $prow = $db->fetch_array($vq);
+            $es_npc_row = (int) ($prow['es_npc'] ?? 0) === 1;
             // Se puede activar un personaje aprobado o EN REVISIÓN (con este
             // último solo se podrá postear en Off Topic hasta la aprobación).
+            // NPCs asignados siempre están aprobados.
             if ($prow['estado'] === 'aprobado' || $prow['estado'] === 'revision') {
                 // Solo un activo por cuenta: desactiva el resto y activa el elegido.
                 $db->update_query('rol_personajes', array('activo' => 0), "uid = {$uid}");
@@ -113,6 +130,9 @@ if ($loggedin && $mybb->request_method === 'post' && $db->table_exists('rol_pers
                     }
                 }
                 $flash = 'Personaje activo actualizado: ' . htmlspecialchars_uni($prow['nombre']) . '.';
+                if ($es_npc_row) {
+                    $flash .= ' Estás posteando como NPC.';
+                }
                 if ($prow['estado'] === 'revision') {
                     $flash .= ' Está en revisión: solo podrás publicar en la zona Off Topic hasta que el staff lo apruebe.';
                 }
@@ -131,21 +151,28 @@ if ($loggedin && $mybb->request_method === 'post' && $db->table_exists('rol_pers
 }
 
 // ─────────────────────────────────────────────────────────────
-// Carga de personajes del usuario
+// Carga de personajes del usuario (excluye eliminados y NPCs)
 // ─────────────────────────────────────────────────────────────
 $personajes = array();
+$npcs = array();
 if ($loggedin && $db->table_exists('rol_personajes')) {
+    $npc_col = $db->field_exists('es_npc', 'rol_personajes') ? ', es_npc' : '';
     $q = $db->simple_select(
         'rol_personajes',
-        'pid, nombre, slug, estado, activo, rango, nivel, avatar',
-        "uid = {$uid}",
+        'pid, nombre, slug, estado, activo, rango, nivel, avatar, icono' . $npc_col,
+        "uid = {$uid} AND estado <> 'eliminado'",
         array('order_by' => 'activo', 'order_dir' => 'desc')
     );
     while ($row = $db->fetch_array($q)) {
-        $personajes[] = $row;
+        if ((int) ($row['es_npc'] ?? 0) === 1) {
+            $npcs[] = $row;
+        } else {
+            $personajes[] = $row;
+        }
     }
 }
 $tiene_personajes = count($personajes) > 0;
+$tiene_npcs = count($npcs) > 0;
 
 $personajes_moderados = array();
 if ($loggedin && $db->table_exists('rol_mensajes')) {
@@ -174,11 +201,15 @@ if ($loggedin && $db->table_exists('rol_cuentas')) {
 }
 $usados_slots = 0;
 foreach ($personajes as $pj) {
-    if ($pj['estado'] !== 'rechazado') {
+    if ($pj['estado'] !== 'rechazado' && $pj['estado'] !== 'eliminado') {
         $usados_slots++;
     }
 }
 $hay_hueco = $usados_slots < $slots;
+
+// Lista visible según toggle
+$lista_visible = ($vista === 'npcs') ? $npcs : $personajes;
+$tiene_visible = count($lista_visible) > 0;
 
 if ($flash === '' && $loggedin && $mybb->get_input('forjado', MyBB::INPUT_INT)) {
     $flash = 'Tu personaje se envió a revisión. El staff lo revisará y podrás activarlo en cuanto sea aprobado.';
@@ -226,19 +257,30 @@ header('Content-Type: text/html; charset=utf-8');
 
 
   <section class="reveal">
-<?php if ($loggedin && $tiene_personajes): ?>
+<?php if ($loggedin && ($tiene_personajes || $tiene_npcs)): ?>
     <div class="pj-bar">
       <span class="pj-count"><b><?php echo $usados_slots; ?>/<?php echo $slots; ?></b> hueco(s) usados &middot; sesi&oacute;n: <b><?php echo $username; ?></b></span>
+<?php if ($es_narrador_cuenta && $tiene_npcs): ?>
+      <div class="pj-toggle" role="tablist" aria-label="Tipo de personaje">
+        <a href="<?php echo $bburl; ?>/personajes.php?vista=personajes" class="pj-toggle-btn<?php echo $vista === 'personajes' ? ' active' : ''; ?>" role="tab">Personajes</a>
+        <a href="<?php echo $bburl; ?>/personajes.php?vista=npcs" class="pj-toggle-btn<?php echo $vista === 'npcs' ? ' active' : ''; ?>" role="tab">NPCs <span class="pj-toggle-n"><?php echo count($npcs); ?></span></a>
+      </div>
+<?php endif; ?>
       <span class="pj-spacer"></span>
-<?php if ($hay_hueco): ?>
+<?php if ($vista === 'personajes' && $hay_hueco): ?>
       <a href="<?php echo $bburl; ?>/crear-personaje.php" class="btn btn-hot btn-sm">Crear personaje</a>
-<?php else: ?>
+<?php elseif ($vista === 'personajes'): ?>
       <a href="<?php echo $bburl; ?>/tramites.php" class="btn btn-ghost btn-sm">Pedir m&aacute;s huecos</a>
 <?php endif; ?>
     </div>
 
+<?php if ($vista === 'npcs'): ?>
+    <p class="pj-intro" style="margin-top:-8px">NPCs asignados a tu cuenta de narrador. Activa uno para <b>postear como &eacute;l</b> en el foro.</p>
+<?php endif; ?>
+
+<?php if ($tiene_visible): ?>
     <div class="cards">
-<?php foreach ($personajes as $pj):
+<?php foreach ($lista_visible as $pj):
         $es_activo   = ((int) $pj['activo']) === 1;
         $rango       = (string) $pj['rango'];
         $rango_e     = htmlspecialchars_uni($rango);
@@ -246,26 +288,33 @@ header('Content-Type: text/html; charset=utf-8');
         list($est_lbl, $est_col) = ope_estado_label((string) $pj['estado']);
         $nombre_e    = htmlspecialchars_uni($pj['nombre']);
         $nivel       = (int) $pj['nivel'];
-        $avatar      = trim((string) $pj['avatar']);
+        $es_npc_card = ($vista === 'npcs');
+        // Contexto pequeño: ICONO del personaje (fallback a avatar, luego inicial).
+        $img_small   = trim((string) ($pj['icono'] ?? ''));
+        if ($img_small === '') $img_small = trim((string) $pj['avatar']);
         $av_initial  = function_exists('mb_substr') ? mb_strtoupper(mb_substr($pj['nombre'], 0, 1, 'UTF-8'), 'UTF-8') : strtoupper(substr($pj['nombre'], 0, 1));
 ?>
-      <article class="pjcard<?php echo $es_activo ? ' active' : ''; ?>">
+      <article class="pjcard<?php echo $es_activo ? ' active' : ''; ?><?php echo $es_npc_card ? ' npc' : ''; ?>">
         <div class="pjcard-top">
           <span class="pjcard-av">
-<?php if ($avatar !== ''): ?>
-            <img src="<?php echo htmlspecialchars_uni($avatar); ?>" alt="">
+<?php if ($img_small !== ''): ?>
+            <img src="<?php echo htmlspecialchars_uni($img_small); ?>" alt="" onerror="this.remove()">
 <?php else: ?>
             <?php echo htmlspecialchars_uni($av_initial); ?>
 <?php endif; ?>
           </span>
           <div>
             <a class="pjcard-name" href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>"><?php echo $nombre_e; ?></a>
-            <div class="pjcard-sub">Nivel <?php echo $nivel; ?></div>
+            <div class="pjcard-sub"><?php echo $es_npc_card ? 'NPC' : 'Nivel ' . $nivel; ?></div>
           </div>
         </div>
         <div class="pjcard-body">
           <span class="heat-badge" style="background:var(<?php echo $heat; ?>)"><?php echo $rango_e; ?></span>
+<?php if ($es_npc_card): ?>
+          <span class="pjcard-chip npc">NPC</span>
+<?php else: ?>
           <span class="pjcard-chip" style="background:<?php echo $est_col; ?>"><?php echo $est_lbl; ?></span>
+<?php endif; ?>
         </div>
         <div class="pjcard-foot">
           <div class="pjcard-actions">
@@ -273,30 +322,52 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if ($es_activo): ?>
             <span class="is-active-note">&#9670; Activo</span>
 <?php elseif ($pj['estado'] === 'aprobado' || $pj['estado'] === 'revision'): ?>
-            <form method="post" action="<?php echo $bburl; ?>/personajes.php">
+            <form method="post" action="<?php echo $bburl; ?>/personajes.php?vista=<?php echo $vista; ?>">
               <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
               <input type="hidden" name="action" value="set_active">
               <input type="hidden" name="pid" value="<?php echo (int) $pj['pid']; ?>">
               <button type="submit" class="btn btn-hot btn-sm">Activar</button>
             </form>
 <?php endif; ?>
-<?php if ($pj['estado'] === 'revision' && isset($personajes_moderados[(int)$pj['pid']])): ?>
+<?php if (!$es_npc_card && $pj['estado'] === 'revision' && isset($personajes_moderados[(int)$pj['pid']])): ?>
             <a href="<?php echo $bburl; ?>/crear-personaje.php?editar=<?php echo (int)$pj['pid']; ?>" class="btn btn-hot btn-sm">Editar ficha</a>
 <?php endif; ?>
           </div>
-<?php if (!$es_activo && $pj['estado'] !== 'aprobado' && $pj['estado'] !== 'revision'): ?>
+<?php if (!$es_npc_card && !$es_activo && $pj['estado'] !== 'aprobado' && $pj['estado'] !== 'revision'): ?>
           <span class="pjcard-note">Pendiente</span>
 <?php endif; ?>
-<?php if ($pj['estado'] === 'revision'): ?>
+<?php if (!$es_npc_card && $pj['estado'] === 'revision'): ?>
           <span class="pjcard-note">En revisi&oacute;n &middot; solo Off Topic</span>
 <?php endif; ?>
-<?php if ($pj['estado'] === 'revision' && isset($personajes_moderados[(int)$pj['pid']])): ?>
+<?php if (!$es_npc_card && $pj['estado'] === 'revision' && isset($personajes_moderados[(int)$pj['pid']])): ?>
           <span class="pjcard-note warn">Cambios solicitados por el staff</span>
 <?php endif; ?>
         </div>
       </article>
 <?php endforeach; ?>
     </div>
+<?php elseif ($vista === 'npcs'): ?>
+    <div class="plate">
+      <div class="plate-b">
+        <div class="pj-empty">
+          <div class="big">Sin NPCs asignados</div>
+          <p>Cuando un administrador te asigne NPCs desde la Zona Staff, aparecer&aacute;n aqu&iacute; para que puedas postear como ellos.</p>
+        </div>
+      </div>
+    </div>
+<?php else: ?>
+    <div class="plate">
+      <div class="plate-b">
+        <div class="pj-empty">
+          <div class="big">Sin personajes propios</div>
+          <p>Tus NPCs asignados est&aacute;n en la pesta&ntilde;a <b>NPCs</b>. Puedes crear un personaje propio cuando quieras.</p>
+<?php if ($hay_hueco): ?>
+          <div class="acts"><a href="<?php echo $bburl; ?>/crear-personaje.php" class="btn btn-hot btn-sm">Crear personaje</a></div>
+<?php endif; ?>
+        </div>
+      </div>
+    </div>
+<?php endif; ?>
 
 <?php elseif ($loggedin): ?>
     <div class="plate">

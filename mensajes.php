@@ -84,6 +84,7 @@ if ($activePid > 0 && $db->table_exists('rol_mensajes')) {
         SELECT m.*, 
                CASE WHEN m.origen_pid = {$activePid} THEN m.destino_pid ELSE m.origen_pid END as otro_pid,
                (SELECT nombre FROM " . TABLE_PREFIX . "rol_personajes WHERE pid = CASE WHEN m.origen_pid = {$activePid} THEN m.destino_pid ELSE m.origen_pid END LIMIT 1) as otro_nombre,
+               (SELECT icono FROM " . TABLE_PREFIX . "rol_personajes WHERE pid = CASE WHEN m.origen_pid = {$activePid} THEN m.destino_pid ELSE m.origen_pid END LIMIT 1) as otro_icono,
                (SELECT COUNT(*) FROM " . TABLE_PREFIX . "rol_mensajes WHERE thread_id = m.thread_id AND destino_pid = {$activePid} AND leido = 0) as no_leidos
         FROM " . TABLE_PREFIX . "rol_mensajes m
         INNER JOIN (
@@ -175,11 +176,19 @@ header('Content-Type: text/html; charset=utf-8');
           <?php if (empty($hilos)): ?>
             <div style="padding:20px;text-align:center;font-family:var(--mono);font-size:.64rem;color:var(--ash)">Sin mensajes aún.</div>
           <?php else: ?>
-            <?php foreach ($hilos as $h): ?>
+            <?php foreach ($hilos as $h):
+              // Contexto pequeño: ICONO del otro personaje (fallback a inicial).
+              $th_ico = trim((string) ($h['otro_icono'] ?? ''));
+              $th_nom = (string) ($h['otro_nombre'] ?? '?');
+              $th_ini = function_exists('mb_substr') ? mb_strtoupper(mb_substr($th_nom, 0, 1, 'UTF-8'), 'UTF-8') : strtoupper(substr($th_nom, 0, 1));
+            ?>
               <a href="<?php echo $bburl; ?>/mensajes.php?t=<?php echo (int)$h['thread_id']; ?>" class="msg-thread<?php echo $thread_open === (int)$h['thread_id'] ? ' active' : ''; ?>">
-                <div class="th-name"><?php echo htmlspecialchars_uni($h['otro_nombre'] ?? '?'); ?></div>
-                <div class="th-subject"><?php echo htmlspecialchars_uni($h['asunto']); ?></div>
-                <div class="th-meta"><?php echo date('d/m H:i', (int)$h['dateline']); ?><?php if ((int)$h['no_leidos'] > 0): ?><span class="th-badge"><?php echo (int)$h['no_leidos']; ?></span><?php endif; ?></div>
+                <span class="th-av"><?php if ($th_ico !== ''): ?><img src="<?php echo htmlspecialchars_uni($th_ico); ?>" alt="" onerror="this.remove()"><?php else: ?><?php echo htmlspecialchars_uni($th_ini); ?><?php endif; ?></span>
+                <span class="th-body">
+                  <span class="th-name"><?php echo htmlspecialchars_uni($th_nom); ?></span>
+                  <span class="th-subject"><?php echo htmlspecialchars_uni($h['asunto']); ?></span>
+                  <span class="th-meta"><?php echo date('d/m H:i', (int)$h['dateline']); ?><?php if ((int)$h['no_leidos'] > 0): ?><span class="th-badge"><?php echo (int)$h['no_leidos']; ?></span><?php endif; ?></span>
+                </span>
               </a>
             <?php endforeach; ?>
           <?php endif; ?>

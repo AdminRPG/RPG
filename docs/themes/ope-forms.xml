@@ -13,6 +13,7 @@
     <div class="ope-plate-b">
       <form action="newthread.php?fid={$fid}&amp;processed=1" method="post" enctype="multipart/form-data">
         <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+        <input type="hidden" name="action" value="do_newthread" />
         <div style="margin-bottom:12px">
           <label>Prefijo</label><br>
           {$prefixselect}
@@ -29,9 +30,25 @@
               <option value="pasado">Pasado</option>
             </select>
           </div>
-          <div class="ope-meta-field" id="ope-fecha-wrap" style="display:none">
-            <label>A&ntilde;o in-rol</label>
-            <input type="number" name="ope_fecha_rol" id="ope_fecha_rol" class="ope-meta-sel" min="0" max="9999" step="1" placeholder="p. ej. 1518" />
+          <div id="ope-fecha-wrap" style="display:none">
+            <div class="ope-meta-field">
+              <label>A&ntilde;o in-rol</label>
+              <input type="number" name="ope_fecha_rol" id="ope_fecha_rol" class="ope-meta-sel" min="0" max="9999" step="1" placeholder="p. ej. 1518" />
+            </div>
+            <div class="ope-meta-field">
+              <label>D&iacute;a</label>
+              <input type="number" name="ope_fecha_dia" class="ope-meta-sel" min="1" max="65" step="1" placeholder="1&ndash;65" />
+            </div>
+            <div class="ope-meta-field">
+              <label>Estaci&oacute;n</label>
+              <select name="ope_estacion" class="ope-meta-sel">
+                <option value="">Autom&aacute;tica (por d&iacute;a)</option>
+                <option value="Primavera">Primavera</option>
+                <option value="Verano">Verano</option>
+                <option value="Oto&ntilde;o">Oto&ntilde;o</option>
+                <option value="Invierno">Invierno</option>
+              </select>
+            </div>
           </div>
           <div class="ope-meta-field">
             <label>Etiqueta</label>
@@ -48,7 +65,14 @@
         (function(){
           var e=document.getElementById('ope_era'),f=document.getElementById('ope-fecha-wrap');
           if(!e||!f)return;
-          function u(){f.style.display=(e.value==='pasado')?'block':'none';}
+          var pasadoFields=f.querySelectorAll('input,select');
+          function u(){
+            var p=(e.value==='pasado');
+            f.style.display=p?'flex':'none';
+            f.style.flexWrap='wrap';
+            f.style.gap='14px';
+            pasadoFields.forEach(function(el){el.disabled=!p;});
+          }
           e.addEventListener('change',u);u();
         })();
         </script>

@@ -1,20 +1,17 @@
 <?php
 /**
- * I-Forge · Forjar personaje (wizard de creación)
- * Página de front-end MyBB (dirección "One Piece Eternal").
+ * I-Forge · Crear NPC (wizard de creación para staff)
+ * Página restringida a Administrador+ (rank >= 3).
  *
- * Wizard de un único envío (sin borradores intermedios) que sigue los
- * 7 pasos de one-piece-eternal-sistemas/01-creacion-de-personaje.md:
- * raza, concepto, stats, virtudes/defectos, facción, equipo, historia.
- *
- * Al enviar: valida TODO en servidor contra inc/ope_rol_data.php
- * (nunca confía en lo que calculó el JS), inserta en mybb_rol_personajes
- * con estado=revision y abre un trámite en mybb_rol_tramites para que el
- * staff lo apruebe desde "Mi expediente".
+ * Mismo wizard de 7 pasos que crear-personaje.php, adaptado para NPC:
+ * - Sin comprobación de slots.
+ * - uid = 0.
+ * - es_npc = 1, estado = 'aprobado' (auto-aprobado).
+ * - Sin trámites ni alertas.
  */
 
 define('IN_MYBB', 1);
-define('THIS_SCRIPT', 'crear-personaje.php');
+define('THIS_SCRIPT', 'crear-npc.php');
 require_once './global.php';
 require_once MYBB_ROOT . 'inc/ope_rol_data.php';
 
@@ -24,30 +21,15 @@ $loggedin = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int)($mybb->user['uid'] ?? 0);
 $username = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
-$staff_level = 0;
-if ($loggedin) {
-    if (isset($mybb->user['ope_staff_level'])) {
-        $staff_level = (int)$mybb->user['ope_staff_level'];
-    } elseif ($db->table_exists('rol_cuentas')) {
-        $cq = $db->simple_select('rol_cuentas', 'staff_level', "uid = {$uid}", array('limit' => 1));
-        if ($db->num_rows($cq)) {
-            $staff_level = (int)$db->fetch_field($cq, 'staff_level');
-        }
-    }
-}
+$staff = $loggedin
+    ? ope_rol_active_staff($uid)
+    : array('pid' => 0, 'rol' => '', 'narrador' => 0, 'rank' => 0, 'is_staff' => false, 'nombre' => '');
+$rank = (int) $staff['rank'];
 
-$initials = '';
-if ($loggedin) {
-    $parts = preg_split('/\s+/', trim((string)$mybb->user['username']));
-    foreach ($parts as $p) {
-        if ($p !== '') {
-            $initials .= function_exists('mb_substr') ? mb_substr($p, 0, 1, 'UTF-8') : substr($p, 0, 1);
-        }
-    }
-    $initials = function_exists('mb_substr') ? mb_substr($initials, 0, 2, 'UTF-8') : substr($initials, 0, 2);
-    $initials = function_exists('mb_strtoupper') ? mb_strtoupper($initials, 'UTF-8') : strtoupper($initials);
+if ($rank < 3) {
+    header('Location: ' . $mybb->settings['bburl'] . '/index.php');
+    exit;
 }
-$initials_e = htmlspecialchars_uni($initials);
 
 $RAZAS      = ope_rol_razas();
 $VIRTUDES   = ope_rol_virtudes();
@@ -58,37 +40,6 @@ $STATS      = ope_rol_stats();
 $STAT_KEYS  = ope_rol_stat_keys();
 $PC_BASE    = ope_rol_pc_iniciales();
 $BERRIES_BASE = ope_rol_berries_iniciales();
-
-// ─────────────────────────────────────────────────────────────
-// Slots disponibles
-// ─────────────────────────────────────────────────────────────
-$slots = 1;
-$usados = 0;
-if ($loggedin && $db->table_exists('rol_cuentas')) {
-    $sq = $db->simple_select('rol_cuentas', 'slots', "uid = {$uid}", array('limit' => 1));
-    if ($db->num_rows($sq)) {
-        $slots = (int)$db->fetch_field($sq, 'slots');
-    }
-}
-if ($loggedin && $db->table_exists('rol_personajes')) {
-    $uq = $db->simple_select('rol_personajes', 'COUNT(*) AS c', "uid = {$uid} AND estado != 'rechazado'");
-    $urow = $db->fetch_array($uq);
-    $usados = (int)($urow['c'] ?? 0);
-}
-$hay_hueco = $usados < $slots;
-
-// ── Detección de edición de ficha moderada ──
-$editando_pid = (int)($mybb->get_input('editar', MyBB::INPUT_INT));
-$editando = null;
-if ($editando_pid > 0 && $loggedin && $db->table_exists('rol_personajes')) {
-    $eq = $db->simple_select('rol_personajes', '*', "pid = {$editando_pid} AND uid = {$uid}", array('limit' => 1));
-    if ($db->num_rows($eq)) {
-        $editando = $db->fetch_array($eq);
-        if ($db->table_exists('rol_mensajes')) {
-            $db->update_query('rol_mensajes', array('leido' => 1), "destino_pid = {$editando_pid} AND asunto LIKE 'Moderación:%'");
-        }
-    }
-}
 
 // ─────────────────────────────────────────────────────────────
 // POST: validar y crear
@@ -108,7 +59,7 @@ function ope_rol_clean($s, $max = 4000)
     return $s;
 }
 
-if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
+if ($mybb->request_method === 'post') {
     if (!verify_post_check($mybb->get_input('my_post_key'), true)) {
         $errores[] = 'La sesión del formulario caducó. Vuelve a intentarlo.';
     } else {
@@ -135,7 +86,7 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             $errores[] = 'El nombre del personaje debe tener al menos 3 caracteres.';
         }
         if ($concepto === '') {
-            $errores[] = 'Describe brevemente el concepto de tu personaje.';
+            $errores[] = 'Describe brevemente el concepto del NPC.';
         }
         if ($nombre !== '' && $db->table_exists('rol_personajes')) {
             $dupe = $db->simple_select('rol_personajes', 'pid', "nombre = '" . $db->escape_string($nombre) . "'", array('limit' => 1));
@@ -144,21 +95,19 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             }
         }
 
-        // ---- Stats: recalcular en servidor, nunca confiar en el cliente ----
         // ---- Sub-opción racial (Herencia Tribal / Linaje Colosal, INI-01) ----
-        // Solo aplica a razas PURAS (no híbridas) cuya raza defina 'sub_opciones':
-        // sustituye la pasiva secundaria genérica por la de la opción elegida.
         $sub_opciones_disp = (!$hibrido && isset($RAZAS[$raza1]['sub_opciones'])) ? $RAZAS[$raza1]['sub_opciones'] : array();
         $sub_opcion = $mybb->get_input('sub_opcion');
         if (!empty($sub_opciones_disp)) {
             if (!isset($sub_opciones_disp[$sub_opcion])) {
-                $errores[] = 'Elige una opción para la pasiva secundaria de tu raza.';
+                $errores[] = 'Elige una opción para la pasiva secundaria de la raza del NPC.';
                 $sub_opcion = '';
             }
         } else {
             $sub_opcion = '';
         }
 
+        // ---- Stats ----
         $stats_base = array_fill_keys($STAT_KEYS, 1);
         $stats_raciales = $stats_base;
         if (isset($RAZAS[$raza1])) {
@@ -224,7 +173,6 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             $pc_gastado += (int)$v['coste'];
             $virtudes_sel[$vid] = array('nombre' => $v['nombre'], 'coste' => (int)$v['coste'], 'spec' => $spec);
         }
-        // Prerrequisitos Adinerado 1→2→3
         if (isset($virtudes_sel['V-RIQ-02']) && !isset($virtudes_sel['V-RIQ-01'])) {
             $errores[] = 'Adinerado 2 requiere tener Adinerado 1.';
         }
@@ -272,7 +220,7 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         $historia_relaciones = ope_rol_clean($mybb->get_input('historia_relaciones'), 3000);
         $min_len = function_exists('mb_strlen') ? mb_strlen($historia_pasado, 'UTF-8') : strlen($historia_pasado);
         if ($min_len < 80) {
-            $errores[] = 'Cuenta el pasado de tu personaje con algo más de detalle (mínimo ~80 caracteres).';
+            $errores[] = 'Cuenta el pasado del NPC con algo más de detalle (mínimo ~80 caracteres).';
         }
 
         // ---- Insertar si todo OK ----
@@ -312,10 +260,11 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             );
 
             $pid = $db->insert_query('rol_personajes', array(
-                'uid' => $uid,
+                'uid' => 0,
                 'nombre' => $db->escape_string($nombre),
                 'slug' => $db->escape_string($slug),
-                'estado' => 'revision',
+                'estado' => 'aprobado',
+                'es_npc' => 1,
                 'activo' => 0,
                 'rango' => $rango,
                 'nivel' => 1,
@@ -328,27 +277,18 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
                 'lastedit' => TIME_NOW,
             ));
 
-            if ($pid && $db->table_exists('rol_tramites')) {
-                $db->insert_query('rol_tramites', array(
-                    'uid' => $uid,
-                    'pid' => (int)$pid,
-                    'tipo' => 'crear_personaje',
-                    'estado' => 'pendiente',
-                    'datos' => $db->escape_string(json_encode(array('nombre' => $nombre, 'faccion' => $faccion), JSON_UNESCAPED_UNICODE)),
-                    'dateline' => TIME_NOW,
-                    'lastedit' => TIME_NOW,
-                ));
-            }
-
             $ok = true;
         }
     }
 }
 
 if ($ok) {
-    header('Location: ' . $mybb->settings['bburl'] . '/personajes.php?forjado=1');
+    header('Location: ' . $mybb->settings['bburl'] . '/crear-npc.php?creado=1&nombre=' . urlencode($nombre));
     exit;
 }
+
+$show_flash = $mybb->get_input('creado', MyBB::INPUT_INT) ? true : false;
+$creado_nombre = htmlspecialchars_uni($mybb->get_input('nombre') ?? '');
 
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
@@ -356,11 +296,10 @@ header('Content-Type: text/html; charset=utf-8');
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?php echo $bbname; ?> · Crear personaje</title>
+<title><?php echo $bbname; ?> · Crear NPC</title>
 <?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-crear-personaje) -->
 </head>
-<body class="ope-pg-crear-personaje">
+<body class="ope-pg-crear-personaje ope-pg-crear-npc">
 
 <?php echo ope_rol_navbar_html(); ?>
 
@@ -368,9 +307,9 @@ header('Content-Type: text/html; charset=utf-8');
   <div class="breadcrumb-in">
     <a href="<?php echo $bburl; ?>/index.php">Inicio</a>
     <span class="sep">&#8250;</span>
-    <a href="<?php echo $bburl; ?>/personajes.php">Personaje</a>
+    <a href="<?php echo $bburl; ?>/zona-staff.php">Zona Staff</a>
     <span class="sep">&#8250;</span>
-    <b>Crear</b>
+    <b>Crear NPC</b>
   </div>
 </div>
 
@@ -378,64 +317,35 @@ header('Content-Type: text/html; charset=utf-8');
 
   <section>
     <div class="shead">
-      <h1>Crear personaje</h1>
-      <span class="code">// one piece eternal</span>
+      <h1>Crear NPC</h1>
+      <span class="code">// one piece eternal · staff</span>
       <span class="rule"></span>
     </div>
   </section>
 
-<?php if (!$loggedin): ?>
-  <div class="plate">
-    <div class="plate-h"><span class="t">Acceso requerido</span><span class="c">// acceso</span></div>
-    <div class="plate-b">
-      <div class="pj-empty">
-        <span class="anvil"><svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M6 20v-5h5v5"/><path d="M4 15l8-4 4 3"/><path d="M14 11l3-6 4 2-2 5"/><circle cx="9" cy="7" r="2.4"/></svg></span>
-        <div class="big">Accede para crear un personaje</div>
-        <p>Necesitas una cuenta en el foro para crear una ficha.</p>
-        <div class="acts">
-          <a href="<?php echo $bburl; ?>/member.php?action=register" class="btn btn-hot">Reg&iacute;strate</a>
-          <a href="<?php echo $bburl; ?>/member.php?action=login" class="btn btn-ghost">Acceder</a>
-        </div>
-      </div>
-    </div>
+<?php if ($show_flash): ?>
+  <div class="flash ok" style="margin-bottom:16px;padding:14px 18px;border:2px solid var(--patina);background:var(--iron-plate);display:flex;align-items:center;justify-content:space-between;gap:14px">
+    <span style="font-family:var(--mono);font-size:.72rem;color:var(--patina-hi)">El NPC <b style="color:var(--paper)"><?php echo $creado_nombre; ?></b> se ha creado con estado <b>aprobado</b> y est&aacute; listo para ser asignado.</span>
+    <span style="display:flex;gap:8px">
+      <a href="<?php echo $bburl; ?>/crear-npc.php" class="btn btn-hot btn-sm">Crear otro</a>
+      <a href="<?php echo $bburl; ?>/zona-staff.php" class="btn btn-ghost btn-sm">Zona Staff</a>
+    </span>
   </div>
-<?php elseif (!$hay_hueco && !$editando): ?>
-  <div class="plate">
-    <div class="plate-h"><span class="t">Sin huecos disponibles</span><span class="c">// <?php echo $usados; ?>/<?php echo $slots; ?></span></div>
-    <div class="plate-b">
-      <div class="pj-empty">
-        <span class="anvil"><svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M6 20v-5h5v5"/><path d="M4 15l8-4 4 3"/><path d="M14 11l3-6 4 2-2 5"/><circle cx="9" cy="7" r="2.4"/></svg></span>
-        <div class="big">Ya usas todos tus huecos de personaje</div>
-        <p>Tu cuenta tiene <?php echo $slots; ?> hueco(s) de personaje y ya los ocupas todos (<?php echo $usados; ?>). Solicita un hueco adicional en trámites o gestiona tus fichas actuales.</p>
-        <div class="acts">
-          <a href="<?php echo $bburl; ?>/personajes.php" class="btn btn-hot">Ver mi expediente</a>
-          <a href="<?php echo $bburl; ?>/tramites.php" class="btn btn-ghost">Trámites</a>
-        </div>
-      </div>
-    </div>
-  </div>
-<?php else: ?>
+<?php endif; ?>
 
 <?php if (!empty($errores)): ?>
-  <div class="flash warn">No se pudo crear el personaje:
+  <div class="flash warn">No se pudo crear el NPC:
     <ul><?php foreach ($errores as $e) echo '<li>' . htmlspecialchars_uni($e) . '</li>'; ?></ul>
   </div>
 <?php endif; ?>
 
-<?php if ($editando): ?>
-  <div style="margin-bottom:14px;padding:12px 16px;border:2px solid var(--h6);background:var(--iron-plate);display:flex;align-items:center;justify-content:space-between;gap:12px">
-    <span style="font-family:var(--mono);font-size:.68rem;color:var(--paper-dim)">Est&aacute;s editando la ficha de <b style="color:var(--paper)"><?php echo htmlspecialchars_uni($editando['nombre']); ?></b>. Los cambios se enviar&aacute;n a revisi&oacute;n de nuevo.</span>
-    <a href="<?php echo $bburl; ?>/personajes.php" class="btn btn-ghost btn-sm">Cancelar</a>
-  </div>
-<?php endif; ?>
-
   <p class="mono" style="font-size:.78rem;color:var(--paper-dim);max-width:76ch;margin-bottom:16px">
-    Sigue los <b style="color:var(--paper)">7 pasos</b> del foro: raza, concepto, estadísticas, virtudes/defectos, facción, equipo e historia. Rellena todo en una sola sesión — al enviar, tu ficha entra en <b style="color:var(--h6)">revisión</b> del staff.
+    Sigue los <b style="color:var(--paper)">7 pasos</b> para crear un personaje no jugador. El NPC se crea con estado <b style="color:var(--patina)">aprobado</b> directamente (sin revisi&oacute;n) y sin due&ntilde;o. Podr&aacute; asignarse a un Narrador desde Zona Staff.
   </p>
 
   <div class="wiz-progress" id="wizProgress"></div>
 
-  <form method="post" action="<?php echo $bburl; ?>/crear-personaje.php" id="wizForm">
+  <form method="post" action="<?php echo $bburl; ?>/crear-npc.php" id="wizForm">
     <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
 
     <!-- PASO 1: RAZA -->
@@ -450,7 +360,7 @@ header('Content-Type: text/html; charset=utf-8');
     $subop = json_encode($r['sub_opciones'] ?? array(), JSON_UNESCAPED_UNICODE);
 ?>
             <label class="race-card">
-              <input type="radio" name="raza_principal" value="<?php echo $rid; ?>" data-mod='<?php echo htmlspecialchars_uni($mod); ?>' data-modsec='<?php echo htmlspecialchars_uni($modsec); ?>' data-subop='<?php echo htmlspecialchars_uni($subop); ?>' data-extra-bump="<?php echo !empty($r['extra_stat_bump']) ? '1' : '0'; ?>" data-nombre="<?php echo htmlspecialchars_uni($r['nombre']); ?>" required>
+              <input type="radio" name="raza_principal" value="<?php echo $rid; ?>" data-mod='<?php echo htmlspecialchars_uni($mod); ?>' data-modsec='<?php echo htmlspecialchars_uni($modsec); ?>' data-subop='<?php echo htmlspecialchars_uni($subop); ?>' data-extra-bump="<?php echo !empty($r['extra_stat_bump']) ? '1' : '0'; ?>" data-nombre="<?php echo htmlspecialchars_uni($r['nombre']); ?>" required<?php echo isset($old['raza_principal']) && $old['raza_principal'] === $rid ? ' checked' : ''; ?>>
               <div class="rc-body">
                 <div class="rc-name"><?php echo htmlspecialchars_uni($r['nombre']); ?></div>
                 <div class="rc-resumen"><?php echo htmlspecialchars_uni($r['resumen']); ?></div>
@@ -461,24 +371,24 @@ header('Content-Type: text/html; charset=utf-8');
           </div>
 
           <div class="field" style="margin-top:16px">
-            <label class="flabel"><input type="checkbox" id="esHibrido" name="es_hibrido" value="1"> ¿Es un híbrido de dos razas?</label>
+            <label class="flabel"><input type="checkbox" id="esHibrido" name="es_hibrido" value="1"<?php echo !empty($old['es_hibrido']) ? ' checked' : ''; ?>> ¿Es un híbrido de dos razas?</label>
             <p class="hint">Un híbrido obtiene SOLO las pasivas primarias de ambas razas (ninguna secundaria).</p>
           </div>
-          <div class="field" id="razaSecundariaWrap" style="display:none">
+          <div class="field" id="razaSecundariaWrap" style="display:<?php echo !empty($old['es_hibrido']) ? 'block' : 'none'; ?>">
             <label class="flabel">Raza secundaria</label>
             <select name="raza_secundaria" id="razaSecundaria">
               <option value="">— elige —</option>
 <?php foreach ($RAZAS as $rid => $r):
     $mod = json_encode($r['mod'], JSON_UNESCAPED_UNICODE);
 ?>
-              <option value="<?php echo $rid; ?>" data-mod='<?php echo htmlspecialchars_uni($mod); ?>' data-extra-bump="<?php echo !empty($r['extra_stat_bump']) ? '1' : '0'; ?>"><?php echo htmlspecialchars_uni($r['nombre']); ?></option>
+              <option value="<?php echo $rid; ?>" data-mod='<?php echo htmlspecialchars_uni($mod); ?>' data-extra-bump="<?php echo !empty($r['extra_stat_bump']) ? '1' : '0'; ?>"<?php echo isset($old['raza_secundaria']) && $old['raza_secundaria'] === $rid ? ' selected' : ''; ?>><?php echo htmlspecialchars_uni($r['nombre']); ?></option>
 <?php endforeach; ?>
             </select>
           </div>
           <div class="field" id="subOpcionWrap" style="display:none">
             <label class="flabel" id="subOpcionLabel">Pasiva secundaria</label>
             <div id="subOpcionGrid" class="race-grid"></div>
-            <p class="hint">Solo se elige si tu raza es <b>pura</b> (sin híbrido): sustituye la pasiva secundaria genérica.</p>
+            <p class="hint">Solo se elige si la raza es <b>pura</b> (sin híbrido): sustituye la pasiva secundaria genérica.</p>
           </div>
         </div>
       </div>
@@ -490,13 +400,13 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="plate-h"><span class="t">2. Nombre y concepto</span><span class="c">// quién es</span></div>
         <div class="plate-b">
           <div class="grid2">
-            <div class="field"><label class="flabel">Nombre del personaje *</label><input type="text" name="nombre" maxlength="120" required value="<?php echo htmlspecialchars_uni($old['nombre'] ?? ''); ?>"></div>
+            <div class="field"><label class="flabel">Nombre del NPC *</label><input type="text" name="nombre" maxlength="120" required value="<?php echo htmlspecialchars_uni($old['nombre'] ?? ''); ?>"></div>
             <div class="field"><label class="flabel">Apodo (opcional)</label><input type="text" name="apodo" maxlength="60" value="<?php echo htmlspecialchars_uni($old['apodo'] ?? ''); ?>"></div>
             <div class="field"><label class="flabel">Edad</label><input type="text" name="edad" maxlength="20" value="<?php echo htmlspecialchars_uni($old['edad'] ?? ''); ?>"></div>
             <div class="field"><label class="flabel">Género</label><input type="text" name="genero" maxlength="40" value="<?php echo htmlspecialchars_uni($old['genero'] ?? ''); ?>"></div>
           </div>
+          <p class="hint">¿Quieres que el NPC tenga una "D." en su nombre? Elige la virtud <b style="color:var(--paper)">Voluntad de D.</b> en el siguiente paso (Virtudes y Defectos).</p>
           <div class="field"><label class="flabel">Concepto / aspecto *</label><textarea name="concepto" required maxlength="600" placeholder="Quién es, qué aspecto tiene, qué lo mueve..."><?php echo htmlspecialchars_uni($old['concepto'] ?? ''); ?></textarea></div>
-          <p class="hint">¿Quieres que tu personaje tenga una "D." en su nombre? Elige la virtud <b style="color:var(--paper)">Voluntad de D.</b> en el siguiente paso (Virtudes y Defectos).</p>
         </div>
       </div>
     </div>
@@ -590,11 +500,10 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">5. Facción inicial</span><span class="c">// punto de partida</span></div>
         <div class="plate-b">
-          <p class="hint" style="margin-bottom:12px"><b>Periodo de Gracia PvP</b> — durante tus primeros 15 días (off-rol) como jugador nuevo no puedes ser objetivo de una Invasión (PvP). Pasado ese tiempo, los mares son libres: atacar a alguien mucho más débil tiene consecuencias (Wanted, persecución Marine, represalias de facción).</p>
           <div class="fac-grid">
 <?php foreach ($FACCIONES as $fid => $f): ?>
             <label class="fac-card">
-              <input type="radio" name="faccion" value="<?php echo $fid; ?>" required>
+              <input type="radio" name="faccion" value="<?php echo $fid; ?>" required<?php echo isset($old['faccion']) && $old['faccion'] === $fid ? ' checked' : ''; ?>>
               <div class="fac-name"><?php echo htmlspecialchars_uni($f['nombre']); ?></div>
               <div class="fac-desc"><?php echo htmlspecialchars_uni($f['desc']); ?></div>
               <div class="fac-adv"><?php echo htmlspecialchars_uni($f['ventaja']); ?></div>
@@ -608,13 +517,13 @@ header('Content-Type: text/html; charset=utf-8');
     <!-- PASO 6: EQUIPO -->
     <div class="wiz-step" data-step="6">
       <div class="plate">
-        <div class="plate-h"><span class="t">6. Equipo inicial</span><span class="c">// elige tu Pack</span></div>
+        <div class="plate-h"><span class="t">6. Equipo inicial</span><span class="c">// elige el Pack</span></div>
         <div class="plate-b">
-          <p class="hint" style="margin-bottom:12px">Elige el Pack de Equipo Inicial que mejor se adapte al concepto de tu personaje. Todos incluyen vestimenta básica de viaje, raciones para 5 días y <b style="color:var(--paper)">50.000 berries</b> iniciales.</p>
+          <p class="hint" style="margin-bottom:12px">Elige el Pack de Equipo Inicial que mejor se adapte al concepto del NPC. Todos incluyen vestimenta básica de viaje, raciones para 5 días y <b style="color:var(--paper)">50.000 berries</b> iniciales.</p>
           <div class="race-grid" id="packGrid">
 <?php foreach ($PACKS as $pid => $p): ?>
             <label class="race-card">
-              <input type="radio" name="pack_equipo" value="<?php echo $pid; ?>" required<?php echo (($old['pack_equipo'] ?? '') === $pid) ? ' checked' : ''; ?>>
+              <input type="radio" name="pack_equipo" value="<?php echo $pid; ?>" required<?php echo isset($old['pack_equipo']) && $old['pack_equipo'] === $pid ? ' checked' : ''; ?>>
               <div class="rc-body">
                 <div class="rc-name"><?php echo htmlspecialchars_uni($p['nombre']); ?></div>
                 <div class="rc-resumen"><?php echo htmlspecialchars_uni($p['resumen']); ?></div>
@@ -653,17 +562,14 @@ header('Content-Type: text/html; charset=utf-8');
       <button type="button" class="btn btn-ghost" id="wizPrev">&larr; Anterior</button>
       <div class="wiz-err" id="wizErr"></div>
       <button type="button" class="btn btn-hot" id="wizNext">Siguiente &rarr;</button>
-      <button type="submit" class="btn btn-hot" id="wizSubmit" style="display:none">Enviar a revisión</button>
+      <button type="submit" class="btn btn-hot" id="wizSubmit" style="display:none">Crear NPC</button>
     </div>
   </form>
-
-<?php endif; ?>
 
 </div>
 
 <?php include __DIR__ . '/inc/footer_custom.php'; ?>
 
-<?php if ($loggedin && $hay_hueco): ?>
 <script>
 (function(){
   var STAT_LABELS = <?php echo json_encode($STATS, JSON_UNESCAPED_UNICODE); ?>;
@@ -709,14 +615,14 @@ header('Content-Type: text/html; charset=utf-8');
       if (document.getElementById('esHibrido').checked && !document.getElementById('razaSecundaria').value) return 'Elige la raza secundaria del híbrido.';
       if (!hibChk.checked){
         var subop = JSON.parse(r1chk.dataset.subop || '{}');
-        if (Object.keys(subop).length && !document.querySelector('input[name=sub_opcion]:checked')) return 'Elige una opción para la pasiva secundaria de tu raza.';
+        if (Object.keys(subop).length && !document.querySelector('input[name=sub_opcion]:checked')) return 'Elige una opción para la pasiva secundaria de la raza.';
       }
     }
     if (n === 2){
       var nombre = form.querySelector('[name=nombre]').value.trim();
       var concepto = form.querySelector('[name=concepto]').value.trim();
       if (nombre.length < 3) return 'Escribe un nombre de al menos 3 caracteres.';
-      if (!concepto) return 'Describe el concepto de tu personaje.';
+      if (!concepto) return 'Describe el concepto del NPC.';
     }
     if (n === 3){
       var bumps = form.querySelectorAll('input[name="stat_bump[]"]:checked');
@@ -739,7 +645,7 @@ header('Content-Type: text/html; charset=utf-8');
       if (!document.querySelector('input[name=pack_equipo]:checked')) return 'Elige un Pack de Equipo Inicial.';
     }
     if (n === 7){
-      if (form.querySelector('[name=historia_pasado]').value.trim().length < 80) return 'Cuenta el pasado de tu personaje con algo más de detalle (mínimo ~80 caracteres).';
+      if (form.querySelector('[name=historia_pasado]').value.trim().length < 80) return 'Cuenta el pasado del NPC con algo más de detalle (mínimo ~80 caracteres).';
     }
     return '';
   }
@@ -858,9 +764,7 @@ header('Content-Type: text/html; charset=utf-8');
       var sum = 0;
       container.querySelectorAll('[data-eff]').forEach(function(el){
         var sig = el.dataset.eff;
-        var eff = parseInt(el.textContent, 10);
         var box = container.querySelector('input[name="stat_bump[]"][value="' + sig + '"]');
-        // recompute base eff from racial only (stored originally), then add bump
         var raw = 1 + (rd.mod1[sig]||0) + (rd.modsec1[sig]||0) + (rd.mod2[sig]||0);
         var withBump = raw + (box && box.checked ? 1 : 0);
         el.textContent = withBump;
@@ -976,9 +880,17 @@ header('Content-Type: text/html; charset=utf-8');
   }
 
   showStep(1);
+
+  // ---- Reveal animation (same as zona-staff) ----
+  if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){
+      if (e.isIntersecting){ e.target.classList.add('vis'); io.unobserve(e.target); }
+    }); }, { threshold: .08 });
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('vis'); });
+  }
 })();
 </script>
-<?php endif; ?>
-
 </body>
 </html>

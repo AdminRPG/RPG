@@ -1,0 +1,62 @@
+========================================================================
+ MUNDO VIVO · IMÁGENES  —  especificaciones y prompts
+========================================================================
+Carpeta: images/mundo-vivo/
+Todas las rutas se resuelven con {bburl}/images/mundo-vivo/<archivo>.
+
+------------------------------------------------------------------------
+QUÉ CONVIENE CAMBIAR (para que se vea mejor)
+------------------------------------------------------------------------
+1) masthead.png  (LOGO del periódico "Eternal News")
+   - PROBLEMA actual: el PNG lleva fondo BLANCO. En el periódico se coloca
+     sobre la textura de papel; para que no se vea un rectángulo blanco se
+     usa un truco CSS (mix-blend-mode:multiply). Funciona, pero lo ideal es:
+   - RECOMENDADO: exportar el logo con FONDO TRANSPARENTE (PNG-24 alpha).
+   - Tamaño sugerido: ~1600 x 420 px (ratio ~3.8:1), nítido, márgenes mínimos.
+   - Que el trazo sea oscuro (marrón/negro) para contrastar sobre papel claro.
+
+2) paper.jpg  (textura de papel de fondo del periódico)
+   - Está bien, pero es VERTICAL y se estira en artículos largos.
+   - RECOMENDADO: una textura SIN COSTURAS (tileable) o más grande y apaisada,
+     ~1600 x 2200 px, tono hueso/sepia uniforme y sin manchas muy marcadas en
+     el centro (para no molestar a la lectura). Grano sutil.
+
+3) estado-hero.jpg  (cabecera de "Estado del mundo")
+   - RECOMENDADO: apaisada 1600 x 640 px, mapa/mar épico oscuro; se le aplica
+     un degradado oscuro por encima, así que puede ser luminosa: se oscurece sola.
+
+4) noticia-placeholder.jpg  (relleno de noticias sin imagen)
+   - RECOMENDADO: 1200 x 675 px (16:9), neutra, estilo grabado/One Piece.
+
+5) newscoo.png  (gaviota mensajera / mascota)
+   - RECOMENDADO: PNG con FONDO TRANSPARENTE, ~600 x 600 px.
+
+Regla general: para las ilustraciones de cada periódico, genera imágenes con el
+ratio que indica el bloque IMAGENES del resultado de la IA:
+   - portada / imagen ancha (figwide):  1200 x 675  (16:9)
+   - imagen normal dentro de columnas:   800 x 600  (4:3)
+   - cartel "SE BUSCA" (wanted):         600 x 600  (1:1)
+
+------------------------------------------------------------------------
+PROMPTS BASE (en inglés; estilo ilustración/anime One Piece)
+------------------------------------------------------------------------
+masthead (logo):
+  vintage nautical newspaper masthead logo reading "ETERNAL NEWS", ornate
+  hand-lettered serif, anchors, compass rose, rope flourishes and a seagull,
+  sepia ink on transparent background, high detail, wide banner 3.8:1
+
+paper (textura):
+  seamless aged parchment paper texture, bone/sepia tone, subtle fibers and
+  faint stains, soft even lighting, tileable, no text
+
+estado-hero (cabecera estado del mundo):
+  epic dark sea world map vibe, stormy ocean horizon, distant islands and a
+  lighthouse, cinematic, moody, One Piece aesthetic, wide banner
+
+portada de periódico (ejemplo, según el mes):
+  One Piece style illustration, {escena del mes}, cinematic wide shot,
+  dramatic lighting; if specific characters appear add "(use reference image of <name>)"
+
+cartel SE BUSCA (wanted):
+  One Piece style wanted poster portrait of {personaje}, aged paper look,
+  bold "WANTED" framing, sly expression

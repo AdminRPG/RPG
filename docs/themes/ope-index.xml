@@ -122,11 +122,15 @@
       <div class="ope-feed">{$ope_latest_posts}</div>
     </article>
 
-    <!-- Curiosidad rotativa -->
-    <article class="ope-panel ope-panel-curio" style="grid-area:curio">
+    <!-- Últimas noticias (Mundo Vivo) — rotan; clic despliega la noticia completa -->
+    <article class="ope-panel ope-panel-curio ope-panel-news" style="grid-area:curio">
       <span class="ope-curio-q" aria-hidden="true">&ldquo;</span>
-      <div class="ope-panel-kicker">// curiosidad</div>
-      <p id="ope-curiosidad-text" class="ope-curio-text">{$ope_curiosidad}</p>
+      <div class="ope-panel-kicker">{$ope_noticia_kicker}</div>
+      <div id="ope-news-item" class="ope-news-item" role="button" tabindex="0">
+        <b id="ope-news-title" class="ope-news-title">{$ope_noticia_first_title}</b>
+        <p id="ope-curiosidad-text" class="ope-curio-text">{$ope_noticia_first_text}</p>
+        <span class="ope-news-more">Leer más &rarr;</span>
+      </div>
       <span class="ope-curio-bar"><i id="ope-curio-bar"></i></span>
     </article>
 
@@ -198,26 +202,61 @@
   </div>
 </section>
 
+<div id="ope-news-modal" class="ope-news-modal" hidden>
+  <div class="ope-news-modal-bg" data-close="1"></div>
+  <div class="ope-news-modal-box" role="dialog" aria-modal="true" aria-labelledby="ope-news-modal-title">
+    <button type="button" class="ope-news-modal-x" data-close="1" aria-label="Cerrar">&times;</button>
+    <div class="ope-panel-kicker">// últimas noticias</div>
+    <h3 id="ope-news-modal-title"></h3>
+    <div id="ope-news-modal-body" class="ope-news-modal-body"></div>
+  </div>
+</div>
+
 <script type="text/javascript">
 (function(){
-  var data = {$curiosidades_json};
+  var data = {$ope_noticias_json};
   var el = document.getElementById('ope-curiosidad-text');
+  var titleEl = document.getElementById('ope-news-title');
   var bar = document.getElementById('ope-curio-bar');
-  if(!el || !data || data.length < 2) return;
+  var item = document.getElementById('ope-news-item');
+  var modal = document.getElementById('ope-news-modal');
+  var mTitle = document.getElementById('ope-news-modal-title');
+  var mBody = document.getElementById('ope-news-modal-body');
+  if(!el || !data || !data.length) return;
   var i = 0, period = 9000;
+  function render(){
+    var d = data[i] || {};
+    if(titleEl){ titleEl.textContent = d.titulo || ''; titleEl.style.display = d.titulo ? '' : 'none'; }
+    el.textContent = d.resumen || '';
+    if(item){ item.classList.toggle('has-more', !!d.cuerpo); }
+  }
+  function openModal(){
+    var d = data[i]; if(!d || !d.cuerpo || !modal) return;
+    mTitle.textContent = d.titulo || '';
+    mBody.innerHTML = d.cuerpo;
+    modal.hidden = false; document.body.style.overflow = 'hidden';
+  }
+  function closeModal(){ if(modal){ modal.hidden = true; document.body.style.overflow = ''; } }
+  if(item){
+    item.addEventListener('click', openModal);
+    item.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openModal(); } });
+  }
+  if(modal){
+    modal.addEventListener('click', function(e){ if(e.target.getAttribute('data-close')) closeModal(); });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
+  }
+  render();
   function restartBar(){
     if(!bar) return;
-    bar.style.transition = 'none';
-    bar.style.width = '0%';
-    void bar.offsetWidth;
-    bar.style.transition = 'width ' + period + 'ms linear';
-    bar.style.width = '100%';
+    bar.style.transition = 'none'; bar.style.width = '0%'; void bar.offsetWidth;
+    bar.style.transition = 'width ' + period + 'ms linear'; bar.style.width = '100%';
   }
+  if(data.length < 2){ if(bar) bar.style.display = 'none'; return; }
   restartBar();
   setInterval(function(){
     i = (i + 1) % data.length;
     el.style.opacity = 0;
-    setTimeout(function(){ el.textContent = data[i]; el.style.opacity = 1; }, 220);
+    setTimeout(function(){ render(); el.style.opacity = 1; }, 220);
     restartBar();
   }, period);
 })();

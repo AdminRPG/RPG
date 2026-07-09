@@ -65,15 +65,89 @@ if ($db->table_exists('rol_personajes')) {
 // Cada tarjeta pertenece a un grupo de rol. "Aprobación de expedientes" ahora
 // requiere Colaborador (rol >= colaborador). El resto de utilidades se añadirán
 // cuando tengan backend real.
+// Contadores adicionales
+$npc_sin_asignar = 0;
+if ($db->table_exists('rol_personajes') && $db->field_exists('es_npc', 'rol_personajes')) {
+    $nq = $db->simple_select('rol_personajes', 'COUNT(*) AS c', "es_npc = 1 AND uid = 0");
+    $npc_sin_asignar = (int) $db->fetch_field($nq, 'c');
+}
+
+$total_personajes = 0;
+if ($db->table_exists('rol_personajes')) {
+    $tq = $db->simple_select('rol_personajes', 'COUNT(*) AS c');
+    $total_personajes = (int) $db->fetch_field($tq, 'c');
+}
+
+$cartas_biblioteca = 0;
+if ($db->table_exists('rol_cartas')) {
+    $cq = $db->simple_select('rol_cartas', 'COUNT(*) AS c');
+    $cartas_biblioteca = (int) $db->fetch_field($cq, 'c');
+}
+$cartas_asignadas = 0;
+if ($db->table_exists('rol_tecnicas')) {
+    $cq = $db->simple_select('rol_tecnicas', 'COUNT(*) AS c');
+    $cartas_asignadas = (int) $db->fetch_field($cq, 'c');
+}
+
+// Contadores Mundo Vivo (para badges de las cards).
+$mv_eventos_pend = 0;
+$mv_noticias_activas = 0;
+if ($db->table_exists('rol_mv_eventos')) {
+    $mv_ciclo = ope_rol_mv_ciclo_actual();
+    if (is_array($mv_ciclo)) {
+        $mv_eventos_pend = (int) $db->fetch_field($db->simple_select('rol_mv_eventos', 'COUNT(*) c', "ciclo_id = " . (int)$mv_ciclo['ciclo_id'] . " AND estado = 'pendiente'"), 'c');
+    }
+}
+if ($db->table_exists('rol_mv_noticias')) {
+    $mv_noticias_activas = (int) $db->fetch_field($db->simple_select('rol_mv_noticias', 'COUNT(*) c', 'activa = 1'), 'c');
+}
+
 $zonas = array(
     array('grp' => 'colaborador', 'code' => 'STF-01',
-        'title' => 'Aprobaci&oacute;n de expedientes',
-        'body'  => 'Revisa las fichas enviadas a revisi&oacute;n, aprueba o rechaza personajes y deja notas al jugador.',
-        'meta'  => $pendientes_count . ' pendiente(s)', 'cta' => 'Revisar', 'badge' => $pendientes_count, 'href' => $bburl . '/revisar-personaje.php'),
+        'title' => 'Gesti&oacute;n de expedientes',
+        'body'  => 'Revisa, aprueba, rechaza, devuelve a revisi&oacute;n o elimina fichas. Gesti&oacute;n completa del ciclo de vida de cada expediente.',
+        'meta'  => $pendientes_count . ' pendiente(s)', 'cta' => 'Revisar', 'badge' => $pendientes_count, 'href' => $bburl . '/revisar-personaje.php',
+        'icon'  => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 15h6"/><path d="M9 11h6"/><path d="M9 19h3"/>'),
     array('grp' => 'webmaster', 'code' => 'STF-02',
         'title' => 'Gesti&oacute;n de staff',
         'body'  => 'Asigna el rol (Colaborador, Moderador, Administrador, Web Master) y el a&ntilde;adido de Narrador a cada personaje, y consulta los permisos de cada rol.',
-        'meta'  => $staff_count . ' con rol', 'cta' => 'Gestionar', 'badge' => $staff_count, 'href' => $bburl . '/gestionar-staff.php'),
+        'meta'  => $staff_count . ' con rol', 'cta' => 'Gestionar', 'badge' => $staff_count, 'href' => $bburl . '/gestionar-staff.php',
+        'icon'  => '<path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6Z"/>'),
+    array('grp' => 'administrador', 'code' => 'STF-03',
+        'title' => 'Crear NPC',
+        'body'  => 'Crea personajes no jugadores (NPC) con el mismo wizard de creaci&oacute;n. Los NPC no pertenecen a ninguna cuenta hasta que se asignan a un Narrador.',
+        'meta'  => $npc_sin_asignar . ' sin asignar', 'cta' => 'Crear NPC', 'badge' => 0, 'href' => $bburl . '/crear-npc.php',
+        'icon'  => '<circle cx="12" cy="8" r="4"/><path d="M4 20v-1a6 6 0 0 1 6-6h4"/><path d="M22 14l-4 4-2-2"/>'),
+    array('grp' => 'administrador', 'code' => 'STF-04',
+        'title' => 'Gestionar personaje',
+        'body'  => 'Edita toda la informaci&oacute;n on-rol de cualquier personaje: stats, virtudes, defectos, inventario, econom&iacute;a, bio, facci&oacute;n y m&aacute;s.',
+        'meta'  => $total_personajes . ' personajes totales', 'cta' => 'Gestionar', 'badge' => 0, 'href' => $bburl . '/gestionar-personaje.php',
+        'icon'  => '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>'),
+    array('grp' => 'administrador', 'code' => 'STF-05',
+        'title' => 'Gestionar NPC',
+        'body'  => 'Asigna NPCs a cuentas con personaje Narrador para que puedan postear como ellos. Los NPCs asignados aparecer&aacute;n en Personaje con un toggle.',
+        'meta'  => '', 'cta' => 'Asignar', 'badge' => 0, 'href' => $bburl . '/gestionar-npc.php',
+        'icon'  => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
+    array('grp' => 'administrador', 'code' => 'STF-06',
+        'title' => 'Crear cartas',
+        'body'  => 'Forja cartas de t&eacute;cnica (INI-03) para la biblioteca com&uacute;n, sin asociarlas a nadie: 6 categor&iacute;as de tags, tier, presupuesto y vista previa en vivo. Incluye ayuda IA con prompt y autorrelleno por YAML.',
+        'meta'  => $cartas_biblioteca . ' en biblioteca', 'cta' => 'Crear cartas', 'badge' => 0, 'href' => $bburl . '/crear-cartas.php',
+        'icon'  => '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/>'),
+    array('grp' => 'administrador', 'code' => 'STF-07',
+        'title' => 'Asignar cartas',
+        'body'  => 'Asocia cartas ya creadas al deck de cualquier personaje. Al asignar se copia la carta al deck (con su insignia propia). Gestiona el deck: retirar cartas o marcar la T&eacute;cnica Insignia.',
+        'meta'  => $cartas_asignadas . ' asignada(s)', 'cta' => 'Asignar', 'badge' => 0, 'href' => $bburl . '/asignar-cartas.php',
+        'icon'  => '<path d="M9 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"/><rect x="9" y="2" width="10" height="20" rx="2"/><path d="M13 7h2"/><path d="M13 11h2"/>'),
+    array('grp' => 'webmaster', 'code' => 'STF-08',
+        'title' => 'Mundo Vivo',
+        'body'  => 'Centro de la Balanza: eventos notificados, misiones del mes, tablero de zonas/facciones/tensi&oacute;n, NPCs y sus ubicaciones. Genera el super-prompt para la IA, ingiere el resultado y publica el nuevo estado del mundo y el peri&oacute;dico <b>Eternal News</b>.',
+        'meta'  => $mv_eventos_pend . ' evento(s) por revisar', 'cta' => 'Abrir panel', 'badge' => $mv_eventos_pend, 'href' => $bburl . '/mundo-vivo.php',
+        'icon'  => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/>'),
+    array('grp' => 'administrador', 'code' => 'STF-09',
+        'title' => 'Noticias',
+        'body'  => 'Gestiona el feed de <b>&Uacute;ltimas noticias</b> de la portada: crea entradas manuales, edita las existentes, act&iacute;valas o desact&iacute;valas de la rotaci&oacute;n y ordena su prioridad. Las noticias de Mundo Vivo se a&ntilde;aden autom&aacute;ticamente.',
+        'meta'  => $mv_noticias_activas . ' en rotaci&oacute;n', 'cta' => 'Gestionar', 'badge' => 0, 'href' => $bburl . '/gestionar-noticias.php',
+        'icon'  => '<path d="M4 4h16v14a2 2 0 0 1-2 2H4Z"/><path d="M4 20a2 2 0 0 1-2-2V8"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/>'),
 );
 
 header('Content-Type: text/html; charset=utf-8');
@@ -158,13 +232,13 @@ header('Content-Type: text/html; charset=utf-8');
 <?php foreach ($zonas_grupo as $z): ?>
       <article class="card">
         <div class="card-top">
-          <span class="card-ic"><svg viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6Z"/></svg></span>
+          <span class="card-ic"><svg viewBox="0 0 24 24"><?php echo isset($z['icon']) ? $z['icon'] : '<path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6Z"/>'; ?></svg></span>
           <div>
             <div class="card-title"><?php echo $z['title']; ?></div>
             <div class="card-code"><?php echo $z['code']; ?></div>
           </div>
           <span class="card-tag" style="background:<?php echo $g['col']; ?>"><?php echo $g['lbl']; ?></span>
-<?php if (!empty($z['badge'])): ?>
+<?php if (!empty($z['badge']) && (int)$z['badge'] > 0): ?>
           <span class="card-count" title="<?php echo (int)$z['badge']; ?> en revisi&oacute;n"><?php echo (int)$z['badge']; ?></span>
 <?php endif; ?>
         </div>
