@@ -385,9 +385,16 @@ header('Content-Type: text/html; charset=utf-8');
   </section>
 
   <!-- ===== EVENTOS ===== -->
+<?php
+// Auto-clasificar eventos sin clasificar (se persiste en DB para la próxima)
+if (!empty($eventos) && $ciclo['ciclo_id'] > 0) {
+    ope_rol_mv_auto_classify_pendientes((int)$ciclo['ciclo_id']);
+    $eventos = ope_rol_mv_eventos((int)$ciclo['ciclo_id']);
+}
+?>
   <section class="mv-panel reveal" id="tab-eventos">
     <div class="plate">
-      <div class="plate-h"><span class="t">Eventos notificados</span><span class="c">// temas del mes</span></div>
+      <div class="plate-h"><span class="t">Eventos notificados</span><span class="c">// clasificación automática</span></div>
       <div class="plate-b">
 <?php if (empty($eventos)): ?>
         <p class="mv-empty">No hay eventos notificados este mes.</p>
@@ -395,26 +402,10 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="mv-row mv-ev mv-ev-<?php echo htmlspecialchars_uni($e['estado']); ?>">
           <div class="mv-ev-main">
             <a class="mv-ev-t" href="<?php echo htmlspecialchars_uni($e['enlace']); ?>" target="_blank" rel="noopener"><?php echo htmlspecialchars_uni($e['titulo']); ?></a>
-            <span class="mv-ev-meta"><?php echo htmlspecialchars_uni($e['zona_slug']); ?> &middot; estado: <b><?php echo htmlspecialchars_uni($e['estado']); ?></b></span>
+            <span class="mv-ev-meta"><?php echo htmlspecialchars_uni($e['zona_slug']); ?> &middot; <b><?php echo htmlspecialchars_uni($e['tipo_suceso'] ?: 'S-??'); ?></b> PE=<?php echo (int)($e['pe_estimado'] ?: 4); ?> &middot; <?php echo htmlspecialchars_uni($e['estado']); ?></span>
             <p class="mv-ev-res"><?php echo nl2br(htmlspecialchars_uni((string)$e['resumen'])); ?></p>
           </div>
           <div class="mv-ev-acts">
-            <form method="post" class="mv-inline">
-              <input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="evento_classify"><input type="hidden" name="evento_id" value="<?php echo (int)$e['evento_id']; ?>">
-              <select name="tipo_suceso" class="mv-input mv-input-xs" title="Tipo de suceso S-01 a S-12">
-                <option value="">S-??</option>
-<?php for ($si = 1; $si <= 12; $si++): $sc = sprintf('S-%02d', $si); $sel = ($e['tipo_suceso'] ?? '') === $sc ? ' selected' : ''; ?>
-                <option value="<?php echo $sc; ?>"<?php echo $sel; ?>><?php echo $sc; ?></option>
-<?php endfor; ?>
-              </select>
-              <select name="pe_estimado" class="mv-input mv-input-xs" title="Peso del Evento 1-10">
-                <option value="">PE</option>
-<?php for ($pei = 1; $pei <= 10; $pei++): $selPE = (isset($e['pe_estimado']) && (int)$e['pe_estimado'] === $pei) ? ' selected' : ''; ?>
-                <option value="<?php echo $pei; ?>"<?php echo $selPE; ?>><?php echo $pei; ?></option>
-<?php endfor; ?>
-              </select>
-              <button class="btn btn-xs" title="Guardar clasificación">✓</button>
-            </form>
             <form method="post"><input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="evento_estado"><input type="hidden" name="evento_id" value="<?php echo (int)$e['evento_id']; ?>"><input type="hidden" name="estado" value="incluido"><button class="btn btn-sm">Incluir</button></form>
             <form method="post"><input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="evento_estado"><input type="hidden" name="evento_id" value="<?php echo (int)$e['evento_id']; ?>"><input type="hidden" name="estado" value="descartado"><button class="btn btn-sm btn-ghost">Descartar</button></form>
             <form method="post" onsubmit="return confirm('¿Eliminar este evento?');"><input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="evento_delete"><input type="hidden" name="evento_id" value="<?php echo (int)$e['evento_id']; ?>"><button class="btn btn-sm btn-danger">×</button></form>
@@ -539,44 +530,37 @@ header('Content-Type: text/html; charset=utf-8');
   <!-- ===== NPCs ===== -->
   <section class="mv-panel reveal" id="tab-npcs" hidden>
     <div class="plate">
-      <div class="plate-h"><span class="t">NPCs mayores</span><span class="c">// con ficha · ubicación</span></div>
+      <div class="plate-h"><span class="t">NPCs mayores</span><span class="c">// datos automáticos desde ficha</span></div>
       <div class="plate-b">
 <?php if (empty($npcs)): ?>
-        <p class="mv-empty">No hay NPCs con ficha. Créalos desde Zona Staff → Crear NPC.</p>
+        <p class="mv-empty">No hay NPCs con ficha.</p>
 <?php else: foreach ($npcs as $n): ?>
 <?php
   $npcTrack = $n['datos_internos']['tracking'] ?? array();
 ?>
-        <form method="post" class="mv-npc">
-          <input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="npc_ubic"><input type="hidden" name="pid" value="<?php echo (int)$n['pid']; ?>">
+        <div class="mv-npc mv-npc-ro">
           <div class="mv-npc-name"><b><?php echo htmlspecialchars_uni($n['nombre']); ?></b> <small><?php echo htmlspecialchars_uni($n['faccion']); ?> · <?php echo htmlspecialchars_uni($n['rango']); ?></small></div>
           <div class="mv-npc-row">
-            <select name="mundo_zona" class="mv-input mv-input-sm"><?php echo mv_zona_options($zonas, $n['mundo_zona']); ?></select>
-            <input type="text" name="mundo_ubic" class="mv-input mv-input-sm" placeholder="Isla/lugar" value="<?php echo htmlspecialchars_uni((string)$n['mundo_ubic']); ?>">
-            <input type="text" name="mundo_estado_np" class="mv-input mv-input-sm" placeholder="Estado (activo/herido...)" value="<?php echo htmlspecialchars_uni((string)$n['mundo_estado_np']); ?>">
-            <input type="text" name="mundo_accion" class="mv-input mv-input-sm" placeholder="Acción actual" value="<?php echo htmlspecialchars_uni((string)$n['mundo_accion']); ?>">
+            <span class="mv-npc-info">Zona: <?php echo htmlspecialchars_uni($n['mundo_zona'] ?: '?'); ?></span>
+            <span class="mv-npc-info">Ubicación: <?php echo htmlspecialchars_uni($n['mundo_ubic'] ?: '?'); ?></span>
+            <span class="mv-npc-info">Estado: <?php echo htmlspecialchars_uni($n['mundo_estado_np'] ?: 'normal'); ?></span>
+            <span class="mv-npc-info">Acción: <?php echo htmlspecialchars_uni($n['mundo_accion'] ?: '?'); ?></span>
           </div>
           <div class="mv-npc-row">
-            <span class="mv-npc-track-lbl">Tracking interno:</span>
-            <input type="number" min="0" max="100" name="track_salud" class="mv-input mv-input-xs" placeholder="Salud" value="<?php echo (int)($npcTrack['salud'] ?? 100); ?>" title="Salud (0-100)">
-            <input type="number" min="0" max="100" name="track_moral" class="mv-input mv-input-xs" placeholder="Moral" value="<?php echo (int)($npcTrack['moral'] ?? 100); ?>" title="Moral (0-100)">
-            <input type="text" name="track_plan" class="mv-input mv-input-sm" placeholder="Plan activo" value="<?php echo htmlspecialchars_uni((string)($npcTrack['plan_activo'] ?? '')); ?>">
-            <input type="text" name="track_meta" class="mv-input mv-input-sm" placeholder="Meta actual" value="<?php echo htmlspecialchars_uni((string)($npcTrack['meta_actual'] ?? '')); ?>">
+            <span class="mv-npc-info">Salud: <?php echo (int)($npcTrack['salud'] ?? 100); ?>/100</span>
+            <span class="mv-npc-info">Moral: <?php echo (int)($npcTrack['moral'] ?? 100); ?>/100</span>
+            <?php if (!empty($npcTrack['plan_activo'])): ?><span class="mv-npc-info">Plan: <?php echo htmlspecialchars_uni($npcTrack['plan_activo']); ?></span><?php endif; ?>
+            <?php if (!empty($npcTrack['meta_actual'])): ?><span class="mv-npc-info">Meta: <?php echo htmlspecialchars_uni($npcTrack['meta_actual']); ?></span><?php endif; ?>
           </div>
-          <button class="btn btn-sm">Guardar</button>
-        </form>
-        <form method="post" class="mv-npc">
-          <input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="npc_json_save">
-          <details class="mv-npc-json">
-            <summary>Datos públicos (JSON) — se muestra en Estado del Mundo</summary>
-            <textarea name="datos_publicos[<?php echo (int)$n['pid']; ?>]" class="mv-input mv-mono" rows="4"><?php echo htmlspecialchars_uni(json_encode($n['datos_publicos'], JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE)); ?></textarea>
+          <details class="mv-npc-json" style="margin-top:0.5rem">
+            <summary>Ver datos completos (públicos + internos)</summary>
+            <pre class="mv-mono" style="font-size:0.75rem;background:#f5f5f5;padding:0.5rem;border-radius:4px;max-height:200px;overflow:auto"><?php
+              echo htmlspecialchars_uni(json_encode($n['datos_publicos'], JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+              echo "\n\n// ---- Interno ----\n\n";
+              echo htmlspecialchars_uni(json_encode($n['datos_internos'], JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+            ?></pre>
           </details>
-          <details class="mv-npc-json">
-            <summary>Datos internos (JSON) — solo staff/IA</summary>
-            <textarea name="datos_internos[<?php echo (int)$n['pid']; ?>]" class="mv-input mv-mono" rows="6"><?php echo htmlspecialchars_uni(json_encode($n['datos_internos'], JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE)); ?></textarea>
-          </details>
-          <button class="btn btn-sm">Guardar JSON</button>
-        </form>
+        </div>
 <?php endforeach; endif; ?>
       </div>
     </div>
@@ -614,31 +598,6 @@ header('Content-Type: text/html; charset=utf-8');
     <div class="plate">
       <div class="plate-h"><span class="t">Hilos narrativos</span><span class="c">// tramas persistentes entre periódicos</span></div>
       <div class="plate-b">
-        <form method="post" class="mv-addform">
-          <input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="thread_add">
-          <input type="text" name="thread_titulo" placeholder="Título del hilo" class="mv-input" required>
-          <div class="mv-addform-row">
-            <select name="thread_estado" class="mv-input mv-input-sm">
-              <option value="activo">Activo</option><option value="latente">Latente</option><option value="cerrado">Cerrado</option>
-            </select>
-            <select name="thread_tipo" class="mv-input mv-input-sm">
-              <option value="criatura">Criatura</option><option value="conflicto">Conflicto</option><option value="misterio">Misterio</option>
-              <option value="exploracion">Exploración</option><option value="persona">Persona</option><option value="profecia">Profecía</option>
-              <option value="objeto">Objeto</option><option value="otro">Otro</option>
-            </select>
-            <input type="text" name="thread_zonas" class="mv-input mv-input-sm" placeholder="Zonas (coma)">
-            <input type="text" name="thread_facciones" class="mv-input mv-input-sm" placeholder="Facciones (coma)">
-          </div>
-          <div class="mv-addform-row">
-            <input type="text" name="thread_npcs" class="mv-input mv-input-sm" placeholder="NPCs implicados (coma)">
-            <input type="text" name="thread_pjs" class="mv-input mv-input-sm" placeholder="PJs implicados (coma)">
-            <label class="mv-chk"><input type="checkbox" name="thread_posible_cierre" value="1"> Posible cierre</label>
-          </div>
-          <textarea name="thread_descripcion" class="mv-input" rows="2" placeholder="Descripción del hilo"></textarea>
-          <input type="text" name="thread_prox_evol" class="mv-input" placeholder="Próxima evolución posible">
-          <button class="btn btn-primary btn-sm">Añadir hilo</button>
-        </form>
-
 <?php
 $threadsList = ope_rol_mv_threads_activos();
 if (empty($threadsList)): ?>
@@ -656,9 +615,6 @@ if (empty($threadsList)): ?>
             <?php if (!empty($th['npc_implicados'])): ?><p class="mv-note">NPCs: <?php echo htmlspecialchars_uni(implode(', ', (array)$th['npc_implicados'])); ?></p><?php endif; ?>
             <?php if (!empty($th['pj_implicados'])): ?><p class="mv-note">PJs: <?php echo htmlspecialchars_uni(implode(', ', (array)$th['pj_implicados'])); ?></p><?php endif; ?>
             <?php if (!empty($th['proxima_evolucion'])): ?><p class="mv-note">Próxima: <?php echo htmlspecialchars_uni($th['proxima_evolucion']); ?></p><?php endif; ?>
-          </div>
-          <div class="mv-ev-acts">
-            <form method="post" onsubmit="return confirm('¿Eliminar este hilo?');"><input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="thread_delete"><input type="hidden" name="thread_id" value="<?php echo htmlspecialchars_uni($th['id'] ?? ''); ?>"><button class="btn btn-sm btn-danger">×</button></form>
           </div>
         </div>
 <?php endforeach; endif; ?>
@@ -694,18 +650,6 @@ if (empty($threadsList)): ?>
           <div class="mv-save-bar"><button class="btn btn-primary btn-sm">Guardar indicaciones</button></div>
         </form>
         <p class="mv-note" style="margin-top:0.75rem">Las indicaciones no se heredan automáticamente. Cópialas manualmente del mes anterior si es necesario.</p>
-      </div>
-    </div>
-
-    <div class="plate">
-      <div class="plate-h"><span class="t">Resumen de navegación</span><span class="c">// viajes del mes</span></div>
-      <div class="plate-b">
-        <form method="post">
-          <input type="hidden" name="my_post_key" value="<?php echo $pk; ?>">
-          <input type="hidden" name="mv_action" value="save_nav_resumen">
-          <textarea name="nav_resumen" class="mv-input" rows="4" placeholder="Resumen de viajes completados, naufragios, descubrimientos..."><?php echo htmlspecialchars_uni((string)($ciclo['nav_resumen'] ?? '')); ?></textarea>
-          <div class="mv-save-bar"><button class="btn btn-primary btn-sm">Guardar</button></div>
-        </form>
       </div>
     </div>
 

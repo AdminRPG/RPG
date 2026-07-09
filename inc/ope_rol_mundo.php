@@ -463,6 +463,89 @@ function ope_rol_mv_faccion_metric_label($key, $v)
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// Auto-clasificación de eventos por palabras clave
+// ─────────────────────────────────────────────────────────────────────────
+
+/**
+ * Clasifica automáticamente un evento según su título y resumen.
+ * @param string $titulo  Título del evento.
+ * @param string $resumen Resumen del evento.
+ * @return array ['tipo_suceso' => 'S-XX', 'pe_estimado' => int]
+ */
+function ope_rol_mv_auto_classify_evento($titulo, $resumen)
+{
+    $texto = mb_strtolower(($titulo ?? '') . ' ' . ($resumen ?? ''), 'UTF-8');
+    $texto = strtr($texto, 'áéíóúüñÁÉÍÓÚÜÑ', 'aeiouunaeiouun');
+
+    $reglas = array(
+        'S-01' => array('tormenta','clima','maremoto','huracan','tsunami','calma','viento','marea','vendaval','tifon','monzon','tempestad','lluvia'),
+        'S-02' => array('barco','nave','pirata','abordaje','naval','marino','galon','navio','bergantin','corbeta','fragata','galeon','buque','flota','tripulacion'),
+        'S-03' => array('tesoro','mapa','ruinas','antiguo','reliquia','descubrimiento','excavacion','artefacto','tumba','templo'),
+        'S-04' => array('reunion','revolucionario','gobierno','politico','conspiracion','secreto','levantamiento','sublevacion','golpe','tirania','opresion','libertad'),
+        'S-05' => array('cazarrecompensas','recompensa','cazar','cazador','bounty','caza','captura','prisionero'),
+        'S-06' => array('torneo','competencia','combate','duelo','pelea','lucha','campeonato','justa','desafio','contienda'),
+        'S-07' => array('enfermedad','plaga','medicina','doctor','curandero','veneno','peste','bacteria','virus','sanacion','hospital'),
+        'S-08' => array('fiesta','celebracion','festival','feria','banquete','mercado','verbena','concierto','espectaculo','boda'),
+        'S-09' => array('criatura','monstruo','bestia','marina','gigante','animal','leviatan','dragon','kaiju','ser','depredador'),
+        'S-10' => array('profecia','oraculo','vision','augurio','leyenda','mitico','presagio','destino','maldicion','bendicion'),
+        'S-11' => array('invento','cientifico','experimento','tecnologia','arma','ingenio','artilugio','mecanismo','laboratorio'),
+        'S-12' => array('desastre','catastrofe','incendio','terremoto','erupcion','hundimiento','explosion','colapso'),
+    );
+
+    // Buscar coincidencias exactas de palabras clave
+    foreach ($reglas as $codigo => $palabras) {
+        foreach ($palabras as $p) {
+            if (mb_strpos($texto, $p) !== false) {
+                return array('tipo_suceso' => $codigo, 'pe_estimado' => rand(3, 6));
+            }
+        }
+    }
+
+    // Default si no matchea nada
+    return array('tipo_suceso' => 'S-02', 'pe_estimado' => 4);
+}
+
+/**
+ * Clasifica y persiste en DB todos los eventos sin clasificar de un ciclo.
+ * @param int $ciclo_id
+ */
+function ope_rol_mv_auto_classify_pendientes($ciclo_id)
+{
+    global $db;
+    $PREFIX = TABLE_PREFIX;
+    $q = $db->simple_select('rol_mv_eventos', 'evento_id, titulo, resumen', "ciclo_id=" . (int)$ciclo_id . " AND (tipo_suceso IS NULL OR tipo_suceso='')");
+    while ($r = $db->fetch_array($q)) {
+        $cl = ope_rol_mv_auto_classify_evento($r['titulo'], $r['resumen']);
+        $db->update_query('rol_mv_eventos', array(
+            'tipo_suceso' => $cl['tipo_suceso'],
+            'pe_estimado' => $cl['pe_estimado'],
+        ), 'evento_id=' . (int)$r['evento_id']);
+    }
+}
+
+/**
+ * Genera automáticamente el resumen de navegación a partir de los NPCs mayores.
+ * @return string
+ */
+function ope_rol_mv_auto_nav_resumen()
+{
+    global $db;
+    $navegantes = array();
+    $q = $db->simple_select('rol_personajes', 'nombre, mundo_zona, mundo_ubic, mundo_accion', "es_npc=1 AND estado<>'eliminado' AND (mundo_zona!='' OR mundo_ubic!='' OR mundo_accion!='')", array('order_by' => 'nombre'));
+    while ($r = $db->fetch_array($q)) {
+        $linea = $r['nombre'];
+        if (!empty($r['mundo_zona'])) $linea .= ' | ' . $r['mundo_zona'];
+        if (!empty($r['mundo_ubic'])) $linea .= ', ' . $r['mundo_ubic'];
+        if (!empty($r['mundo_accion'])) $linea .= ' - ' . $r['mundo_accion'];
+        $navegantes[] = $linea;
+    }
+    if (empty($navegantes)) {
+        return "Sin movimientos relevantes este mes.";
+    }
+    return "Personajes en movimiento:\n" . implode("\n", $navegantes) . "\n\nViajes y rutas maritimas transcurren con normalidad en la mayoria de los mares, salvo donde la tension o los fenomenos naturales alteran las travesias.";
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // Generación del super-prompt
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -1049,6 +1132,12 @@ function ope_rol_mv_build_prompt($ciclo)
 
     // Eventos
     $L[] = "== EVENTOS NOTIFICADOS ESTE MES ==";
+    $L[] = "INSTRUCCIÓN: Los eventos son la materia prima del periódico. Analiza cada uno:";
+    $L[] = "su tipo (S-01 a S-12) y peso estimado (PE 1-10) determinan su relevancia. Los eventos";
+    $L[] = "deben influir en las métricas de la zona y facción correspondientes, y ser la base";
+    $L[] = "del contenido del periódico. Si hay pocos eventos, la IA debe generar contenido de";
+    $L[] = "relleno coherente (vida en las islas, economía, rumores).";
+    $L[] = "";
     if (empty($eventos)) {
         $L[] = "(Ninguno.)";
     } else {
@@ -1061,7 +1150,15 @@ function ope_rol_mv_build_prompt($ciclo)
                     $rango = ' | personaje: ' . $rr['nombre'] . ' (rango ' . ($rr['rango'] !== '' ? $rr['rango'] : '?') . ')';
                 }
             }
-            $L[] = "- [" . ($e['zona_slug'] !== '' ? $e['zona_slug'] : 'zona?') . "] " . $e['titulo'] . $rango;
+            // Auto-clasificar si no tiene tipo_suceso/pe_estimado
+            $ts = $e['tipo_suceso'] ?? '';
+            $pe = isset($e['pe_estimado']) ? (int)$e['pe_estimado'] : 0;
+            if (empty($ts) || $pe < 1) {
+                $cl = ope_rol_mv_auto_classify_evento($e['titulo'], $e['resumen']);
+                if (empty($ts)) $ts = $cl['tipo_suceso'];
+                if ($pe < 1)   $pe = $cl['pe_estimado'];
+            }
+            $L[] = "- [$ts|PE=$pe] [" . ($e['zona_slug'] !== '' ? $e['zona_slug'] : 'zona?') . "] " . $e['titulo'] . $rango;
             $L[] = "  Enlace: " . $e['enlace'];
             $L[] = "  Resumen: " . trim(preg_replace('/\s+/', ' ', (string) $e['resumen']));
         }
@@ -1080,6 +1177,12 @@ function ope_rol_mv_build_prompt($ciclo)
             }
         }
     }
+    $L[] = "";
+    $L[] = "INSTRUCCIÓN: Analiza el estado de cada misión. Las COMPLETADAS han tenido un impacto";
+    $L[] = "directo en el mundo: ajusta las métricas de zonas y facciones afectadas, genera";
+    $L[] = "consecuencias narrativas coherentes y menciónalas en el periódico. Las FALLIDAS también";
+    $L[] = "dejan huella (tensión, bajas, oportunidades perdidas). Las EN CURSO deben avanzar o";
+    $L[] = "complicarse según lo que haya ocurrido este mes.";
     $L[] = "";
 
     // NPCs mayores
@@ -1125,14 +1228,14 @@ function ope_rol_mv_build_prompt($ciclo)
         $L[] = "";
     }
 
-    // Indicaciones del staff
-    // Navegación del mes
+    // Navegación del mes (auto-generada desde NPCs si vacía)
     $nav = trim((string) ($ciclo['nav_resumen'] ?? ''));
-    if ($nav !== '') {
-        $L[] = "== NAVEGACIÓN DEL MES ==";
-        $L[] = $nav;
-        $L[] = "";
+    if ($nav === '') {
+        $nav = ope_rol_mv_auto_nav_resumen();
     }
+    $L[] = "== NAVEGACIÓN DEL MES ==";
+    $L[] = $nav;
+    $L[] = "";
 
     $L[] = "== INDICACIONES DEL STAFF (obligatorio seguirlas) ==";
     $ind = trim((string) $ciclo['indicaciones']);
