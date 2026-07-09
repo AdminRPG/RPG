@@ -43,3 +43,6 @@ test-results/
 
 # Backups
 backups/
+
+# Graphify generated graph (rebuild with: py -m graphify extract . --code-only)
+graphify-out/
