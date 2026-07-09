@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Tienda del foro
+ * I-Forge · Tienda del foro — Bazar Pirata
  * Compra objetos, consumibles y mejoras para tu personaje.
  */
 define('IN_MYBB', 1);
@@ -11,15 +11,14 @@ $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 
 $tiendas = [
-    'armeria'   => ['nombre' => 'Armería',   'tag' => 'Armas y Armaduras'],
-    'astilleros'=> ['nombre' => 'Astilleros', 'tag' => 'Barcos y Piezas'],
-    'general'   => ['nombre' => 'General',    'tag' => 'Todo lo demás'],
+    'armeria'   => ['nombre' => 'Armería',   'tag' => 'Armas y Armaduras',   'emoji' => '⚔️', 'lema' => 'El filo de la justicia y el acero del Nuevo Mundo'],
+    'astilleros'=> ['nombre' => 'Astilleros', 'tag' => 'Barcos y Piezas',     'emoji' => '⛵', 'lema' => 'Donde hasta el barco más humilde se convierte en leyenda'],
+    'general'   => ['nombre' => 'Bazar',      'tag' => 'Todo lo demás',       'emoji' => '🧺', 'lema' => 'Si existe, lo tenemos. Si no, pregúntale al vendedor'],
 ];
 
-$cat_labels = [
-    'armas' => 'Armas', 'armaduras' => 'Armaduras', 'barcos' => 'Barcos',
-    'piezas' => 'Piezas', 'consumibles' => 'Consumibles',
-    'mejoras' => 'Mejoras', 'especiales' => 'Especiales',
+$cat_emoji = [
+    'armas' => '🗡️', 'armaduras' => '🛡️', 'barcos' => '⛵', 'piezas' => '⚙️',
+    'consumibles' => '🧪', 'mejoras' => '💎', 'especiales' => '🏆',
 ];
 
 $productos = [
@@ -27,7 +26,7 @@ $productos = [
     ['t'=>'armeria','c'=>'armas','nom'=>'Katana oscura','pre'=>120000,'dc'=>'Hoja negra templada en magma.','dl'=>'Forjada en las profundidades del Volcán de la Luna. Su filo absorbe calor durante el temple, dándole un brillo cobrizo.','det'=>['Daño base: 2d6','Peso: 1.8 kg','Tipo: Corte','Durabilidad: 45/45','Req. Nivel: 15']],
     ['t'=>'armeria','c'=>'armas','nom'=>'Hacha de guerra','pre'=>78000,'dc'=>'Bipenne tallada en hierro del Norte.','dl'=>'Dos filos tallados a mano que permiten alternar el golpe sin perder equilibrio. Peso descomunal, lenta pero devastadora.','det'=>['Daño base: 1d12','Peso: 4.2 kg','Tipo: Contundente','Durabilidad: 70/70','Requiere 2 manos']],
     ['t'=>'armeria','c'=>'armas','nom'=>'Pistola de chispa','pre'=>55000,'dc'=>'Arma de fuego de un cañón.','dl'=>'Réplica de los diseños del Oeste. Cañón de bronce con mecanismo de rueda. Recargar es lento, el fogonazo inicial lo vale.','det'=>['Daño base: 1d10','Alcance: 20 m','Recarga: 2 turnos','Munición: Balas de plomo']],
-    ['t'=>'armeria','c'=>'armas','nom'=>'Bastón de hierro','pre'=>32000,'dc'=>'Barra de hierro macizo. Contundente.','dl'=>'Hierro negro sin adornos. Arma de dotación Marine. Sin filo, pero con fuerza suficiente parte cualquier defensa de madera.','det'=>['Daño base: 1d6','Peso: 3.0 kg','Tipo: Contundente','Durabilidad: 80/80']],
+    ['t'=>'armeria','c'=>'armas','nom'=>'Bastón de hierro','pre'=>32000,'dc'=>'Barra de hierro macizo. Contundente.','dl'=>'Hierro negro sin adornos. Arma de dotación Marine. Sin filo, pero con fuerza suficiente para partir cualquier defensa de madera.','det'=>['Daño base: 1d6','Peso: 3.0 kg','Tipo: Contundente','Durabilidad: 80/80']],
     ['t'=>'armeria','c'=>'armaduras','nom'=>'Pechera de cuero','pre'=>38000,'dc'=>'Armadura ligera de cuero endurecido.','dl'=>'Coraza de cuero hervido y endurecido al sol. Flexible, ligera, sorprendentemente resistente. Ideal para exploradores.','det'=>['Defensa: +2','Peso: 1.5 kg','Tipo: Ligera','Penalización: -']],
     ['t'=>'armeria','c'=>'armaduras','nom'=>'Cota de malla','pre'=>95000,'dc'=>'Anillos de acero entrelazados.','dl'=>'Cota forjada anillo a anillo, entrelazados y remachados. El estándar de Marines y cazarecompensas profesionales.','det'=>['Defensa: +4','Peso: 8.0 kg','Tipo: Media','Penalización: -1 AGI']],
     ['t'=>'armeria','c'=>'armaduras','nom'=>'Escudo de roble','pre'=>28000,'dc'=>'Madera reforzada con flejes de hierro.','dl'=>'Escudo redondo de roble macizo con refuerzos de hierro y umbo central de acero. Efectivo contra ataques cuerpo a cuerpo.','det'=>['Defensa: +2 al bloquear','Peso: 3.5 kg','Cobertura: 1/4 cuerpo','Durabilidad: 50/50']],
@@ -46,14 +45,17 @@ $productos = [
     ['t'=>'general','c'=>'especiales','nom'=>'Licencia de caza','pre'=>150000,'dc'=>'Cazar recompensas legal.','dl'=>'Documento sellado por la sede Marine de Loguetown. Sin este permiso, cobrar recompensas en East Blue es ilegal.','det'=>['Jurisdicción: East Blue','Duración: 1 año','Renovable: Sí']],
 ];
 
-// Placeholder SVG (generic item box)
-function placeholder_svg($size = 40) {
-    return '<svg viewBox="0 0 100 100" width="'.$size.'" height="'.$size.'"><rect x="15" y="15" width="70" height="70" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="42" r="12" fill="none" stroke="currentColor" stroke-width="3"/><path d="M22 80c0-16 12-28 28-28s28 12 28 28" fill="none" stroke="currentColor" stroke-width="3"/></svg>';
-}
-
 $prods_json = json_encode(array_map(function($p) {
     return ['t'=>$p['t'],'c'=>$p['c'],'nom'=>$p['nom'],'pre'=>$p['pre'],'dc'=>$p['dc'],'dl'=>$p['dl'],'det'=>$p['det']??[]];
 }, $productos), JSON_UNESCAPED_UNICODE);
+
+$tiendas_json = json_encode($tiendas, JSON_UNESCAPED_UNICODE);
+$cat_emoji_json = json_encode($cat_emoji, JSON_UNESCAPED_UNICODE);
+$cat_labels_json = json_encode([
+    'armas' => 'Armas', 'armaduras' => 'Armaduras', 'barcos' => 'Barcos',
+    'piezas' => 'Piezas', 'consumibles' => 'Consumibles',
+    'mejoras' => 'Mejoras', 'especiales' => 'Especiales',
+], JSON_UNESCAPED_UNICODE);
 
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
@@ -68,55 +70,49 @@ header('Content-Type: text/html; charset=utf-8');
 
 <?php echo ope_rol_navbar_html(); ?>
 
-<div class="breadcrumb">
-  <div class="breadcrumb-in">
-    <a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span>
-    <a href="<?php echo $bburl; ?>/tramites.php">Trámites</a><span class="sep">›</span>
-    <b>Tienda</b>
-  </div>
-</div>
+<div class="breadcrumb"><div class="breadcrumb-in"><a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span><a href="<?php echo $bburl; ?>/tramites.php">Trámites</a><span class="sep">›</span><b>Tienda</b></div></div>
 
 <div class="wrap">
 
   <section class="reveal">
     <div class="shead">
-      <h1>Tienda</h1>
+      <h1>Bazar Pirata</h1>
       <span class="code">// equipa a tu personaje</span>
       <span class="rule"></span>
     </div>
   </section>
 
-  <section class="reveal ts-shop" id="tsApp">
+  <section class="reveal shop-wrap" id="shopApp">
 
-    <!-- LEFT: storefront image -->
-    <aside class="ts-front" id="tsFront" data-tienda="armeria">
-      <div class="ts-front-bg"></div>
-      <div class="ts-front-in">
-        <div class="ts-front-picto" id="tsFrontPicto"><?php echo placeholder_svg(72); ?></div>
-        <div class="ts-front-nom" id="tsFrontNom">Armería</div>
-        <div class="ts-front-tag" id="tsFrontTag">Armas y Armaduras</div>
-      </div>
-    </aside>
-
-    <!-- RIGHT: products + cart -->
-    <div class="ts-right">
-
-      <!-- top bar: tabs + cart -->
-      <div class="ts-topbar">
-        <div class="ts-tabs" id="tsTabs">
-<?php $first_t = true; foreach ($tiendas as $tid => $t): ?>
-          <button class="ts-tab<?php if ($first_t) echo ' on'; ?>" data-tienda="<?php echo $tid; ?>"><?php echo $t['nombre']; ?></button>
-<?php $first_t = false; endforeach; ?>
+    <!-- Shop banner -->
+    <div class="shop-banner" id="shopBanner" data-tienda="armeria">
+      <div class="shop-banner-bg"></div>
+      <div class="shop-banner-in">
+        <span class="shop-banner-emoji" id="shopEmoji">⚔️</span>
+        <div class="shop-banner-text">
+          <h2 class="shop-banner-nom" id="shopNom">Armería</h2>
+          <p class="shop-banner-tag" id="shopTag">Armas y Armaduras</p>
+          <p class="shop-banner-lema" id="shopLema">El filo de la justicia y el acero del Nuevo Mundo</p>
         </div>
-        <button class="ts-cart-btn" id="tsCartBtn" onclick="toggleCart()">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
-          <span class="ts-cart-badge" id="tsCartBadge">0</span>
-        </button>
       </div>
-
-      <!-- product grid (3 cols) -->
-      <div class="ts-grid" id="tsGrid"></div>
     </div>
+
+    <!-- Toolbar -->
+    <div class="shop-toolbar">
+      <div class="shop-tabs" id="shopTabs">
+        <button class="shop-tab on" data-tienda="armeria">⚔️ Armería</button>
+        <button class="shop-tab" data-tienda="astilleros">⛵ Astilleros</button>
+        <button class="shop-tab" data-tienda="general">🧺 Bazar</button>
+      </div>
+      <button class="shop-cart-btn" id="shopCartBtn" onclick="toggleCart()">
+        🛒
+        <span class="shop-cart-badge" id="shopCartBadge">0</span>
+      </button>
+    </div>
+
+    <!-- Product grid -->
+    <div class="shop-grid" id="shopGrid"></div>
+
   </section>
 
   <section class="reveal">
@@ -127,39 +123,42 @@ header('Content-Type: text/html; charset=utf-8');
 
 </div>
 
-<!-- Product detail modal -->
-<div class="ts-modal" id="tsModal" hidden>
-  <div class="ts-modal-bg" onclick="closeModal()"></div>
-  <div class="ts-modal-box">
-    <button class="ts-modal-x" onclick="closeModal()">✕</button>
-    <div class="ts-modal-icon" id="tsModalIcon"></div>
-    <h2 class="ts-modal-nom" id="tsModalNom"></h2>
-    <span class="ts-modal-pre" id="tsModalPre"></span>
-    <p class="ts-modal-desc" id="tsModalDesc"></p>
-    <dl class="ts-modal-dets" id="tsModalDets"></dl>
-    <div class="ts-modal-actions">
-      <div class="ts-qty">
-        <button type="button" onclick="qtyDelta(-1)">−</button>
-        <input type="text" id="tsQty" value="1" readonly>
-        <button type="button" onclick="qtyDelta(1)">+</button>
+<!-- Modal -->
+<div class="shop-modal" id="shopModal" hidden>
+  <div class="shop-modal-bg" onclick="closeModal()"></div>
+  <div class="shop-modal-box">
+    <button class="shop-modal-x" onclick="closeModal()">✕</button>
+    <div class="shop-modal-icon" id="shopModalIcon"></div>
+    <div class="shop-modal-info">
+      <h2 class="shop-modal-nom" id="shopModalNom"></h2>
+      <span class="shop-modal-cat" id="shopModalCat"></span>
+      <span class="shop-modal-pre" id="shopModalPre"></span>
+      <p class="shop-modal-desc" id="shopModalDesc"></p>
+      <dl class="shop-modal-dets" id="shopModalDets"></dl>
+      <div class="shop-modal-actions">
+        <div class="shop-qty">
+          <button type="button" onclick="qtyDelta(-1)">−</button>
+          <input type="text" id="shopQty" value="1" readonly>
+          <button type="button" onclick="qtyDelta(1)">+</button>
+        </div>
+        <button class="btn btn-hot" onclick="addToCart()">Añadir al carrito</button>
       </div>
-      <button class="btn btn-hot" onclick="addToCart()">Añadir al carrito</button>
     </div>
   </div>
 </div>
 
 <!-- Cart slide-out -->
-<div class="ts-cart" id="tsCart" hidden>
-  <div class="ts-cart-top">
-    <span class="ts-cart-h">Carrito</span>
-    <button class="ts-cart-x" onclick="toggleCart()">✕</button>
+<div class="shop-cart" id="shopCart" hidden>
+  <div class="shop-cart-top">
+    <span class="shop-cart-h">🏴‍☠️ Carrito</span>
+    <button class="shop-cart-x" onclick="toggleCart()">✕</button>
   </div>
-  <div class="ts-cart-body" id="tsCartBody">
-    <div class="ts-cart-empty">El carrito está vacío.</div>
+  <div class="shop-cart-body" id="shopCartBody">
+    <div class="shop-cart-empty">El carrito está vacío.</div>
   </div>
-  <div class="ts-cart-foot">
-    <span class="ts-cart-total" id="tsCartTotal">0 B</span>
-    <button class="btn btn-hot" id="tsBuyBtn" disabled title="Próximamente">Comprar todo</button>
+  <div class="shop-cart-foot">
+    <span class="shop-cart-total" id="shopCartTotal">0 B</span>
+    <button class="btn btn-hot" id="shopBuyBtn" disabled title="Próximamente">Comprar todo</button>
   </div>
 </div>
 
@@ -168,65 +167,83 @@ header('Content-Type: text/html; charset=utf-8');
 <script>
 (function(){
   var prods = <?php echo $prods_json; ?>;
+  var tiendas = <?php echo $tiendas_json; ?>;
+  var catEmoji = <?php echo $cat_emoji_json; ?>;
+  var catLabels = <?php echo $cat_labels_json; ?>;
   var cart = [];
   var currentTienda = 'armeria';
   var modalIdx = -1;
 
-  // Placeholder SVG icon
   var phSvg = '<svg viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="42" r="12" fill="none" stroke="currentColor" stroke-width="3"/><path d="M22 80c0-16 12-28 28-28s28 12 28 28" fill="none" stroke="currentColor" stroke-width="3"/></svg>';
-  function ph(w){ return '<svg viewBox="0 0 100 100" width="'+w+'" height="'+w+'"><rect x="15" y="15" width="70" height="70" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="42" r="12" fill="none" stroke="currentColor" stroke-width="3"/><path d="M22 80c0-16 12-28 28-28s28 12 28 28" fill="none" stroke="currentColor" stroke-width="3"/></svg>'; }
 
-  // ── Render grid ──
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
   function renderGrid() {
     var filtered = prods.filter(function(p){ return p.t === currentTienda; });
     var html = '';
     filtered.forEach(function(p, i){
-      html += '<div class="ts-item" data-idx="' + i + '" onclick="openModal(' + i + ')">' +
-        '<div class="ts-item-icon">' + ph(40) + '</div>' +
-        '<div class="ts-item-nom">' + esc(p.nom) + '</div>' +
+      var realIdx = prods.indexOf(p);
+      var catEm = catEmoji[p.c] || '📦';
+      var catLb = catLabels[p.c] || p.c;
+      html += '<div class="shop-item" data-idx="' + realIdx + '" onclick="openModal(' + realIdx + ')">' +
+        '<div class="shop-item-head">' +
+          '<span class="shop-item-cat">' + catEm + ' ' + esc(catLb) + '</span>' +
+          '<span class="shop-item-pre">' + p.pre.toLocaleString('es-ES') + ' B</span>' +
+        '</div>' +
+        '<div class="shop-item-icon">' + phSvg + '</div>' +
+        '<div class="shop-item-nom">' + esc(p.nom) + '</div>' +
+        '<div class="shop-item-dc">' + esc(p.dc) + '</div>' +
       '</div>';
     });
-    document.getElementById('tsGrid').innerHTML = html || '<div class="ts-empty">No hay productos en esta tienda.</div>';
+    document.getElementById('shopGrid').innerHTML = html || '<div class="shop-empty">No hay productos en esta tienda.</div>';
   }
 
-  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function updateBanner(tiendaId) {
+    var s = tiendas[tiendaId];
+    var banner = document.getElementById('shopBanner');
+    banner.setAttribute('data-tienda', tiendaId);
+    document.getElementById('shopEmoji').textContent = s.emoji;
+    document.getElementById('shopNom').textContent = s.nombre;
+    document.getElementById('shopTag').textContent = s.tag;
+    document.getElementById('shopLema').textContent = s.lema;
+  }
 
-  // ── Modal ──
   window.openModal = function(idx) {
     modalIdx = idx;
     var p = prods[idx];
-    document.getElementById('tsModalIcon').innerHTML = '<div class="ts-modal-icon-in">' + ph(100) + '</div>';
-    document.getElementById('tsModalNom').textContent = p.nom;
-    document.getElementById('tsModalPre').textContent = p.pre.toLocaleString('es-ES') + ' B';
-    document.getElementById('tsModalDesc').textContent = p.dl;
+    document.getElementById('shopModalIcon').innerHTML = '<div class="shop-modal-icon-in">' + phSvg + '</div>';
+    document.getElementById('shopModalNom').textContent = p.nom;
+    var catEm = catEmoji[p.c] || '📦';
+    var catLb = catLabels[p.c] || p.c;
+    document.getElementById('shopModalCat').textContent = catEm + ' ' + catLb;
+    document.getElementById('shopModalPre').textContent = p.pre.toLocaleString('es-ES') + ' B';
+    document.getElementById('shopModalDesc').textContent = p.dl;
     var detsHtml = '';
     (p.det||[]).forEach(function(d){
       var parts = d.split(': ');
       detsHtml += '<dt>' + esc(parts[0]) + '</dt><dd>' + esc(parts.slice(1).join(': ')) + '</dd>';
     });
-    document.getElementById('tsModalDets').innerHTML = detsHtml;
-    document.getElementById('tsQty').value = '1';
-    document.getElementById('tsModal').removeAttribute('hidden');
-    document.body.classList.add('ts-no-scroll');
+    document.getElementById('shopModalDets').innerHTML = detsHtml;
+    document.getElementById('shopQty').value = '1';
+    document.getElementById('shopModal').removeAttribute('hidden');
+    document.body.classList.add('shop-no-scroll');
   };
 
   window.closeModal = function() {
-    document.getElementById('tsModal').setAttribute('hidden','');
-    document.body.classList.remove('ts-no-scroll');
+    document.getElementById('shopModal').setAttribute('hidden','');
+    document.body.classList.remove('shop-no-scroll');
   };
 
   window.qtyDelta = function(d) {
-    var inp = document.getElementById('tsQty');
+    var inp = document.getElementById('shopQty');
     var v = Math.max(1, (parseInt(inp.value,10)||1) + d);
     inp.value = v;
   };
 
-  // ── Cart ──
   window.addToCart = function() {
     if (modalIdx < 0) return;
     var p = prods[modalIdx];
-    var qty = parseInt(document.getElementById('tsQty').value, 10) || 1;
-    // Find existing
+    var qty = parseInt(document.getElementById('shopQty').value, 10) || 1;
     var found = false;
     for (var i = 0; i < cart.length; i++) {
       if (cart[i].idx === modalIdx) { cart[i].qty += qty; found = true; break; }
@@ -242,81 +259,70 @@ header('Content-Type: text/html; charset=utf-8');
   };
 
   window.toggleCart = function() {
-    var el = document.getElementById('tsCart');
+    var el = document.getElementById('shopCart');
     if (el.hasAttribute('hidden')) {
       el.removeAttribute('hidden');
-      document.body.classList.add('ts-no-scroll');
+      document.body.classList.add('shop-no-scroll');
     } else {
       el.setAttribute('hidden','');
-      document.body.classList.remove('ts-no-scroll');
+      document.body.classList.remove('shop-no-scroll');
     }
   };
 
   function updateCartUI() {
-    var badge = document.getElementById('tsCartBadge');
+    var badge = document.getElementById('shopCartBadge');
     var total = 0;
     var count = 0;
     cart.forEach(function(c){ total += c.pre * c.qty; count += c.qty; });
     badge.textContent = count;
     badge.style.display = count > 0 ? 'inline' : 'none';
 
-    var body = document.getElementById('tsCartBody');
+    var body = document.getElementById('shopCartBody');
     if (count === 0) {
-      body.innerHTML = '<div class="ts-cart-empty">El carrito está vacío.</div>';
+      body.innerHTML = '<div class="shop-cart-empty">El carrito está vacío.</div>';
     } else {
       var html = '';
       cart.forEach(function(c){
         var p = prods[c.idx];
-        html += '<div class="ts-cart-item">' +
-          '<div class="ts-cart-item-icon">' + ph(28) + '</div>' +
-          '<div class="ts-cart-item-info">' +
-            '<div class="ts-cart-item-nom">' + esc(p.nom) + '</div>' +
-            '<div class="ts-cart-item-meta">' + c.qty + ' × ' + p.pre.toLocaleString('es-ES') + ' B</div>' +
+        html += '<div class="shop-cart-item">' +
+          '<div class="shop-cart-item-icon">' + phSvg + '</div>' +
+          '<div class="shop-cart-item-info">' +
+            '<div class="shop-cart-item-nom">' + esc(p.nom) + '</div>' +
+            '<div class="shop-cart-item-meta">' + c.qty + ' × ' + p.pre.toLocaleString('es-ES') + ' B</div>' +
           '</div>' +
-          '<div class="ts-cart-item-sub">' + (p.pre * c.qty).toLocaleString('es-ES') + ' B</div>' +
-          '<button class="ts-cart-item-x" onclick="removeFromCart(' + c.idx + ')">✕</button>' +
+          '<div class="shop-cart-item-sub">' + (p.pre * c.qty).toLocaleString('es-ES') + ' B</div>' +
+          '<button class="shop-cart-item-x" onclick="removeFromCart(' + c.idx + ')">✕</button>' +
         '</div>';
       });
       body.innerHTML = html;
     }
 
-    document.getElementById('tsCartTotal').textContent = total.toLocaleString('es-ES') + ' B';
-    document.getElementById('tsBuyBtn').disabled = count === 0;
+    document.getElementById('shopCartTotal').textContent = total.toLocaleString('es-ES') + ' B';
+    document.getElementById('shopBuyBtn').disabled = count === 0;
   }
 
-  // ── Store tabs ──
-  document.getElementById('tsTabs').addEventListener('click', function(e){
-    var tab = e.target.closest('.ts-tab');
+  // Tab switching
+  document.getElementById('shopTabs').addEventListener('click', function(e){
+    var tab = e.target.closest('.shop-tab');
     if (!tab || tab.classList.contains('on')) return;
-    document.querySelectorAll('.ts-tab').forEach(function(t){ t.classList.remove('on'); });
+    document.querySelectorAll('.shop-tab').forEach(function(t){ t.classList.remove('on'); });
     tab.classList.add('on');
     currentTienda = tab.getAttribute('data-tienda');
-    // Update storefront
-    var front = document.getElementById('tsFront');
-    front.setAttribute('data-tienda', currentTienda);
-    var storeData = <?php echo json_encode($tiendas, JSON_UNESCAPED_UNICODE); ?>;
-    var s = storeData[currentTienda];
-    document.getElementById('tsFrontNom').textContent = s.nombre;
-    document.getElementById('tsFrontTag').textContent = s.tag;
-    document.getElementById('tsFrontPicto').innerHTML = '<?php echo placeholder_svg(72); ?>';
+    updateBanner(currentTienda);
     renderGrid();
   });
 
-  // ── Init ──
   renderGrid();
   updateCartUI();
 
-  // Close modal on Escape
   document.addEventListener('keydown', function(e){
-    if (e.key === 'Escape') { closeModal(); if (!document.getElementById('tsCart').hasAttribute('hidden')) toggleCart(); }
+    if (e.key === 'Escape') { closeModal(); if (!document.getElementById('shopCart').hasAttribute('hidden')) toggleCart(); }
   });
 
-  // Click outside cart to close
-  document.getElementById('tsCart').addEventListener('click', function(e){
+  document.getElementById('shopCart').addEventListener('click', function(e){
     if (e.target === this) toggleCart();
   });
 
-  // Reveal
   if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
     var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); } }); }, { threshold: .06 });
     document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });

@@ -317,6 +317,7 @@ function ope_rol_navbar_html()
     };
 
     $links   = '<a href="' . $bburl . '/personajes.php" class="ope-nav-link' . $isOn(array('personajes.php', 'ficha.php', 'crear-personaje.php')) . '">Personaje</a>';
+    $links  .= '<a href="' . $bburl . '/tripulacion.php" class="ope-nav-link' . $isOn(array('tripulacion.php')) . '">Tripulaci&oacute;n</a>';
     $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php', 'notificar-tema.php', 'tablon-misiones.php', 'aceptar-mision.php', 'tienda.php')) . '">Tr&aacute;mites</a>';
     // Mundo Vivo: sección desplegable (Periódicos + Estado del mundo).
     $mvOn = $isOn(array('periodicos.php', 'estado-mundo.php'));
