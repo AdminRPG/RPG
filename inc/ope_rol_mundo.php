@@ -231,7 +231,7 @@ function ope_rol_mv_npc_mayores()
     if (!$db->table_exists('rol_personajes') || !$db->field_exists('es_npc', 'rol_personajes')) {
         return $out;
     }
-    $q = $db->simple_select('rol_personajes', 'pid, nombre, rango, datos, mundo_zona, mundo_ubic, mundo_accion, mundo_estado_np', "es_npc = 1 AND estado <> 'eliminado'", array('order_by' => 'nombre', 'order_dir' => 'ASC'));
+    $q = $db->simple_select('rol_personajes', 'pid, nombre, rango, datos, mundo_zona, mundo_ubic, mundo_accion, mundo_estado_np, datos_publicos, datos_internos', "es_npc = 1 AND estado <> 'eliminado'", array('order_by' => 'nombre', 'order_dir' => 'ASC'));
     while ($r = $db->fetch_array($q)) {
         $faccion = '';
         $d = @json_decode((string) $r['datos'], true);
@@ -239,6 +239,14 @@ function ope_rol_mv_npc_mayores()
             $faccion = (string) $d['faccion'];
         }
         $r['faccion'] = $faccion;
+        $dp_raw = (string) ($r['datos_publicos'] ?? '');
+        $di_raw = (string) ($r['datos_internos'] ?? '');
+        $r['datos_publicos'] = array();
+        $r['datos_internos'] = array();
+        $dp = @json_decode($dp_raw, true);
+        $di = @json_decode($di_raw, true);
+        if (is_array($dp)) $r['datos_publicos'] = $dp;
+        if (is_array($di)) $r['datos_internos'] = $di;
         $out[] = $r;
     }
     return $out;
@@ -255,6 +263,44 @@ function ope_rol_mv_npc_menores($ciclo_id = 0)
     $q = $db->simple_select('rol_mv_npc_menores', '*', $where, array('order_by' => 'dateline', 'order_dir' => 'DESC'));
     while ($r = $db->fetch_array($q)) {
         $out[] = $r;
+    }
+    return $out;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Hilos narrativos, periódicos y tracking (v3)
+// ─────────────────────────────────────────────────────────────────────────
+
+function ope_rol_mv_threads_activos() {
+    global $db;
+    $ultimo = ope_rol_mv_ultimo_publicado();
+    if (!$ultimo || empty($ultimo['estado_json'])) return array();
+    $ej = json_decode($ultimo['estado_json'], true);
+    if (!is_array($ej) || !isset($ej['threads']) || !is_array($ej['threads'])) return array();
+    return $ej['threads'];
+}
+
+function ope_rol_mv_ultimos_periodicos($n = 3) {
+    global $db;
+    $out = array();
+    if (!$db->table_exists('rol_mv_ciclos')) return $out;
+    $q = $db->simple_select('rol_mv_ciclos', 'ciclo_id, periodo, noticia_titulo, periodico_html, published_at', "published_at > 0", array('order_by' => 'published_at', 'order_dir' => 'DESC', 'limit' => (int)$n));
+    while ($r = $db->fetch_array($q)) {
+        $r['periodico_resumen'] = mb_substr(strip_tags((string)$r['periodico_html']), 0, 500);
+        unset($r['periodico_html']);
+        $out[] = $r;
+    }
+    return $out;
+}
+
+function ope_rol_mv_npc_tracking_from_db() {
+    global $db;
+    $out = array();
+    $q = $db->simple_select('rol_personajes', 'pid, datos_internos', "es_npc = 1 AND estado <> 'eliminado'");
+    while ($r = $db->fetch_array($q)) {
+        $di = json_decode((string)$r['datos_internos'], true);
+        if (!is_array($di) || !isset($di['tracking'])) continue;
+        $out[(int)$r['pid']] = $di['tracking'];
     }
     return $out;
 }
@@ -371,13 +417,16 @@ function ope_rol_mv_band5($v, array $labels)
 function ope_rol_mv_zona_metrics()
 {
     return array(
-        'est' => array('label' => 'Estabilidad',              'bands' => array('Colapso', 'Inestable', 'Tensa', 'Estable', 'Próspera'),           'col' => 'var(--patina)'),
-        'mar' => array('label' => 'Presencia Marine',         'bands' => array('Nula', 'Escasa', 'Moderada', 'Fuerte', 'Dominante'),               'col' => 'var(--fac-marine)'),
-        'pir' => array('label' => 'Actividad pirata',         'bands' => array('Insignificante', 'Baja', 'Notable', 'Alta', 'Dominante'),         'col' => 'var(--fac-pirata)'),
-        'rev' => array('label' => 'Influencia revolucionaria','bands' => array('Nula', 'Escasa', 'Moderada', 'Fuerte', 'Dominante'),               'col' => 'var(--fac-revolucionario)'),
-        'eco' => array('label' => 'Prosperidad económica',    'bands' => array('Miseria', 'Precaria', 'Modesta', 'Próspera', 'Opulenta'),          'col' => 'var(--ember)'),
-        'civ' => array('label' => 'Orden civil',              'bands' => array('Anarquía', 'Caótico', 'Frágil', 'Ordenado', 'Férreo'),            'col' => 'var(--fac-cazarrecompensas)'),
-        'pel' => array('label' => 'Nivel de peligro',         'bands' => array('Seguro', 'Bajo', 'Moderado', 'Alto', 'Mortal'),                   'col' => 'var(--crack)'),
+        'cli' => array('label'=>'Clima',              'bands'=>array('Tormentoso','Inestable','Variable','Bonancible','Calma'),              'col'=>'var(--h4)'),
+        'pel' => array('label'=>'Nivel de peligro',   'bands'=>array('Seguro','Bajo','Moderado','Alto','Mortal'),                          'col'=>'var(--crack)'),
+        'riq' => array('label'=>'Riqueza',            'bands'=>array('Miseria','Precaria','Modesta','Próspera','Opulenta'),                'col'=>'var(--ember)'),
+        'civ' => array('label'=>'Orden civil',        'bands'=>array('Anarquía','Caótico','Frágil','Ordenado','Férreo'),                  'col'=>'var(--fac-cazarrecompensas)'),
+        'mar' => array('label'=>'Presencia Marine',   'bands'=>array('Nula','Escasa','Moderada','Fuerte','Dominante'),                     'col'=>'var(--fac-marine)'),
+        'pir' => array('label'=>'Actividad pirata',   'bands'=>array('Insignificante','Baja','Notable','Alta','Dominante'),               'col'=>'var(--fac-pirata)'),
+        'rev' => array('label'=>'Influencia revolucionaria','bands'=>array('Nula','Escasa','Moderada','Fuerte','Dominante'),              'col'=>'var(--fac-revolucionario)'),
+        'inf' => array('label'=>'Inframundo',         'bands'=>array('Inexistente','Bajo','Notable','Extendido','Dominante'),              'col'=>'var(--crack)'),
+        'est' => array('label'=>'Estabilidad',        'bands'=>array('Colapso','Inestable','Tensa','Estable','Próspera'),                 'col'=>'var(--patina)'),
+        'ten' => array('label'=>'Tensión General',    'bands'=>array('Paz','Leve','Notable','Alta','Crítica'),                            'col'=>'var(--danger)'),
     );
 }
 
@@ -387,12 +436,13 @@ function ope_rol_mv_zona_metrics()
 function ope_rol_mv_faccion_metrics()
 {
     return array(
-        'rep' => array('label' => 'Reputación pública',   'special' => 'rep',                                                                        'col' => 'var(--patina)'),
-        'coh' => array('label' => 'Cohesión interna',     'bands' => array('Fracturada', 'Débil', 'Sólida', 'Firme', 'Monolítica'),                 'col' => 'var(--h4)'),
-        'mil' => array('label' => 'Poder militar',        'bands' => array('Ínfimo', 'Débil', 'Medio', 'Fuerte', 'Supremo'),                        'col' => 'var(--crack)'),
-        'inf' => array('label' => 'Influencia política',  'bands' => array('Nula', 'Escasa', 'Moderada', 'Fuerte', 'Dominante'),                    'col' => 'var(--fac-civil)'),
-        'eco' => array('label' => 'Recursos económicos',  'bands' => array('Miseria', 'Precaria', 'Modesta', 'Próspera', 'Opulenta'),               'col' => 'var(--ember)'),
-        'mor' => array('label' => 'Moral',                'bands' => array('Rota', 'Baja', 'Firme', 'Alta', 'Fervorosa'),                          'col' => 'var(--fac-revolucionario)'),
+        'rep' => array('label'=>'Reputación pública', 'special'=>'rep',                                                                           'col'=>'var(--patina)'),
+        'coh' => array('label'=>'Cohesión interna',   'bands'=>array('Fracturada','Débil','Sólida','Firme','Monolítica'),                              'col'=>'var(--h4)'),
+        'mil' => array('label'=>'Poder militar',      'bands'=>array('Ínfimo','Débil','Medio','Fuerte','Supremo'),                                    'col'=>'var(--crack)'),
+        'pol' => array('label'=>'Influencia política','bands'=>array('Nula','Escasa','Moderada','Fuerte','Dominante'),                                'col'=>'var(--fac-civil)'),
+        'eco' => array('label'=>'Recursos económicos','bands'=>array('Miseria','Precaria','Modesta','Próspera','Opulenta'),                            'col'=>'var(--ember)'),
+        'mor' => array('label'=>'Moral',              'bands'=>array('Rota','Baja','Firme','Alta','Fervorosa'),                                       'col'=>'var(--fac-revolucionario)'),
+        'alc' => array('label'=>'Alcance',            'bands'=>array('Local','Regional','Multimar','Global','Mundial'),                                'col'=>'var(--h4)'),
     );
 }
 
@@ -416,7 +466,7 @@ function ope_rol_mv_faccion_metric_label($key, $v)
 // Generación del super-prompt
 // ─────────────────────────────────────────────────────────────────────────
 
-/** Construye el super-prompt autocontenido para la IA externa. */
+/** Construye el super-prompt autocontenido para la IA externa (v3). */
 function ope_rol_mv_build_prompt($ciclo)
 {
     global $db;
@@ -426,72 +476,501 @@ function ope_rol_mv_build_prompt($ciclo)
     $tablero   = ope_rol_mv_tablero();
     $eventos   = ope_rol_mv_eventos((int) $ciclo['ciclo_id'], 'incluido');
     if (empty($eventos)) {
-        // Si el staff no ha marcado ninguno, incluir los pendientes por defecto.
         $eventos = ope_rol_mv_eventos((int) $ciclo['ciclo_id']);
     }
     $misiones  = ope_rol_mv_misiones((int) $ciclo['ciclo_id']);
     $npcs      = ope_rol_mv_npc_mayores();
     $menores   = ope_rol_mv_npc_menores((int) $ciclo['ciclo_id']);
+    $threads   = ope_rol_mv_threads_activos();
+    $periodicos = ope_rol_mv_ultimos_periodicos(3);
 
     $L = array();
     $L[] = "###############################################################################";
-    $L[] = "#  MUNDO VIVO · \"LA BALANZA\"  —  MOTOR NARRATIVO DE ONE PIECE ETERNAL";
+    $L[] = "#  MUNDO VIVO · \"LA BALANZA\" v3  —  MOTOR NARRATIVO DE ONE PIECE ETERNAL";
     $L[] = "###############################################################################";
     $L[] = "";
-    $L[] = "Eres el MOTOR NARRATIVO y el CRONISTA del mundo del foro de rol \"One Piece Eternal\".";
-    $L[] = "Trabajas sobre un mundo persistente inspirado en One Piece pero con su propia continuidad (no copies la trama del manga; respeta el TONO: aventura, mar, libertad, Marines vs piratas, revolucionarios, Gobierno Mundial, Reyes del Mar, islas peligrosas).";
-    $L[] = "Recibes: (a) el ESTADO ACTUAL del mundo (el Tablero de La Balanza), (b) todo lo ocurrido ESTE MES (temas notificados por jugadores, misiones, movimientos de NPCs) y (c) las INDICACIONES del staff.";
+    $L[] = "======================================================================";
+    $L[] = " 1 · QUIÉN ERES Y QUÉ RECIBES";
+    $L[] = "======================================================================";
     $L[] = "";
-    $L[] = "TU TRABAJO — produce, en este orden, CUATRO entregables (formato exacto al final):";
-    $L[] = "  1) NUEVO ESTADO DEL MUNDO — recalcula todas las métricas del Tablero de forma coherente con lo ocurrido (ESTADO_JSON).";
-    $L[] = "  2) PERIÓDICO MENSUAL \"Eternal News\" — un periódico in-character en HTML, al estilo de la prensa del mundo de One Piece, que narra el mes (PERIODICO_HTML).";
-    $L[] = "  3) NOTICIA DE PORTADA — un titular + resumen + cuerpo breve para la home del foro (NOTICIA).";
-    $L[] = "  4) PROMPTS DE IMAGEN — descripciones en inglés para ilustrar el periódico (IMAGENES).";
+    $L[] = "Eres el MOTOR NARRATIVO del foro de rol \"One Piece Eternal\". Trabajas sobre un mundo";
+    $L[] = "persistente inspirado en One Piece pero con su propia continuidad (NO copies la trama";
+    $L[] = "del manga; respeta el TONO: aventura, mar, libertad, Marines vs piratas, revolucionarios,";
+    $L[] = "Gobierno Mundial, Reyes del Mar, islas peligrosas).";
     $L[] = "";
-    $L[] = "== PRINCIPIOS DE LA BALANZA ==";
-    $L[] = "· LA PAZ ES EL ESTADO NORMAL DEL MUNDO. Un mundo en guerra total es la EXCEPCIÓN rarísima, no la norma. La mayoría de los meses el mundo está en calma o con conflictos pequeños y localizados. Si un mes no pasa gran cosa, el mundo se ESTABILIZA, no se incendia.";
-    $L[] = "· El mundo es una BALANZA que TIENDE AL EQUILIBRIO: por sí sola, la balanza empuja hacia la calma. Hace falta una fuerza sostenida y grande para inclinarla hacia la guerra, y esa fuerza debe venir de EVENTOS CONCRETOS de este mes (o de indicaciones del staff), nunca de la nada.";
-    $L[] = "· Causa y efecto PROPORCIONADO: una victoria pirata sonada sube un poco PIR y baja un poco MAR en ESA zona y tensa a las facciones implicadas SOLO en ese mar. Sin un evento que lo justifique, NO subas tensiones ni bajes estabilidad.";
-    $L[] = "· Los NPCs están VIVOS: se mueven y reaccionan con mesura acorde a su facción; la mayoría busca sus intereses SIN desatar guerras.";
-    $L[] = "· Continuidad: respeta el estado previo, las notas y los arcos abiertos. Evoluciónalos poco a poco, no los reinicies ni los dispares.";
+    $L[] = "Recibes tres cosas cada mes:";
+    $L[] = "  (a) el ESTADO ACTUAL del mundo completo (métricas de cada mar, facciones, tensiones,";
+    $L[] = "      arcos narrativos, hilos en curso, NPCs con su ubicación y plan).";
+    $L[] = "  (b) TODO lo ocurrido ESTE MES: eventos notificados por jugadores (con resumen,";
+    $L[] = "      zona y personaje), misiones en curso/completadas/fallidas, movimientos de NPCs,";
+    $L[] = "      y el resumen de navegación (viajes, naufragios, descubrimientos).";
+    $L[] = "  (c) las INDICACIONES del staff (si las hay), que tienes OBLIGACIÓN de seguir.";
     $L[] = "";
-    $L[] = "== REGRESIÓN A LA CALMA (aplícala SIEMPRE, primero) ==";
-    $L[] = "Antes de sumar el impacto de los eventos, RELAJA el mundo hacia su reposo:";
-    $L[] = "  · Toda TENSIÓN de un par sin un evento que la alimente este mes BAJA 8-15 puntos hacia su base de paz (~15-30). La calma vuelve rápido.";
-    $L[] = "  · EST, CIV y ECO de una zona sin conflicto se RECUPERAN 3-8 puntos hacia su base saludable (~55-70).";
-    $L[] = "  · PIR y PEL sin sucesos que los sostengan BAJAN 3-8 puntos.";
-    $L[] = "  · La COH y la MOR de las facciones tienden lentamente a un punto medio (~50-65) salvo evento.";
-    $L[] = "Solo DESPUÉS de relajar, aplica las subidas por los eventos concretos del mes. Resultado esperado: un mes tranquilo deja el mundo IGUAL o MÁS EN PAZ que el anterior.";
+    $L[] = "======================================================================";
+    $L[] = " 2 · TIENES ACCESO A LA BASE DE DATOS";
+    $L[] = "======================================================================";
     $L[] = "";
-    $L[] = "== CÓMO PONDERAR EL IMPACTO (guía; TÚ decides los números finales, siempre CONSERVADOR) ==";
-    $L[] = "Para cada evento estima su IMPACTO combinando escala, rango y acumulación:";
-    $L[] = "  · Escala PE 0-10: 0 anecdótico · 2 personal · 3 local (aldea/barco) · 5 insular (isla/base) · 7 regional (un mar) · 9 global · 10 cataclísmico.";
-    $L[] = "  · Rango del personaje: F/E débiles · D/C medios · B/A fuertes · S/S+ élite · M/M+ trascendentes.";
-    $L[] = "  · ACUMULACIÓN: varios eventos pequeños conectados en un mismo mar durante VARIOS meses pesan como uno grande. Un solo evento aislado pesa poco.";
-    $L[] = "TOPES POR CICLO (respétalos salvo evento cataclísmico o indicación de staff):";
-    $L[] = "  · Subidas: local ±1..3 · insular/regional +4..8 · global +9..15. Bajar hacia la calma puede ser algo mayor.";
-    $L[] = "  · Una TENSIÓN no puede subir más de +15 en un solo mes. Pasar de calma (~20) a guerra abierta (>80) exige 4-5 meses de escalada sostenida, no un mes.";
-    $L[] = "  · Como mucho UN mar debería acercarse a conflicto serio en un mes normal; el resto, en calma.";
+    $L[] = "Puedes ejecutar consultas SQL sobre estas tablas (prefijo: mybb_) para obtener";
+    $L[] = "información adicional cuando la necesites. No hace falta que consultes todo cada";
+    $L[] = "vez — solo lo que necesites para resolver dudas:";
     $L[] = "";
-    $L[] = "== MÉTRICAS DEL TABLERO ==";
-    $L[] = "ZONA (mar), 0-100 cada una (base de paz entre paréntesis):";
-    $L[] = "  EST estabilidad (~60) · MAR presencia Marine/Gobierno (~50) · PIR actividad pirata (~30) · REV influencia revolucionaria (~20) · ECO prosperidad económica (~55) · CIV orden civil (~60) · PEL peligro (~30; clima, Reyes del Mar, criaturas).";
-    $L[] = "FACCIÓN:";
-    $L[] = "  REP reputación pública (-100..100) · COH cohesión interna · MIL poder militar · INF influencia política · ECO recursos económicos · MOR moral (todas 0-100 salvo REP).";
-    $L[] = "TENSIÓN entre facciones POR MAR (0-100), UMBRALES:";
-    $L[] = "  · 0-30 = PAZ / roces normales (lo habitual en casi todos los mares).";
-    $L[] = "  · 31-55 = fricción / rivalidad fría.";
-    $L[] = "  · 56-75 = conflicto localizado (escaramuzas, no guerra).";
-    $L[] = "  · 76-89 = guerra inminente (raro; solo tras meses de escalada).";
-    $L[] = "  · 90-100 = GUERRA ABIERTA (excepcional; casi nunca, y como mucho en un mar).";
-    $L[] = "Cada par tiene un valor DISTINTO en cada mar y una NOTA que explica el porqué EN ESE MAR. Si no hay motivo este mes, la tensión debe estar en calma.";
+    $L[] = "  Tabla                     | Para qué consultarla";
+    $L[] = "  -------------------------|------------------------------------------------------";
+    $L[] = "  rol_mv_ciclos            | Ciclos pasados: periodico_html, estado_json (threads,";
+    $L[] = "                          |   npc_tracking), noticia_titulo, indicaciones, nav_resumen";
+    $L[] = "  rol_mv_zonas            | Métricas actuales de cada zona (cli, pel, riq, civ, mar,";
+    $L[] = "                          |   pir, rev, inf, est, ten + notas)";
+    $L[] = "  rol_mv_facciones        | Métricas actuales de cada facción (rep, coh, mil, pol,";
+    $L[] = "                          |   eco, mor, alc + notas)";
+    $L[] = "  rol_mv_tension          | Tensión entre facciones por mar (valor 0-100 + notas)";
+    $L[] = "  rol_mv_arcos            | Arcos narrativos abiertos (nombre, estado, zonas,";
+    $L[] = "                          |   facciones, descripción)";
+    $L[] = "  rol_mv_eventos          | Eventos notificados este ciclo por los jugadores";
+    $L[] = "  rol_mv_misiones         | Misiones del ciclo actual (en curso/completadas/fallidas)";
+    $L[] = "  rol_mv_npc_menores      | NPCs menores (relleno) registrados este ciclo";
+    $L[] = "  rol_personajes (es_npc=1)| NPCs mayores con ficha: datos_publicos (JSON visible para";
+    $L[] = "                          |   jugadores), datos_internos (JSON solo staff/IA con";
+    $L[] = "                          |   personalidad, metas, tracking: salud, moral, plan, ubicación)";
+    $L[] = "  rol_mv_periodicos       | Periódicos anteriores (para mantener continuidad narrativa)";
     $L[] = "";
-    $L[] = "== REGLAS DE ESCRITURA (periódico y noticia) ==";
-    $L[] = "· NUNCA muestres números, métricas, slugs ni terminología de sistema. Todo se traduce a lenguaje natural in-world ('la presencia de la Marina se desploma en el West Blue').";
-    $L[] = "· Voz de prensa del mundo: titulares llamativos, tono periodístico con color local; puede haber sesgo pro-Gobierno velado, rumores y columnas de opinión.";
-    $L[] = "· Cita a personajes y NPCs por su nombre cuando aparezcan en los eventos; da protagonismo a lo que hicieron los jugadores.";
-    $L[] = "· No inventes contradicciones con el estado ni reveles secretos de staff/metajuego.";
-    $L[] = "· Idioma: español.";
+    $L[] = "Cuándo consultar cada tabla:";
+    $L[] = "  · Si dudas del histórico: rol_mv_ciclos WHERE estado='publicado' ORDER BY ciclo_id DESC LIMIT 3";
+    $L[] = "  · Si quieres los valores exactos de métricas: rol_mv_zonas";
+    $L[] = "  · Si quieres tracking detallado de un NPC: rol_personajes WHERE es_npc=1 AND pid=X";
+    $L[] = "  · Si quieres ver cómo se redactó un periódico anterior: rol_mv_ciclos.periodico_html";
+    $L[] = "";
+    $L[] = "======================================================================";
+    $L[] = " 3 · FLUJO DE TRABAJO (sigue estos pasos en orden)";
+    $L[] = "======================================================================";
+    $L[] = "";
+    $L[] = "PASO 1 — ABSORBE el contexto completo:";
+    $L[] = "  · Lee el estado actual del mundo (secciones abajo)";
+    $L[] = "  · Lee los periódicos de los últimos 3 meses (incluidos en las secciones) para";
+    $L[] = "    mantener el tono y estilo";
+    $L[] = "  · Lee los hilos narrativos abiertos del último ciclo";
+    $L[] = "  · Si hay indicaciones del staff, intégralas AHORA en tu razonamiento";
+    $L[] = "";
+    $L[] = "PASO 2 — CLASIFICA cada evento y misión:";
+    $L[] = "  · Asigna a cada suceso un tipo S-01 a S-12 (ver tabla en sección 5)";
+    $L[] = "  · Estima su Peso de Evento (PE 1-10) basado en la escala";
+    $L[] = "  · Identifica el rango más alto entre participantes para calcular MR";
+    $L[] = "  · Determina FR (relevancia narrativa: 0.5-2.0)";
+    $L[] = "  · Calcula FA (acumulación: si hay múltiples sucesos similares en la misma zona)";
+    $L[] = "";
+    $L[] = "PASO 3 — APLICA REGRESIÓN A LA CALMA:";
+    $L[] = "  · Aplica la tabla de regresión (sección 6) a TODAS las métricas de zona y facción";
+    $L[] = "  · La regresión se aplica INCLUSO si hay eventos — primero regresa, luego suma";
+    $L[] = "  · Respeta las excepciones (arcos activos, inercia narrativa, indicaciones staff)";
+    $L[] = "";
+    $L[] = "PASO 4 — CALCULA IMPACTOS:";
+    $L[] = "  · Para cada suceso: IMPACTO_NETO = (PE × MR × FR × FA) / 10";
+    $L[] = "  · Distribuye según la huella de su tipo S-XX (ppal ×1.0, sec ×0.5, ter ×0.3)";
+    $L[] = "  · Aplica los topes anti-escalada (ver sección 5.3) — NUNCA los superes";
+    $L[] = "  · Si el IMPACTO_NETO es 0 tras redondeo, el suceso no mueve métricas";
+    $L[] = "";
+    $L[] = "PASO 5 — EVOLUCIONA LOS NPCs:";
+    $L[] = "  · Para cada NPC mayor listado, evalúa el MOTOR DE DECISIÓN (sección 8)";
+    $L[] = "  · Actualiza salud, moral, plan_activo, ubicacion_zona, meta_actual";
+    $L[] = "  · Si el NPC inicia una acción, clasifícala como suceso (vuelve al paso 2)";
+    $L[] = "";
+    $L[] = "PASO 6 — EVOLUCIONA LOS HILOS NARRATIVOS:";
+    $L[] = "  · Revisa los threads del ciclo anterior (se abajo, sección HILOS)";
+    $L[] = "  · Decide: evolucionar, mantener latente, cerrar, o fusionar";
+    $L[] = "  · Como mínimo 1 thread debe evolucionar o cerrarse este ciclo";
+    $L[] = "  · Máximo 12 threads activos";
+    $L[] = "  · Si un thread no ha cambiado en 3 ciclos, ciérralo como latente";
+    $L[] = "  · Los threads nuevos surgen de eventos importantes (PE 5+ o que involucren NPCs mayores)";
+    $L[] = "";
+    $L[] = "PASO 7 — GENERA LOS 5 ENTREGABLES:";
+    $L[] = "  · ESTADO_JSON con el nuevo tablero + threads + npc_tracking";
+    $L[] = "  · PERIODICO_HTML en formato periódico in-world";
+    $L[] = "  · NOTICIA de portada (titular + resumen + cuerpo)";
+    $L[] = "  · MISIONES (2-5 ganchos narrativos para el próximo mes)";
+    $L[] = "  · IMAGENES (prompts en inglés para las ilustraciones del periódico)";
+    $L[] = "  · Incluye SIEMPRE los 5 bloques aunque algún bloque tenga contenido mínimo";
+    $L[] = "";
+    $L[] = "======================================================================";
+    $L[] = " 4 · PRINCIPIOS RECTORES (v3) — NUNCA LOS VIOLES";
+    $L[] = "======================================================================";
+    $L[] = "";
+    $L[] = "1. LA PAZ ES EL ESTADO NORMAL. La mayoría de los meses el mundo está en calma o con";
+    $L[] = "   conflictos pequeños y localizados. Solo excepcionalmente hay guerras.";
+    $L[] = "2. REGRESIÓN A LA CALMA. El mundo siempre tiende a sus valores base. Sin eventos, se";
+    $L[] = "   pacifica automáticamente cada mes.";
+    $L[] = "3. NO ESCALADA SIN CAUSA SOSTENIDA. Ningún evento aislado causa una guerra. Se necesitan";
+    $L[] = "   4-5 meses de tensión alimentada para llegar a un conflicto abierto entre facciones.";
+    $L[] = "4. PROPORCIONALIDAD. Evento pequeño = impacto pequeño. PE 1-3 apenas mueven métricas.";
+    $L[] = "   Solo eventos PE 8+ mueven múltiples métricas significativamente.";
+    $L[] = "5. CONTINUIDAD NARRATIVA. El periódico de este mes NO olvida los anteriores. Los hilos";
+    $L[] = "   abiertos evolucionan. Las noticias pasadas tienen consecuencias futuras.";
+    $L[] = "6. EL STAFF SOLO PONE NOTAS/INDICACIONES. Todo lo demás (clasificación, impacto,";
+    $L[] = "   cálculo, generación del periódico) lo haces TÚ como IA.";
+    $L[] = "";
+    $L[] = "======================================================================";
+    $L[] = " 5 · SISTEMA DE IMPACTO v3 — CLASIFICACIÓN, FÓRMULA, TOPES";
+    $L[] = "======================================================================";
+    $L[] = "";
+    $L[] = "5.1 — CLASIFICACIÓN S-01 a S-12";
+    $L[] = "";
+    $L[] = "Cada suceso (evento notificado, misión completada, acción de NPC) se clasifica en";
+    $L[] = "UNO de estos 12 tipos. La clasificación determina qué métricas se modifican:";
+    $L[] = "";
+    $L[] = "  S-01 Combate (gana Marine/Gob)  → MAR +, PIR -, CIV +";
+    $L[] = "    Ej: patrulla Marine captura piratas, base pirate destruida";
+    $L[] = "";
+    $L[] = "  S-02 Combate (gana Pirata)       → PIR +, TEN +, MAR -";
+    $L[] = "    Ej: barco Marine hundido, base Marine asaltada, marine derrotado";
+    $L[] = "";
+    $L[] = "  S-03 Combate (gana Rev)          → REV +, MAR -, EST -";
+    $L[] = "    Ej: gobierno expuesto, arsenal robado, presos liberados";
+    $L[] = "";
+    $L[] = "  S-04 Combate (gana Caza)         → REP cazarrecompensas +";
+    $L[] = "    Ej: recompensa cobrada, pirata entregado a la Marina";
+    $L[] = "";
+    $L[] = "  S-05 Diplomacia/Paz              → TEN -, EST +, CIV +";
+    $L[] = "    Ej: alianza firmada, tratado de paz, mediación, tregua, festival";
+    $L[] = "";
+    $L[] = "  S-06 Crimen/Inframundo           → INF +, CIV -, EST -";
+    $L[] = "    Ej: robo, asesinato, mercado negro, soborno, contrabando";
+    $L[] = "";
+    $L[] = "  S-07 Exploración                 → RIQ +, PEL -";
+    $L[] = "    Ej: isla descubierta, ruina explorada, tesoro encontrado";
+    $L[] = "";
+    $L[] = "  S-08 Catástrofe Natural          → EST -×2, CIV -, PEL +";
+    $L[] = "    Ej: tormenta, tsunami, erupción, plaga, incendio";
+    $L[] = "";
+    $L[] = "  S-09 Construcción/Mejora         → RIQ +, CIV +";
+    $L[] = "    Ej: base construida, barco mejorado, comercio abierto";
+    $L[] = "";
+    $L[] = "  S-10 Narrativo/Trama             → variable ±2 (según contexto)";
+    $L[] = "    Ej: revelación, giro argumental, encuentro con NPC clave";
+    $L[] = "";
+    $L[] = "  S-11 Derrota/Huida               → facción afectada: MOR -, REP -";
+    $L[] = "    Ej: personaje huye, pierde combate, barco gravemente dañado";
+    $L[] = "";
+    $L[] = "  S-12 Evento Social               → CIV +, TEN -, EST +";
+    $L[] = "    Ej: fiesta, torneo, boda, funeral, subasta";
+    $L[] = "";
+    $L[] = "  Huella por suceso (cómo se distribuye el impacto entre las métricas):";
+    $L[] = "    · Principal (ppal): ×1.0 del IMPACTO_NETO";
+    $L[] = "    · Secundaria (sec): ×0.5 del IMPACTO_NETO";
+    $L[] = "    · Terciaria (ter): ×0.3 del IMPACTO_NETO";
+    $L[] = "  Además, efectos en facción: MOR/REP según tabla específica (S-01 sube MOR Marine,";
+    $L[] = "  S-02 sube MOR Pirata, S-08 baja REP Gobierno, etc.)";
+    $L[] = "";
+    $L[] = "  Un suceso con PE ≤ 3 SOLO afecta a la zona donde ocurrió.";
+    $L[] = "  Un suceso con PE ≥ 4 puede afectar zonas adyacentes con 50% de intensidad.";
+    $L[] = "  Tensión (TEN) solo sube si el suceso enfrenta directamente a dos facciones.";
+    $L[] = "";
+    $L[] = "5.2 — FÓRMULA DE IMPACTO";
+    $L[] = "";
+    $L[] = "  IMPACTO_BRUTO = PE × MR × FR × FA";
+    $L[] = "  IMPACTO_NETO  = redondear(IMPACTO_BRUTO / 10), mínimo 0";
+    $L[] = "";
+    $L[] = "  PE — Peso del Evento (1-10):";
+    $L[] = "     1 anecdótico (pelea de taberna) · 2 personal (duelo 1v1)";
+    $L[] = "     3 local (afecta aldea) · 4 insular-bajo (afecta isla)";
+    $L[] = "     5 insular-alto (conmociona isla entera) · 6 regional-bajo (varias islas)";
+    $L[] = "     7 regional-alto (todo un mar) · 8 global-bajo (múltiples mares)";
+    $L[] = "     9 global-alto (sacude el mundo, muerte figura mayor) · 10 cataclísmico";
+    $L[] = "";
+    $L[] = "  MR — Multiplicador de Rango (del participante de mayor rango):";
+    $L[] = "     F ×0.3 · E ×0.5 · D ×0.7 · C ×1.0 · B ×1.3 · A ×1.6";
+    $L[] = "     S ×2.0 · SS ×2.5 · M ×3.0 · M+ ×4.0";
+    $L[] = "";
+    $L[] = "  FR — Factor de Relevancia:";
+    $L[] = "     0.5 = aislado (sin conexión con tramas activas)";
+    $L[] = "     1.0 = conectado (involucra facción, zona o personaje relevante)";
+    $L[] = "     1.5 = NPC mayor o arco activo";
+    $L[] = "     2.0 = CLAVE para un arco (punto de inflexión narrativa)";
+    $L[] = "";
+    $L[] = "  FA — Factor de Acumulación (sucesos similares en misma zona este ciclo):";
+    $L[] = "     1 suceso → ×1.0 · 2-3 sucesos → ×1.3 · 4-6 → ×1.7 · 7+ → ×2.0";
+    $L[] = "     Si los sucesos forman parte de la misma cadena narrativa: +0.5 extra";
+    $L[] = "";
+    $L[] = "  Ejemplo práctico: un combate de un personaje rango A (MR=1.6) que derrota a un";
+    $L[] = "  pirata (S-02), con PE=4 (insular-bajo), FR=1.0 (conectado), FA=1.0 (único):";
+    $L[] = "  IMPACTO_BRUTO = 4 × 1.6 × 1.0 × 1.0 = 6.4";
+    $L[] = "  IMPACTO_NETO = 6.4 / 10 = 0.64 → redondeado = 1";
+    $L[] = "  → PIR += 1, TEN += 0 (0.5 redondeado a 0), MAR -= 0 (0.3 redondeado a 0)";
+    $L[] = "";
+    $L[] = "5.3 — TOPES ANTI-ESCALADA (OBLIGATORIOS, aplican SIEMPRE)";
+    $L[] = "";
+    $L[] = "  POR CICLO (por zona/métrica):";
+    $L[] = "    · Cualquier métrica individual: máximo ±15 por ciclo";
+    $L[] = "    · Tensión General (TEN): máximo +12 por ciclo";
+    $L[] = "";
+    $L[] = "  POR SUCESO INDIVIDUAL:";
+    $L[] = "    · Ningún suceso puede cambiar una métrica más de ±6";
+    $L[] = "    · PE 1-3: máximo ±2 en una métrica";
+    $L[] = "    · PE 4-6: máximo ±4 en una métrica";
+    $L[] = "    · PE 7-10: máximo ±6 en una métrica";
+    $L[] = "";
+    $L[] = "  REGLA DE GUERRA:";
+    $L[] = "    · Tensión > 80 en un par requiere 3+ ciclos consecutivos con tensión > 70 en ese par";
+    $L[] = "    · Si la tensión baja de 70 en algún ciclo, el contador se reinicia";
+    $L[] = "    · Guerra abierta (tensión > 90) SOLO si tensión > 80 el ciclo anterior";
+    $L[] = "";
+    $L[] = "  REGLA DE MÍNIMO IMPACTO:";
+    $L[] = "    · Si no hubo eventos en una zona: -3 a -8 de regresión obligatoria";
+    $L[] = "    · PE muy bajo (1-2) con rango bajo (F-D), FR y FA mínimos:";
+    $L[] = "      IMPACTO_NETO = 0. Es intencional. Acciones triviales no mueven el mundo.";
+    $L[] = "";
+    $L[] = "======================================================================";
+    $L[] = " 6 · REGRESIÓN A LA CALMA (aplícala SIEMPRE, es el PRIMER paso del cálculo)";
+    $L[] = "======================================================================";
+    $L[] = "";
+    $L[] = "Antes de sumar NINGÚN impacto, cada métrica regresa hacia su valor base.";
+    $L[] = "Esto evita que el mundo se desvíe permanentemente por un solo ciclo de eventos.";
+    $L[] = "";
+    $L[] = "6.1 — REGRESIÓN POR MÉTRICA DE ZONA (hacia su valor base):";
+    $L[] = "";
+    $L[] = "  Métrica  | Regresión mensual    | Velocidad | Significado narrativo";
+    $L[] = "  ---------|---------------------|-----------|--------------------------------";
+    $L[] = "  CLI      | vuelve 5-10 a 60    | Rápida    | El clima se normaliza solo";
+    $L[] = "  PEL      | baja 3-8 a 30       | Media     | Los peligros marinos disminuyen";
+    $L[] = "  RIQ      | sube 2-5 a 50       | Lenta     | La economía se recupera despacio";
+    $L[] = "  CIV      | sube 3-8 a 55       | Media     | El orden civil se recompone";
+    $L[] = "  MAR      | tiende 3-6 a 45     | Media     | La Marina se redistribuye";
+    $L[] = "  PIR      | baja 3-8 a 25       | Media-ráp | Piratas se cansan o se van";
+    $L[] = "  REV      | baja 2-5 a 15       | Lenta     | Células durmientes se repliegan";
+    $L[] = "  INF      | baja 2-5 a 20       | Lenta     | El crimen se repliega";
+    $L[] = "  EST      | sube 4-8 a 55       | Media     | La calma y estabilidad vuelven";
+    $L[] = "  TEN      | baja 5-12 a 20      | Rápida    | Las tensiones se enfrían rápido";
+    $L[] = "";
+    $L[] = "  NOTA: los valores de regresión son un RANGO (ej: 5-10). Elige un valor dentro";
+    $L[] = "  del rango según qué tan extrema esté la métrica. Si CLI=90, regresa más (10)";
+    $L[] = "  hacia 60. Si CLI=65 (cerca de base), regresa menos (5).";
+    $L[] = "";
+    $L[] = "6.2 — REGRESIÓN POR MÉTRICA DE FACCIÓN (global):";
+    $L[] = "";
+    $L[] = "  REP | tiende 3-5 hacia su base de facción | Lenta";
+    $L[] = "  COH | tiende 2-4 hacia 50                | Muy lenta";
+    $L[] = "  MIL | se mantiene ±1 (solo cambia por   | Muy lenta";
+    $L[] = "       | eventos masivos PE 7+)";
+    $L[] = "  POL | tiende 2-3 hacia su base de facción| Lenta";
+    $L[] = "  ECO | sube 1-3 hacia 50                  | Muy lenta";
+    $L[] = "  MOR | tiende 3-6 hacia 50                | Media";
+    $L[] = "  ALC | se mantiene (solo cambia por       | Estática";
+    $L[] = "       | guerras/conquistas)";
+    $L[] = "";
+    $L[] = "6.3 — EXCEPCIONES A LA REGRESIÓN";
+    $L[] = "";
+    $L[] = "  La regresión NO se aplica (o al 50%) si:";
+    $L[] = "  · Hay un arco activo en la zona que justifique mantener la tensión";
+    $L[] = "    (ej: \"La Guerra del West Blue\" mantiene TEN elevada)";
+    $L[] = "  · Las indicaciones del staff especifican mantener ciertas métricas";
+    $L[] = "  · La métrica está dentro de ±5 de su valor base (ya está en equilibrio)";
+    $L[] = "";
+    $L[] = "  INERCIA NARRATIVA (el mundo tiene memoria):";
+    $L[] = "  · Si una métrica ha estado >70 durante 3+ ciclos → regresión al 50%";
+    $L[] = "    (el mundo se ha \"acostumbrado\" a ese estado)";
+    $L[] = "  · Si una métrica ha estado <30 durante 3+ ciclos → regresión ×1.5";
+    $L[] = "    (el mundo \"quiere\" normalizarse con más fuerza)";
+    $L[] = "";
+    $L[] = "  DURACIÓN MÁXIMA DE SUSPENSIÓN:";
+    $L[] = "  · Un arco no puede suspender la regresión en una misma zona por más de";
+    $L[] = "    6 ciclos consecutivos. Pasado ese límite, la regresión se reanuda al 100%.";
+    $L[] = "";
+    $L[] = "======================================================================";
+    $L[] = " 7 · MÉTRICAS DEL TABLERO (guía de referencia)";
+    $L[] = "======================================================================";
+    $L[] = "";
+    $L[] = "7.1 — MÉTRICAS DE ZONA (0-100 cada una, por cada uno de los 8 mares)";
+    $L[] = "";
+    $L[] = "  CLI (Clima) — base 60. Mide la calidad del clima predominante.";
+    $L[] = "    0 = tormentas perpetuas, 100 = calma absoluta.";
+    $L[] = "    Afecta a: navegación (tirada de clima).";
+    $L[] = "";
+    $L[] = "  PEL (Peligro Marítimo) — base 30. Peligros del mar (Sea Kings, corrientes).";
+    $L[] = "    0 = mar seguro, 100 = muerte casi segura al zarpar.";
+    $L[] = "    Afecta a: navegación (tirada de peligros).";
+    $L[] = "";
+    $L[] = "  RIQ (Riqueza) — base 50. Recursos naturales y económicos de la zona.";
+    $L[] = "    0 = pobreza extrema, 100 = el Dorado.";
+    $L[] = "    Afecta a: hallazgos en viajes, recompensas de misiones.";
+    $L[] = "";
+    $L[] = "  CIV (Orden Civil) — base 55. Control y legalidad en las islas.";
+    $L[] = "    0 = anarquía total, 100 = régimen férreo.";
+    $L[] = "    Afecta a: eventos en isla, probabilidad de incidentes.";
+    $L[] = "";
+    $L[] = "  MAR (Presión Marine) — base 45. Presencia e influencia de la Marina.";
+    $L[] = "    0 = sin Marines, 100 = cuartel general en cada isla.";
+    $L[] = "    Afecta a: encuentros en viaje, libertad de movimiento pirata.";
+    $L[] = "";
+    $L[] = "  PIR (Actividad Pirata) — base 25. Nivel de actividad pirata.";
+    $L[] = "    0 = mares limpios, 100 = invasión pirata.";
+    $L[] = "    Afecta a: encuentros en viaje, misiones generadas.";
+    $L[] = "";
+    $L[] = "  REV (Influencia Revolucionaria) — base 15. Penetración del Ejército Rev.";
+    $L[] = "    0 = sin revolucionarios, 100 = bastión rebelde.";
+    $L[] = "    Afecta a: tramas secretas, misiones de facción.";
+    $L[] = "";
+    $L[] = "  INF (Influencia del Inframundo) — base 20. Poder del crimen organizado.";
+    $L[] = "    0 = crimen inexistente, 100 = paraíso del hampa.";
+    $L[] = "    Afecta a: misiones de inframundo, eventos ilegales.";
+    $L[] = "";
+    $L[] = "  EST (Estabilidad General) — base ~55. Salud global de la zona.";
+    $L[] = "    Fórmula: (CLI×0.5 - PEL×0.5 + RIQ×1 + CIV×2 + MAR×1 - PIR×1 - REV×0.5 - INF×0.5) / 7";
+    $L[] = "    0 = colapso, 100 = utopía. NO se modifica directamente por eventos";
+    $L[] = "    (se recalcula automáticamente con la fórmula al cambiar las demás métricas).";
+    $L[] = "";
+    $L[] = "  TEN (Tensión General) — base 20. Tensión global entre facciones en el mar.";
+    $L[] = "    0 = paz absoluta, 100 = guerra total entre todos.";
+    $L[] = "    Afecta a: umbral de guerra, misiones de conflicto.";
+    $L[] = "";
+    $L[] = "7.2 — MÉTRICAS DE FACCIÓN (globales, 7 por cada una de las 6 facciones)";
+    $L[] = "";
+    $L[] = "  REP (Reputación) — Rango: -100 a 100. Percepción pública mundial.";
+    $L[] = "    Negativa = odiada. Positiva = querida/respetada.";
+    $L[] = "";
+    $L[] = "  COH (Cohesión) — 0-100. Unidad interna, lealtad entre miembros.";
+    $L[] = "    0 = facción fracturada, 100 = lealtad absoluta.";
+    $L[] = "";
+    $L[] = "  MIL (Poder Militar) — 0-100. Capacidad bélica.";
+    $L[] = "    0 = desarmados, 100 = superpotencia militar.";
+    $L[] = "";
+    $L[] = "  POL (Influencia Política) — 0-100. Poder diplomático/administrativo.";
+    $L[] = "    0 = sin voz, 100 = maneja gobiernos.";
+    $L[] = "";
+    $L[] = "  ECO (Recursos Económicos) — 0-100. Finanzas, suministros.";
+    $L[] = "    0 = en bancarrota, 100 = cofre del tesoro infinito.";
+    $L[] = "";
+    $L[] = "  MOR (Moral) — 0-100. Moral de tropas/miembros.";
+    $L[] = "    0 = depresión/deserción, 100 = euforia/combatividad.";
+    $L[] = "";
+    $L[] = "  ALC (Alcance) — 0-100. Presencia en cuántos mares del mundo.";
+    $L[] = "    0 = confinados a una isla, 100 = presentes en los 8 mares.";
+    $L[] = "";
+    $L[] = "7.3 — TENSIÓN ENTRE FACCIONES (por mar)";
+    $L[] = "";
+    $L[] = "  Cada uno de los 15 pares canónicos tiene un valor DISTINTO (0-100) en CADA mar,";
+    $L[] = "  con NOTAS que explican el porqué de esa tensión en ese mar específico.";
+    $L[] = "";
+    $L[] = "  Pares canónicos (orden): marine|pirata, marine|revolucionario, marine|gobierno,";
+    $L[] = "  marine|cazarrecompensas, marine|civil, pirata|revolucionario, pirata|gobierno,";
+    $L[] = "  pirata|cazarrecompensas, pirata|civil, revolucionario|gobierno,";
+    $L[] = "  revolucionario|cazarrecompensas, revolucionario|civil, gobierno|cazarrecompensas,";
+    $L[] = "  gobierno|civil, cazarrecompensas|civil";
+    $L[] = "";
+    $L[] = "  UMBRALES DE TENSIÓN:";
+    $L[] = "    0-30  = PAZ (relaciones normales o indiferencia)";
+    $L[] = "    31-55 = FRICCIÓN (roces, desconfianza, incidentes menores)";
+    $L[] = "    56-75 = CONFLICTO LOCALIZADO (escaramuzas, patrullas hostiles)";
+    $L[] = "    76-89 = GUERRA INMINENTE (movilizaciones, ataques directos)";
+    $L[] = "    90-100 = GUERRA ABIERTA (conflicto declarado, sin cuartel)";
+    $L[] = "";
+    $L[] = "======================================================================";
+    $L[] = " 8 · NPCs MAYORES — MOTOR DE DECISIÓN (cómo decidir qué hace cada NPC)";
+    $L[] = "======================================================================";
+    $L[] = "";
+    $L[] = "Cada NPC mayor tiene una personalidad definida por 6 ejes (0-100):";
+    $L[] = "  AGR (Agresividad) - tendencia a iniciar conflicto";
+    $L[] = "  VAL (Valentía) - disposición a enfrentar peligro";
+    $L[] = "  HON (Honor) - código moral, lealtad a principios";
+    $L[] = "  LEA (Lealtad) - lealtad a su facción/superiores";
+    $L[] = "  AMB (Ambición) - impulso por ascender, acumular poder";
+    $L[] = "  INT (Inteligencia) - capacidad estratégica";
+    $L[] = "";
+    $L[] = "Cada NPC tiene 1-3 METAS activas y un TRACKING por ciclo:";
+    $L[] = "  salud (0-100, 100=sano), moral (0-100, 100=alta)";
+    $L[] = "  plan_activo (texto: qué está haciendo ahora)";
+    $L[] = "  ubicacion_zona (dónde está)";
+    $L[] = "  meta_actual (qué meta persigue ahora)";
+    $L[] = "";
+    $L[] = "8.1 — TRIGGERS DE ACCIÓN (evalúalos EN ORDEN para cada NPC)";
+    $L[] = "";
+    $L[] = "  #1  Amenaza directa: NPC enemigo en misma zona con AGR > 60 → atacar/emboscar";
+    $L[] = "  #2  Oportunidad de meta: métrica clave para su meta subió/bajó >10 → actuar";
+    $L[] = "  #3  Vacío de poder: MAR o CIV < 25 en su zona → ocupar/declarar control";
+    $L[] = "  #4  Crisis facción: MIL o MOR de su facción < 30 → reagrupar/pedir refuerzos";
+    $L[] = "  #5  Tensión crítica: TEN > 70 entre su facción y otra en su zona → preparar guerra";
+    $L[] = "  #6  Hilo activo: thread que le involucra con estado=activo → avanzar el hilo";
+    $L[] = "  #7  Invitación jugador: jugador le contactó este ciclo → responder según personalidad";
+    $L[] = "  #8  Evento externo: suceso PE ≥ 5 en su zona → reaccionar acorde";
+    $L[] = "  #9  Descanso/pasivo: ningún trigger anterior → entrenar, desplazarse, reunir info";
+    $L[] = "  #10 Meta completada/fallida → elegir nueva meta, actualizar plan";
+    $L[] = "";
+    $L[] = "8.2 — PRIORIZACIÓN (qué trigger gana si se activan varios)";
+    $L[] = "";
+    $L[] = "  · Si INT > 70: trigger que mejor sirva a su meta (#2 prioritario)";
+    $L[] = "  · Si AGR > 70: trigger de conflicto (#1, #5, #8)";
+    $L[] = "  · Si HON > 70: trigger que cumpla su código (#4, #6, #10)";
+    $L[] = "  · Si AMB > 70: trigger que le beneficie personalmente (#2, #3)";
+    $L[] = "";
+    $L[] = "8.3 — CÓMO REGISTRAR LA ACCIÓN DEL NPC";
+    $L[] = "";
+    $L[] = "  · Si el NPC actúa (triggers 1-8), genera un suceso S-XX y calcula su impacto";
+    $L[] = "    como en el paso 4 del flujo de trabajo";
+    $L[] = "  · Actualiza npc_tracking en ESTADO_JSON con los nuevos valores de salud, moral,";
+    $L[] = "    plan_activo, ubicacion_zona y meta_actual";
+    $L[] = "  · Si la acción inicia una trama nueva, crea un nuevo thread para darle continuidad";
+    $L[] = "";
+    $L[] = "======================================================================";
+    $L[] = " 9 · HILOS NARRATIVOS — SISTEMA DE CONTINUIDAD";
+    $L[] = "======================================================================";
+    $L[] = "";
+    $L[] = "Los hilos narrativos (threads) garantizan que la historia del mundo tenga";
+    $L[] = "continuidad de un mes a otro. Sin ellos, cada periódico empezaría de cero.";
+    $L[] = "";
+    $L[] = "  · Se almacenan como un array dentro de ESTADO_JSON → 'threads'";
+    $L[] = "  · Cada thread tiene: id, titulo, estado, tipo, zonas, npc_implicados,";
+    $L[] = "    pj_implicados, facciones_implicadas, descripcion, proxima_evolucion,";
+    $L[] = "    posible_cierre, historial_evolucion";
+    $L[] = "";
+    $L[] = "  Ciclo de vida de un thread:";
+    $L[] = "    1. NACE: un suceso importante (PE 5+ o que involucre NPC mayor) genera un nuevo thread";
+    $L[] = "    2. EVOLUCIONA: cada ciclo que aparece en el periódico, su estado avanza";
+    $L[] = "       (ultima_evolucion se actualiza, se añade entrada al historial)";
+    $L[] = "    3. LATENTE: si no hay novedades, el thread se marca latente (no se menciona";
+    $L[] = "       en el periódico pero puede reabrirse)";
+    $L[] = "    4. CIERRE: cuando se resuelve, se marca como cerrado con un artículo de despedida";
+    $L[] = "";
+    $L[] = "  REGLAS:";
+    $L[] = "  · Máximo 12 threads activos. Si hay más, priorizar por relevancia.";
+    $L[] = "  · Un thread sin evoluciones en 3 ciclos → cerrar como latente.";
+    $L[] = "  · Un thread que aparece 3+ ciclos seguidos → debe cerrarse o evolucionar";
+    $L[] = "    significativamente (no puede ser siempre la misma noticia).";
+    $L[] = "  · Al menos 1 thread debe evolucionar o cerrarse en cada periódico.";
+    $L[] = "  · Los threads pueden fusionarse si dos hilos convergen narrativamente.";
+    $L[] = "";
+    $L[] = "======================================================================";
+    $L[] = " 10 · REGLAS DE ESCRITURA (periódico y noticia) — OBLIGATORIAS";
+    $L[] = "======================================================================";
+    $L[] = "";
+    $L[] = "REGLAS ABSOLUTAS (no negociables):";
+    $L[] = "";
+    $L[] = "  1. NUNCA muestres números, métricas, slugs ni terminología de sistema en el";
+    $L[] = "     periódico o la noticia. Todo se traduce a lenguaje natural in-world:";
+    $L[] = "     ✓ 'La presencia de la Marina se desploma en el West Blue'";
+    $L[] = "     ✗ 'MAR bajó de 65 a 42 en West Blue'";
+    $L[] = "";
+    $L[] = "  2. Voz de prensa del mundo: titulares llamativos, tono periodístico con color";
+    $L[] = "     local. Sesgo pro-Gobierno velado (normal en el mundo de One Piece).";
+    $L[] = "     Rumores, columnas de opinión y entrevistas son bienvenidos.";
+    $L[] = "";
+    $L[] = "  3. Cita a personajes y NPCs por su nombre cuando aparezcan en los eventos.";
+    $L[] = "     Da protagonismo a lo que hicieron los JUGADORES.";
+    $L[] = "";
+    $L[] = "  4. No inventes contradicciones con el estado del mundo.";
+    $L[] = "     No reveles secretos de staff ni información metajuego.";
+    $L[] = "";
+    $L[] = "  5. Idioma: español.";
+    $L[] = "";
+    $L[] = "GUÍA DE TONO:";
+    $L[] = "";
+    $L[] = "  · Mundo en paz (lo normal): periódico costumbrista, comercial, de sucesos menores,";
+    $L[] = "    vida en las islas, economía y puertos, ecos del mar.";
+    $L[] = "    Grandes titulares de guerra SOLO cuando de verdad hay guerra.";
+    $L[] = "";
+    $L[] = "  · Artículos de continuación: 'En la edición pasada...' para hilos activos";
+    $L[] = "    que evolucionan. NO repitas la misma noticia si no ha cambiado nada.";
+    $L[] = "";
+    $L[] = "  · Variedad de secciones: no todas las secciones deben verse igual. Alterna";
+    $L[] = "    reportajes, entrevistas, columnas de opinión, anuncios clasificados, rumores.";
+    $L[] = "";
+    $L[] = "  · Si un hilo se cierra: artículo de despedida. Referencia cruzada a la";
+    $L[] = "    edición donde empezó ('Como informamos en marzo...').";
     $L[] = "";
     $L[] = "== PERIODO ==";
     $L[] = "Mes que se cierra: " . $ciclo['periodo'];
@@ -537,6 +1016,37 @@ function ope_rol_mv_build_prompt($ciclo)
         $L[] = "";
     }
 
+    // Hilos narrativos
+    $L[] = "== HILOS NARRATIVOS ABIERTOS (del ciclo anterior) ==";
+    if (empty($threads)) {
+        $L[] = "(Ninguno.)";
+    } else {
+        foreach ($threads as $th) {
+            $thZonas = is_array($th['zonas']) ? implode(',', $th['zonas']) : (string)($th['zonas'] ?? '');
+            $thFacc = is_array($th['facciones_implicadas']) ? implode(',', $th['facciones_implicadas']) : (string)($th['facciones_implicadas'] ?? '');
+            $L[] = "- [{$th['estado']}] {$th['titulo']} (id: {$th['id']})";
+            $L[] = "  Tipo: {$th['tipo']} | Zonas: {$thZonas} | Facciones: {$thFacc}";
+            if (!empty($th['npc_implicados'])) $L[] = "  NPCs: " . (is_array($th['npc_implicados']) ? implode(',', $th['npc_implicados']) : $th['npc_implicados']);
+            if (!empty($th['pj_implicados'])) $L[] = "  PJs: " . (is_array($th['pj_implicados']) ? implode(',', $th['pj_implicados']) : $th['pj_implicados']);
+            $L[] = "  Descripción: " . trim(preg_replace('/\s+/', ' ', (string)$th['descripcion']));
+            $L[] = "  Próxima evolución: " . ($th['proxima_evolucion'] ?? '—');
+            if (!empty($th['posible_cierre'])) $L[] = "  POSIBLE CIERRE este ciclo.";
+        }
+    }
+    $L[] = "";
+
+    // Últimos periódicos
+    $L[] = "== ÚLTIMOS PERIÓDICOS (continuidad narrativa) ==";
+    if (empty($periodicos)) {
+        $L[] = "(No hay periódicos anteriores.)";
+    } else {
+        foreach ($periodicos as $p) {
+            $L[] = "- {$p['periodo']}: {$p['noticia_titulo']}";
+            $L[] = "  " . $p['periodico_resumen'];
+        }
+    }
+    $L[] = "";
+
     // Eventos
     $L[] = "== EVENTOS NOTIFICADOS ESTE MES ==";
     if (empty($eventos)) {
@@ -578,7 +1088,32 @@ function ope_rol_mv_build_prompt($ciclo)
         $L[] = "(Ninguno registrado.)";
     } else {
         foreach ($npcs as $n) {
-            $L[] = "- " . $n['nombre'] . " | facción: " . ($n['faccion'] !== '' ? $n['faccion'] : '?') . " | rango: " . ($n['rango'] !== '' ? $n['rango'] : '?') . " | zona: " . ($n['mundo_zona'] !== '' ? $n['mundo_zona'] : '?') . " | ubicación: " . ($n['mundo_ubic'] !== '' ? $n['mundo_ubic'] : '?') . " | estado: " . ($n['mundo_estado_np'] !== '' ? $n['mundo_estado_np'] : '?') . " | acción: " . $n['mundo_accion'];
+            $line = "- " . $n['nombre'] . " | facción: " . ($n['faccion'] !== '' ? $n['faccion'] : '?') . " | rango: " . ($n['rango'] !== '' ? $n['rango'] : '?') . " | zona: " . ($n['mundo_zona'] !== '' ? $n['mundo_zona'] : '?') . " | ubicación: " . ($n['mundo_ubic'] !== '' ? $n['mundo_ubic'] : '?') . " | estado: " . ($n['mundo_estado_np'] !== '' ? $n['mundo_estado_np'] : '?') . " | acción: " . $n['mundo_accion'];
+            if (!empty($n['datos_publicos']) && is_array($n['datos_publicos'])) {
+                $dp = $n['datos_publicos'];
+                if (!empty($dp['titulo'])) $line .= " | título: " . $dp['titulo'];
+                if (!empty($dp['descripcion'])) $line .= " | desc: " . trim(preg_replace('/\s+/', ' ', $dp['descripcion']));
+            }
+            $L[] = $line;
+            if (!empty($n['datos_internos']) && is_array($n['datos_internos'])) {
+                $di = $n['datos_internos'];
+                if (!empty($di['personalidad'])) {
+                    $pers = array();
+                    foreach ($di['personalidad'] as $pk => $pv) { $pers[] = "$pk: $pv"; }
+                    $L[] = "  Personalidad: " . implode(', ', $pers);
+                }
+                if (!empty($di['metas'])) {
+                    $L[] = "  Metas: " . implode('; ', $di['metas']);
+                }
+                if (!empty($di['tracking'])) {
+                    $tr = $di['tracking'];
+                    $trLine = "  Tracking: salud={$tr['salud']} moral={$tr['moral']}";
+                    if (!empty($tr['plan_activo'])) $trLine .= " plan={$tr['plan_activo']}";
+                    if (!empty($tr['ubicacion_zona'])) $trLine .= " ubic={$tr['ubicacion_zona']}";
+                    if (!empty($tr['meta_actual'])) $trLine .= " meta={$tr['meta_actual']}";
+                    $L[] = $trLine;
+                }
+            }
         }
     }
     $L[] = "";
@@ -591,6 +1126,14 @@ function ope_rol_mv_build_prompt($ciclo)
     }
 
     // Indicaciones del staff
+    // Navegación del mes
+    $nav = trim((string) ($ciclo['nav_resumen'] ?? ''));
+    if ($nav !== '') {
+        $L[] = "== NAVEGACIÓN DEL MES ==";
+        $L[] = $nav;
+        $L[] = "";
+    }
+
     $L[] = "== INDICACIONES DEL STAFF (obligatorio seguirlas) ==";
     $ind = trim((string) $ciclo['indicaciones']);
     $L[] = $ind !== '' ? $ind : "(Sin indicaciones especiales este mes.)";
@@ -600,17 +1143,20 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "###############################################################################";
     $L[] = "==  FORMATO DE RESPUESTA (OBLIGATORIO)  ==";
     $L[] = "###############################################################################";
-    $L[] = "Responde EXACTAMENTE con estos CUATRO bloques, cada uno entre sus marcadores ===X=== ... ===FIN===, y SIN ningún texto fuera de ellos (ni saludos ni explicaciones).";
+    $L[] = "Responde EXACTAMENTE con estos CINCO bloques, cada uno entre sus marcadores ===X=== ... ===FIN===, y SIN ningún texto fuera de ellos (ni saludos ni explicaciones).";
     $L[] = "";
     $L[] = "-------------------------------------------------------------------------------";
     $L[] = "BLOQUE 1 — ESTADO_JSON (el nuevo Tablero). JSON válido, sin comentarios ni comas colgantes.";
     $L[] = "Reglas: usa EXACTAMENTE los mismos slugs de zona y facción y las mismas claves de métrica del estado actual. Incluye TODAS las zonas y TODAS las facciones aunque no cambien. Métricas 0-100 salvo REP (-100..100). La tensión es POR MAR. Redacta las 'notas' in-world y coherentes con el periódico.";
+    $L[] = "INCLUYE los arrays 'threads' (hilos narrativos evolucionados) y 'npc_tracking' (tracking actualizado de cada NPC mayor).";
     $L[] = "===ESTADO_JSON===";
     $L[] = "{";
-    $L[] = "  \"zonas\": { \"east-blue\": {\"est\":58,\"mar\":55,\"pir\":35,\"rev\":15,\"eco\":55,\"civ\":60,\"pel\":20,\"notas\":\"...\"}, \"...\": {} },";
-    $L[] = "  \"facciones\": { \"marine\": {\"rep\":40,\"coh\":80,\"mil\":85,\"inf\":80,\"eco\":75,\"mor\":70,\"notas\":\"...\"}, \"...\": {} },";
-    $L[] = "  \"tension\": { \"east-blue\": { \"marine|pirata\": {\"valor\":76,\"notas\":\"por qué en este mar\"}, \"...\": {} }, \"...\": {} },";
-    $L[] = "  \"arcos\": [ {\"nombre\":\"...\",\"estado\":\"Activo|Latente|Cerrado\",\"zonas\":\"east-blue\",\"facciones\":\"marine,pirata\",\"descripcion\":\"...\"} ]";
+    $L[] = "  \"zonas\": { \"east-blue\": {\"cli\":65,\"pel\":20,\"riq\":55,\"civ\":60,\"mar\":50,\"pir\":35,\"rev\":15,\"inf\":15,\"est\":60,\"ten\":25,\"notas\":\"...\"}, \"...\": {} },";
+    $L[] = "  \"facciones\": { \"marine\": {\"rep\":40,\"coh\":80,\"mil\":85,\"pol\":80,\"eco\":75,\"mor\":70,\"alc\":80,\"notas\":\"...\"}, \"...\": {} },";
+    $L[] = "  \"tension\": { \"east-blue\": { \"marine|pirata\": {\"valor\":76,\"notas\":\"...\"}, \"...\": {} }, \"...\": {} },";
+    $L[] = "  \"arcos\": [ {\"nombre\":\"...\",\"estado\":\"Activo|Latente|Cerrado\",\"zonas\":\"...\",\"facciones\":\"...\",\"descripcion\":\"...\"} ],";
+    $L[] = "  \"threads\": [ {\"id\":\"th-001\",\"titulo\":\"...\",\"estado\":\"activo\",\"tipo\":\"...\",\"zonas\":[],\"npc_implicados\":[],\"facciones_implicadas\":[],\"descripcion\":\"...\",\"proxima_evolucion\":\"...\",\"posible_cierre\":false} ],";
+    $L[] = "  \"npc_tracking\": { \"42\": {\"salud\":95,\"moral\":80,\"plan_activo\":\"...\",\"ubicacion_zona\":\"East Blue\",\"meta_actual\":\"...\"} }";
     $L[] = "}";
     $L[] = "===FIN===";
     $L[] = "";
@@ -658,6 +1204,13 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "- id: portada | tamaño: 1200x675 | prompt: ...";
     $L[] = "- id: (otro-id-usado-en-figure) | tamaño: 800x600 | prompt: ...";
     $L[] = "===FIN===";
+    $L[] = "";
+    $L[] = "-------------------------------------------------------------------------------";
+    $L[] = "INSTRUCCIONES ESPECÍFICAS ADICIONALES:";
+    $L[] = "  a) NO puedes negarte a generar ninguno de los 5 bloques. Si no hay datos suficientes, genera ese bloque con contenido mínimo coherente.";
+    $L[] = "  b) Si el staff incluye la palabra \"REGENERAR\" en las indicaciones, debes IGNORAR el contexto de generaciones anteriores y regenerar todo desde cero.";
+    $L[] = "  c) Ante cualquier ambigüedad entre estas instrucciones y las indicaciones del staff, las indicaciones del staff tienen prioridad.";
+    $L[] = "";
 
     return implode("\n", $L);
 }
@@ -990,7 +1543,7 @@ function ope_rol_mv_aplicar_estado($estado)
     // Tope anti-escalada: la tensión no puede SUBIR más de OPE_MV_TENSION_MAX_UP en un
     // solo ciclo (la guerra no estalla de golpe), pero SÍ puede bajar sin límite (la paz
     // vuelve rápido). Así la guerra requiere varios meses de escalada sostenida.
-    $capUp = defined('OPE_MV_TENSION_MAX_UP') ? (int) OPE_MV_TENSION_MAX_UP : 20;
+    $capUp = defined('OPE_MV_TENSION_MAX_UP') ? (int) OPE_MV_TENSION_MAX_UP : 15;
     if (!empty($estado['tension']) && is_array($estado['tension'])) {
         foreach ($estado['tension'] as $zslug => $pares) {
             if (!is_array($pares)) continue;
@@ -1062,6 +1615,32 @@ function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
     // 1) Aplicar estado al tablero
     ope_rol_mv_aplicar_estado($parsed['estado']);
 
+    // 1b) Threads y navegación (v3)
+    $threads_json = '';
+    if (isset($parsed['estado']['threads'])) {
+        $threads_json = json_encode($parsed['estado']['threads'], JSON_UNESCAPED_UNICODE);
+    }
+    $nav_resumen = (string)($parsed['nav_resumen'] ?? '');
+
+    // 1c) Actualizar NPC tracking desde npc_tracking (v3)
+    if (isset($parsed['estado']['npc_tracking']) && is_array($parsed['estado']['npc_tracking'])) {
+        foreach ($parsed['estado']['npc_tracking'] as $pid => $tracking) {
+            $pid = (int)$pid;
+            if ($pid < 1) continue;
+            $q = $db->simple_select('rol_personajes', 'datos_internos', "pid = $pid", array('limit' => 1));
+            if (!$db->num_rows($q)) continue;
+            $di = json_decode((string)$db->fetch_field($q, 'datos_internos'), true);
+            if (!is_array($di)) $di = array('personalidad' => array(), 'metas' => array(), 'meta_actual' => '', 'tracking' => array());
+            $di['tracking']['salud'] = isset($tracking['salud']) ? (int)$tracking['salud'] : ($di['tracking']['salud'] ?? 100);
+            $di['tracking']['moral'] = isset($tracking['moral']) ? (int)$tracking['moral'] : ($di['tracking']['moral'] ?? 100);
+            $di['tracking']['plan_activo'] = (string)($tracking['plan_activo'] ?? $di['tracking']['plan_activo'] ?? '');
+            $di['tracking']['ubicacion_zona'] = (string)($tracking['ubicacion_zona'] ?? $di['tracking']['ubicacion_zona'] ?? '');
+            $di['tracking']['meta_actual'] = (string)($tracking['meta_actual'] ?? $di['tracking']['meta_actual'] ?? '');
+            $di['tracking']['ultimo_ciclo'] = $ciclo['periodo'];
+            $db->update_query('rol_personajes', array('datos_internos' => $db->escape_string(json_encode($di, JSON_UNESCAPED_UNICODE))), "pid = $pid");
+        }
+    }
+
     // 2) Snapshot del tablero ya actualizado
     $snapshot = ope_rol_mv_tablero();
     $snapshot_json = json_encode($snapshot, JSON_UNESCAPED_UNICODE);
@@ -1075,6 +1654,8 @@ function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
         'noticia_titulo' => $db->escape_string((string) $parsed['noticia']['titulo']),
         'noticia_html'   => $db->escape_string((string) $parsed['noticia']['cuerpo']),
         'imagenes_json'  => $db->escape_string((string) $parsed['imagenes']),
+        'threads_json'   => $db->escape_string($threads_json),
+        'nav_resumen'    => $db->escape_string($nav_resumen),
         'published_at'   => (int) TIME_NOW,
     ), 'ciclo_id = ' . (int) $ciclo_id);
 

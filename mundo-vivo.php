@@ -43,6 +43,18 @@ if ($is_webmaster && $mybb->request_method === 'post' && $ciclo_id > 0) {
                 $flash = 'Evento actualizado.';
             }
 
+        } elseif ($action === 'evento_classify') {
+            $eid = (int)$mybb->get_input('evento_id', MyBB::INPUT_INT);
+            $ts = $mybb->get_input('tipo_suceso');
+            $pe = $mybb->get_input('pe_estimado', MyBB::INPUT_INT);
+            if ($eid > 0) {
+                $upd = array();
+                if (preg_match('/^S-\d{2}$/', $ts)) $upd['tipo_suceso'] = $db->escape_string($ts);
+                if ($pe >= 1 && $pe <= 10) $upd['pe_estimado'] = $pe;
+                if (!empty($upd)) $db->update_query('rol_mv_eventos', $upd, 'evento_id = ' . $eid);
+                $flash = 'Clasificación del evento guardada.';
+            }
+
         } elseif ($action === 'evento_delete') {
             $eid = (int)$mybb->get_input('evento_id', MyBB::INPUT_INT);
             if ($eid > 0) { $db->delete_query('rol_mv_eventos', 'evento_id = ' . $eid); $flash = 'Evento eliminado.'; }
@@ -127,7 +139,20 @@ if ($is_webmaster && $mybb->request_method === 'post' && $ciclo_id > 0) {
                     'mundo_accion'    => $db->escape_string(trim($mybb->get_input('mundo_accion'))),
                     'mundo_estado_np' => $db->escape_string(trim($mybb->get_input('mundo_estado_np'))),
                 ), 'pid = ' . $pid);
-                $flash = 'Ubicación del NPC actualizada.';
+                // Tracking fields (datos_internos)
+                $q = $db->simple_select('rol_personajes', 'datos_internos', "pid = $pid", array('limit' => 1));
+                if ($db->num_rows($q)) {
+                    $di = json_decode((string)$db->fetch_field($q, 'datos_internos'), true);
+                    if (!is_array($di)) $di = array('personalidad' => array(), 'metas' => array(), 'meta_actual' => '', 'tracking' => array());
+                    $trackSalud = $mybb->get_input('track_salud', MyBB::INPUT_INT);
+                    $trackMoral = $mybb->get_input('track_moral', MyBB::INPUT_INT);
+                    if ($trackSalud >= 0 && $trackSalud <= 100) $di['tracking']['salud'] = $trackSalud;
+                    if ($trackMoral >= 0 && $trackMoral <= 100) $di['tracking']['moral'] = $trackMoral;
+                    $di['tracking']['plan_activo'] = $mybb->get_input('track_plan');
+                    $di['tracking']['meta_actual'] = $mybb->get_input('track_meta');
+                    $db->update_query('rol_personajes', array('datos_internos' => $db->escape_string(json_encode($di, JSON_UNESCAPED_UNICODE))), "pid = $pid");
+                }
+                $flash = 'Ubicación y tracking del NPC actualizados.';
             }
 
         } elseif ($action === 'npc_menor_add') {
@@ -147,6 +172,97 @@ if ($is_webmaster && $mybb->request_method === 'post' && $ciclo_id > 0) {
         } elseif ($action === 'npc_menor_delete') {
             $id = (int)$mybb->get_input('id', MyBB::INPUT_INT);
             if ($id > 0) { $db->delete_query('rol_mv_npc_menores', 'id = ' . $id); $flash = 'NPC menor eliminado.'; }
+
+        } elseif ($action === 'npc_json_save') {
+            $dpi = $mybb->get_input('datos_publicos', MyBB::INPUT_ARRAY);
+            $dii = $mybb->get_input('datos_internos', MyBB::INPUT_ARRAY);
+            if (is_array($dpi)) {
+                foreach ($dpi as $pid => $json_str) {
+                    $pid = (int)$pid; if ($pid < 1) continue;
+                    $dp_clean = json_decode($json_str, true);
+                    if (!is_array($dp_clean)) $dp_clean = new stdClass();
+                    $db->update_query('rol_personajes', array('datos_publicos' => $db->escape_string(json_encode($dp_clean, JSON_UNESCAPED_UNICODE))), 'pid = ' . $pid);
+                }
+            }
+            if (is_array($dii)) {
+                foreach ($dii as $pid => $json_str) {
+                    $pid = (int)$pid; if ($pid < 1) continue;
+                    $di_clean = json_decode($json_str, true);
+                    if (!is_array($di_clean)) $di_clean = new stdClass();
+                    $db->update_query('rol_personajes', array('datos_internos' => $db->escape_string(json_encode($di_clean, JSON_UNESCAPED_UNICODE))), 'pid = ' . $pid);
+                }
+            }
+            $flash = 'Datos de NPCs actualizados.';
+
+        } elseif ($action === 'save_nav_resumen') {
+            $db->update_query('rol_mv_ciclos', array('nav_resumen' => $db->escape_string(trim($mybb->get_input('nav_resumen')))), 'ciclo_id = ' . $ciclo_id);
+            $flash = 'Resumen de navegación guardado.';
+
+        } elseif ($action === 'thread_save') {
+            $threads = $mybb->get_input('threads', MyBB::INPUT_ARRAY);
+            if (is_array($threads)) {
+                $ultimo = ope_rol_mv_ultimo_publicado();
+                $estado_json = $ultimo ? json_decode($ultimo['estado_json'], true) : array();
+                if (!is_array($estado_json)) $estado_json = array();
+                $estado_json['threads'] = array_values($threads);
+                $db->update_query('rol_mv_ciclos', array(
+                    'estado_json' => $db->escape_string(json_encode($estado_json, JSON_UNESCAPED_UNICODE))
+                ), 'ciclo_id = ' . (int)($ultimo['ciclo_id'] ?? 0));
+                $flash = 'Hilos narrativos actualizados.';
+            }
+
+        } elseif ($action === 'thread_add') {
+            $titulo = trim($mybb->get_input('thread_titulo'));
+            if ($titulo !== '') {
+                $ultimo = ope_rol_mv_ultimo_publicado();
+                $estado_json = $ultimo ? json_decode($ultimo['estado_json'], true) : array();
+                if (!is_array($estado_json)) $estado_json = array();
+                if (!isset($estado_json['threads'])) $estado_json['threads'] = array();
+                $nextId = 1;
+                foreach ($estado_json['threads'] as $ex) {
+                    if (isset($ex['id']) && preg_match('/^th-(\d+)$/', $ex['id'], $m)) {
+                        $nextId = max($nextId, (int)$m[1] + 1);
+                    }
+                }
+                $estado_json['threads'][] = array(
+                    'id' => 'th-' . str_pad((string)$nextId, 3, '0', STR_PAD_LEFT),
+                    'titulo' => $titulo,
+                    'estado' => $mybb->get_input('thread_estado') ?: 'activo',
+                    'tipo' => $mybb->get_input('thread_tipo') ?: 'otro',
+                    'zonas' => array_filter(array_map('trim', explode(',', $mybb->get_input('thread_zonas')))),
+                    'npc_implicados' => array_filter(array_map('trim', explode(',', $mybb->get_input('thread_npcs')))),
+                    'pj_implicados' => array_filter(array_map('trim', explode(',', $mybb->get_input('thread_pjs')))),
+                    'facciones_implicadas' => array_filter(array_map('trim', explode(',', $mybb->get_input('thread_facciones')))),
+                    'primer_avistamiento' => $ciclo['periodo'],
+                    'ultima_evolucion' => $ciclo['periodo'],
+                    'ultimo_periodico' => $ciclo['periodo'],
+                    'descripcion' => trim($mybb->get_input('thread_descripcion')),
+                    'proxima_evolucion' => trim($mybb->get_input('thread_prox_evol')),
+                    'posible_cierre' => (bool)$mybb->get_input('thread_posible_cierre', MyBB::INPUT_INT),
+                    'historial_evolucion' => array(array('fecha' => $ciclo['periodo'], 'evento' => 'Creado por staff', 'periodico' => $ciclo['periodo'])),
+                );
+                $db->update_query('rol_mv_ciclos', array(
+                    'estado_json' => $db->escape_string(json_encode($estado_json, JSON_UNESCAPED_UNICODE))
+                ), 'ciclo_id = ' . (int)($ultimo['ciclo_id'] ?? 0));
+                $flash = 'Hilo narrativo añadido.';
+            }
+
+        } elseif ($action === 'thread_delete') {
+            $thread_id = $mybb->get_input('thread_id');
+            if ($thread_id !== '') {
+                $ultimo = ope_rol_mv_ultimo_publicado();
+                $estado_json = $ultimo ? json_decode($ultimo['estado_json'], true) : array();
+                if (!is_array($estado_json)) $estado_json = array();
+                if (!empty($estado_json['threads'])) {
+                    $estado_json['threads'] = array_values(array_filter($estado_json['threads'], function($t) use ($thread_id) {
+                        return is_array($t) && ($t['id'] ?? '') !== $thread_id;
+                    }));
+                }
+                $db->update_query('rol_mv_ciclos', array(
+                    'estado_json' => $db->escape_string(json_encode($estado_json, JSON_UNESCAPED_UNICODE))
+                ), 'ciclo_id = ' . (int)($ultimo['ciclo_id'] ?? 0));
+                $flash = 'Hilo narrativo eliminado.';
+            }
 
         } elseif ($action === 'generar_prompt') {
             $ciclo = ope_rol_mv_ciclo_by_id($ciclo_id);
@@ -262,6 +378,7 @@ header('Content-Type: text/html; charset=utf-8');
       <button class="mv-tab" data-tab="misiones">Misiones <span class="mv-pill"><?php echo count($misiones); ?></span></button>
       <button class="mv-tab" data-tab="tablero">Tablero</button>
       <button class="mv-tab" data-tab="npcs">NPCs</button>
+      <button class="mv-tab" data-tab="hilos">Hilos</button>
       <button class="mv-tab" data-tab="historico">Histórico</button>
       <button class="mv-tab" data-tab="generar">Generar / Publicar</button>
     </div>
@@ -282,6 +399,22 @@ header('Content-Type: text/html; charset=utf-8');
             <p class="mv-ev-res"><?php echo nl2br(htmlspecialchars_uni((string)$e['resumen'])); ?></p>
           </div>
           <div class="mv-ev-acts">
+            <form method="post" class="mv-inline">
+              <input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="evento_classify"><input type="hidden" name="evento_id" value="<?php echo (int)$e['evento_id']; ?>">
+              <select name="tipo_suceso" class="mv-input mv-input-xs" title="Tipo de suceso S-01 a S-12">
+                <option value="">S-??</option>
+<?php for ($si = 1; $si <= 12; $si++): $sc = sprintf('S-%02d', $si); $sel = ($e['tipo_suceso'] ?? '') === $sc ? ' selected' : ''; ?>
+                <option value="<?php echo $sc; ?>"<?php echo $sel; ?>><?php echo $sc; ?></option>
+<?php endfor; ?>
+              </select>
+              <select name="pe_estimado" class="mv-input mv-input-xs" title="Peso del Evento 1-10">
+                <option value="">PE</option>
+<?php for ($pei = 1; $pei <= 10; $pei++): $selPE = (isset($e['pe_estimado']) && (int)$e['pe_estimado'] === $pei) ? ' selected' : ''; ?>
+                <option value="<?php echo $pei; ?>"<?php echo $selPE; ?>><?php echo $pei; ?></option>
+<?php endfor; ?>
+              </select>
+              <button class="btn btn-xs" title="Guardar clasificación">✓</button>
+            </form>
             <form method="post"><input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="evento_estado"><input type="hidden" name="evento_id" value="<?php echo (int)$e['evento_id']; ?>"><input type="hidden" name="estado" value="incluido"><button class="btn btn-sm">Incluir</button></form>
             <form method="post"><input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="evento_estado"><input type="hidden" name="evento_id" value="<?php echo (int)$e['evento_id']; ?>"><input type="hidden" name="estado" value="descartado"><button class="btn btn-sm btn-ghost">Descartar</button></form>
             <form method="post" onsubmit="return confirm('¿Eliminar este evento?');"><input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="evento_delete"><input type="hidden" name="evento_id" value="<?php echo (int)$e['evento_id']; ?>"><button class="btn btn-sm btn-danger">×</button></form>
@@ -411,14 +544,38 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if (empty($npcs)): ?>
         <p class="mv-empty">No hay NPCs con ficha. Créalos desde Zona Staff → Crear NPC.</p>
 <?php else: foreach ($npcs as $n): ?>
+<?php
+  $npcTrack = $n['datos_internos']['tracking'] ?? array();
+?>
         <form method="post" class="mv-npc">
           <input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="npc_ubic"><input type="hidden" name="pid" value="<?php echo (int)$n['pid']; ?>">
           <div class="mv-npc-name"><b><?php echo htmlspecialchars_uni($n['nombre']); ?></b> <small><?php echo htmlspecialchars_uni($n['faccion']); ?> · <?php echo htmlspecialchars_uni($n['rango']); ?></small></div>
-          <select name="mundo_zona" class="mv-input mv-input-sm"><?php echo mv_zona_options($zonas, $n['mundo_zona']); ?></select>
-          <input type="text" name="mundo_ubic" class="mv-input mv-input-sm" placeholder="Isla/lugar" value="<?php echo htmlspecialchars_uni((string)$n['mundo_ubic']); ?>">
-          <input type="text" name="mundo_estado_np" class="mv-input mv-input-sm" placeholder="Estado (activo/herido...)" value="<?php echo htmlspecialchars_uni((string)$n['mundo_estado_np']); ?>">
-          <input type="text" name="mundo_accion" class="mv-input" placeholder="Acción actual" value="<?php echo htmlspecialchars_uni((string)$n['mundo_accion']); ?>">
+          <div class="mv-npc-row">
+            <select name="mundo_zona" class="mv-input mv-input-sm"><?php echo mv_zona_options($zonas, $n['mundo_zona']); ?></select>
+            <input type="text" name="mundo_ubic" class="mv-input mv-input-sm" placeholder="Isla/lugar" value="<?php echo htmlspecialchars_uni((string)$n['mundo_ubic']); ?>">
+            <input type="text" name="mundo_estado_np" class="mv-input mv-input-sm" placeholder="Estado (activo/herido...)" value="<?php echo htmlspecialchars_uni((string)$n['mundo_estado_np']); ?>">
+            <input type="text" name="mundo_accion" class="mv-input mv-input-sm" placeholder="Acción actual" value="<?php echo htmlspecialchars_uni((string)$n['mundo_accion']); ?>">
+          </div>
+          <div class="mv-npc-row">
+            <span class="mv-npc-track-lbl">Tracking interno:</span>
+            <input type="number" min="0" max="100" name="track_salud" class="mv-input mv-input-xs" placeholder="Salud" value="<?php echo (int)($npcTrack['salud'] ?? 100); ?>" title="Salud (0-100)">
+            <input type="number" min="0" max="100" name="track_moral" class="mv-input mv-input-xs" placeholder="Moral" value="<?php echo (int)($npcTrack['moral'] ?? 100); ?>" title="Moral (0-100)">
+            <input type="text" name="track_plan" class="mv-input mv-input-sm" placeholder="Plan activo" value="<?php echo htmlspecialchars_uni((string)($npcTrack['plan_activo'] ?? '')); ?>">
+            <input type="text" name="track_meta" class="mv-input mv-input-sm" placeholder="Meta actual" value="<?php echo htmlspecialchars_uni((string)($npcTrack['meta_actual'] ?? '')); ?>">
+          </div>
           <button class="btn btn-sm">Guardar</button>
+        </form>
+        <form method="post" class="mv-npc">
+          <input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="npc_json_save">
+          <details class="mv-npc-json">
+            <summary>Datos públicos (JSON) — se muestra en Estado del Mundo</summary>
+            <textarea name="datos_publicos[<?php echo (int)$n['pid']; ?>]" class="mv-input mv-mono" rows="4"><?php echo htmlspecialchars_uni(json_encode($n['datos_publicos'], JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE)); ?></textarea>
+          </details>
+          <details class="mv-npc-json">
+            <summary>Datos internos (JSON) — solo staff/IA</summary>
+            <textarea name="datos_internos[<?php echo (int)$n['pid']; ?>]" class="mv-input mv-mono" rows="6"><?php echo htmlspecialchars_uni(json_encode($n['datos_internos'], JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE)); ?></textarea>
+          </details>
+          <button class="btn btn-sm">Guardar JSON</button>
         </form>
 <?php endforeach; endif; ?>
       </div>
@@ -452,6 +609,63 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
   </section>
 
+  <!-- ===== HILOS NARRATIVOS ===== -->
+  <section class="mv-panel reveal" id="tab-hilos" hidden>
+    <div class="plate">
+      <div class="plate-h"><span class="t">Hilos narrativos</span><span class="c">// tramas persistentes entre periódicos</span></div>
+      <div class="plate-b">
+        <form method="post" class="mv-addform">
+          <input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="thread_add">
+          <input type="text" name="thread_titulo" placeholder="Título del hilo" class="mv-input" required>
+          <div class="mv-addform-row">
+            <select name="thread_estado" class="mv-input mv-input-sm">
+              <option value="activo">Activo</option><option value="latente">Latente</option><option value="cerrado">Cerrado</option>
+            </select>
+            <select name="thread_tipo" class="mv-input mv-input-sm">
+              <option value="criatura">Criatura</option><option value="conflicto">Conflicto</option><option value="misterio">Misterio</option>
+              <option value="exploracion">Exploración</option><option value="persona">Persona</option><option value="profecia">Profecía</option>
+              <option value="objeto">Objeto</option><option value="otro">Otro</option>
+            </select>
+            <input type="text" name="thread_zonas" class="mv-input mv-input-sm" placeholder="Zonas (coma)">
+            <input type="text" name="thread_facciones" class="mv-input mv-input-sm" placeholder="Facciones (coma)">
+          </div>
+          <div class="mv-addform-row">
+            <input type="text" name="thread_npcs" class="mv-input mv-input-sm" placeholder="NPCs implicados (coma)">
+            <input type="text" name="thread_pjs" class="mv-input mv-input-sm" placeholder="PJs implicados (coma)">
+            <label class="mv-chk"><input type="checkbox" name="thread_posible_cierre" value="1"> Posible cierre</label>
+          </div>
+          <textarea name="thread_descripcion" class="mv-input" rows="2" placeholder="Descripción del hilo"></textarea>
+          <input type="text" name="thread_prox_evol" class="mv-input" placeholder="Próxima evolución posible">
+          <button class="btn btn-primary btn-sm">Añadir hilo</button>
+        </form>
+
+<?php
+$threadsList = ope_rol_mv_threads_activos();
+if (empty($threadsList)): ?>
+        <p class="mv-empty">No hay hilos narrativos activos.</p>
+<?php else: foreach ($threadsList as $th): if (!is_array($th)) continue; ?>
+        <div class="mv-row">
+          <div class="mv-mis-main">
+            <span class="mv-mis-t"><?php echo htmlspecialchars_uni($th['titulo'] ?? '(sin título)'); ?> <small>[<?php echo htmlspecialchars_uni($th['estado'] ?? ''); ?>]</small></span>
+            <span class="mv-ev-meta">
+              Tipo: <?php echo htmlspecialchars_uni($th['tipo'] ?? ''); ?>
+              <?php if (!empty($th['zonas'])): ?> &middot; Zonas: <?php echo htmlspecialchars_uni(implode(', ', (array)$th['zonas'])); endif; ?>
+              <?php if (!empty($th['facciones_implicadas'])): ?> &middot; Facciones: <?php echo htmlspecialchars_uni(implode(', ', (array)$th['facciones_implicadas'])); endif; ?>
+            </span>
+            <?php if (!empty($th['descripcion'])): ?><p class="mv-ev-res"><?php echo htmlspecialchars_uni($th['descripcion']); ?></p><?php endif; ?>
+            <?php if (!empty($th['npc_implicados'])): ?><p class="mv-note">NPCs: <?php echo htmlspecialchars_uni(implode(', ', (array)$th['npc_implicados'])); ?></p><?php endif; ?>
+            <?php if (!empty($th['pj_implicados'])): ?><p class="mv-note">PJs: <?php echo htmlspecialchars_uni(implode(', ', (array)$th['pj_implicados'])); ?></p><?php endif; ?>
+            <?php if (!empty($th['proxima_evolucion'])): ?><p class="mv-note">Próxima: <?php echo htmlspecialchars_uni($th['proxima_evolucion']); ?></p><?php endif; ?>
+          </div>
+          <div class="mv-ev-acts">
+            <form method="post" onsubmit="return confirm('¿Eliminar este hilo?');"><input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="thread_delete"><input type="hidden" name="thread_id" value="<?php echo htmlspecialchars_uni($th['id'] ?? ''); ?>"><button class="btn btn-sm btn-danger">×</button></form>
+          </div>
+        </div>
+<?php endforeach; endif; ?>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== HISTÓRICO ===== -->
   <section class="mv-panel reveal" id="tab-historico" hidden>
     <div class="plate">
@@ -478,6 +692,19 @@ header('Content-Type: text/html; charset=utf-8');
           <input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="save_indicaciones">
           <textarea name="indicaciones" class="mv-input" rows="5" placeholder="Qué quieres que la IA tenga en cuenta este mes..."><?php echo htmlspecialchars_uni((string)($ciclo['indicaciones'] ?? '')); ?></textarea>
           <div class="mv-save-bar"><button class="btn btn-primary btn-sm">Guardar indicaciones</button></div>
+        </form>
+        <p class="mv-note" style="margin-top:0.75rem">Las indicaciones no se heredan automáticamente. Cópialas manualmente del mes anterior si es necesario.</p>
+      </div>
+    </div>
+
+    <div class="plate">
+      <div class="plate-h"><span class="t">Resumen de navegación</span><span class="c">// viajes del mes</span></div>
+      <div class="plate-b">
+        <form method="post">
+          <input type="hidden" name="my_post_key" value="<?php echo $pk; ?>">
+          <input type="hidden" name="mv_action" value="save_nav_resumen">
+          <textarea name="nav_resumen" class="mv-input" rows="4" placeholder="Resumen de viajes completados, naufragios, descubrimientos..."><?php echo htmlspecialchars_uni((string)($ciclo['nav_resumen'] ?? '')); ?></textarea>
+          <div class="mv-save-bar"><button class="btn btn-primary btn-sm">Guardar</button></div>
         </form>
       </div>
     </div>
@@ -615,6 +842,45 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endforeach; ?>
         </div>
 <?php endif; ?>
+
+        <h3 class="mv-prev-h">Hilos narrativos activos</h3>
+<?php
+$threadsPrev = (is_array($preview['estado']) && !empty($preview['estado']['threads'])) ? $preview['estado']['threads'] : array();
+if (empty($threadsPrev)): ?>
+        <p class="mv-empty">La IA no devolvió hilos narrativos.</p>
+<?php else: ?>
+        <div class="mv-thrlist">
+<?php foreach ($threadsPrev as $th): if (!is_array($th)) continue; ?>
+          <div class="mv-thrcard">
+            <div class="mv-thrcard-h">
+              <span class="mv-thrcard-t"><?php echo htmlspecialchars_uni($th['titulo'] ?? '(sin título)'); ?></span>
+              <span class="mv-thrcard-est"><?php echo htmlspecialchars_uni($th['estado'] ?? ''); ?></span>
+            </div>
+<?php if (!empty($th['descripcion'])): ?><p><?php echo htmlspecialchars_uni($th['descripcion']); ?></p><?php endif; ?>
+<?php if (!empty($th['proxima_evolucion'])): ?><p class="mv-note">Próxima: <?php echo htmlspecialchars_uni($th['proxima_evolucion']); ?></p><?php endif; ?>
+          </div>
+<?php endforeach; ?>
+        </div>
+<?php endif; ?>
+
+        <h3 class="mv-prev-h">Tracking de NPCs mayores</h3>
+<?php
+$npcTrackPrev = (is_array($preview['estado']) && !empty($preview['estado']['npc_tracking'])) ? $preview['estado']['npc_tracking'] : array();
+if (empty($npcTrackPrev)): ?>
+        <p class="mv-empty">La IA no devolvió tracking de NPCs.</p>
+<?php else:
+  $currentTracking = ope_rol_mv_npc_tracking_from_db();
+  foreach ($npcTrackPrev as $pid => $track):
+    $old = $currentTracking[(int)$pid] ?? array();
+?>
+          <div class="mv-diff-block">
+            <div class="mv-diff-name">NPC #<?php echo (int)$pid; ?></div>
+            <div class="mv-diff-line">Salud: <?php echo (int)($old['salud'] ?? 100); ?> → <?php echo (int)$track['salud']; ?></div>
+            <div class="mv-diff-line">Moral: <?php echo (int)($old['moral'] ?? 100); ?> → <?php echo (int)$track['moral']; ?></div>
+            <div class="mv-diff-line">Ubicación: <?php echo htmlspecialchars_uni($old['ubicacion_zona'] ?? '?'); ?> → <?php echo htmlspecialchars_uni($track['ubicacion_zona']); ?></div>
+            <div class="mv-diff-line">Plan: <?php echo htmlspecialchars_uni($track['plan_activo'] ?? ''); ?></div>
+          </div>
+<?php endforeach; endif; ?>
 
         <form method="post" onsubmit="return confirm('¿Publicar el nuevo estado del mundo, el periódico y la noticia?');">
           <input type="hidden" name="my_post_key" value="<?php echo $pk; ?>"><input type="hidden" name="mv_action" value="publicar">

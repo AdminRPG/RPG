@@ -2667,8 +2667,8 @@ body.ope-pg-periodicos .pe-archive li a span{display:block;font-family:var(--bod
 .ope-per-longread p{column-count:1;font-size:1.02rem;line-height:1.72;text-align:justify;margin:0 0 14px}
 .ope-per-longread p:first-of-type::first-letter{font-family:'Big Shoulders Display',Impact,serif;font-size:3rem;line-height:.8;float:left;padding:4px 8px 0 0;color:#7a4a12}
 /* Cita destacada / pull-quote */
-.ope-per-pull{margin:16px 0;padding:10px 20px;border-left:5px solid #7a4a12;font-family:'Big Shoulders Display',Impact,serif;font-size:1.5rem;line-height:1.15;color:#3a2a14;font-style:italic;break-inside:avoid}
-.ope-per-cols .ope-per-pull{font-size:1.15rem;margin:10px 0}
+.ope-per-pull{margin:18px 0;padding:14px 22px;background:transparent;border:none;border-top:2px solid #b79f74;border-bottom:2px solid #b79f74;font-family:'Big Shoulders Display',Impact,serif;font-size:1.45rem;line-height:1.18;color:#3a2a14;font-style:italic;break-inside:avoid;text-align:center}
+.ope-per-cols .ope-per-pull{font-size:1.12rem;margin:12px 0}
 /* Tira de anuncios / clasificados */
 .ope-per-ads{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:16px 0}
 .ope-per-ad{border:2px solid #3a2a14;background:rgba(122,74,18,.06);padding:12px 13px;text-align:center}

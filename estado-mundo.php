@@ -79,7 +79,7 @@ header('Content-Type: text/html; charset=utf-8');
   <div class="em-hero-in">
     <span class="em-hero-k">// la balanza del mundo</span>
     <h1>Estado del mundo</h1>
-    <p><?php echo $ultimo ? ('Última actualización: ' . htmlspecialchars_uni($ultimo['periodo'])) : 'El mundo aún no ha vivido su primer ciclo.'; ?></p>
+    <p><?php echo $ultimo ? 'Última actualización: <a href="' . $bburl . '/periodicos.php?c=' . (int)$ultimo['ciclo_id'] . '">' . htmlspecialchars_uni($ultimo['periodo']) . '</a>' : 'El mundo aún no ha vivido su primer ciclo.'; ?></p>
   </div>
 </div>
 
@@ -88,21 +88,14 @@ header('Content-Type: text/html; charset=utf-8');
   <section class="reveal">
     <div class="shead"><h2>Los mares</h2><span class="code">// pulsa un mar para ver su ficha completa</span><span class="rule"></span></div>
     <div class="em-grid">
-<?php foreach ($zonas as $z):
-        // barras destacadas (teaser): estabilidad, marine, pirata
-        $teaser = array('est', 'mar', 'pir');
-?>
+<?php foreach ($zonas as $z): ?>
       <button type="button" class="em-zona" data-zona="<?php echo htmlspecialchars_uni($z['slug']); ?>" aria-haspopup="dialog">
-        <div class="em-zona-top"><h3><?php echo htmlspecialchars_uni($z['nombre']); ?></h3><span class="em-zona-more">Ver ficha &rarr;</span></div>
+        <div class="em-zona-top"><h3><?php echo htmlspecialchars_uni($z['nombre']); ?></h3><span class="em-zona-more">Ver notas &rarr;</span></div>
         <div class="em-bars">
-<?php foreach ($teaser as $k):
-          $m = $zMetrics[$k];
+<?php foreach ($zMetrics as $k => $m):
           echo mv_metric_bar($m['label'], $z[$k], ope_rol_mv_band5($z[$k], $m['bands']), $m['col']);
         endforeach; ?>
         </div>
-<?php if (trim((string)$z['notas']) !== ''): ?>
-        <p class="em-zona-teasernote"><?php echo htmlspecialchars_uni(mb_substr(trim((string)$z['notas']), 0, 90)); ?><?php echo mb_strlen(trim((string)$z['notas'])) > 90 ? '…' : ''; ?></p>
-<?php endif; ?>
       </button>
 <?php endforeach; ?>
     </div>
@@ -144,22 +137,52 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endif; ?>
 
 <?php
-  $npcs_ubicados = array_filter($npcs, function ($n) { return trim((string)$n['mundo_zona']) !== '' || trim((string)$n['mundo_ubic']) !== ''; });
+$threadsPub = ope_rol_mv_threads_activos();
+if (!empty($threadsPub)):
+  $threadsActivos = array_filter($threadsPub, function($t) { return in_array($t['estado'] ?? '', ['activo', 'reabierto']); });
+  if (!empty($threadsActivos)):
+?>
+  <section class="reveal">
+    <div class="shead"><h2>Hilos del mundo</h2><span class="code">// tramas en curso</span><span class="rule"></span></div>
+    <div class="em-arcos">
+<?php foreach ($threadsActivos as $th): ?>
+      <article class="em-arco">
+        <h3><?php echo htmlspecialchars_uni($th['titulo'] ?? '(sin título)'); ?> <span class="em-arco-st"><?php echo htmlspecialchars_uni($th['tipo'] ?? ''); ?></span></h3>
+        <?php if (!empty($th['descripcion'])): ?><p><?php echo nl2br(htmlspecialchars_uni($th['descripcion'])); ?></p><?php endif; ?>
+        <?php if (!empty($th['facciones_implicadas'])): ?><p class="em-notas">Facciones: <?php echo htmlspecialchars_uni(implode(', ', (array)$th['facciones_implicadas'])); ?></p><?php endif; ?>
+        <?php if (!empty($th['npc_implicados'])): ?><p class="em-notas">NPCs: <?php echo htmlspecialchars_uni(implode(', ', (array)$th['npc_implicados'])); ?></p><?php endif; ?>
+        <?php if (!empty($th['pj_implicados'])): ?><p class="em-notas">PJs: <?php echo htmlspecialchars_uni(implode(', ', (array)$th['pj_implicados'])); ?></p><?php endif; ?>
+        <?php if (!empty($th['proxima_evolucion'])): ?><p class="em-notas">Próxima evolución: <?php echo htmlspecialchars_uni($th['proxima_evolucion']); ?></p><?php endif; ?>
+      </article>
+<?php endforeach; ?>
+    </div>
+  </section>
+<?php endif; endif; ?>
+
+<?php
+  $npcs_ubicados = array_filter($npcs, function ($n) { return trim((string)$n['mundo_zona']) !== '' || trim((string)$n['mundo_ubic']) !== '' || !empty($n['datos_publicos']); });
   if (!empty($npcs_ubicados)):
 ?>
   <section class="reveal">
     <div class="shead"><h2>Figuras del mundo</h2><span class="code">// NPCs y su paradero</span><span class="rule"></span></div>
     <div class="em-grid em-grid-fac">
 <?php foreach ($npcs_ubicados as $n):
+        $pub = $n['datos_publicos'] ?? array();
         $zname = isset($zonas[$n['mundo_zona']]) ? $zonas[$n['mundo_zona']]['nombre'] : $n['mundo_zona'];
+        $ubicPublica = !empty($pub['ubicacion_publica']) ? $pub['ubicacion_publica'] : ($zname !== '' ? $zname : '');
+        if (trim((string)$n['mundo_ubic']) !== '' && empty($pub['ubicacion_publica'])) {
+            $ubicPublica .= ($ubicPublica !== '' ? ' · ' : '') . trim((string)$n['mundo_ubic']);
+        }
 ?>
       <article class="em-npc">
         <h3><?php echo htmlspecialchars_uni($n['nombre']); ?></h3>
         <div class="em-fac-tags">
-<?php if ($n['faccion'] !== ''): ?><span class="em-tag"><?php echo htmlspecialchars_uni($n['faccion']); ?></span><?php endif; ?>
-<?php if ($zname !== ''): ?><span class="em-tag"><?php echo htmlspecialchars_uni($zname); ?><?php echo trim((string)$n['mundo_ubic']) !== '' ? (' · ' . htmlspecialchars_uni($n['mundo_ubic'])) : ''; ?></span><?php endif; ?>
+          <?php if ($n['faccion'] !== ''): ?><span class="em-tag"><?php echo htmlspecialchars_uni($n['faccion']); ?></span><?php endif; ?>
+          <?php if (!empty($pub['titulos'][0])): ?><span class="em-tag"><?php echo htmlspecialchars_uni($pub['titulos'][0]); ?></span><?php endif; ?>
+          <?php if ($ubicPublica !== ''): ?><span class="em-tag"><?php echo htmlspecialchars_uni($ubicPublica); ?></span><?php endif; ?>
         </div>
-<?php if (trim((string)$n['mundo_accion']) !== ''): ?><p class="em-notas"><?php echo htmlspecialchars_uni((string)$n['mundo_accion']); ?></p><?php endif; ?>
+        <?php if (!empty($pub['descripcion'])): ?><p class="em-notas"><?php echo htmlspecialchars_uni(mb_substr($pub['descripcion'], 0, 200)); ?><?php echo mb_strlen($pub['descripcion']) > 200 ? '…' : ''; ?></p><?php endif; ?>
+        <?php if (trim((string)$n['mundo_accion']) !== ''): ?><p class="em-notas"><?php echo htmlspecialchars_uni((string)$n['mundo_accion']); ?></p><?php endif; ?>
       </article>
 <?php endforeach; ?>
     </div>
@@ -172,8 +195,9 @@ header('Content-Type: text/html; charset=utf-8');
 <div class="em-zonafull-store" hidden>
 <?php foreach ($zonas as $z):
         $zt = isset($tension[$z['slug']]) ? $tension[$z['slug']] : array();
-        // ordenar tensiones de mayor a menor
         uasort($zt, function ($a, $b) { return $b['valor'] <=> $a['valor']; });
+        $zt_top3 = array_slice($zt, 0, 3, true);
+        $zt_rest = array_slice($zt, 3, null, true);
 ?>
   <div id="zfull-<?php echo htmlspecialchars_uni($z['slug']); ?>" data-title="<?php echo htmlspecialchars_uni($z['nombre']); ?>">
     <div class="em-full-metrics">
@@ -191,7 +215,7 @@ header('Content-Type: text/html; charset=utf-8');
       <h4>Tensiones entre facciones en este mar</h4>
 <?php if (empty($zt)): ?>
       <p class="em-notas">Sin datos de tensión para este mar.</p>
-<?php else: foreach ($zt as $par => $info):
+<?php else: foreach ($zt_top3 as $par => $info):
           $na = isset($facciones[$info['a']]) ? $facciones[$info['a']]['nombre'] : $info['a'];
           $nb = isset($facciones[$info['b']]) ? $facciones[$info['b']]['nombre'] : $info['b'];
 ?>
@@ -202,7 +226,24 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if (trim((string)$info['notas']) !== ''): ?>
       <p class="em-ten-note"><?php echo nl2br(htmlspecialchars_uni((string)$info['notas'])); ?></p>
 <?php endif; ?>
-<?php endforeach; endif; ?>
+<?php endforeach; ?>
+<?php if (!empty($zt_rest)): ?>
+      <details class="em-ten-more">
+        <summary>Ver todas las tensiones (<?php echo count($zt_rest); ?> más)</summary>
+<?php foreach ($zt_rest as $par => $info):
+          $na = isset($facciones[$info['a']]) ? $facciones[$info['a']]['nombre'] : $info['a'];
+          $nb = isset($facciones[$info['b']]) ? $facciones[$info['b']]['nombre'] : $info['b'];
+?>
+        <div class="em-ten <?php echo mv_tension_class($info['valor']); ?>">
+          <span class="em-ten-p"><?php echo htmlspecialchars_uni($na); ?> <em>vs</em> <?php echo htmlspecialchars_uni($nb); ?></span>
+          <span class="em-ten-l"><?php echo ope_rol_mv_tension_label($info['valor']); ?> <em><?php echo (int)$info['valor']; ?></em></span>
+        </div>
+<?php if (trim((string)$info['notas']) !== ''): ?>
+        <p class="em-ten-note"><?php echo nl2br(htmlspecialchars_uni((string)$info['notas'])); ?></p>
+<?php endif; ?>
+<?php endforeach; ?>
+      </details>
+<?php endif; endif; ?>
     </div>
   </div>
 <?php endforeach; ?>

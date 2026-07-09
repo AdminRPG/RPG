@@ -1325,52 +1325,56 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="guide-note"><strong>Límites:</strong> Máximo 2 muertes por año, 3 meses entre muertes, y el personaje debe haber estado activo al menos 1 mes. Está prohibido matar personajes solo para transferir recursos.</div>
         </div>
 
-        <!-- 18 · Mundo Vivo (solo resumen para jugadores) -->
+        <!-- 18 · Mundo Vivo v3 (guía pública para jugadores) -->
         <div class="guide-content" id="g-mundo-vivo">
-          <div class="g-title">Mundo Vivo</div>
+          <div class="g-title">Mundo Vivo — La Balanza v3</div>
           <div class="g-sub">// tus acciones cambian el mundo</div>
-          <p>El Sistema de Mundo Vivo "La Balanza" es el corazón de One Piece Eternal: <strong>todo lo que haces tiene peso</strong>. Cada misión, cada combate, cada alianza o traición afecta al equilibrio del mundo.</p>
+          <p>El Sistema de Mundo Vivo "La Balanza" es el corazón de One Piece Eternal: <strong>todo lo que haces tiene peso</strong>. Cada misión, cada combate, cada alianza o traición afecta al equilibrio del mundo. Cada mes natural se publica el periódico <strong>Eternal News</strong> contando qué ha pasado y cómo ha cambiado el mundo.</p>
 
-          <h3>¿Cómo Funciona?</h3>
-          <p>Cada <strong>15 días</strong> (un ciclo), el staff procesa todas las misiones y temas completados por los jugadores. Cada acción genera un <strong>Impacto Mundial (IM)</strong> que se calcula con la fórmula: <strong>IM = PE × MR × FR × FA</strong></p>
+          <h3>¿Cómo afecta a tu personaje?</h3>
           <ul>
-            <li><strong>PE (Peso del Evento):</strong> Qué tan grande fue lo que hiciste (1 = pelea de taberna, 10 = evento cataclísmico).</li>
-            <li><strong>MR (Multiplicador de Rango):</strong> Cuánto pesa tu voluntad en el mundo según tu rango (F = ×0.5, M+ = ×3.0).</li>
-            <li><strong>FR (Factor de Relevancia):</strong> Qué tan conectado está con las grandes tramas.</li>
-            <li><strong>FA (Factor de Acumulación):</strong> Si forma parte de un arco más grande, el impacto se multiplica.</li>
+            <li><strong>Tus acciones importan:</strong> cada misión que completas, cada tema en presente que abres, mueve las métricas del mundo.</li>
+            <li><strong>El mundo reacciona:</strong> si los piratas causan caos en un mar, la Marina refuerza la zona. Si ayudas a una isla, su prosperidad mejora.</li>
+            <li><strong>El periódico "Eternal News":</strong> cada mes se publica con las noticias del mundo. Si haces algo importante, <strong>saldrás en el periódico</strong>.</li>
+            <li><strong>Misiones mensuales:</strong> el estado del mundo genera misiones. Si un mar está en crisis, aparecerán misiones de ayuda. Si hay tensiones, misiones de conflicto.</li>
+            <li><strong>Navegación afectada:</strong> el clima, los peligros y los encuentros en tus viajes dependen del estado del mar por el que navegues.</li>
+            <li><strong>Eventos al llegar a una isla:</strong> al abrir un tema en presente, el estado del mar determina si te encuentras algo (bueno, malo o simplemente interesante).</li>
           </ul>
 
           <h3>El Tablero Mundial</h3>
-          <p>El mundo se divide en <strong>13 regiones</strong> (mares, islas del cielo, Deep Sea) y <strong>9 facciones</strong>. Cada región tiene valores de Estabilidad (EST), Presencia Marine (MAR) y Actividad Pirata (PIR). Las facciones tienen Reputación (REP) y Cohesión (COH). Tus acciones modifican estos valores.</p>
+          <p>El mundo se divide en <strong>8 mares</strong> (zonas): East Blue, West Blue, North Blue, South Blue, Calm Belt, Red Line, Paraíso y New World. Cada mar tiene <strong>10 métricas</strong> que puedes consultar en la página <strong>Estado del Mundo</strong>:</p>
+          <ul>
+            <li><strong>Clima (CLI):</strong> cómo es el clima predominante (0=tormentas perpetuas, 100=calma absoluta).</li>
+            <li><strong>Peligro Marítimo (PEL):</strong> qué peligroso es navegar (Sea Kings, corrientes, Calm Belt).</li>
+            <li><strong>Riqueza (RIQ):</strong> recursos económicos y naturales de la zona.</li>
+            <li><strong>Orden Civil (CIV):</strong> control y legalidad en las islas (0=anarquía, 100=ferreo).</li>
+            <li><strong>Presión Marine (MAR):</strong> presencia e influencia de la Marina/Gobierno.</li>
+            <li><strong>Actividad Pirata (PIR):</strong> cuántos piratas operan en la zona.</li>
+            <li><strong>Influencia Revolucionaria (REV):</strong> presencia del Ejército Revolucionario.</li>
+            <li><strong>Influencia del Inframundo (INF):</strong> poder del crimen organizado.</li>
+            <li><strong>Estabilidad General (EST):</strong> salud general del mar (media ponderada).</li>
+            <li><strong>Tensión General (TEN):</strong> tensión entre facciones en el mar.</li>
+          </ul>
+          <p>Además, hay <strong>6 facciones</strong> (Marine, Pirata, Revolucionario, Gobierno Mundial, Cazarrecompensas, Civil), cada una con su propio perfil: Reputación, Cohesión, Poder Militar, Influencia Política, Recursos, Moral y Alcance. Todo visible en la página Estado del Mundo.</p>
 
-          <h3>El Ciclo de 15 Días</h3>
+          <h3>¿Cómo contribuyes?</h3>
           <ol>
-            <li><strong>Días 1-14 (Recolección):</strong> Los jugadores completan misiones y envían reportes.</li>
-            <li><strong>Día 15 (Procesamiento):</strong> El staff calcula los IMs y actualiza el Tablero Mundial.</li>
-            <li><strong>Días 15-16 (Redacción):</strong> Se genera la Crónica del Mundo, un periódico narrativo de lo ocurrido.</li>
-            <li><strong>Día 17 (Publicación):</strong> Se publica la Crónica para todos los jugadores.</li>
+            <li><strong>Completa misiones</strong> — generan sucesos que la IA procesa cada mes.</li>
+            <li><strong>Abre temas en presente</strong> — pueden generar eventos en la isla según el estado del mar.</li>
+            <li><strong>Notifica tus temas</strong> — usa el trámite "Notificar tema" en el foro para que el staff registre tus acciones.</li>
+            <li><strong>Participa en la navegación</strong> — los viajes que hagas serán registrados y afectan al mundo.</li>
           </ol>
 
-          <h3>¿Por Qué Importa?</h3>
-          <ul>
-            <li><strong>Tu personaje sale en el periódico.</strong> Si tu IM es suficientemente alto, la Crónica menciona tus hazañas.</li>
-            <li><strong>Las regiones cambian.</strong> Si muchos jugadores causan caos en una región, la Estabilidad baja y el Gobierno envía refuerzos. Si una región está en paz, los comerciantes prosperan.</li>
-            <li><strong>Las facciones reaccionan.</strong> Si atacas repetidamente a los Marines, la Tensión sube y eventualmente se desata una guerra.</li>
-            <li><strong>Los NPCs importantes se mueven.</strong> Los Almirantes, Yonkos y líderes revolucionarios reaccionan a los eventos del mundo. No están estáticos.</li>
-          </ul>
+          <h3>Continuidad entre meses</h3>
+          <p>El Mundo Vivo tiene <strong>memoria</strong>. El periódico de este mes recuerda lo que pasó el mes pasado. Los hilos narrativos se extienden a lo largo de varios meses. Una noticia de hace meses puede tener consecuencias hoy. <strong>Tú puedes ser parte de esas historias.</strong> Si tu personaje aparece en un periódico, ese hecho no se olvida — puede evolucionar, generar tramas o volver a mencionarse en el futuro.</p>
 
-          <h3>Efectos de Umbral</h3>
-          <table class="guide-table">
-            <thead><tr><th>Condición</th><th>Evento Automático</th></tr></thead>
-            <tbody>
-              <tr><td>EST región &lt; 20</td><td><strong>Crisis.</strong> Gobierno envía refuerzos. Nuevas misiones.</td></tr>
-              <tr><td>Tensión &gt; 85</td><td><strong>Guerra Inminente.</strong> Misiones de guerra disponibles.</td></tr>
-              <tr><td>REP facción &gt; 80</td><td><strong>Héroe de la Facción.</strong> Beneficios únicos.</td></tr>
-              <tr><td>REP facción &lt; -80</td><td><strong>Enemigo Público.</strong> Cazadores y Marines te priorizan.</td></tr>
-            </tbody>
-          </table>
+          <h3>Política anti-escalada</h3>
+          <p>El sistema está diseñado para que la guerra sea <strong>rara y difícil</strong>. Un combate aislado no desata una guerra. Hacen falta meses de tensión creciente y múltiples enfrentamientos para que dos facciones lleguen a un conflicto abierto. El estado normal del mundo es la <strong>paz</strong> y la <strong>aventura</strong>.</p>
 
-          <div class="guide-note"><strong>Pequeñas acciones juntas mueven montañas.</strong> Cuatro misiones pequeñas en la misma región durante un ciclo pueden desencadenar un evento mayor. La constancia y la coordinación entre jugadores tienen premio.</div>
+          <h3>¿Dónde verlo?</h3>
+          <p>Consulta el estado actual del mundo en la página <a href="estado-mundo.php"><strong>Estado del Mundo</strong></a>, donde puedes ver las métricas de cada mar, el perfil de cada facción, los arcos en marcha y los NPCs importantes con su paradero.</p>
+
+          <div class="guide-note"><strong>Pequeñas acciones juntas mueven montañas.</strong> Varias misiones pequeñas en la misma zona durante un mes pueden desencadenar eventos mayores. La constancia y la coordinación entre jugadores tienen premio. Y recuerda: el periódico del mes que viene leerá lo que hagas este mes.</div>
         </div>
 
         <!-- 19 · Frutas del Diablo -->
