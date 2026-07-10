@@ -33,6 +33,9 @@ require_once MYBB_ROOT . 'inc/ope_rol_mundo.php';
 // para las páginas públicas, que ya no llevan datos mockup.
 require_once MYBB_ROOT . 'inc/ope_rol_catalogos.php';
 
+// Sistema OP-Eternal + Motor de PP (Puntos de Progreso) — Oleada 1.
+require_once MYBB_ROOT . 'inc/ope_rol_system.php';
+
 $plugins->add_hook('global_start', 'ope_rol_global');
 
 // Posteo por personaje: estampa el pid del personaje activo en cada
@@ -48,6 +51,11 @@ $plugins->add_hook('datahandler_post_insert_post_end', 'ope_rol_after_post');
 // postbit deben reflejar SIEMPRE ese estado, nunca el estado actual/en vivo.
 $plugins->add_hook('datahandler_post_insert_thread_end', 'ope_rol_snapshot_post');
 $plugins->add_hook('datahandler_post_insert_post_end', 'ope_rol_snapshot_post');
+
+// PP automático por post: cuenta palabras y asigna Puntos de Progreso.
+// Corre DESPUÉS de snapshot_post en el mismo hook (MyBB ejecuta en orden de registro).
+$plugins->add_hook('datahandler_post_insert_thread_end', 'ope_pp_on_post');
+$plugins->add_hook('datahandler_post_insert_post_end', 'ope_pp_on_post');
 
 // Restricción de posteo: un personaje EN REVISIÓN solo puede publicar en la
 // zona Off Topic (crear tema o responder). Los aprobados, en cualquier foro.

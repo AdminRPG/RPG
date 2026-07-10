@@ -489,7 +489,8 @@ img.icon{width:16px;height:16px;vertical-align:middle;display:inline}
 .ope-pt.active,.ope-pt[aria-pressed="true"]{background:var(--ember);color:var(--iron)}
 
 /* ===== RELOJ ON-ROL ===== */
-.ope-onrol{margin:0 0 14px;display:flex;align-items:center;gap:14px;padding:10px 16px;border:2px solid #000;background:linear-gradient(90deg,var(--iron-edge),var(--iron-plate));flex-wrap:wrap}
+.ope-onrol{margin:0 0 14px;display:flex;align-items:center;gap:14px;padding:10px 16px;border:2px solid #000;background:linear-gradient(90deg,var(--iron-edge),var(--iron-plate));flex-wrap:wrap;color:inherit;text-decoration:none;transition:border-color .14s,box-shadow .14s}
+.ope-onrol:hover{border-color:var(--ember);box-shadow:0 0 10px rgba(255,203,147,.15)}
 .ope-onrol-dot{width:10px;height:10px;border-radius:50%;background:var(--season,var(--ember));box-shadow:0 0 10px var(--season,var(--ember));flex:0 0 auto}
 .ope-onrol-label{font-family:var(--mono);font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--paper-dim)}
 .ope-onrol-season{font-family:var(--disp);font-weight:800;font-size:1.15rem;text-transform:uppercase;letter-spacing:.5px;color:var(--season,var(--paper))}
@@ -3202,3 +3203,190 @@ body.ope-pg-gestionar-catalogos .gc-check{display:flex;align-items:center;gap:8p
 body.ope-pg-gestionar-catalogos .gc-check input{accent-color:var(--ember)}
 body.ope-pg-gestionar-catalogos .gc-inactivo{opacity:.55}
 body.ope-pg-gestionar-catalogos .gc-oculto{font-family:var(--mono);font-size:.5rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:var(--rivet);color:var(--paper);padding:1px 6px;margin-left:6px}
+
+/* ===== CALENDARIO ON-ROL ===== */
+body.ope-pg-calendario-onrol .btn{font-family:var(--mono);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 20px;border:2px solid #000;cursor:pointer;transition:transform .12s,box-shadow .12s;display:inline-block}
+body.ope-pg-calendario-onrol .btn-hot{background:var(--ember);color:var(--iron)}
+body.ope-pg-calendario-onrol .btn-hot:hover{background:var(--ember-hi);color:var(--iron);transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
+body.ope-pg-calendario-onrol .btn-ghost{background:transparent;color:var(--paper);border-color:var(--rivet)}
+body.ope-pg-calendario-onrol .btn-ghost:hover{color:var(--iron);background:var(--paper);border-color:#000;transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
+body.ope-pg-calendario-onrol .btn-sm{padding:7px 13px;font-size:.7rem}
+
+body.ope-pg-calendario-onrol .flash{border:2px solid #000;padding:11px 14px;margin-bottom:16px;font-family:var(--mono);font-size:.74rem;font-weight:700;letter-spacing:.3px}
+body.ope-pg-calendario-onrol .flash.ok{background:var(--patina);color:var(--iron)}
+body.ope-pg-calendario-onrol .flash.warn{background:var(--h6);color:var(--iron)}
+
+body.ope-pg-calendario-onrol .plate{border:2px solid #000;background:var(--iron-plate);margin-bottom:12px}
+body.ope-pg-calendario-onrol .plate-h{background:var(--iron-edge);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:2px solid #000}
+body.ope-pg-calendario-onrol .plate-h .t{font-family:var(--disp);font-weight:800;font-size:1.1rem;text-transform:uppercase;color:var(--paper);letter-spacing:.5px}
+body.ope-pg-calendario-onrol .plate-h .c{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
+body.ope-pg-calendario-onrol .plate-b{padding:13px}
+
+body.ope-pg-calendario-onrol .shead{display:flex;align-items:baseline;gap:14px;margin:8px 0 14px}
+body.ope-pg-calendario-onrol .shead h1,body.ope-pg-calendario-onrol .shead h2{font-family:var(--disp);font-weight:800;font-size:2rem;text-transform:uppercase;color:var(--paper);line-height:1}
+body.ope-pg-calendario-onrol .shead .code{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ember-hi);letter-spacing:1px}
+body.ope-pg-calendario-onrol .shead .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--rivet) 0 6px,transparent 6px 12px)}
+
+body.ope-pg-calendario-onrol .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
+body.ope-pg-calendario-onrol .reveal.vis{opacity:1;transform:none}
+
+body.ope-pg-calendario-onrol .foot{background:var(--iron-edge);border-top:2px solid #000;padding:24px 18px;margin-top:auto}
+body.ope-pg-calendario-onrol .foot-in{max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+body.ope-pg-calendario-onrol .foot-b{font-family:var(--disp);font-weight:900;font-size:1.3rem;text-transform:uppercase;color:var(--paper)}
+body.ope-pg-calendario-onrol .foot-links{display:flex;gap:16px;flex-wrap:wrap}
+body.ope-pg-calendario-onrol .foot-links a{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
+body.ope-pg-calendario-onrol .foot-links a:hover{color:var(--ember-hi)}
+body.ope-pg-calendario-onrol .foot-c{font-family:var(--mono);font-size:.62rem;color:var(--ash)}
+
+/* Navegación del año */
+body.ope-pg-calendario-onrol .ocal-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+body.ope-pg-calendario-onrol .ocal-nav-in{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+body.ope-pg-calendario-onrol .ocal-now{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.68rem;font-weight:700;color:var(--paper);letter-spacing:.5px}
+body.ope-pg-calendario-onrol .ocal-now-dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+body.ope-pg-calendario-onrol .ocal-now-txt{color:var(--paper-dim)}
+
+/* Cabecera de estación */
+body.ope-pg-calendario-onrol .ocal-season-h{display:flex;align-items:center;gap:12px}
+body.ope-pg-calendario-onrol .ocal-season-t{display:flex;align-items:center;gap:8px}
+body.ope-pg-calendario-onrol .ocal-dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+
+/* Grid de días: 13 columnas (65 = 13×5) */
+body.ope-pg-calendario-onrol .ocal-grid{display:grid;grid-template-columns:repeat(13,1fr);gap:4px}
+
+/* Cada día */
+body.ope-pg-calendario-onrol .ocal-day{position:relative;aspect-ratio:1;border:1px solid var(--rivet);background:var(--iron);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:background .14s,border-color .14s,transform .12s;overflow:hidden}
+body.ope-pg-calendario-onrol .ocal-day-edit{cursor:pointer}
+body.ope-pg-calendario-onrol .ocal-day-edit:hover{background:var(--iron-hi);border-color:var(--ember);transform:translate(-1px,-1px);box-shadow:2px 2px 0 rgba(0,0,0,.5);z-index:2}
+body.ope-pg-calendario-onrol .ocal-day-edit:focus-visible{outline:2px solid var(--ember-hi);outline-offset:1px;z-index:2}
+
+body.ope-pg-calendario-onrol .ocal-intro{font-size:.92rem;color:var(--paper-dim);max-width:70ch;line-height:1.55;margin:-4px 0 16px}
+body.ope-pg-calendario-onrol .ocal-intro b{color:var(--paper);font-weight:600}
+body.ope-pg-calendario-onrol .ocal-intro a{color:var(--ember-hi)}
+
+body.ope-pg-calendario-onrol .noperm{border:2px dashed var(--crack);background:var(--iron-plate);padding:40px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+body.ope-pg-calendario-onrol .noperm .lock{width:72px;height:72px;background:var(--iron);border:2px solid #000;display:flex;align-items:center;justify-content:center}
+body.ope-pg-calendario-onrol .noperm .lock svg{width:36px;height:36px;stroke:var(--crack);fill:none;stroke-width:2}
+body.ope-pg-calendario-onrol .noperm .big{font-family:var(--disp);font-weight:800;font-size:1.9rem;text-transform:uppercase;color:var(--paper);line-height:1}
+body.ope-pg-calendario-onrol .noperm p{font-family:var(--mono);font-size:.76rem;color:var(--paper-dim);line-height:1.6;max-width:54ch}
+body.ope-pg-calendario-onrol .ocal-day-num{font-family:var(--mono);font-size:.62rem;font-weight:700;color:var(--ash);line-height:1}
+body.ope-pg-calendario-onrol .ocal-day-hasnote .ocal-day-num{color:var(--ember-hi)}
+body.ope-pg-calendario-onrol .ocal-day-hasnote{border-color:var(--gold-deep)}
+
+/* Luna llena */
+body.ope-pg-calendario-onrol .ocal-luna{position:absolute;top:1px;right:2px;color:var(--ember);line-height:1}
+body.ope-pg-calendario-onrol .ocal-luna svg{}
+body.ope-pg-calendario-onrol .ocal-day-luna{background:var(--iron-hi);border-color:var(--gold-deep)}
+
+/* Punto de anotación */
+body.ope-pg-calendario-onrol .ocal-note-dot{width:4px;height:4px;border-radius:50%;background:var(--ember-hi);flex:0 0 auto}
+body.ope-pg-calendario-onrol .ocal-note-dot-sm{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ember-hi);border:1px solid var(--gold-deep);vertical-align:middle;margin-right:2px}
+
+/* Día actual */
+body.ope-pg-calendario-onrol .ocal-day-today{background:var(--iron-hi);border-color:var(--season,var(--ember));z-index:1}
+body.ope-pg-calendario-onrol .ocal-day-today .ocal-day-num{color:var(--paper);font-size:.7rem}
+body.ope-pg-calendario-onrol .ocal-today-ring{position:absolute;inset:1px;border:1.5px solid var(--season,var(--ember));border-radius:1px;pointer-events:none;animation:ocal-pulse 2.5s ease-in-out infinite}
+@keyframes ocal-pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* Leyenda */
+body.ope-pg-calendario-onrol .ocal-legend{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:6px 0 20px;font-family:var(--mono);font-size:.6rem;font-weight:700;color:var(--paper-dim);letter-spacing:.5px;text-transform:uppercase}
+body.ope-pg-calendario-onrol .ocal-legend-i{display:inline-flex;align-items:center;gap:4px;color:var(--ash)}
+body.ope-pg-calendario-onrol .ocal-dot-sm{display:inline-block;width:8px;height:8px;border-radius:50%;border:1px solid #000;vertical-align:middle;margin-right:2px}
+
+/* Modal de edición */
+body.ope-pg-calendario-onrol .ocal-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center}
+body.ope-pg-calendario-onrol .ocal-modal[hidden]{display:none}
+body.ope-pg-calendario-onrol .ocal-modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.7)}
+body.ope-pg-calendario-onrol .ocal-modal-box{position:relative;z-index:1;background:var(--iron-plate);border:3px solid #000;box-shadow:8px 8px 0 rgba(0,0,0,.6);max-width:520px;width:calc(100% - 32px);max-height:90vh;overflow-y:auto}
+body.ope-pg-calendario-onrol .ocal-modal-x{position:absolute;top:6px;right:10px;background:none;border:none;color:var(--paper-dim);font-size:1.5rem;cursor:pointer;line-height:1;padding:0 4px;font-family:var(--mono);z-index:2}
+body.ope-pg-calendario-onrol .ocal-modal-x:hover{color:var(--ember)}
+body.ope-pg-calendario-onrol .ocal-meta{padding:0 13px 8px;font-family:var(--mono);font-size:.7rem;color:var(--paper);letter-spacing:.3px}
+body.ope-pg-calendario-onrol .ocal-meta b{color:var(--ember-hi)}
+body.ope-pg-calendario-onrol .ocal-field{padding:0 13px 12px}
+body.ope-pg-calendario-onrol .mv-lbl{display:block;font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--paper-dim);margin-bottom:4px}
+body.ope-pg-calendario-onrol .mv-textarea{width:100%;background:var(--iron);border:2px solid var(--rivet);color:var(--paper);font-family:var(--body);font-size:.88rem;padding:10px 12px;line-height:1.5;resize:vertical}
+body.ope-pg-calendario-onrol .mv-textarea:focus{border-color:var(--ember);outline:none}
+body.ope-pg-calendario-onrol .ocal-form-actions{display:flex;gap:8px;padding:0 13px 13px;flex-wrap:wrap}
+
+@media(max-width:860px){
+  body.ope-pg-calendario-onrol .ocal-grid{grid-template-columns:repeat(10,1fr)}
+}
+@media(max-width:560px){
+  body.ope-pg-calendario-onrol .ocal-grid{grid-template-columns:repeat(7,1fr)}
+  body.ope-pg-calendario-onrol .ocal-nav{flex-direction:column;align-items:flex-start}
+}
+
+/* ============================================================
+   PROGRESIÓN — página progresion.php (PP + stats)
+   ============================================================ */
+
+/* Barra de PP */
+/* Progresión: barra de PP */
+.ope-prog-ppbar{border:2px solid #000;background:var(--iron-plate);display:grid;grid-template-columns:1fr auto;margin-bottom:18px;box-shadow:5px 5px 0 rgba(0,0,0,.35)}
+
+/* Progresión: vitales de combate (PV/EN/PA/Rango) */
+.ope-prog-vitals{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.ope-prog-vital{border:2px solid #000;background:var(--iron-plate);padding:12px 16px;text-align:center;box-shadow:3px 3px 0 rgba(0,0,0,.25)}
+.ope-prog-vital--pv{border-left:4px solid var(--crack)}
+.ope-prog-vital--en{border-left:4px solid var(--patina)}
+.ope-prog-vital--pa{border-left:4px solid var(--gold)}
+.ope-prog-vital--rango{border-left:4px solid var(--h6)}
+.ope-prog-vital-val{display:block;font-family:var(--disp);font-weight:900;font-size:2rem;line-height:1;color:var(--paper);text-shadow:0 2px 0 #000}
+.ope-prog-vital-label{display:block;font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);margin-top:4px}
+@media(max-width:500px){.ope-prog-vitals{grid-template-columns:repeat(2,1fr)}}
+.ope-prog-ppbar-total{padding:18px 22px;display:flex;flex-direction:column;justify-content:center}
+.ope-prog-ppbar-val{font-family:var(--disp);font-weight:900;font-size:3rem;line-height:1;color:var(--gold-hi);text-shadow:0 2px 0 #000}
+.ope-prog-ppbar-label{font-family:var(--mono);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);margin-top:4px}
+.ope-prog-ppbar-detail{display:flex;gap:0;border-left:2px solid #000}
+.ope-prog-ppbar-stat{padding:14px 20px;text-align:center;border-left:1px solid var(--iron-edge)}
+.ope-prog-ppbar-stat:first-child{border-left:none}
+.ope-prog-ppbar-num{font-family:var(--disp);font-weight:800;font-size:1.5rem;color:var(--paper);line-height:1}
+.ope-prog-ppbar-lbl{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;color:var(--paper-dim);margin-top:3px}
+@media(max-width:500px){.ope-prog-ppbar{grid-template-columns:1fr}.ope-prog-ppbar-detail{border-left:none;border-top:2px solid #000}}
+
+/* Pilar de stats */
+.ope-prog-pilar{margin-bottom:24px}
+.ope-prog-pilar-titulo{font-family:var(--disp);font-weight:800;font-size:1.1rem;text-transform:uppercase;color:var(--paper);border-left:4px solid var(--ember);padding:0 0 4px 12px;margin-bottom:10px;letter-spacing:.5px}
+
+/* Grid de stats */
+.ope-prog-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ope-prog-stat{border:2px solid #000;background:var(--iron-plate);padding:12px;box-shadow:3px 3px 0 rgba(0,0,0,.25);transition:border-color .15s}
+.ope-prog-stat--up{border-color:var(--gold);box-shadow:3px 3px 0 rgba(255,203,147,.25)}
+.ope-prog-stat-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ope-prog-stat-key{font-family:var(--disp);font-weight:900;font-size:1.1rem;color:var(--patina-hi);line-height:1;text-transform:uppercase}
+.ope-prog-stat-name{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim);letter-spacing:.3px}
+.ope-prog-stat-body{display:flex;flex-direction:column;gap:6px}
+.ope-prog-stat-rank{display:flex;align-items:baseline;gap:8px}
+.ope-prog-stat-rangochar{font-family:var(--disp);font-weight:900;font-size:2rem;line-height:1;color:var(--gold-hi);text-shadow:0 1px 0 #000}
+.ope-prog-stat-rangolabel{font-family:var(--mono);font-size:.58rem;color:var(--paper-dim);text-transform:uppercase}
+.ope-prog-stat-bar{display:flex;gap:3px}
+.ope-prog-stat-dot{width:100%;height:4px;background:var(--iron);border:1px solid var(--rivet)}
+.ope-prog-stat-dot--on{background:var(--patina-hi);border-color:var(--patina)}
+.ope-prog-stat-coste{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
+.ope-prog-stat-max{font-family:var(--disp);font-weight:900;font-size:.9rem;color:var(--crack);text-transform:uppercase}
+.ope-prog-stat-next{font-family:var(--mono);font-size:.62rem;font-weight:700;color:var(--paper-dim)}
+.ope-prog-stat-pp{font-family:var(--mono);font-size:.58rem;font-weight:700;color:var(--gold-hi);background:var(--iron);padding:2px 6px;border:1px solid var(--rivet)}
+.ope-prog-stat-nopp{font-family:var(--mono);font-size:.58rem;color:var(--ash)}
+.ope-prog-btn-up{padding:3px 9px!important;font-size:.6rem!important}
+@media(max-width:768px){.ope-prog-stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:400px){.ope-prog-stats-grid{grid-template-columns:1fr}}
+
+/* Tabla de historial */
+.ope-prog-log{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.68rem}
+.ope-prog-log thead{background:var(--iron-edge)}
+.ope-prog-log th{text-align:left;padding:8px 12px;font-weight:700;text-transform:uppercase;font-size:.58rem;letter-spacing:.5px;color:var(--paper-dim);border-bottom:2px solid #000}
+.ope-prog-log td{padding:7px 12px;border-bottom:1px solid var(--concrete-line);color:var(--ink)}
+.ope-prog-log-pp{font-weight:700;text-align:center;font-family:var(--disp);font-size:.95rem}
+.ope-prog-log-gan .ope-prog-log-pp{color:var(--patina-hi)}
+.ope-prog-log-gas .ope-prog-log-pp{color:var(--crack)}
+.ope-prog-log-gan td:first-child{border-left:3px solid var(--patina)}
+.ope-prog-log-gas td:first-child{border-left:3px solid var(--crack)}
+
+/* Flash messages (reusable) */
+.flash{padding:12px 16px;margin-bottom:14px;border:2px solid #000;font-family:var(--mono);font-size:.75rem;font-weight:700;box-shadow:4px 4px 0 rgba(0,0,0,.25)}
+.flash.ok{background:var(--patina);color:var(--iron)}
+.flash.error{background:var(--crack);color:#fff}
+.flash.warn{background:var(--gold);color:var(--iron)}
+
+/* Utility: form inline + plate sin padding */
+.ope-prog-form-inline{display:inline}
+.ope-prog-plate-nopad{padding:0!important}

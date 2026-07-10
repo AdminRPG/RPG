@@ -814,7 +814,8 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if ($puede_gestionar): ?>
     <div class="under">
       <div class="acts">
-        <button type="button" class="btn btn-hot" id="ope-gestion-open" aria-haspopup="dialog">Gesti&oacute;n</button>
+        <a href="<?php echo $bburl; ?>/progresion.php" class="btn btn-hot">Progresi&oacute;n</a>
+        <button type="button" class="btn btn-ghost" id="ope-gestion-open" aria-haspopup="dialog">Gesti&oacute;n</button>
       </div>
     </div>
 <?php endif; ?>
