@@ -1,0 +1,42 @@
+---
+description: Esqueleto obligatorio de páginas PHP autónomas y reglas CSS (DESIGN.md §1.4–1.6)
+globs: **/*.php,docs/themes/ope.css
+alwaysApply: false
+---
+
+# Páginas autónomas · scaffold y CSS
+
+Antes de crear o rediseñar una página `.php` del RPG, lee **`docs/DESIGN.md` §1.4–1.6**.
+
+## Obligatorio en cada página nueva
+
+1. `ope_rol_head_base()` + `ope_rol_navbar_html()` — sin `<style>` inline.
+2. `<body class="ope-pg-<pagina> [variante]">` — scope para CSS exclusivo.
+3. Breadcrumb con markup estándar (ya estilizado **globalmente**):
+
+```html
+<div class="breadcrumb">
+  <div class="breadcrumb-in">
+    <a href=".../index.php">Inicio</a>
+    <span class="sep">›</span>
+    <b>Título</b>
+  </div>
+</div>
+```
+
+4. Contenedor `.wrap` + `.shead` + `.reveal` según el patrón del proyecto.
+5. Datos desde BD/helpers (`inc/ope_rol_catalogos.php`, etc.) — **sin mockups** en el PHP.
+
+## CSS — qué NO hacer
+
+- **No** duplicar reglas `body.ope-pg-* .breadcrumb` — el breadcrumb global (`.breadcrumb` / `.breadcrumb-in`) ya cubre todas las páginas PHP.
+- **No** añadir clases en HTML/JS sin regla correspondiente en `docs/themes/ope.css`.
+- Estilos exclusivos de página → `body.ope-pg-<pagina> .clase` al final de `ope.css`.
+- Tras editar CSS: `php scripts/sync-theme.php import` y `verify`.
+
+## Checklist rápido
+
+- [ ] ¿Todas las clases del HTML tienen CSS?
+- [ ] ¿Breadcrumb con `.sep` y sin CSS duplicado por página?
+- [ ] ¿Modales con `hidden`, `.in`, `*-no-scroll`, Escape y clic en backdrop?
+- [ ] ¿`php scripts/check-inline-styles.php` limpio?

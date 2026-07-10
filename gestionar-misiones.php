@@ -62,6 +62,9 @@ if ($is_admin && $mybb->request_method === 'post') {
             $mid = (int)$mybb->get_input('mision_id', MyBB::INPUT_INT);
             if ($mid > 0) {
                 $db->delete_query('rol_mv_misiones', 'mision_id = ' . $mid);
+                if ($db->table_exists('rol_mv_mision_asignaciones')) {
+                    $db->delete_query('rol_mv_mision_asignaciones', 'mision_id = ' . $mid);
+                }
                 $flash = 'Misión eliminada.';
             }
         }
@@ -74,11 +77,14 @@ if ($is_admin && $eid > 0) {
     if ($db->num_rows($eq)) $edit = $db->fetch_array($eq);
 }
 
+// Misiones para el listado de gestión: las COMPLETADAS ya no se muestran.
 $misiones = array();
 if ($is_admin && $db->table_exists('rol_mv_misiones')) {
-    $q = $db->simple_select('rol_mv_misiones', '*', '', array('order_by' => 'mision_id', 'order_dir' => 'DESC'));
+    $q = $db->simple_select('rol_mv_misiones', '*', "estado <> 'completada'", array('order_by' => 'mision_id', 'order_dir' => 'DESC'));
     while ($r = $db->fetch_array($q)) $misiones[] = $r;
 }
+// Asignaciones (quién ha cogido cada misión) para marcar las "en proceso".
+$asignaciones = ope_rol_mv_asignaciones_map();
 
 $pk = htmlspecialchars_uni($mybb->post_code);
 
@@ -213,11 +219,25 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate-b">
 <?php if (empty($misiones)): ?>
         <p class="mv-empty">No hay misiones todavía.</p>
-<?php else: foreach ($misiones as $m): $mid = (int)$m['mision_id']; $zn = isset($zonas[$m['zona_slug']]) ? htmlspecialchars_uni($zonas[$m['zona_slug']]['nombre']) : htmlspecialchars_uni($m['zona_slug']); ?>
-        <div class="mv-row mv-mis-<?php echo htmlspecialchars_uni($m['estado']); ?>">
+<?php else: foreach ($misiones as $m):
+        $mid = (int)$m['mision_id'];
+        $zn = isset($zonas[$m['zona_slug']]) ? htmlspecialchars_uni($zonas[$m['zona_slug']]['nombre']) : htmlspecialchars_uni($m['zona_slug']);
+        $asig = $asignaciones[$mid] ?? null;
+        $en_proceso = ($asig && $m['estado'] === 'en_curso');
+        // Nombres del líder y compañeros que han cogido la misión.
+        $lider_n = $asig ? ope_rol_cat_nombre_pid((int)$asig['pid']) : '';
+        $comp_names = array();
+        if ($asig) { foreach ($asig['companeros_arr'] as $cpid) { $n = ope_rol_cat_nombre_pid((int)$cpid); if ($n !== '') $comp_names[] = $n; } }
+        $estado_txt = $en_proceso ? 'En proceso' : ($estado_opts[$m['estado']] ?? htmlspecialchars_uni($m['estado']));
+?>
+        <div class="mv-row mv-mis-<?php echo $en_proceso ? 'en_proceso' : htmlspecialchars_uni($m['estado']); ?>">
           <div class="mv-ev-main">
-            <span class="mv-mis-t"><?php echo htmlspecialchars_uni($m['titulo']); ?> <small>[<?php echo $m['rango'] ?: 'D'; ?> · <?php echo htmlspecialchars_uni($m['modalidad']); ?>]</small></span>
-            <span class="mv-ev-meta"><?php echo $zn ? $zn . ' · ' : ''; ?><?php echo $m['facciones'] ? htmlspecialchars_uni($m['facciones']) . ' · ' : ''; ?>pelig. <?php echo (int)$m['peligrosidad']; ?>/5 · <?php echo $estado_opts[$m['estado']] ?? htmlspecialchars_uni($m['estado']); ?></span>
+            <span class="mv-mis-t"><?php echo htmlspecialchars_uni($m['titulo']); ?> <small>[<?php echo $m['rango'] ?: 'D'; ?> · <?php echo htmlspecialchars_uni($m['modalidad']); ?>]</small>
+              <?php if ($en_proceso): ?><span class="mv-mis-badge">En proceso</span><?php endif; ?></span>
+            <span class="mv-ev-meta"><?php echo $zn ? $zn . ' · ' : ''; ?><?php echo $m['facciones'] ? htmlspecialchars_uni($m['facciones']) . ' · ' : ''; ?>pelig. <?php echo (int)$m['peligrosidad']; ?>/5 · <?php echo $estado_txt; ?></span>
+            <?php if ($en_proceso && $lider_n !== ''): ?>
+            <p class="mv-mis-cogida">Cogida por <b><?php echo htmlspecialchars_uni($lider_n); ?></b><?php if ($comp_names): ?> junto a <?php echo htmlspecialchars_uni(implode(', ', $comp_names)); ?><?php endif; ?></p>
+            <?php endif; ?>
             <?php if (trim((string)$m['resumen']) !== ''): ?><p class="mv-ev-res"><?php echo htmlspecialchars_uni($m['resumen']); ?></p><?php endif; ?>
           </div>
           <div class="mv-ev-acts">

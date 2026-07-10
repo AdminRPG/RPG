@@ -1,5 +1,5 @@
 ---
-version: 2.1
+version: 2.2
 name: One Piece Eternal
 palette: océano de aventura
 stylesheet: docs/themes/ope.css
@@ -63,10 +63,11 @@ inc/plugins/ope_rol.php
 
 1. **`:root`** — todos los tokens (paleta, fuentes). Ver §2 y §3.
 2. **Base** — reset, `body`, enlaces, selección, foco.
-3. **Componentes globales** — breadcrumb, `.ope-wrap`, botones, tarjetas, etc.
+3. **Componentes globales** — breadcrumb (`.breadcrumb` y `#ope-breadcrumb`),
+   `.wrap`, botones, tarjetas, modales compartidos, etc.
 4. **Páginas autónomas** — bloque final, cada una scopeada bajo
-   `body.ope-pg-<pagina>` (personajes, ficha, tramites, guias, zona-staff,
-   crear-personaje, alertas, mensajes, revisar-personaje).
+   `body.ope-pg-<pagina>` solo para estilos **exclusivos** de esa página (no
+   para redefinir componentes globales).
 
 ### 1.2 Cómo una página PHP consume los estilos
 
@@ -96,7 +97,83 @@ body.ope-pg-personajes .mi-modulo{ … }
 Nunca escribas `.mi-modulo{…}` sin el prefijo `body.ope-pg-…`: sin scope puede
 colisionar con otra página o con las plantillas de MyBB.
 
-### 1.4 Despliegue (repo → BD/caché del tema)
+### 1.4 Plantilla obligatoria de página autónoma (`.php`)
+
+Toda página nueva del RPG debe seguir este esqueleto. Si falta un bloque, la UI
+sale rota aunque el HTML “parezca correcto”.
+
+```php
+<body class="ope-pg-<pagina> [variantes-opcionales]">
+  <?php echo ope_rol_navbar_html(); ?>
+
+  <div class="breadcrumb">
+    <div class="breadcrumb-in">
+      <a href="<?php echo $bburl; ?>/index.php">Inicio</a>
+      <span class="sep">›</span>
+      <!-- enlaces intermedios opcionales -->
+      <b>Título de la página</b>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="reveal">
+      <div class="shead">
+        <h1>…</h1>
+        <span class="code">// metadato</span>
+        <span class="rule"></span>
+      </div>
+    </section>
+    …
+  </div>
+</body>
+```
+
+**Clases de `<body>` habituales**
+
+| Página | `class` en `<body>` |
+|--------|---------------------|
+| Una sola zona | `ope-pg-tienda` |
+| Varias URLs comparten look | `ope-pg-biblioteca bib-akuma` (scope común + variante) |
+| Staff / mundo vivo | `ope-pg-mundo-vivo` o `ope-pg-gestionar-catalogos ope-pg-mundo-vivo` |
+
+La variante (`bib-akuma`, `bib-personajes`…) solo ajusta acentos; el scope base
+(`ope-pg-biblioteca`) agrupa reglas compartidas del catálogo.
+
+### 1.5 Breadcrumb: dos markups, un solo aspecto
+
+| Contexto | Markup | Estilos |
+|----------|--------|---------|
+| Foros MyBB (plantillas) | `#ope-breadcrumb` + `.ope-breadcrumb-in` | Global en `ope.css` § base |
+| Páginas `.php` autónomas | `.breadcrumb` + `.breadcrumb-in` | **Global en `ope.css` § base** |
+
+**Regla:** el breadcrumb de páginas PHP **no** se redefine por página. Ya está
+estilizado globalmente. Si copias el bloque `body.ope-pg-* .breadcrumb{…}` de
+otra página, estás duplicando (legacy); no lo añadas en páginas nuevas.
+
+**Markup obligatorio del separador:** `<span class="sep">›</span>` con espacios
+implícitos vía `gap` del flex — nunca pegues texto sin el `<span class="sep">`.
+
+### 1.6 Qué va en global vs scope de página
+
+| Elemento | Dónde va el CSS | Ejemplo |
+|----------|-----------------|---------|
+| Breadcrumb, `.wrap`, `.shead`, `.reveal`, `.btn` | Global (o ya definido) | No repetir por página |
+| Layout exclusivo de la página | `body.ope-pg-<pagina>` | `.shop-banner`, `.bib-grid` |
+| Variante visual dentro de familia | `body.ope-pg-biblioteca.bib-akuma` | `--bib-accent` distinto |
+| Datos / listados | PHP + BD | Nunca arrays mock en el `.php` |
+
+**Errores recurrentes (evitar)**
+
+1. Crear HTML con clases nuevas pero olvidar el bloque CSS (breadcrumb, flash,
+   modales).
+2. Asumir que “componente global” en DESIGN.md implica que ya funciona sin
+   comprobar el **nombre de clase real** en el PHP (`.breadcrumb` ≠ `#ope-breadcrumb`).
+3. Añadir solo `.shead` en scope de página y olvidar breadcrumb u otros bloques
+   del esqueleto.
+4. Usar `aspect-ratio` o grids en PHP sin declararlos en `ope.css`.
+5. Poblar catálogos con arrays PHP en vez de `inc/ope_rol_catalogos.php` + BD.
+
+### 1.7 Despliegue (repo → BD/caché del tema)
 
 `ope.css` y las plantillas viven en el repo y se sincronizan a MyBB:
 
@@ -194,10 +271,24 @@ Este fondo es global: aplica a todas las páginas por venir del `body` de `ope.c
 
 ## 6. Checklist antes de commitear UI
 
+### Página nueva o rediseño
+
 - [ ] Ninguna página `.php` contiene `<style>`.
 - [ ] La página llama a `ope_rol_head_base()` y a `ope_rol_navbar_html()`.
-- [ ] El `<body>` tiene su clase `ope-pg-<pagina>` si tiene CSS propio.
-- [ ] Los estilos nuevos están en `ope.css`, con tokens (no hex sueltos) y
-      scopeados bajo `body.ope-pg-<pagina>` si son específicos de una página.
-- [ ] Ejecutado `php scripts/sync-theme.php import` y `verify` sin diferencias.
-- [ ] Commit de `docs/themes/ope.css` (+ PHP/plantillas tocadas).
+- [ ] El `<body>` tiene `ope-pg-<pagina>` (+ variante si aplica, p. ej. `bib-akuma`).
+- [ ] Breadcrumb con `.breadcrumb` / `.breadcrumb-in` / `.sep` (§1.5) — **sin**
+      CSS duplicado por página.
+- [ ] Contenido desde BD/helpers (`ope_rol_catalogos.php`, etc.), sin mockups.
+- [ ] Toda clase usada en HTML/JS tiene regla en `ope.css` (global o scope).
+- [ ] Modales/overlays: estado `hidden`, clase `.in` al abrir, `*-no-scroll` en
+      `body`, cierre con Escape y clic en backdrop.
+- [ ] `php scripts/check-inline-styles.php` sin inlines estáticos.
+- [ ] `php scripts/sync-theme.php import` y `verify` sin diferencias.
+- [ ] Commit de `docs/themes/ope.css` (+ PHP/helpers tocados).
+
+### Catálogo / tienda (recuerdo rápido)
+
+- [ ] Pestañas y metadatos de sección en PHP (`ope_rol_cat_tiendas()`), no hardcoded en JS.
+- [ ] Proporciones documentadas: banner tienda **4:5** (columna izquierda), productos **1:1** (grid derecha); layout `shop-layout` dos columnas.
+- [ ] Tarjetas de biblioteca: media + modal de detalle con las mismas clases
+      (`bib-card`, `bib-overlay`, `bib-detail`).

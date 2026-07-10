@@ -28,6 +28,11 @@ require_once MYBB_ROOT . 'inc/ope_rol_data.php';
 // eventos, misiones, NPCs, prompt, publicación, noticias del index).
 require_once MYBB_ROOT . 'inc/ope_rol_mundo.php';
 
+// Catálogos gestionables por staff (tienda, tripulaciones, bibliotecas de
+// akuma/bestiario/estilos) + asignación de misiones. Fuente única de lectura
+// para las páginas públicas, que ya no llevan datos mockup.
+require_once MYBB_ROOT . 'inc/ope_rol_catalogos.php';
+
 $plugins->add_hook('global_start', 'ope_rol_global');
 
 // Posteo por personaje: estampa el pid del personaje activo en cada
@@ -317,7 +322,7 @@ function ope_rol_navbar_html()
     };
 
     $links   = '<a href="' . $bburl . '/personajes.php" class="ope-nav-link' . $isOn(array('personajes.php', 'ficha.php', 'crear-personaje.php')) . '">Personaje</a>';
-    $links  .= '<a href="' . $bburl . '/tripulacion.php" class="ope-nav-link' . $isOn(array('tripulacion.php')) . '">Tripulaci&oacute;n</a>';
+    $links  .= '<a href="' . $bburl . '/tripulacion.php" class="ope-nav-link' . $isOn(array('tripulacion.php', 'tramite-tripulacion.php')) . '">Tripulaci&oacute;n</a>';
     $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php', 'notificar-tema.php', 'tablon-misiones.php', 'aceptar-mision.php', 'tienda.php')) . '">Tr&aacute;mites</a>';
     // Mundo Vivo: sección desplegable (Periódicos + Estado del mundo).
     $mvOn = $isOn(array('periodicos.php', 'estado-mundo.php'));

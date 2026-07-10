@@ -11,10 +11,39 @@ $uid      = (int)($mybb->user['uid'] ?? 0);
 $ciclo    = ope_rol_mv_ciclo_actual();
 $ciclo_id = $ciclo ? (int)$ciclo['ciclo_id'] : 0;
 $todas    = $ciclo_id ? ope_rol_mv_misiones($ciclo_id) : array();
+$asignadas = ope_rol_mv_asignaciones_map();
 $misiones = array();
 foreach ($todas as $m) {
-    if ($m['estado'] === 'en_curso') $misiones[] = $m;
+    // Disponibles = en curso y que nadie haya cogido todavía.
+    if ($m['estado'] === 'en_curso' && !isset($asignadas[(int)$m['mision_id']])) {
+        $misiones[] = $m;
+    }
 }
+
+// Personaje activo del jugador y catálogo de PJs aprobados para elegir
+// compañeros en misiones de grupo.
+$activo_pid = 0;
+if ($loggedin && $db->table_exists('rol_cuentas')) {
+    $cq = $db->simple_select('rol_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
+    if ($db->num_rows($cq)) $activo_pid = (int)$db->fetch_field($cq, 'personaje_activo');
+}
+$companeros_pool = array();
+if ($loggedin && $db->table_exists('rol_personajes')) {
+    $pq = $db->simple_select('rol_personajes', 'pid, nombre', "estado = 'aprobado' AND es_npc = 0", array('order_by' => 'nombre', 'order_dir' => 'ASC'));
+    while ($pr = $db->fetch_array($pq)) {
+        if ((int)$pr['pid'] === $activo_pid) continue;
+        $companeros_pool[] = array('pid' => (int)$pr['pid'], 'nombre' => htmlspecialchars_uni($pr['nombre']));
+    }
+}
+
+$tm_flash = ''; $tm_flash_kind = 'ok';
+$aviso = $mybb->get_input('a'); $error = $mybb->get_input('e');
+if ($aviso === 'ok') { $tm_flash = 'Has cogido la misión. Aparecerá como "en proceso" para el staff.'; }
+elseif ($error === 'sin_personaje') { $tm_flash = 'Necesitas un personaje activo para aceptar misiones.'; $tm_flash_kind = 'warn'; }
+elseif ($error === 'ya_cogida') { $tm_flash = 'Esa misión ya la ha cogido otro personaje.'; $tm_flash_kind = 'warn'; }
+elseif ($error === 'no_disponible') { $tm_flash = 'Esa misión ya no está disponible.'; $tm_flash_kind = 'warn'; }
+elseif ($error === 'sesion') { $tm_flash = 'La sesión caducó. Vuelve a intentarlo.'; $tm_flash_kind = 'warn'; }
+
 $zonas     = $db->table_exists('rol_mv_zonas') ? ope_rol_mv_zonas() : array();
 $facciones = $db->table_exists('rol_mv_facciones') ? ope_rol_mv_facciones() : array();
 $orden_fac = ope_rol_mv_faccion_order();
@@ -68,6 +97,10 @@ header('Content-Type: text/html; charset=utf-8');
       <span class="rule"></span>
     </div>
   </section>
+
+<?php if ($tm_flash !== ''): ?>
+  <section class="reveal"><div class="flash <?php echo $tm_flash_kind; ?>"><?php echo htmlspecialchars_uni($tm_flash); ?></div></section>
+<?php endif; ?>
 
   <section class="reveal" id="tmApp">
     <div class="tm-filters">
@@ -205,12 +238,15 @@ foreach ($page_set as $m):
       'peligro'  => $pel,
       'dots'     => $dots,
       'rec'      => htmlspecialchars_uni((string)$m['recompensa']),
+      'mod'      => (string)$m['modalidad'],
       'mod_lbl'  => $modalidad_labels[$m['modalidad']] ?? 'Cualquiera',
       'log'      => $loggedin,
       'pkey'     => htmlspecialchars_uni($mybb->post_code),
       'bburl'    => $bburl,
     );
   }, $misiones)); ?>;
+  var companerosPool = <?php echo json_encode($companeros_pool, JSON_UNESCAPED_UNICODE); ?>;
+  var tienePersonaje = <?php echo $activo_pid > 0 ? 'true' : 'false'; ?>;
 
   // Click en card -> animación "arrancar" y mostrar detalle
   document.addEventListener('click', function(e){
@@ -246,12 +282,22 @@ foreach ($page_set as $m):
         '<div class="tm-d-item"><span class="tm-bg-lbl">Modalidad</span><span class="tm-d-val">' + d.mod_lbl + '</span></div>' +
         '<div class="tm-d-item"><span class="tm-bg-lbl">Recompensa</span><span class="tm-d-val">' + (d.rec || '<span class="tm-dim">—</span>') + '</span></div>' +
       '</div>' +
-      (d.log ?
-        '<form method="post" action="' + d.bburl + '/aceptar-mision.php" class="tm-d-frm">' +
-          '<input type="hidden" name="mision_id" value="' + d.id + '">' +
-          '<input type="hidden" name="my_post_key" value="' + d.pkey + '">' +
-          '<button type="submit" class="btn btn-hot">Aceptar misión</button>' +
-        '</form>' :
+      (d.log ? (
+        !tienePersonaje ?
+          '<div class="tm-d-note">Necesitas un personaje activo para coger esta misión.</div>' :
+          '<form method="post" action="' + d.bburl + '/aceptar-mision.php" class="tm-d-frm">' +
+            '<input type="hidden" name="mision_id" value="' + d.id + '">' +
+            '<input type="hidden" name="my_post_key" value="' + d.pkey + '">' +
+            (d.mod !== 'solo' && companerosPool.length ?
+              '<div class="tm-d-crew"><span class="tm-bg-lbl">Compañeros de misión (opcional)</span>' +
+              '<div class="tm-d-crew-list">' +
+                companerosPool.map(function(c){
+                  return '<label class="tm-d-crew-opt"><input type="checkbox" name="companeros[]" value="' + c.pid + '"><span>' + c.nombre + '</span></label>';
+                }).join('') +
+              '</div></div>' : '') +
+            '<button type="submit" class="btn btn-hot">' + (d.mod !== 'solo' ? 'Coger misión en grupo' : 'Coger misión') + '</button>' +
+          '</form>'
+        ) :
         '<div class="tm-d-note">Inicia sesión para aceptar esta misión.</div>'
       );
 

@@ -1,89 +1,140 @@
 <?php
+/**
+ * I-Forge · Biblioteca de NPCs
+ * Catálogo poblado desde BD (rol_personajes, es_npc=1). Sin datos mockup.
+ * Estilos en docs/themes/ope.css (scope: ope-pg-biblioteca).
+ */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'biblioteca-npc.php');
 require_once './global.php';
+
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
-header('Content-Type: text/html; charset=utf-8');
-$data = [
-  ['n'=>'Shanks','f'=>'pirata','r'=>'Emperador','l'=>1050,'e'=>'Activo','d'=>'Capitán de los Red Hair. Uno de los Cuatro Emperadores. Ex-miembro de la tripulación de Roger.'],
-  ['n'=>'Marshall D. Teach','f'=>'pirata','r'=>'Emperador','l'=>1040,'e'=>'Activo','d'=>'Capitán de los Blackbeard. Emperador. Portador de Yami Yami + Gura Gura.'],
-  ['n'=>'Akainu (Sakazuki)','f'=>'marine','r'=>'Almirante Flota','l'=>1100,'e'=>'Activo','d'=>'Almirante de Flota Marine. Justicia absoluta. Portador del Magma.'],
-  ['n'=>'Kizaru (Borsalino)','f'=>'marine','r'=>'Almirante','l'=>1050,'e'=>'Activo','d'=>'Almirante Marine. Portador de la Pika Pika no Mi (Luz).'],
-  ['n'=>'Aokiji (Kuzan)','f'=>'marine','r'=>'Almirante','l'=>1040,'e'=>'Activo','d'=>'Almirante Marine. Portador del Hielo. Antiguo Marine, ahora con Teach.'],
-  ['n'=>'Monkey D. Garp','f'=>'marine','r'=>'Vicealmirante','l'=>1100,'e'=>'Activo','d'=>'Héroe de la Marine. Puño de amor. Abuelo de Luffy. Padre de Dragon.'],
-  ['n'=>'Silvers Rayleigh','f'=>'pirata','r'=>'Leyenda','l'=>1080,'e'=>'Retirado','d'=>'Primer oficial de Gol D. Roger. El Rey Oscuro. Vivió en Sabaody.'],
-  ['n'=>'Boa Hancock','f'=>'pirata','r'=>'Emperatriz','l'=>920,'e'=>'Activo','d'=>'Emperatriz de Amazon Lily. Shichibukai. Portadora de la Mero Mero no Mi.'],
-  ['n'=>'Dracule Mihawk','f'=>'pirata','r'=>'Shichibukai','l'=>1050,'e'=>'Activo','d'=>'El mejor espadachín. Antiguo Shichibukai. Portador de Yoru.'],
-  ['n'=>'Bartholomew Kuma','f'=>'revolucionario','r'=>'Shichibukai','l'=>950,'e'=>'Desconocido','d'=>'Antiguo Shichibukai. Revolucionario. Portador de la Nikyu Nikyu no Mi.'],
-  ['n'=>'Vegapunk','f'=>'gobierno','r'=>'Científico','l'=>'??','e'=>'Activo','d'=>'Genio científico del Gobierno Mundial. Creó los Pacifista y las armas más avanzadas.'],
-  ['n'=>'Kong','f'=>'gobierno','r'=>'Comandante Supremo','l'=>1200,'e'=>'Activo','d'=>'Comandante Supremo de las fuerzas del Gobierno Mundial. Superior a los Almirantes.'],
-];
+
+$FACCIONES = ope_rol_facciones();
+$data = ope_rol_cat_npcs_publicos();
+
 $data_json = json_encode($data, JSON_UNESCAPED_UNICODE);
+$fac_labels = array();
+foreach ($FACCIONES as $slug => $f) { $fac_labels[$slug] = $f['nombre']; }
+$fac_labels_json = json_encode($fac_labels, JSON_UNESCAPED_UNICODE);
+
+header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?php echo $bbname; ?> · Biblioteca NPC</title>
+<title><?php echo $bbname; ?> · Biblioteca de NPCs</title>
 <?php echo ope_rol_head_base(); ?>
 </head>
-<body class="ope-pg-biblioteca">
+<body class="ope-pg-biblioteca bib-npc">
 <?php echo ope_rol_navbar_html(); ?>
-<div class="breadcrumb"><div class="breadcrumb-in"><a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span><b>Biblioteca NPC</b></div></div>
+<div class="breadcrumb"><div class="breadcrumb-in"><a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span><b>Biblioteca de NPCs</b></div></div>
 <div class="wrap">
-<section class="reveal"><div class="shead"><h1>Biblioteca NPC</h1><span class="code">// personajes no jugadores</span><span class="rule"></span></div></section>
+<section class="reveal"><div class="shead"><h1>Biblioteca de NPCs</h1><span class="code">// personajes no jugadores · <?php echo count($data); ?> fichados</span><span class="rule"></span></div></section>
+
 <section class="reveal" id="bibApp">
-<div class="bib-search-wrap"><input type="text" class="bib-search" id="bibSearch" placeholder="Buscar NPC..."></div>
-<div class="bib-filters" id="bibFilters">
-  <button class="bib-filter on" data-filt="todas">Todos</button>
-  <button class="bib-filter" data-filt="pirata">🏴‍☠️ Pirata</button>
-  <button class="bib-filter" data-filt="marine">⚓ Marine</button>
-  <button class="bib-filter" data-filt="revolucionario">🔥 Revolucionario</button>
-  <button class="bib-filter" data-filt="gobierno">🏛️ Gobierno</button>
-</div>
-<div class="bib-grid" id="bibGrid"></div>
+  <div class="bib-toolbar">
+    <div class="bib-search-wrap"><input type="text" class="bib-search" id="bibSearch" placeholder="Buscar NPC…" autocomplete="off"></div>
+    <div class="bib-filters" id="bibFilters">
+      <button class="bib-filter on" data-filt="todas">Todos</button>
+<?php foreach ($FACCIONES as $slug => $f): ?>
+      <button class="bib-filter" data-filt="<?php echo htmlspecialchars_uni($slug); ?>"><?php echo htmlspecialchars_uni($f['nombre']); ?></button>
+<?php endforeach; ?>
+    </div>
+  </div>
+  <div class="bib-grid" id="bibGrid"></div>
 </section>
 </div>
+
+<div class="bib-overlay" id="bibOverlay" hidden><div class="bib-detail" id="bibDetail"></div></div>
+
 <?php include __DIR__ . '/inc/footer_custom.php'; ?>
+
 <script>
 (function(){
   var data = <?php echo $data_json; ?>;
+  var facLabels = <?php echo $fac_labels_json; ?>;
+  var BB = '<?php echo $bburl; ?>';
   var filtro = 'todas';
+  var grid = document.getElementById('bibGrid');
+  var overlay = document.getElementById('bibOverlay');
+  var detail = document.getElementById('bibDetail');
 
-  function render() {
-    var q = document.getElementById('bibSearch').value.toLowerCase();
-    var items = data.filter(function(p){
-      if (filtro !== 'todas' && p.f !== filtro) return false;
-      if (q && p.n.toLowerCase().indexOf(q) === -1 && (p.r||'').toLowerCase().indexOf(q) === -1) return false;
-      return true;
-    });
-    var html = '';
-    items.forEach(function(p){
-      var facLabel = {pirata:'🏴‍☠️ Pirata',marine:'⚓ Marine',revolucionario:'🔥 Revolucionario',gobierno:'🏛️ Gobierno'}[p.f]||p.f;
-      html += '<div class="bib-card">'
-        + '<div class="bib-card-avatar">' + p.n.charAt(0) + '</div>'
-        + '<div class="bib-card-head">'
-        + '<span class="bib-card-nom">' + p.n + '</span>'
-        + '<span class="bib-card-tag fac-' + p.f + '">' + facLabel + '</span>'
-        + '</div>'
-        + '<div class="bib-card-extra"><span>🎭 <b>' + p.r + '</b></span></div>'
-        + '<div class="bib-card-extra"><span>⭐ Nivel <b>' + p.l + '</b></span><span>● ' + p.e + '</span></div>'
-        + '<div class="bib-card-desc">' + p.d + '</div>'
-        + '</div>';
-    });
-    document.getElementById('bibGrid').innerHTML = html || '<div class="bib-empty">No se encontraron NPCs.</div>';
+  function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function facLbl(s){ return facLabels[s] || (s? s.charAt(0).toUpperCase()+s.slice(1) : ''); }
+  function media(p){
+    if (p.imagen) return '<img src="'+esc(p.imagen)+'" alt="" loading="lazy" onerror="this.parentNode.classList.add(\'no-img\');this.remove()">';
+    return '<span class="bib-media-ini">'+esc((p.nombre||'?').charAt(0))+'</span>';
   }
 
+  function render(){
+    var q = document.getElementById('bibSearch').value.toLowerCase().trim();
+    var items = data.filter(function(p){
+      if (filtro !== 'todas' && p.faccion_slug !== filtro) return false;
+      if (q && p.nombre.toLowerCase().indexOf(q) === -1 && (p.rango_faccion||'').toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+    if (!items.length){ grid.innerHTML = '<div class="bib-empty">No se encontraron NPCs.</div>'; return; }
+    grid.innerHTML = items.map(function(p){
+      var i = data.indexOf(p);
+      return '<article class="bib-card fac-'+esc(p.faccion_slug||'civil')+'" data-i="'+i+'">'
+        + '<div class="bib-card-media">'+media(p)
+          + '<span class="bib-card-tag-npc">NPC</span>'
+          + '<span class="bib-card-rank">'+esc(p.rango||'—')+'</span>'
+        + '</div>'
+        + '<div class="bib-card-body">'
+          + '<h3 class="bib-card-nom">'+esc(p.nombre)+'</h3>'
+          + '<div class="bib-card-meta">'+(p.rango_faccion?'<span>'+esc(p.rango_faccion)+'</span>':'')+(p.faccion_slug?'<span>'+esc(facLbl(p.faccion_slug))+'</span>':'')+'</div>'
+          + '<p class="bib-card-desc">'+esc(p.concepto||'Sin concepto registrado.')+'</p>'
+        + '</div></article>';
+    }).join('');
+  }
+
+  function openDetail(p){
+    var rows = '';
+    function row(l,v){ if(v) rows += '<div class="bib-d-row"><span class="bib-d-l">'+esc(l)+'</span><span class="bib-d-v">'+esc(v)+'</span></div>'; }
+    row('Facción', facLbl(p.faccion_slug));
+    row('Rango / cargo', p.rango_faccion);
+    row('Raza', p.raza);
+    row('Edad', p.edad); row('Género', p.genero);
+    row('Nivel', p.nivel); row('Rango', p.rango);
+    var blocks = '';
+    function block(l,v){ if(v && v.trim()) blocks += '<div class="bib-d-block"><span class="bib-d-h">'+esc(l)+'</span><p>'+esc(v)+'</p></div>'; }
+    block('Concepto', p.concepto);
+    block('Personalidad', p.personalidad);
+    block('Apariencia', p.apariencia);
+    detail.innerHTML =
+      '<button type="button" class="bib-d-close" aria-label="Cerrar">✕</button>'
+      + '<div class="bib-d-head fac-'+esc(p.faccion_slug||'civil')+'">'
+        + '<div class="bib-d-media">'+media(p)+'</div>'
+        + '<div class="bib-d-title"><h2>'+esc(p.nombre)+'</h2>'+(p.apodo?'<span class="bib-d-apodo">«'+esc(p.apodo)+'»</span>':'')
+        + '<span class="ope-tag ope-tag-npc">NPC</span>'
+        + (p.faccion_slug?' <span class="ope-tag ope-tag-'+esc(p.faccion_slug)+'">'+esc(facLbl(p.faccion_slug))+'</span>':'')+'</div>'
+      + '</div>'
+      + '<div class="bib-d-grid">'+rows+'</div>'
+      + blocks
+      + '<div class="bib-d-actions"><a class="btn btn-hot" href="'+BB+'/ficha.php?pid='+p.pid+'">Ver ficha completa</a></div>';
+    overlay.hidden = false; document.body.classList.add('bib-no-scroll');
+    requestAnimationFrame(function(){ detail.classList.add('in'); });
+  }
+  function closeDetail(){ detail.classList.remove('in'); overlay.hidden = true; document.body.classList.remove('bib-no-scroll'); }
+
+  grid.addEventListener('click', function(e){ var c = e.target.closest('.bib-card'); if(!c) return; openDetail(data[+c.getAttribute('data-i')]); });
+  overlay.addEventListener('click', function(e){ if(e.target===overlay || e.target.closest('.bib-d-close')) closeDetail(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !overlay.hidden) closeDetail(); });
   document.getElementById('bibSearch').addEventListener('input', render);
   document.getElementById('bibFilters').addEventListener('click', function(e){
-    var btn = e.target.closest('.bib-filter');
-    if (!btn) return;
-    document.querySelectorAll('.bib-filter').forEach(function(b){ b.classList.remove('on'); });
-    btn.classList.add('on');
-    filtro = btn.getAttribute('data-filt');
-    render();
+    var b = e.target.closest('.bib-filter'); if(!b) return;
+    this.querySelectorAll('.bib-filter').forEach(function(x){ x.classList.remove('on'); });
+    b.classList.add('on'); filtro = b.getAttribute('data-filt'); render();
   });
   render();
+
+  if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('vis'); io.unobserve(e.target);} }); }, { threshold:.08 });
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  } else { document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('vis'); }); }
 })();
 </script>
 </body>

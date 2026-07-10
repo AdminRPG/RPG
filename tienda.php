@@ -1,7 +1,8 @@
 <?php
 /**
  * I-Forge · Tienda del foro — Bazar Pirata
- * Compra objetos, consumibles y mejoras para tu personaje.
+ * Productos poblados desde BD (rol_tienda_items). Sin datos mockup.
+ * Estilos en docs/themes/ope.css (scope: ope-pg-tienda).
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'tienda.php');
@@ -10,52 +11,29 @@ require_once './global.php';
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 
-$tiendas = [
-    'armeria'   => ['nombre' => 'Armería',   'tag' => 'Armas y Armaduras',   'emoji' => '⚔️', 'lema' => 'El filo de la justicia y el acero del Nuevo Mundo'],
-    'astilleros'=> ['nombre' => 'Astilleros', 'tag' => 'Barcos y Piezas',     'emoji' => '⛵', 'lema' => 'Donde hasta el barco más humilde se convierte en leyenda'],
-    'general'   => ['nombre' => 'Bazar',      'tag' => 'Todo lo demás',       'emoji' => '🧺', 'lema' => 'Si existe, lo tenemos. Si no, pregúntale al vendedor'],
-];
+$tiendas    = ope_rol_cat_tiendas();
+$cat_labels = ope_rol_cat_categoria_labels();
+$items      = ope_rol_cat_tienda_items();
 
-$cat_emoji = [
-    'armas' => '🗡️', 'armaduras' => '🛡️', 'barcos' => '⛵', 'piezas' => '⚙️',
-    'consumibles' => '🧪', 'mejoras' => '💎', 'especiales' => '🏆',
-];
+$productos = array();
+foreach ($items as $p) {
+    $productos[] = array(
+        't'   => (string) $p['tienda'],
+        'c'   => (string) $p['categoria'],
+        'nom' => (string) $p['nombre'],
+        'pre' => (int) $p['precio'],
+        'dc'  => (string) $p['resumen'],
+        'dl'  => (string) $p['descripcion'],
+        'img' => (string) $p['imagen'],
+        'det' => $p['detalles_arr'],
+    );
+}
 
-$productos = [
-    ['t'=>'armeria','c'=>'armas','nom'=>'Espada de acero','pre'=>45000,'dc'=>'Espada recta de acero forjado.','dl'=>'Forjada en los hornos de Sunacma por el herrero Dorn. Acero al carbono con filo tratado. No es legendaria, pero jamás te fallará.','det'=>['Daño base: 1d8','Peso: 2.5 kg','Tipo: Corte','Durabilidad: 60/60']],
-    ['t'=>'armeria','c'=>'armas','nom'=>'Katana oscura','pre'=>120000,'dc'=>'Hoja negra templada en magma.','dl'=>'Forjada en las profundidades del Volcán de la Luna. Su filo absorbe calor durante el temple, dándole un brillo cobrizo.','det'=>['Daño base: 2d6','Peso: 1.8 kg','Tipo: Corte','Durabilidad: 45/45','Req. Nivel: 15']],
-    ['t'=>'armeria','c'=>'armas','nom'=>'Hacha de guerra','pre'=>78000,'dc'=>'Bipenne tallada en hierro del Norte.','dl'=>'Dos filos tallados a mano que permiten alternar el golpe sin perder equilibrio. Peso descomunal, lenta pero devastadora.','det'=>['Daño base: 1d12','Peso: 4.2 kg','Tipo: Contundente','Durabilidad: 70/70','Requiere 2 manos']],
-    ['t'=>'armeria','c'=>'armas','nom'=>'Pistola de chispa','pre'=>55000,'dc'=>'Arma de fuego de un cañón.','dl'=>'Réplica de los diseños del Oeste. Cañón de bronce con mecanismo de rueda. Recargar es lento, el fogonazo inicial lo vale.','det'=>['Daño base: 1d10','Alcance: 20 m','Recarga: 2 turnos','Munición: Balas de plomo']],
-    ['t'=>'armeria','c'=>'armas','nom'=>'Bastón de hierro','pre'=>32000,'dc'=>'Barra de hierro macizo. Contundente.','dl'=>'Hierro negro sin adornos. Arma de dotación Marine. Sin filo, pero con fuerza suficiente para partir cualquier defensa de madera.','det'=>['Daño base: 1d6','Peso: 3.0 kg','Tipo: Contundente','Durabilidad: 80/80']],
-    ['t'=>'armeria','c'=>'armaduras','nom'=>'Pechera de cuero','pre'=>38000,'dc'=>'Armadura ligera de cuero endurecido.','dl'=>'Coraza de cuero hervido y endurecido al sol. Flexible, ligera, sorprendentemente resistente. Ideal para exploradores.','det'=>['Defensa: +2','Peso: 1.5 kg','Tipo: Ligera','Penalización: -']],
-    ['t'=>'armeria','c'=>'armaduras','nom'=>'Cota de malla','pre'=>95000,'dc'=>'Anillos de acero entrelazados.','dl'=>'Cota forjada anillo a anillo, entrelazados y remachados. El estándar de Marines y cazarecompensas profesionales.','det'=>['Defensa: +4','Peso: 8.0 kg','Tipo: Media','Penalización: -1 AGI']],
-    ['t'=>'armeria','c'=>'armaduras','nom'=>'Escudo de roble','pre'=>28000,'dc'=>'Madera reforzada con flejes de hierro.','dl'=>'Escudo redondo de roble macizo con refuerzos de hierro y umbo central de acero. Efectivo contra ataques cuerpo a cuerpo.','det'=>['Defensa: +2 al bloquear','Peso: 3.5 kg','Cobertura: 1/4 cuerpo','Durabilidad: 50/50']],
-    ['t'=>'astilleros','c'=>'barcos','nom'=>'Bote a vela','pre'=>250000,'dc'=>'Embarcación para 2-3 personas.','dl'=>'Bote de pino con vela cuadrada. Sin cubierta ni camarote. Suficiente para navegar entre islas con buen tiempo.','det'=>['Tripulación: 2-3','Velocidad: 6 nudos','Autonomía: 3 días','Bodega: 500 kg']],
-    ['t'=>'astilleros','c'=>'barcos','nom'=>'Goleta ligera','pre'=>800000,'dc'=>'Dos palos, rápida y maniobrable.','dl'=>'Diseño ágil con velas cangrejas. Cubierta corrida y camarote. Popular entre corsarios por equilibrio velocidad/carga.','det'=>['Tripulación: 6-10','Velocidad: 9 nudos','Autonomía: 10 días','Bodega: 5 tn','Cañones: 4']],
-    ['t'=>'astilleros','c'=>'piezas','nom'=>'Timón reforzado','pre'=>45000,'dc'=>'Hierro y roble. Resiste tormentas.','dl'=>'Fabricado por carpinteros de Water Seven. Eje de hierro forjado y pala de roble encapado. Soporta embestidas.','det'=>['Resistencia: +40 %','Peso: 120 kg','Compatibilidad: Goletas']],
-    ['t'=>'astilleros','c'=>'piezas','nom'=>'Velas de repuesto','pre'=>22000,'dc'=>'Juego de 3 velas de lona.','dl'=>'Cosidas a mano con hilo de cáñamo encerado. Incluyen cabos y ojetes de bronce. 6×4 metros cada una.','det'=>['Cantidad: 3','Material: Lona encerada','Tamaño: 6×4 m']],
-    ['t'=>'general','c'=>'consumibles','nom'=>'Poción de vida','pre'=>8000,'dc'=>'Recupera 50 HP al instante.','dl'=>'Infusión de hierbas de la Isa Toroa. Brebaje denso y amargo que cierra heridas superficiales en segundos.','det'=>['Curación: 50 HP','Uso: 1 acción','Stock máx: 5/mes']],
-    ['t'=>'general','c'=>'consumibles','nom'=>'Elixir de energía','pre'=>15000,'dc'=>'Ignora la fatiga 24 h.','dl'=>'Destilado de fruta del diablo fragmentada (variedad inerte). Vigilia que permite ignorar la fatiga durante 24 h.','det'=>['Duración: 24 h','Efecto: Ignorar fatiga','Stock máx: 3/mes']],
-    ['t'=>'general','c'=>'consumibles','nom'=>'Antídoto universal','pre'=>6000,'dc'=>'Neutraliza venenos comunes.','dl'=>'Suero preparado por la rama médica Marine. Neutraliza venenos de origen animal y vegetal del East Blue.','det'=>['Cobertura: Venenos comunes','Efectividad: 95 %','Uso: Ingerir']],
-    ['t'=>'general','c'=>'consumibles','nom'=>'Bomba de humo','pre'=>4000,'dc'=>'Cortina de humo táctico.','dl'=>'Esfera de hierro con pólvora y resina. Genera nube de humo de 6m de radio durante 1d4 turnos.','det'=>['Radio: 6 m','Duración: 1d4 turnos','Uso: 1 acción menor']],
-    ['t'=>'general','c'=>'mejoras','nom'=>'Gema de fuerza','pre'=>200000,'dc'=>'+10 % daño físico.','dl'=>'Cuarzo imbuido con energía de fruta del diablo. Al engarzarla en un arma, el filo brilla y los golpes duelen más.','det'=>['Efecto: +10 % daño físico','Tipo: Encantamiento','Duración: Permanente']],
-    ['t'=>'general','c'=>'mejoras','nom'=>'Pergamino blindaje','pre'=>180000,'dc'=>'+1 defensa permanente.','dl'=>'Pergamino de piel de dragón marino con runas. Al leerlo, la armadura del portador brilla y su resistencia aumenta.','det'=>['Efecto: +1 defensa','Tipo: Mejora de armadura','Duración: Permanente']],
-    ['t'=>'general','c'=>'mejoras','nom'=>'Manual combate','pre'=>65000,'dc'=>'+1 al primer ataque.','dl'=>'Diagramas de llaves, derribos y contraataques de un instructor Marine. Requiere una semana de estudio.','det'=>['Efecto: +1 primer ataque/combate','Estudio: 7 días','Uso: Una vez']],
-    ['t'=>'general','c'=>'especiales','nom'=>'Mapa del tesoro','pre'=>250000,'dc'=>'Coordenadas de un tesoro.','dl'=>'Pergamino envejecido con marcas de una cala secreta. La tinta ha corrido. El tesoro puede ser real o una broma.','det'=>['Tipo: Tesoro enterrado','Dificultad: Media','Garantía: Ninguna']],
-    ['t'=>'general','c'=>'especiales','nom'=>'Licencia de caza','pre'=>150000,'dc'=>'Cazar recompensas legal.','dl'=>'Documento sellado por la sede Marine de Loguetown. Sin este permiso, cobrar recompensas en East Blue es ilegal.','det'=>['Jurisdicción: East Blue','Duración: 1 año','Renovable: Sí']],
-];
+$prods_json      = json_encode($productos, JSON_UNESCAPED_UNICODE);
+$tiendas_json    = json_encode($tiendas, JSON_UNESCAPED_UNICODE);
+$cat_labels_json = json_encode($cat_labels, JSON_UNESCAPED_UNICODE);
 
-$prods_json = json_encode(array_map(function($p) {
-    return ['t'=>$p['t'],'c'=>$p['c'],'nom'=>$p['nom'],'pre'=>$p['pre'],'dc'=>$p['dc'],'dl'=>$p['dl'],'det'=>$p['det']??[]];
-}, $productos), JSON_UNESCAPED_UNICODE);
-
-$tiendas_json = json_encode($tiendas, JSON_UNESCAPED_UNICODE);
-$cat_emoji_json = json_encode($cat_emoji, JSON_UNESCAPED_UNICODE);
-$cat_labels_json = json_encode([
-    'armas' => 'Armas', 'armaduras' => 'Armaduras', 'barcos' => 'Barcos',
-    'piezas' => 'Piezas', 'consumibles' => 'Consumibles',
-    'mejoras' => 'Mejoras', 'especiales' => 'Especiales',
-], JSON_UNESCAPED_UNICODE);
+$primera_tienda = 'armeria';
 
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
@@ -74,64 +52,55 @@ header('Content-Type: text/html; charset=utf-8');
 
 <div class="wrap">
 
-  <section class="reveal">
-    <div class="shead">
-      <h1>Bazar Pirata</h1>
-      <span class="code">// equipa a tu personaje</span>
-      <span class="rule"></span>
-    </div>
-  </section>
-
   <section class="reveal shop-wrap" id="shopApp">
 
-    <!-- Shop banner -->
-    <div class="shop-banner" id="shopBanner" data-tienda="armeria">
-      <div class="shop-banner-bg"></div>
-      <div class="shop-banner-in">
-        <span class="shop-banner-emoji" id="shopEmoji">⚔️</span>
-        <div class="shop-banner-text">
-          <h2 class="shop-banner-nom" id="shopNom">Armería</h2>
-          <p class="shop-banner-tag" id="shopTag">Armas y Armaduras</p>
-          <p class="shop-banner-lema" id="shopLema">El filo de la justicia y el acero del Nuevo Mundo</p>
+    <div class="shop-layout">
+
+      <aside class="shop-aside">
+        <div class="shop-banner" id="shopBanner" data-tienda="<?php echo htmlspecialchars_uni($primera_tienda); ?>">
+          <div class="shop-banner-media">
+            <div class="shop-banner-bg" aria-hidden="true"></div>
+            <img class="shop-banner-img" id="shopBannerImg" src="" alt="" loading="lazy">
+          </div>
+          <div class="shop-banner-text">
+            <span class="shop-banner-kicker" id="shopTag">&nbsp;</span>
+            <h1 class="shop-banner-nom" id="shopNom">&nbsp;</h1>
+            <p class="shop-banner-lema" id="shopLema">&nbsp;</p>
+          </div>
         </div>
+
+        <div class="shop-tabs" id="shopTabs" role="tablist" aria-label="Secciones de la tienda">
+<?php $first = true; foreach ($tiendas as $slug => $meta): ?>
+          <button type="button" class="shop-tab<?php echo $first ? ' on' : ''; ?>" role="tab" data-tienda="<?php echo htmlspecialchars_uni($slug); ?>"><?php echo htmlspecialchars_uni($meta['nombre']); ?></button>
+<?php $first = false; endforeach; ?>
+        </div>
+      </aside>
+
+      <div class="shop-main">
+        <div class="shop-main-head">
+          <span class="shop-main-lbl">// catálogo de la sección</span>
+          <button type="button" class="shop-cart-btn" id="shopCartBtn" onclick="toggleCart()" aria-label="Abrir carrito">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+            <span class="shop-cart-badge" id="shopCartBadge">0</span>
+          </button>
+        </div>
+        <div class="shop-grid" id="shopGrid"></div>
       </div>
+
     </div>
 
-    <!-- Toolbar -->
-    <div class="shop-toolbar">
-      <div class="shop-tabs" id="shopTabs">
-        <button class="shop-tab on" data-tienda="armeria">⚔️ Armería</button>
-        <button class="shop-tab" data-tienda="astilleros">⛵ Astilleros</button>
-        <button class="shop-tab" data-tienda="general">🧺 Bazar</button>
-      </div>
-      <button class="shop-cart-btn" id="shopCartBtn" onclick="toggleCart()">
-        🛒
-        <span class="shop-cart-badge" id="shopCartBadge">0</span>
-      </button>
-    </div>
-
-    <!-- Product grid -->
-    <div class="shop-grid" id="shopGrid"></div>
-
-  </section>
-
-  <section class="reveal">
-    <div class="plate plate-warn">
-      <div class="plate-b ti-notice">Las imágenes reales se añadirán cuando el equipo de arte defina los assets. Precios ilustrativos. Sistema de compra próximo.</div>
-    </div>
   </section>
 
 </div>
 
-<!-- Modal -->
 <div class="shop-modal" id="shopModal" hidden>
   <div class="shop-modal-bg" onclick="closeModal()"></div>
   <div class="shop-modal-box">
     <button class="shop-modal-x" onclick="closeModal()">✕</button>
-    <div class="shop-modal-icon" id="shopModalIcon"></div>
+    <div class="shop-modal-media" id="shopModalMedia"></div>
     <div class="shop-modal-info">
-      <h2 class="shop-modal-nom" id="shopModalNom"></h2>
       <span class="shop-modal-cat" id="shopModalCat"></span>
+      <h2 class="shop-modal-nom" id="shopModalNom"></h2>
       <span class="shop-modal-pre" id="shopModalPre"></span>
       <p class="shop-modal-desc" id="shopModalDesc"></p>
       <dl class="shop-modal-dets" id="shopModalDets"></dl>
@@ -147,10 +116,9 @@ header('Content-Type: text/html; charset=utf-8');
   </div>
 </div>
 
-<!-- Cart slide-out -->
 <div class="shop-cart" id="shopCart" hidden>
   <div class="shop-cart-top">
-    <span class="shop-cart-h">🏴‍☠️ Carrito</span>
+    <span class="shop-cart-h">Carrito</span>
     <button class="shop-cart-x" onclick="toggleCart()">✕</button>
   </div>
   <div class="shop-cart-body" id="shopCartBody">
@@ -168,59 +136,65 @@ header('Content-Type: text/html; charset=utf-8');
 (function(){
   var prods = <?php echo $prods_json; ?>;
   var tiendas = <?php echo $tiendas_json; ?>;
-  var catEmoji = <?php echo $cat_emoji_json; ?>;
   var catLabels = <?php echo $cat_labels_json; ?>;
+  var BB = '<?php echo $bburl; ?>';
   var cart = [];
-  var currentTienda = 'armeria';
+  var currentTienda = '<?php echo htmlspecialchars_uni($primera_tienda); ?>';
   var modalIdx = -1;
 
-  var phSvg = '<svg viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="42" r="12" fill="none" stroke="currentColor" stroke-width="3"/><path d="M22 80c0-16 12-28 28-28s28 12 28 28" fill="none" stroke="currentColor" stroke-width="3"/></svg>';
-
-  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  var phSvg = '<span class="shop-ph" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 16l16-8 16 8-16 8-16-8z" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M8 16v16l16 8 16-8V16" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M24 24v16" stroke="currentColor" stroke-width="2.2"/></svg></span>';
+  function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function media(p, cls){
+    if (p.img) return '<img class="'+(cls||'')+'" src="'+esc(p.img)+'" alt="" loading="lazy" onerror="this.parentNode.classList.add(\'no-img\');this.outerHTML=\''+phSvg.replace(/'/g,"\\'")+'\'">';
+    return phSvg;
+  }
 
   function renderGrid() {
     var filtered = prods.filter(function(p){ return p.t === currentTienda; });
-    var html = '';
-    filtered.forEach(function(p, i){
+    if (!filtered.length){ document.getElementById('shopGrid').innerHTML = '<div class="shop-empty">No hay productos en esta tienda.</div>'; return; }
+    document.getElementById('shopGrid').innerHTML = filtered.map(function(p){
       var realIdx = prods.indexOf(p);
-      var catEm = catEmoji[p.c] || '📦';
       var catLb = catLabels[p.c] || p.c;
-      html += '<div class="shop-item" data-idx="' + realIdx + '" onclick="openModal(' + realIdx + ')">' +
-        '<div class="shop-item-head">' +
-          '<span class="shop-item-cat">' + catEm + ' ' + esc(catLb) + '</span>' +
-          '<span class="shop-item-pre">' + p.pre.toLocaleString('es-ES') + ' B</span>' +
-        '</div>' +
-        '<div class="shop-item-icon">' + phSvg + '</div>' +
-        '<div class="shop-item-nom">' + esc(p.nom) + '</div>' +
-        '<div class="shop-item-dc">' + esc(p.dc) + '</div>' +
-      '</div>';
-    });
-    document.getElementById('shopGrid').innerHTML = html || '<div class="shop-empty">No hay productos en esta tienda.</div>';
+      return '<article class="shop-item" data-idx="'+realIdx+'" onclick="openModal('+realIdx+')">'
+        + '<div class="shop-item-media">'+media(p)+'<span class="shop-item-cat">'+esc(catLb)+'</span></div>'
+        + '<div class="shop-item-body">'
+          + '<h3 class="shop-item-nom">'+esc(p.nom)+'</h3>'
+          + '<p class="shop-item-dc">'+esc(p.dc)+'</p>'
+          + '<div class="shop-item-foot"><span class="shop-item-pre">'+p.pre.toLocaleString('es-ES')+' B</span><span class="shop-item-cta">Ver</span></div>'
+        + '</div></article>';
+    }).join('');
   }
 
   function updateBanner(tiendaId) {
-    var s = tiendas[tiendaId];
+    var s = tiendas[tiendaId]; if(!s) return;
     var banner = document.getElementById('shopBanner');
+    var img = document.getElementById('shopBannerImg');
     banner.setAttribute('data-tienda', tiendaId);
-    document.getElementById('shopEmoji').textContent = s.emoji;
     document.getElementById('shopNom').textContent = s.nombre;
     document.getElementById('shopTag').textContent = s.tag;
     document.getElementById('shopLema').textContent = s.lema;
+    if (s.imagen) {
+      img.src = (s.imagen.indexOf('http') === 0 || s.imagen.indexOf('/') === 0) ? s.imagen : (BB + '/' + s.imagen);
+      img.alt = s.nombre;
+      banner.classList.remove('no-banner-img');
+      img.onerror = function(){ banner.classList.add('no-banner-img'); };
+    } else {
+      img.removeAttribute('src');
+      banner.classList.add('no-banner-img');
+    }
   }
 
   window.openModal = function(idx) {
     modalIdx = idx;
     var p = prods[idx];
-    document.getElementById('shopModalIcon').innerHTML = '<div class="shop-modal-icon-in">' + phSvg + '</div>';
+    document.getElementById('shopModalMedia').innerHTML = media(p, 'shop-modal-img');
     document.getElementById('shopModalNom').textContent = p.nom;
-    var catEm = catEmoji[p.c] || '📦';
-    var catLb = catLabels[p.c] || p.c;
-    document.getElementById('shopModalCat').textContent = catEm + ' ' + catLb;
+    document.getElementById('shopModalCat').textContent = catLabels[p.c] || p.c;
     document.getElementById('shopModalPre').textContent = p.pre.toLocaleString('es-ES') + ' B';
-    document.getElementById('shopModalDesc').textContent = p.dl;
+    document.getElementById('shopModalDesc').textContent = p.dl || p.dc;
     var detsHtml = '';
     (p.det||[]).forEach(function(d){
-      var parts = d.split(': ');
+      var parts = String(d).split(': ');
       detsHtml += '<dt>' + esc(parts[0]) + '</dt><dd>' + esc(parts.slice(1).join(': ')) + '</dd>';
     });
     document.getElementById('shopModalDets').innerHTML = detsHtml;
@@ -228,100 +202,66 @@ header('Content-Type: text/html; charset=utf-8');
     document.getElementById('shopModal').removeAttribute('hidden');
     document.body.classList.add('shop-no-scroll');
   };
-
   window.closeModal = function() {
     document.getElementById('shopModal').setAttribute('hidden','');
     document.body.classList.remove('shop-no-scroll');
   };
-
   window.qtyDelta = function(d) {
     var inp = document.getElementById('shopQty');
-    var v = Math.max(1, (parseInt(inp.value,10)||1) + d);
-    inp.value = v;
+    inp.value = Math.max(1, (parseInt(inp.value,10)||1) + d);
   };
-
   window.addToCart = function() {
     if (modalIdx < 0) return;
     var p = prods[modalIdx];
     var qty = parseInt(document.getElementById('shopQty').value, 10) || 1;
     var found = false;
-    for (var i = 0; i < cart.length; i++) {
-      if (cart[i].idx === modalIdx) { cart[i].qty += qty; found = true; break; }
-    }
-    if (!found) cart.push({idx: modalIdx, qty: qty, nom: p.nom, pre: p.pre});
-    closeModal();
-    updateCartUI();
+    for (var i = 0; i < cart.length; i++) { if (cart[i].idx === modalIdx) { cart[i].qty += qty; found = true; break; } }
+    if (!found) cart.push({idx: modalIdx, qty: qty});
+    closeModal(); updateCartUI();
   };
-
-  window.removeFromCart = function(idx) {
-    cart = cart.filter(function(c){ return c.idx !== idx; });
-    updateCartUI();
-  };
-
+  window.removeFromCart = function(idx) { cart = cart.filter(function(c){ return c.idx !== idx; }); updateCartUI(); };
   window.toggleCart = function() {
     var el = document.getElementById('shopCart');
-    if (el.hasAttribute('hidden')) {
-      el.removeAttribute('hidden');
-      document.body.classList.add('shop-no-scroll');
-    } else {
-      el.setAttribute('hidden','');
-      document.body.classList.remove('shop-no-scroll');
-    }
+    if (el.hasAttribute('hidden')) { el.removeAttribute('hidden'); document.body.classList.add('shop-no-scroll'); }
+    else { el.setAttribute('hidden',''); document.body.classList.remove('shop-no-scroll'); }
   };
 
   function updateCartUI() {
     var badge = document.getElementById('shopCartBadge');
-    var total = 0;
-    var count = 0;
-    cart.forEach(function(c){ total += c.pre * c.qty; count += c.qty; });
-    badge.textContent = count;
-    badge.style.display = count > 0 ? 'inline' : 'none';
-
+    var total = 0, count = 0;
+    cart.forEach(function(c){ var p = prods[c.idx]; total += p.pre * c.qty; count += c.qty; });
+    badge.textContent = count; badge.style.display = count > 0 ? 'inline' : 'none';
     var body = document.getElementById('shopCartBody');
-    if (count === 0) {
-      body.innerHTML = '<div class="shop-cart-empty">El carrito está vacío.</div>';
-    } else {
-      var html = '';
-      cart.forEach(function(c){
+    if (count === 0) { body.innerHTML = '<div class="shop-cart-empty">El carrito está vacío.</div>'; }
+    else {
+      body.innerHTML = cart.map(function(c){
         var p = prods[c.idx];
-        html += '<div class="shop-cart-item">' +
-          '<div class="shop-cart-item-icon">' + phSvg + '</div>' +
-          '<div class="shop-cart-item-info">' +
-            '<div class="shop-cart-item-nom">' + esc(p.nom) + '</div>' +
-            '<div class="shop-cart-item-meta">' + c.qty + ' × ' + p.pre.toLocaleString('es-ES') + ' B</div>' +
-          '</div>' +
-          '<div class="shop-cart-item-sub">' + (p.pre * c.qty).toLocaleString('es-ES') + ' B</div>' +
-          '<button class="shop-cart-item-x" onclick="removeFromCart(' + c.idx + ')">✕</button>' +
-        '</div>';
-      });
-      body.innerHTML = html;
+        return '<div class="shop-cart-item">'
+          + '<div class="shop-cart-item-info"><div class="shop-cart-item-nom">'+esc(p.nom)+'</div>'
+          + '<div class="shop-cart-item-meta">'+c.qty+' × '+p.pre.toLocaleString('es-ES')+' B</div></div>'
+          + '<div class="shop-cart-item-sub">'+(p.pre*c.qty).toLocaleString('es-ES')+' B</div>'
+          + '<button class="shop-cart-item-x" onclick="removeFromCart('+c.idx+')">✕</button></div>';
+      }).join('');
     }
-
     document.getElementById('shopCartTotal').textContent = total.toLocaleString('es-ES') + ' B';
     document.getElementById('shopBuyBtn').disabled = count === 0;
   }
 
-  // Tab switching
   document.getElementById('shopTabs').addEventListener('click', function(e){
     var tab = e.target.closest('.shop-tab');
     if (!tab || tab.classList.contains('on')) return;
-    document.querySelectorAll('.shop-tab').forEach(function(t){ t.classList.remove('on'); });
+    this.querySelectorAll('.shop-tab').forEach(function(t){ t.classList.remove('on'); });
     tab.classList.add('on');
     currentTienda = tab.getAttribute('data-tienda');
-    updateBanner(currentTienda);
-    renderGrid();
+    updateBanner(currentTienda); renderGrid();
   });
 
-  renderGrid();
-  updateCartUI();
+  updateBanner(currentTienda); renderGrid(); updateCartUI();
 
   document.addEventListener('keydown', function(e){
     if (e.key === 'Escape') { closeModal(); if (!document.getElementById('shopCart').hasAttribute('hidden')) toggleCart(); }
   });
-
-  document.getElementById('shopCart').addEventListener('click', function(e){
-    if (e.target === this) toggleCart();
-  });
+  document.getElementById('shopCart').addEventListener('click', function(e){ if (e.target === this) toggleCart(); });
 
   if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
     var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); } }); }, { threshold: .06 });

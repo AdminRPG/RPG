@@ -102,6 +102,14 @@ if ($db->table_exists('rol_mv_noticias')) {
     $mv_noticias_activas = (int) $db->fetch_field($db->simple_select('rol_mv_noticias', 'COUNT(*) c', 'activa = 1'), 'c');
 }
 
+$trip_tramites_pend = 0;
+if ($db->table_exists('rol_tramites')) {
+    $trip_tramites_pend = (int) $db->fetch_field(
+        $db->simple_select('rol_tramites', 'COUNT(*) c', "estado = 'pendiente' AND tipo IN ('fundar_tripulacion','unirse_tripulacion')"),
+        'c'
+    );
+}
+
 $zonas = array(
     array('grp' => 'colaborador', 'code' => 'STF-01',
         'title' => 'Gesti&oacute;n de expedientes',
@@ -153,6 +161,16 @@ $zonas = array(
         'body'  => 'Administra las misiones del <b>Tabl&oacute;n</b>: crea, edita, activa, desactiva o elimina misiones del ciclo actual. Controla estado, rango, peligrosidad, recompensa y facciones implicadas.',
         'meta'  => '', 'cta' => 'Ir al panel', 'badge' => 0, 'href' => $bburl . '/gestionar-misiones.php',
         'icon'  => '<path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6Z"/><path d="M12 8v4l2 2"/>'),
+    array('grp' => 'administrador', 'code' => 'STF-11',
+        'title' => 'Gestionar cat&aacute;logos',
+        'body'  => 'Administra en un solo sitio todos los cat&aacute;logos del foro: la <b>Tienda</b> (Bazar), las <b>Tripulaciones</b> y las bibliotecas de <b>Akuma no Mi</b>, <b>Bestiario</b> y <b>Estilos</b>. Crea, edita, muestra u oculta cada entrada.',
+        'meta'  => '', 'cta' => 'Gestionar', 'badge' => 0, 'href' => $bburl . '/gestionar-catalogos.php',
+        'icon'  => '<path d="M4 4h7v7H4Z"/><path d="M13 4h7v7h-7Z"/><path d="M4 13h7v7H4Z"/><path d="M13 13h7v7h-7Z"/>'),
+    array('grp' => 'administrador', 'code' => 'STF-12',
+        'title' => 'Tr&aacute;mites de tripulaci&oacute;n',
+        'body'  => 'Aprueba o rechaza solicitudes de jugadores para <b>fundar</b> una nueva tripulaci&oacute;n o <b>unirse</b> a una existente. Al aprobar se actualiza el cat&aacute;logo y la membres&iacute;a del personaje.',
+        'meta'  => $trip_tramites_pend . ' pendiente(s)', 'cta' => 'Revisar', 'badge' => $trip_tramites_pend, 'href' => $bburl . '/gestionar-tramites-tripulacion.php',
+        'icon'  => '<path d="M3 18l9-14 9 14"/><path d="M3 18h18"/><circle cx="18" cy="6" r="3" fill="currentColor"/>'),
 );
 
 header('Content-Type: text/html; charset=utf-8');
