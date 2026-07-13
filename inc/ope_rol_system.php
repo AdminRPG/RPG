@@ -412,17 +412,6 @@ function ope_pp_on_post(&$dh)
 // ─────────────────────────────────────────────────────────────────────────
 
 /**
- * Tabla de EN máxima por rango del personaje (AV-01).
- */
-function ope_combat_en_table()
-{
-    return array(
-        'F' => 20, 'E' => 25, 'D' => 30, 'C' => 40, 'B' => 50,
-        'A' => 65, 'S' => 80, 'SS' => 100, 'M' => 130, 'M+' => 170,
-    );
-}
-
-/**
  * Calcula PV máximos: (FUE + VIG) × 5 + (VOL + CON) × 2
  */
 function ope_combat_calc_pv($stats)
@@ -434,73 +423,66 @@ function ope_combat_calc_pv($stats)
     return ($fue + $vig) * 5 + ($vol + $con) * 2;
 }
 
-/**
- * Calcula EN máxima según el rango del personaje.
- */
-function ope_combat_calc_en($rango)
-{
-    $table = ope_combat_en_table();
-    return isset($table[(string) $rango]) ? $table[(string) $rango] : 20;
+function ope_combat_calc_en($stats) {
+    $vol = ope_rol_stat_num($stats, 'VOL');
+    $con = ope_rol_stat_num($stats, 'CON');
+    return ($vol * 3) + ($con * 2);
 }
 
-/**
- * Bono de PA por rango (AV-01).
- */
-function ope_combat_pa_bonus($rango)
-{
-    $map = array(
-        'F' => 0, 'E' => 0, 'D' => 0,   // Novato
-        'C' => 1, 'B' => 1,              // Oficial
-        'A' => 2, 'S' => 2,              // Élite
-        'SS' => 3, 'M' => 3, 'M+' => 3,  // Leyenda
-    );
-    return isset($map[(string) $rango]) ? $map[(string) $rango] : 0;
+function ope_combat_pa_bonus($nivel) {
+    $n = (int)$nivel;
+    if ($n >= 80) return 3;
+    if ($n >= 50) return 2;
+    if ($n >= 25) return 1;
+    return 0;
 }
 
-/**
- * Calcula PA por turno: AGI + max(INT, ING, CAR) + bono_rango
- */
-function ope_combat_calc_pa($stats, $rango)
-{
+function ope_combat_calc_pa($stats, $nivel) {
     $agi = ope_rol_stat_num($stats, 'AGI');
     $int = ope_rol_stat_num($stats, 'INT');
     $ing = ope_rol_stat_num($stats, 'ING');
     $car = ope_rol_stat_num($stats, 'CAR');
-    $bonus = ope_combat_pa_bonus($rango);
-    return $agi + max($int, $ing, $car) + $bonus;
+    $bonus = ope_combat_pa_bonus($nivel);
+    return 3 + (int)($agi / 20) + (int)(max($int, $ing, $car) / 20) + $bonus;
 }
 
-/**
- * Recalcula y guarda PV, EN, PA del personaje en BD.
- * Llamar después de cualquier cambio de stats.
- */
 function ope_combat_recalc($pid)
 {
     global $db;
-    $pid = (int) $pid;
+    $pid = (int)$pid;
     if ($pid < 1 || !$db->table_exists('rol_personajes')) return false;
 
-    $q = $db->simple_select('rol_personajes', 'datos, rango', "pid = {$pid}", array('limit' => 1));
+    $q = $db->simple_select('rol_personajes', 'stats_json, nivel', "pid = {$pid}", array('limit' => 1));
     if (!$db->num_rows($q)) return false;
     $pj = $db->fetch_array($q);
 
-    $datos = json_decode((string) $pj['datos'], true);
-    if (!is_array($datos)) $datos = array();
-    $stats = is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array();
-    $rango = ope_rol_rank_from_sum(ope_rol_stat_sum($stats));
+    $stats_json = (string)($pj['stats_json'] ?? '');
+    $stats = json_decode($stats_json, true);
+    if (!is_array($stats) || empty($stats)) {
+        // Fallback: intentar leer del JSON 'datos' antiguo
+        $q2 = $db->simple_select('rol_personajes', 'datos', "pid = {$pid}", array('limit' => 1));
+        if ($db->num_rows($q2)) {
+            $pj2 = $db->fetch_array($q2);
+            $datos = json_decode((string)$pj2['datos'], true);
+            $stats = is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array();
+        }
+    }
+    if (empty($stats)) return false;
+
+    $sum = ope_rol_stat_sum($stats);
+    $nivel = ope_rol_nivel_from_sum($sum);
 
     $pv = ope_combat_calc_pv($stats);
-    $en = ope_combat_calc_en($rango);
-    $pa = ope_combat_calc_pa($stats, $rango);
+    $en = ope_combat_calc_en($stats);
+    $pa = ope_combat_calc_pa($stats, $nivel);
 
     $db->update_query('rol_personajes', array(
         'pv_max'       => $pv,
         'en_max'       => $en,
         'pa_por_turno' => $pa,
-        'rango'        => $db->escape_string($rango),
     ), "pid = {$pid}");
 
-    return array('pv_max' => $pv, 'en_max' => $en, 'pa_por_turno' => $pa, 'rango' => $rango);
+    return array('pv_max' => $pv, 'en_max' => $en, 'pa_por_turno' => $pa);
 }
 
 /**

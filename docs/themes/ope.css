@@ -3514,6 +3514,8 @@ body.ope-pg-progresion .ope-prog-plate-nopad{padding:0!important}
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* --- Bloque del oráculo dentro del post --- */
+.ope-viaje-header{margin:0 0 18px}
+.ope-viaje-header .ope-viaje-oraculo{margin-top:0}
 .ope-viaje-oraculo{
   --vo-sea:var(--op-ocean,#10477B);
   --vo-sky:var(--op-sky,#41A4E0);
@@ -3789,4 +3791,50 @@ body.ope-pg-viajes .ope-vj-submit{padding:12px 22px!important}
   body.ope-pg-viajes .ope-vj-ta,
   body.ope-pg-viajes .ope-vj-barco-in,
   body.ope-pg-viajes .ope-vj-crew-chip span{transition:none}
+}
+
+/* ============================================================
+   Banner decorativo compartido (ope_rol_deco_banner)
+   Masthead ancho 21:9 con placeholder cuando la imagen no existe.
+   ============================================================ */
+.ope-deco-banner{
+  position:relative;margin:0 0 24px;border:3px solid #000;overflow:hidden;
+  background:var(--iron);box-shadow:6px 6px 0 rgba(0,0,0,.4);
+}
+.ope-deco-banner img{display:block;width:100%;aspect-ratio:21/9;object-fit:cover;object-position:center}
+.ope-deco-banner.has-image::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(6,25,45,.05) 40%,rgba(6,25,45,.55) 100%);
+}
+.ope-deco-ph{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  aspect-ratio:21/9;padding:24px;text-align:center;color:var(--rivet);
+  background:
+    repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0 12px,transparent 12px 24px),
+    linear-gradient(135deg,var(--iron-edge),var(--iron-plate));
+}
+.ope-deco-ph svg{width:46px;height:46px;opacity:.55}
+.ope-deco-ph span{font-family:var(--mono),monospace;font-size:.72rem;color:var(--paper-dim)}
+.ope-deco-ph small{font-family:var(--mono),monospace;font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;color:var(--rivet)}
+@media(max-width:700px){
+  .ope-deco-banner img,.ope-deco-ph{aspect-ratio:16/9}
+}
+
+/* ── Hero lateral: imagen 4:5 a la izquierda + información a la derecha ── */
+.ope-deco-split{display:grid;grid-template-columns:minmax(240px,320px) 1fr;gap:26px;align-items:center}
+.ope-deco-aside{
+  position:relative;margin:0;border:3px solid #000;overflow:hidden;
+  background:var(--iron);box-shadow:6px 6px 0 rgba(0,0,0,.4);align-self:stretch;
+}
+.ope-deco-aside img{display:block;width:100%;height:100%;aspect-ratio:4/5;object-fit:cover;object-position:center}
+.ope-deco-aside.has-image::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent 55%,rgba(6,25,45,.5) 100%);
+}
+.ope-deco-aside .ope-deco-ph{aspect-ratio:4/5;height:100%}
+.ope-deco-split-main{min-width:0}
+@media(max-width:760px){
+  .ope-deco-split{grid-template-columns:1fr;gap:18px}
+  .ope-deco-aside{max-width:360px}
+  .ope-deco-aside img,.ope-deco-aside .ope-deco-ph{aspect-ratio:16/9}
 }

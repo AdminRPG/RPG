@@ -119,6 +119,9 @@ header('Content-Type: text/html; charset=utf-8');
 
 <div class="wrap">
 
+  <?php echo ope_rol_deco_banner('ope/deco/tramites', 'Ventanillas de trámites oficiales del foro', 'Trámites oficiales'); ?>
+
+
   <section class="reveal">
     <div class="shead">
       <h1>Trámites</h1>

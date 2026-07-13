@@ -241,6 +241,9 @@ header('Content-Type: text/html; charset=utf-8');
 
 <div class="wrap">
 
+  <?php echo ope_rol_deco_banner('ope/deco/personajes', 'Galería de personajes de la tripulación', 'Expediente de personajes'); ?>
+
+
   <section class="reveal">
     <div class="shead">
       <h1>Personaje</h1>

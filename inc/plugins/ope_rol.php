@@ -595,6 +595,87 @@ function ope_rol_head_base()
 }
 
 /**
+ * Devuelve la URL pública de una imagen decorativa si el archivo existe.
+ * $rel es la ruta relativa SIN extensión desde images/ (p.ej. 'ope/deco/tramites').
+ * Prueba webp/avif/jpg/jpeg/png y devuelve '' si no hay ninguna.
+ */
+function ope_rol_deco_url($rel)
+{
+    global $mybb;
+    static $cache = array();
+    $rel = trim((string) $rel, '/');
+    if (isset($cache[$rel])) {
+        return $cache[$rel];
+    }
+    $url = '';
+    foreach (array('webp', 'avif', 'jpg', 'jpeg', 'png') as $ext) {
+        if (@is_file(MYBB_ROOT . 'images/' . $rel . '.' . $ext)) {
+            $url = rtrim((string) $mybb->settings['bburl'], '/') . '/images/' . $rel . '.' . $ext;
+            break;
+        }
+    }
+    return $cache[$rel] = $url;
+}
+
+/**
+ * Renderiza un banner decorativo ancho (masthead) con fallback a placeholder.
+ * Sin dependencias de iconos externos: usa un SVG inline.
+ *
+ * @param string $rel    ruta relativa sin extensión desde images/ (p.ej. 'ope/deco/tramites')
+ * @param string $alt    texto alternativo de la imagen
+ * @param string $kicker etiqueta mono opcional mostrada en el placeholder
+ */
+function ope_rol_deco_banner($rel, $alt = '', $kicker = '')
+{
+    $rel = trim((string) $rel, '/');
+    $url = ope_rol_deco_url($rel);
+
+    $out = '<figure class="ope-deco-banner' . ($url !== '' ? ' has-image' : '') . '">';
+    if ($url !== '') {
+        $out .= '<img src="' . htmlspecialchars_uni($url) . '" alt="' . htmlspecialchars_uni($alt) . '" loading="lazy">';
+    } else {
+        $svg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21 3H3a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1Zm-1 2v9.6l-3.3-3.3a1 1 0 0 0-1.4 0L11 15.6l-1.8-1.8a1 1 0 0 0-1.4 0L4 17.6V5ZM8.5 8.5A1.5 1.5 0 1 1 7 10a1.5 1.5 0 0 1 1.5-1.5Z"/></svg>';
+        $out .= '<div class="ope-deco-ph">' . $svg
+              . '<span>images/' . htmlspecialchars_uni($rel) . '.webp</span>';
+        if ($kicker !== '') {
+            $out .= '<small>' . htmlspecialchars_uni($kicker) . '</small>';
+        }
+        $out .= '</div>';
+    }
+    $out .= '</figure>';
+    return $out;
+}
+
+/**
+ * Renderiza una imagen decorativa vertical 4:5 para usar como columna lateral
+ * (patrón "imagen a la izquierda, información a la derecha"). Fallback a placeholder.
+ *
+ * @param string $rel    ruta relativa sin extensión desde images/ (p.ej. 'ope/deco/guias')
+ * @param string $alt    texto alternativo de la imagen
+ * @param string $kicker etiqueta mono opcional mostrada en el placeholder
+ */
+function ope_rol_deco_aside($rel, $alt = '', $kicker = '')
+{
+    $rel = trim((string) $rel, '/');
+    $url = ope_rol_deco_url($rel);
+
+    $out = '<figure class="ope-deco-aside' . ($url !== '' ? ' has-image' : '') . '">';
+    if ($url !== '') {
+        $out .= '<img src="' . htmlspecialchars_uni($url) . '" alt="' . htmlspecialchars_uni($alt) . '" loading="lazy">';
+    } else {
+        $svg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21 3H3a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1Zm-1 2v9.6l-3.3-3.3a1 1 0 0 0-1.4 0L11 15.6l-1.8-1.8a1 1 0 0 0-1.4 0L4 17.6V5ZM8.5 8.5A1.5 1.5 0 1 1 7 10a1.5 1.5 0 0 1 1.5-1.5Z"/></svg>';
+        $out .= '<div class="ope-deco-ph">' . $svg
+              . '<span>images/' . htmlspecialchars_uni($rel) . '.webp</span>';
+        if ($kicker !== '') {
+            $out .= '<small>' . htmlspecialchars_uni($kicker) . '</small>';
+        }
+        $out .= '</div>';
+    }
+    $out .= '</figure>';
+    return $out;
+}
+
+/**
  * Inyecta la navbar única justo tras <body> en cualquier página que pase por
  * el pipeline estándar de MyBB (output_page) y que aún no la traiga en su
  * propia plantilla. Evita duplicados comprobando el id del nav.
@@ -1656,21 +1737,50 @@ function ope_rol_parse_viaje($message)
 /** Inyecta panel de viaje activo en plantilla showthread. */
 function ope_rol_viaje_showthread_end()
 {
-    global $tid, $mybb;
+    global $tid, $mybb, $thread, $posts;
     $uid = (int) ($mybb->user['uid'] ?? 0);
     $active_pid = (int) ($mybb->user['ope_active_pid'] ?? 0);
     if ($active_pid < 1 && $uid > 0 && function_exists('ope_rol_active_pid_for')) {
         $active_pid = ope_rol_active_pid_for($uid);
     }
-    $GLOBALS['ope_viaje_panel'] = function_exists('ope_viaje_panel_showthread')
+
+    $GLOBALS['ope_viaje_panel'] = '';
+    $GLOBALS['ope_viaje_scripts'] = '';
+
+    $v = function_exists('ope_viaje_por_tid') ? ope_viaje_por_tid((int) $tid) : null;
+    if (!$v) {
+        return;
+    }
+
+    // Tarjeta del Oráculo como cabecera del tema (no como post).
+    $card = '';
+    if (function_exists('ope_oraculo_post_html')) {
+        $oracle = json_decode((string) ($v['resultado_json'] ?? ''), true);
+        if (!is_array($oracle)) {
+            $oracle = array('tramos' => array(), 'mods' => array());
+        }
+        $card = '<div class="ope-viaje-header">' . ope_oraculo_post_html($v, $oracle) . '</div>';
+    }
+
+    $panel = function_exists('ope_viaje_panel_showthread')
         ? ope_viaje_panel_showthread((int) $tid, $uid, $active_pid)
         : '';
-    $GLOBALS['ope_viaje_scripts'] = '';
-    if (function_exists('ope_viaje_por_tid') && function_exists('ope_oraculo_showthread_scripts')) {
-        $v = ope_viaje_por_tid((int) $tid);
-        if ($v) {
-            $GLOBALS['ope_viaje_scripts'] = ope_oraculo_showthread_scripts();
-        }
+
+    $GLOBALS['ope_viaje_panel'] = $card . $panel;
+
+    // Oculta el primer post (OP-Eternal) para que el oráculo no se vea como post.
+    $first_pid = (int) ($thread['firstpost'] ?? 0);
+    if ($first_pid > 0 && !empty($posts) && is_string($posts)) {
+        $posts = preg_replace(
+            '#<a name="pid' . $first_pid . '"[^>]*></a>\s*<article\b[^>]*id="post_' . $first_pid . '"[\s\S]*?</article>#',
+            '',
+            $posts,
+            1
+        );
+    }
+
+    if (function_exists('ope_oraculo_showthread_scripts')) {
+        $GLOBALS['ope_viaje_scripts'] = ope_oraculo_showthread_scripts();
     }
 }
 

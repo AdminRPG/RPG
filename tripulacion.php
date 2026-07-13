@@ -41,11 +41,15 @@ header('Content-Type: text/html; charset=utf-8');
 
 <div class="wrap">
 
-  <section class="reveal">
-    <div class="shead">
-      <h1>Tripulaciones</h1>
-      <span class="code">// navega con los tuyos</span>
-      <span class="rule"></span>
+  <section class="reveal ope-deco-split">
+    <?php echo ope_rol_deco_aside('ope/deco/tripulacion', 'Tripulación reunida en la cubierta de un navío', 'Tripulaciones'); ?>
+    <div class="ope-deco-split-main">
+      <div class="shead">
+        <h1>Tripulaciones</h1>
+        <span class="code">// navega con los tuyos</span>
+        <span class="rule"></span>
+      </div>
+      <p class="tram-intro">Ninguna leyenda se forja en solitario. Encuentra tu tripulación, enrola a los tuyos y surca el mundo bajo una misma bandera: aquí se listan todas las tripulaciones activas y sus miembros.</p>
     </div>
   </section>
 

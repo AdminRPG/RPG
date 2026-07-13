@@ -62,38 +62,65 @@ if (!function_exists('ope_rol_stats')) {
         return $keys;
     }
 
-    /** Escala de rangos F..M+ → valor numérico. */
-    function ope_rol_rank_scale()
-    {
-        return array(
-            'F' => 1, 'E' => 2, 'D' => 3, 'C' => 4, 'B' => 5,
-            'A' => 6, 'S' => 7, 'SS' => 8, 'M' => 9, 'M+' => 10,
-        );
+    function ope_rol_nivel_from_sum($sum) {
+        return (int) floor(((int)$sum) / 10);
     }
 
-    /** Rango del personaje según la suma de las 12 stats efectivas (doc 05). */
-    function ope_rol_rank_from_sum($sum)
-    {
-        $sum = (int)$sum;
-        if ($sum >= 66) return 'M+';
-        if ($sum >= 56) return 'M';
-        if ($sum >= 47) return 'SS';
-        if ($sum >= 39) return 'S';
-        if ($sum >= 32) return 'A';
-        if ($sum >= 26) return 'B';
-        if ($sum >= 21) return 'C';
-        if ($sum >= 17) return 'D';
-        if ($sum >= 14) return 'E';
-        return 'F';
+    function ope_rol_nivel_label($nivel) {
+        $n = (int)$nivel;
+        if ($n >= 100) return 'Leyenda';
+        if ($n >= 80)  return 'Emperador';
+        if ($n >= 60)  return 'Almirante';
+        if ($n >= 40)  return 'Vicealmirante';
+        if ($n >= 25)  return 'Capitán';
+        if ($n >= 15)  return 'Oficial';
+        if ($n >= 9)   return 'Novato';
+        return 'Civil';
     }
 
-    /** Valor numérico de una stat efectiva (0..10). Ausente → $default (1). */
-    function ope_rol_stat_num($stats, $key, $default = 1)
-    {
-        if (!is_array($stats) || !array_key_exists($key, $stats)) {
-            return max(0, (int) $default);
+if (!function_exists('ope_rol_stats_para_nivel')) {
+    /** Puntos de stat acumulados necesarios para alcanzar un nivel. */
+    function ope_rol_stats_para_nivel($nivel_objetivo) {
+        $n = max(1, (int)$nivel_objetivo);
+        return $n * $n * 5;
+    }
+}
+
+if (!function_exists('ope_rol_nivel_maximo_stats')) {
+    /** Máximo nivel alcanzable con X puntos de stat ganados. */
+    function ope_rol_nivel_maximo_stats($stats_ganados) {
+        $pts = (int)$stats_ganados;
+        $nivel = 1;
+        while ($nivel < 100 && ope_rol_stats_para_nivel($nivel + 1) <= $pts) {
+            $nivel++;
         }
-        return max(0, min(10, (int) $stats[$key]));
+        return $nivel;
+    }
+}
+
+if (!function_exists('ope_rol_puede_subir_stats')) {
+    /** ¿Puede este personaje seguir subiendo stats o necesita nivel antes? */
+    function ope_rol_puede_subir_stats($nivel_actual, $stats_ganados) {
+        $n = max(1, (int)$nivel_actual);
+        $limite = ope_rol_stats_para_nivel($n + 1);
+        return ((int)$stats_ganados) < $limite;
+    }
+}
+
+if (!function_exists('ope_rol_puede_subir_nivel')) {
+    /** ¿Puede subir de nivel? */
+    function ope_rol_puede_subir_nivel($nivel_actual, $stats_ganados) {
+        $n = max(1, (int)$nivel_actual);
+        $necesario = ope_rol_stats_para_nivel($n + 1);
+        return ((int)$stats_ganados) >= $necesario;
+    }
+}
+
+    function ope_rol_stat_num($stats, $key, $default = 5) {
+        if (!is_array($stats) || !array_key_exists($key, $stats)) {
+            return max(0, (int)$default);
+        }
+        return max(0, (int)$stats[$key]);
     }
 
     /** Suma de las 12 stats efectivas (INI-04 / INI-01). */
@@ -106,77 +133,30 @@ if (!function_exists('ope_rol_stats')) {
         return $sum;
     }
 
-    /** Rango de stat desde valor numérico (0 = penalizado por pasiva). */
-    function ope_rol_rank_from_val($val)
-    {
-        $val = (int) $val;
-        if ($val <= 0) return '0';
-        if ($val >= 10) return 'M+';
-        if ($val >= 9)  return 'M';
-        if ($val >= 8)  return 'SS';
-        if ($val >= 7)  return 'S';
-        if ($val >= 6)  return 'A';
-        if ($val >= 5)  return 'B';
-        if ($val >= 4)  return 'C';
-        if ($val >= 3)  return 'D';
-        if ($val >= 2)  return 'E';
-        return 'F';
+    function ope_rol_stat_upgrade_cost($current_val) {
+        $v = (int)$current_val;
+        if ($v >= 101) return 12;
+        if ($v >= 81)  return 8;
+        if ($v >= 61)  return 5;
+        if ($v >= 41)  return 3;
+        if ($v >= 21)  return 2;
+        return 1;
     }
 
-    /** Valor numérico desde rango de stat (F=1 … M+=10). */
-    function ope_rol_val_from_rank($rank)
-    {
-        $map = ope_rol_rank_scale();
-        return isset($map[(string) $rank]) ? $map[(string) $rank] : 1;
-    }
-
-    /**
-     * Coste PP para subir una stat al siguiente rango (INI-04).
-     * Desde 0 (pasiva negativa) cuesta 0→F + F→E = 10 PP.
-     *
-     * @return int|false
-     */
-    function ope_rol_stat_upgrade_cost($current_val)
-    {
-        $current = (int) $current_val;
-        if ($current >= 10) return false;
-        if ($current <= 0) return 10;
-        if ($current >= 9) return 200;
-        if ($current >= 8) return 150;
-        if ($current >= 7) return 110;
-        if ($current >= 6) return 80;
-        if ($current >= 5) return 55;
-        if ($current >= 4) return 35;
-        if ($current >= 3) return 20;
-        if ($current >= 2) return 10;
-        return 5;
-    }
-
-    /** Etiquetas legibles para rangos de stat en UI. */
-    function ope_rol_stat_rank_labels()
-    {
-        return array(
-            '0'  => 'Penalizado',
-            'F'  => 'Pésimo',
-            'E'  => 'Muy bajo',
-            'D'  => 'Bajo',
-            'C'  => 'Normal',
-            'B'  => 'Bueno',
-            'A'  => 'Notable',
-            'S'  => 'Excepcional',
-            'SS' => 'Legendario',
-            'M'  => 'Máximo',
-            'M+' => 'Trascendente',
-        );
+    function ope_rol_stat_label($val) {
+        $v = (int)$val;
+        if ($v >= 100) return 'Trascendente';
+        if ($v >= 80)  return 'Legendario';
+        if ($v >= 60)  return 'Excepcional';
+        if ($v >= 40)  return 'Notable';
+        if ($v >= 25)  return 'Bueno';
+        if ($v >= 15)  return 'Normal';
+        if ($v >= 10)  return 'Bajo';
+        return 'Mínimo';
     }
 }
 
 if (!function_exists('ope_rol_razas')) {
-    /**
-     * 9 razas. 'mod' = deltas a las stats efectivas de la PASIVA PRIMARIA
-     * (siempre se aplica, pura o híbrida). 'mod_secundaria' solo se aplica
-     * si el personaje es PURO de esa raza (no híbrido).
-     */
     function ope_rol_razas()
     {
         return array(
@@ -184,139 +164,81 @@ if (!function_exists('ope_rol_razas')) {
                 'nombre' => 'Humano',
                 'resumen' => 'La raza más numerosa. Presente en los Cuatro Mares y la Grand Line. Su fuerza es la adaptabilidad.',
                 'primaria_nombre' => 'Adaptabilidad',
-                'primaria_desc' => 'Al crear el personaje, puedes subir DOS stats de F a E en lugar de una.',
+                'primaria_desc' => 'Al crear el personaje, obtienes 40 Puntos de Stat iniciales en lugar de 30.',
                 'secundaria_nombre' => 'Herencia Tribal',
                 'secundaria_desc' => 'Elige: Humano Genérico (Mayoría Silenciosa) o una Tribu Real (Ashinaga, Tenaga, Kubinaga, Kuja).',
-                'mod' => array(),
-                'mod_secundaria' => array(),
-                'extra_stat_bump' => true,
-                // Elección obligatoria al crear (solo si es PURO, ver INI-01): sustituye
-                // la pasiva secundaria genérica por la de la tribu elegida.
+                'multiplicadores' => array(),
+                'multiplicadores_secundaria' => array(),
+                'ps_bonus' => 10,
                 'sub_opciones_label' => 'Herencia Tribal',
                 'sub_opciones' => array(
-                    'generico' => array(
-                        'nombre' => 'Mayoría Silenciosa',
-                        'desc' => '+10% a la ganancia de Reputación con cualquier facción.',
-                        'mod' => array(),
-                    ),
-                    'ashinaga' => array(
-                        'nombre' => 'Zancada Larga (Tribu Ashinaga)',
-                        'desc' => '+50% velocidad de movimiento terrestre. +1 AGI efectiva en ataques de patada o salto.',
-                        'mod' => array(),
-                    ),
-                    'tenaga' => array(
-                        'nombre' => 'Doble Articulación (Tribu Tenaga)',
-                        'desc' => '+1m de alcance cuerpo a cuerpo con armas de mano. +1 DES efectiva con herramientas de precisión, ganzúas o instrumentos.',
-                        'mod' => array(),
-                    ),
-                    'kubinaga' => array(
-                        'nombre' => 'Visión Elevada (Tribu Kubinaga)',
-                        'desc' => '+1 PER efectiva para avistar amenazas a distancia. Inmune a penalizadores de flanqueo básico y -5 a la dificultad para detectar emboscadas por la espalda.',
-                        'mod' => array(),
-                    ),
-                    'kuja' => array(
-                        'nombre' => 'Haki de las Guerreras (Tribu Kuja)',
-                        'desc' => 'Solo mujeres. Empiezas con la virtud "Haki de Armadura Latente" gratis (sin gastar PC). Tus flechas/arcos pueden canalizar VOL para daño espiritual menor (Tier I).',
-                        'mod' => array(),
-                        'solo_femenino' => true,
-                    ),
+                    'generico' => array('nombre' => 'Mayoría Silenciosa', 'desc' => '+10% a la ganancia de Reputación con cualquier facción.'),
+                    'ashinaga' => array('nombre' => 'Zancada Larga (Tribu Ashinaga)', 'desc' => '+50% velocidad de movimiento terrestre.'),
+                    'tenaga' => array('nombre' => 'Doble Articulación (Tribu Tenaga)', 'desc' => '+1m de alcance cuerpo a cuerpo con armas de mano.'),
+                    'kubinaga' => array('nombre' => 'Visión Elevada (Tribu Kubinaga)', 'desc' => 'Inmune a penalizadores de flanqueo básico.'),
+                    'kuja' => array('nombre' => 'Haki de las Guerreras (Tribu Kuja)', 'desc' => 'Solo mujeres. Virtud "Haki de Armadura Latente" gratis.', 'solo_femenino' => true),
                 ),
             ),
             'skypiean' => array(
-                'nombre' => 'Skypiean',
-                'resumen' => 'Habitantes de las islas del cielo. Alas pequeñas para planear. Cultura del Dial.',
-                'primaria_nombre' => 'Planeo Celestial',
-                'primaria_desc' => 'Puedes planear distancias cortas y niegas el daño por caída. +1 AGI efectiva para movimiento.',
-                'secundaria_nombre' => 'Herencia del Dial',
-                'secundaria_desc' => 'Empiezas con un Dial básico a elección. +1 ING para crear/modificar Dials.',
-                'mod' => array('AGI' => 1),
-                'mod_secundaria' => array('ING' => 1),
+                'nombre' => 'Skypiean', 'resumen' => 'Habitantes de las islas del cielo. Alas pequeñas para planear.',
+                'primaria_nombre' => 'Planeo Celestial', 'primaria_desc' => 'Puedes planear y niegas daño por caída.',
+                'secundaria_nombre' => 'Herencia del Dial', 'secundaria_desc' => 'Empiezas con un Dial básico. +10% ING para Dials.',
+                'multiplicadores' => array('AGI' => 1.15),
+                'multiplicadores_secundaria' => array('ING' => 1.10),
             ),
             'gyojin' => array(
-                'nombre' => 'Gyojin (Tritón)',
-                'resumen' => 'Guerreros del mar. Velocidad y fuerza multiplicadas bajo el agua.',
-                'primaria_nombre' => 'Sangre del Abismo',
-                'primaria_desc' => 'Respiras bajo el agua. ×2 velocidad de movimiento en agua. +1 VIG permanente.',
-                'secundaria_nombre' => 'Gyojin Karate Innato',
-                'secundaria_desc' => 'Carta Tier I "Gyojin Karate: Puño de Agua" gratis. +1 FUE efectiva en contacto con agua.',
-                'mod' => array('VIG' => 1),
-                'mod_secundaria' => array('FUE' => 1),
+                'nombre' => 'Gyojin (Tritón)', 'resumen' => 'Guerreros del mar. Velocidad y fuerza bajo el agua.',
+                'primaria_nombre' => 'Sangre del Abismo', 'primaria_desc' => 'Respiras bajo el agua. ×2 velocidad en agua.',
+                'secundaria_nombre' => 'Gyojin Karate Innato', 'secundaria_desc' => 'Carta Tier I "Gyojin Karate: Puño de Agua" gratis.',
+                'multiplicadores' => array('VIG' => 1.15, 'FUE' => 1.15),
+                'multiplicadores_secundaria' => array(),
             ),
             'gigante' => array(
-                'nombre' => 'Gigante',
-                'resumen' => 'Colosos de Elbaf. Cultura guerrera basada en el honor, el duelo y la fuerza.',
-                'primaria_nombre' => 'Fuerza Colosal',
-                'primaria_desc' => '+2 FUE permanente. ×1.5 daño cuerpo a cuerpo. ×2 alcance. -1 AGI permanente.',
-                'secundaria_nombre' => 'Linaje Colosal',
-                'secundaria_desc' => 'Elige: Gigante Común (Piel de Batalla) o Gigante Ancestral (Cuerpo Devastador).',
-                'mod' => array('FUE' => 2, 'AGI' => -1),
-                'mod_secundaria' => array('VIG' => 1),
-                // Elección obligatoria al crear (solo si es PURO, ver INI-01).
+                'nombre' => 'Gigante', 'resumen' => 'Colosos de Elbaf. Cultura guerrera de honor y fuerza.',
+                'primaria_nombre' => 'Fuerza Colosal', 'primaria_desc' => '+25% FUE. ×1.5 daño cuerpo a cuerpo. ×2 alcance.',
+                'secundaria_nombre' => 'Linaje Colosal', 'secundaria_desc' => 'Elige: Gigante Común o Gigante Ancestral.',
+                'multiplicadores' => array('FUE' => 1.25, 'AGI' => 0.85),
+                'multiplicadores_secundaria' => array('VIG' => 1.10),
                 'sub_opciones_label' => 'Linaje Colosal',
                 'sub_opciones' => array(
-                    'comun' => array(
-                        'nombre' => 'Piel de Batalla (Gigante Común)',
-                        'desc' => '+1 VIG permanente. Las heridas leves no te afectan en combate.',
-                        'mod' => array('VIG' => 1),
-                    ),
-                    'ancestral' => array(
-                        'nombre' => 'Cuerpo Devastador (Gigante Ancestral)',
-                        'desc' => 'Tamaño de 30 a 60 m, con cuernos. Tu penalización racial de AGI aumenta a -2 (en lugar de -1). Tu multiplicador de daño cuerpo a cuerpo sube a ×2.0 (en lugar de ×1.5) y tus ataques ignoran el 50% de la resistencia física de estructuras, defensas pesadas y barcos.',
-                        // -1 AGI extra que se SUMA a la penalización -1 ya aplicada por la
-                        // pasiva primaria: total efectivo -2 AGI para el Ancestral.
-                        'mod' => array('AGI' => -1),
-                    ),
+                    'comun' => array('nombre' => 'Piel de Batalla (Gigante Común)', 'desc' => '+10% VIG. Las heridas leves no te afectan en combate.'),
+                    'ancestral' => array('nombre' => 'Cuerpo Devastador (Gigante Ancestral)', 'desc' => '30-60m, cuernos. AGI -15% adicional. Daño ×2.0. Ignora 50% resistencia de estructuras.'),
                 ),
             ),
             'mink' => array(
-                'nombre' => 'Mink',
-                'resumen' => 'Tribu animal de Zou. Leales hasta la muerte. Electro natural y Sulong bajo luna llena.',
-                'primaria_nombre' => 'Electro',
-                'primaria_desc' => 'Generas descargas eléctricas al contacto. +25% daño contra metal/armadura.',
-                'secundaria_nombre' => 'Instinto Salvaje',
-                'secundaria_desc' => '+1 PER efectiva para rastrear, detectar emboscadas y percibir intenciones hostiles.',
-                'mod' => array(),
-                'mod_secundaria' => array('PER' => 1),
+                'nombre' => 'Mink', 'resumen' => 'Tribu animal de Zou. Electro natural y Sulong bajo luna llena.',
+                'primaria_nombre' => 'Electro', 'primaria_desc' => 'Generas descargas eléctricas. +25% daño contra metal.',
+                'secundaria_nombre' => 'Instinto Salvaje', 'secundaria_desc' => '+10% PER para rastrear y detectar emboscadas.',
+                'multiplicadores' => array(),
+                'multiplicadores_secundaria' => array('PER' => 1.10),
             ),
             'lunarian' => array(
-                'nombre' => 'Lunarian',
-                'resumen' => 'Raza casi extinta. Genera fuego corporal. Perseguidos por el Gobierno Mundial.',
-                'primaria_nombre' => 'Llamarada',
-                'primaria_desc' => 'Envuelves partes del cuerpo en fuego (1 PA). +1 VIG efectiva mientras la llama está activa.',
-                'secundaria_nombre' => 'Los Últimos',
-                'secundaria_desc' => 'Wanted automático de 100M. +1 VOL efectiva vs Marines/Gobierno. -50% ganancia REP en territorio del Gobierno.',
-                'mod' => array(),
-                'mod_secundaria' => array('VOL' => 1),
+                'nombre' => 'Lunarian', 'resumen' => 'Raza casi extinta. Genera fuego corporal. Perseguidos por el Gobierno.',
+                'primaria_nombre' => 'Llamarada', 'primaria_desc' => 'Envuelves partes del cuerpo en fuego (1 PA).',
+                'secundaria_nombre' => 'Los Últimos', 'secundaria_desc' => 'Wanted automático de 100M. +10% VOL vs Marines/Gobierno.',
+                'multiplicadores' => array(),
+                'multiplicadores_secundaria' => array('VOL' => 1.10),
             ),
             'sirena' => array(
-                'nombre' => 'Sirena / Sireno (Ningyo)',
-                'resumen' => 'Belleza submarina. Comunicación natural con criaturas marinas. Velocidad extrema en agua.',
-                'primaria_nombre' => 'Gracia Marina',
-                'primaria_desc' => '×3 velocidad de movimiento en agua. Telepatía con fauna marina no hostil. +1 SEN permanente.',
-                'secundaria_nombre' => 'Canto Hipnótico',
-                'secundaria_desc' => '+1 CAR efectiva para persuasión, seducción o distracción mediante tu voz.',
-                'mod' => array('SEN' => 1),
-                'mod_secundaria' => array('CAR' => 1),
+                'nombre' => 'Sirena / Sireno (Ningyo)', 'resumen' => 'Belleza submarina. Telepatía con fauna marina. Velocidad extrema en agua.',
+                'primaria_nombre' => 'Gracia Marina', 'primaria_desc' => '×3 velocidad en agua. Telepatía con fauna marina.',
+                'secundaria_nombre' => 'Canto Hipnótico', 'secundaria_desc' => '+10% CAR para persuasión y distracción con tu voz.',
+                'multiplicadores' => array('SEN' => 1.15),
+                'multiplicadores_secundaria' => array('CAR' => 1.10),
             ),
             'bucaneer' => array(
-                'nombre' => 'Bucaneer',
-                'resumen' => 'Fuerza desproporcionada en cuerpo humano. Perseguidos por el Gobierno.',
-                'primaria_nombre' => 'Sangre de Gigante',
-                'primaria_desc' => '+1 FUE y +1 VIG permanentes. Empuñas armas de una categoría superior sin penalización.',
-                'secundaria_nombre' => 'Estirpe Marcada',
-                'secundaria_desc' => 'Wanted automático de 50M. +1 VOL efectiva contra cualquier forma de opresión o esclavitud.',
-                'mod' => array('FUE' => 1, 'VIG' => 1),
-                'mod_secundaria' => array('VOL' => 1),
+                'nombre' => 'Bucaneer', 'resumen' => 'Fuerza desproporcionada en cuerpo humano. Perseguidos por el Gobierno.',
+                'primaria_nombre' => 'Sangre de Gigante', 'primaria_desc' => '+15% FUE y +15% VIG. Empuñas armas de categoría superior sin penalización.',
+                'secundaria_nombre' => 'Estirpe Marcada', 'secundaria_desc' => 'Wanted automático de 50M. +10% VOL contra opresión.',
+                'multiplicadores' => array('FUE' => 1.15, 'VIG' => 1.15),
+                'multiplicadores_secundaria' => array('VOL' => 1.10),
             ),
             'tontatta' => array(
-                'nombre' => 'Tontatta',
-                'resumen' => 'La raza más pequeña del mundo. Velocidad y sigilo incomparables. Maestros artesanos.',
-                'primaria_nombre' => 'Diminuto y Letal',
-                'primaria_desc' => '-1 FUE, +2 AGI, +2 DES permanentes. Los enemigos tienen -10 a PER para detectarte.',
-                'secundaria_nombre' => 'Manos de Artesano',
-                'secundaria_desc' => 'Oficio gratis y su primera especialización. +1 ING efectiva para fabricar o reparar.',
-                'mod' => array('FUE' => -1, 'AGI' => 2, 'DES' => 2),
-                'mod_secundaria' => array('ING' => 1),
+                'nombre' => 'Tontatta', 'resumen' => 'La raza más pequeña. Velocidad y sigilo incomparables.',
+                'primaria_nombre' => 'Diminuto y Letal', 'primaria_desc' => '-20% FUE, +25% AGI, +25% DES. -10 PER enemiga para detectarte.',
+                'secundaria_nombre' => 'Manos de Artesano', 'secundaria_desc' => 'Oficio gratis + primera especialización. +10% ING para fabricar.',
+                'multiplicadores' => array('FUE' => 0.80, 'AGI' => 1.25, 'DES' => 1.25),
+                'multiplicadores_secundaria' => array('ING' => 1.10),
             ),
         );
     }
@@ -594,6 +516,36 @@ if (!function_exists('ope_rol_defectos')) {
                 'D-FIS-10' => array('nombre' => 'Ausencia de Tacto', 'devuelve' => 3, 'desc' => 'Sin sensibilidad en parte del cuerpo. Puramente narrativo.', 'spec' => true),
             ),
         );
+    }
+}
+
+if (!function_exists('ope_rol_ps_iniciales')) {
+    function ope_rol_ps_iniciales($raza = '') {
+        if ($raza === 'humano') return 40;
+        return 30;
+    }
+}
+
+if (!function_exists('ope_rol_aplicar_pasivas')) {
+    function ope_rol_aplicar_pasivas($stats_base, $raza_data) {
+        $efectivas = $stats_base;
+        $mults = isset($raza_data['multiplicadores']) ? $raza_data['multiplicadores'] : array();
+        foreach ($mults as $stat => $factor) {
+            if (isset($efectivas[$stat])) {
+                $efectivas[$stat] = (int) round($efectivas[$stat] * $factor);
+            }
+        }
+        return $efectivas;
+    }
+}
+
+if (!function_exists('ope_rol_stats_base')) {
+    function ope_rol_stats_base() {
+        $base = array();
+        foreach (ope_rol_stat_keys() as $sk) {
+            $base[$sk] = 5;
+        }
+        return $base;
     }
 }
 

@@ -66,13 +66,16 @@ header('Content-Type: text/html; charset=utf-8');
 <div class="wrap">
 
   <!-- INTRO -->
-  <section class="reveal">
-    <div class="shead">
-      <h1>Guías</h1>
-      <span class="code">// reglamento &amp; sistema</span>
-      <span class="rule"></span>
+  <section class="reveal ope-deco-split">
+    <?php echo ope_rol_deco_aside('ope/deco/guias', 'Manuales y guías del sistema de rol', 'Guías del sistema'); ?>
+    <div class="ope-deco-split-main">
+      <div class="shead">
+        <h1>Guías</h1>
+        <span class="code">// reglamento &amp; sistema</span>
+        <span class="rule"></span>
+      </div>
+      <p class="guia-intro">Aquí encontrarás <b>todas las guías oficiales</b> del sistema de juego de One Piece Eternal: desde cómo crear tu personaje hasta las reglas de combate, progresión y el funcionamiento del mundo. <b>Navega por las categorías</b> de abajo para encontrar lo que buscas.</p>
     </div>
-    <p class="guia-intro">Aquí encontrarás <b>todas las guías oficiales</b> del sistema de juego de One Piece Eternal: desde cómo crear tu personaje hasta las reglas de combate, progresión y el funcionamiento del mundo. <b>Navega por las categorías</b> de abajo para encontrar lo que buscas.</p>
   </section>
 
   <!-- FILTROS + VISOR -->

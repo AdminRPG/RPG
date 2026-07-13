@@ -49,6 +49,9 @@ header('Content-Type: text/html; charset=utf-8');
 </div>
 
 <div class="wrap">
+
+  <?php echo ope_rol_deco_banner('ope/deco/periodicos', 'Prensa y periódicos del mundo', 'Prensa del mundo'); ?>
+
   <section class="reveal">
     <div class="shead"><h1>Eternal News</h1><span class="code">// hemeroteca del mundo</span><span class="rule"></span></div>
   </section>
