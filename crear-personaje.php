@@ -535,7 +535,7 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="plate-b">
           <p class="stats-hint">Todas empiezan en <b class="c-paper">5</b>. Reparte tus <b class="c-ember" id="psDisponiblesLabel">30 PS</b> como quieras (máx 15 PS por stat; 20 antes de pasivas).</p>
           <div id="statsContainer"></div>
-          <div class="wiz-sum-bar"><span>Suma efectiva: <b id="statSum">0</b></span><span>Nivel del personaje: <b id="statLevel">1</b></span></div>
+          <div class="wiz-sum-bar"><span>Suma efectiva: <b id="statSum">0</b></span><span>Nivel inicial: <b id="statLevel">1 (todos empiezan a nivel 1)</b></span></div>
         </div>
       </div>
     </div>
@@ -912,7 +912,7 @@ header('Content-Type: text/html; charset=utf-8');
         sum += eff;
       });
       document.getElementById('statSum').textContent = sum;
-      document.getElementById('statLevel').textContent = Math.floor(sum / 10);
+      document.getElementById('statLevel').textContent = '1 (todos empiezan a nivel 1)';
     }
 
     psInputs.forEach(function(inp){ inp.addEventListener('input', recompute); });
@@ -1013,7 +1013,8 @@ header('Content-Type: text/html; charset=utf-8');
       '<div class="line"><b>Raza</b>' + razaTxt + '</div>' +
       '<div class="line"><b>Facción</b>' + faccionTxt + '</div></div>' +
       '<div class="sum-block"><h4>Estadísticas</h4>' +
-      '<div class="line"><b>Suma total</b>' + document.getElementById('statSum').textContent + ' — Nivel ' + document.getElementById('statLevel').textContent + '</div></div>' +
+      '<div class="line"><b>Suma total</b>' + document.getElementById('statSum').textContent + '</div>' +
+      '<div class="line"><b>Nivel inicial</b>1 (el nivel se gana jugando)</div></div>' +
       '<div class="sum-block"><h4>Virtudes (' + virtudesNames.length + ')</h4><div class="line">' + (virtudesNames.join(', ') || 'Ninguna') + '</div></div>' +
       '<div class="sum-block"><h4>Defectos (' + defectosNames.length + ')</h4><div class="line">' + (defectosNames.join(', ') || 'Ninguno') + '</div></div>' +
       '<div class="sum-block"><h4>Equipo</h4><div class="line"><b>Pack</b>' + packTxt + '</div><div class="line"><b>Berries</b>' + document.getElementById('berriesOut').textContent + '</div></div>';

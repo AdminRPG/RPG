@@ -283,14 +283,14 @@ header('Content-Type: text/html; charset=utf-8');
   <!-- ── Subida de Nivel ── -->
   <?php if ($puede_subir_nivel): ?>
   <section class="reveal">
-    <div class="plate" style="border-color: var(--ember);">
+    <div class="plate ope-lvl-plate">
       <div class="plate-h">
         <span class="t">¡Puedes subir de nivel!</span>
         <span class="c">// Nivel <?php echo $nivel_actual; ?> → <?php echo $nivel_actual + 1; ?></span>
       </div>
       <div class="plate-b">
         <p>Has acumulado <b><?php echo $stats_ganados; ?> puntos de stat</b> subidos con PP. ¡Desbloquea el siguiente tramo!</p>
-        <form method="post" action="progresion.php" style="margin-top:1rem;">
+        <form method="post" action="progresion.php" class="ope-lvl-form">
           <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
           <input type="hidden" name="subir_nivel" value="1">
           <button type="submit" class="btn btn-hot">Subir a Nivel <?php echo $nivel_actual + 1; ?></button>
@@ -308,7 +308,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate-b">
         <p>Has llegado al máximo de puntos de stat para tu nivel actual (<b><?php echo $pts_necesarios; ?> pts</b>). Sube de nivel para seguir mejorando.</p>
         <p style="color:var(--ink-dim);">Puntos acumulados: <b><?php echo $stats_ganados; ?></b> / <?php echo $pts_necesarios; ?></p>
-        <form method="post" action="progresion.php" style="margin-top:1rem;">
+        <form method="post" action="progresion.php" class="ope-lvl-form">
           <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
           <input type="hidden" name="subir_nivel" value="1">
           <button type="submit" class="btn btn-hot">Subir a Nivel <?php echo $nivel_actual + 1; ?></button>

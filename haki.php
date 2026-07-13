@@ -81,14 +81,7 @@ header('Content-Type: text/html; charset=utf-8');
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Haki</title>
 <?php echo ope_rol_head_base(); ?>
-<style>
-.ope-haki-bar { display:flex; gap:0.5rem; margin:1rem 0; }
-.ope-haki-dot { flex:1; text-align:center; padding:0.5rem; background:var(--plate-bg, #1a1a2e); border-radius:6px; font-size:0.8rem; color:var(--ink-dim, #666); border:1px solid var(--plate-border, #333); }
-.ope-haki-dot--on { background:var(--ember, #e94560); color:#fff; border-color:var(--ember, #e94560); font-weight:bold; }
-.ope-haki-max { color:var(--ember, #e94560); font-weight:bold; margin-top:0.5rem; }
-.ope-haki-pl { color:var(--patina, #0f3460); font-style:italic; margin-top:0.5rem; }
-.ope-haki-locked { color:var(--ink-dim, #666); margin-top:0.5rem; }
-</style>
+<!-- estilos en docs/themes/ope.css (scope: ope-pg-haki) -->
 </head>
 <body class="ope-pg-haki">
 

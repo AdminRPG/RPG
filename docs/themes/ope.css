@@ -3838,3 +3838,18 @@ body.ope-pg-viajes .ope-vj-submit{padding:12px 22px!important}
   .ope-deco-aside{max-width:360px}
   .ope-deco-aside img,.ope-deco-aside .ope-deco-ph{aspect-ratio:16/9}
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Haki — haki.php (panel de progresión de los 3 tipos de Haki)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+body.ope-pg-haki .ope-haki-bar{display:flex;gap:0.5rem;margin:1rem 0}
+body.ope-pg-haki .ope-haki-dot{flex:1;text-align:center;padding:0.5rem;background:var(--plate-bg);border-radius:6px;font-size:0.8rem;color:var(--ink-dim);border:1px solid var(--plate-border)}
+body.ope-pg-haki .ope-haki-dot--on{background:var(--ember);color:#fff;border-color:var(--ember);font-weight:bold}
+body.ope-pg-haki .ope-haki-max{color:var(--ember);font-weight:bold;margin-top:0.5rem}
+body.ope-pg-haki .ope-haki-pl{color:var(--patina);font-style:italic;margin-top:0.5rem}
+body.ope-pg-haki .ope-haki-locked{color:var(--ink-dim);margin-top:0.5rem}
+
+/* ── Subida de nivel en progresion.php ── */
+body.ope-pg-progresion .ope-lvl-plate{border-color:var(--ember)}
+body.ope-pg-progresion .ope-lvl-form{margin-top:1rem}
