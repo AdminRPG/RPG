@@ -3434,6 +3434,7 @@ body.ope-pg-progresion .flash.warn{background:var(--h6);color:var(--iron)}
 .ope-prog-hero-track-top b{color:var(--gold-hi)}
 .ope-prog-hero-bar{height:14px;border:2px solid #000;background:var(--iron);overflow:hidden;box-shadow:inset 0 0 0 1px var(--rivet)}
 .ope-prog-hero-bar span{display:block;height:100%;background:repeating-linear-gradient(45deg,var(--patina) 0 8px,var(--patina-hi) 8px 16px);transition:width .4s}
+.ope-prog-hero-bar--mt{margin-top:.5rem}
 .ope-prog-hero-note{font-family:var(--mono);font-size:.66rem;line-height:1.5;color:var(--paper-dim);margin:0}
 .ope-prog-hero-note b{color:var(--paper)}
 .ope-prog-hero-pp{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 24px;background:var(--iron-edge);border-left:2px solid #000}
@@ -3455,6 +3456,7 @@ body.ope-pg-progresion .flash.warn{background:var(--h6);color:var(--iron)}
 .ope-prog-vital-label{display:block;font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);margin-top:4px}
 @media(max-width:500px){.ope-prog-vitals{grid-template-columns:repeat(2,1fr)}}
 .ope-prog-ppbar-total{padding:18px 22px;display:flex;flex-direction:column;justify-content:center}
+.ope-prog-ppbar-total--full{flex-basis:100%;text-align:center}
 .ope-prog-ppbar-val{font-family:var(--disp);font-weight:900;font-size:3rem;line-height:1;color:var(--gold-hi);text-shadow:0 2px 0 #000}
 .ope-prog-ppbar-label{font-family:var(--mono);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);margin-top:4px}
 .ope-prog-ppbar-detail{display:flex;gap:0;border-left:2px solid #000}
@@ -3843,6 +3845,25 @@ body.ope-pg-viajes .ope-vj-submit{padding:12px 22px!important}
    Haki — haki.php (panel de progresión de los 3 tipos de Haki)
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ── Scaffolding base (scope ope-pg-haki) ── */
+body.ope-pg-haki .shead{display:flex;align-items:baseline;gap:14px;margin:8px 0 14px}
+body.ope-pg-haki .shead h1,body.ope-pg-haki .shead h2{font-family:var(--disp);font-weight:800;font-size:2rem;text-transform:uppercase;color:var(--paper);line-height:1}
+body.ope-pg-haki .shead .code{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ember-hi);letter-spacing:1px}
+body.ope-pg-haki .shead .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--rivet) 0 6px,transparent 6px 12px)}
+body.ope-pg-haki .plate{border:2px solid #000;background:var(--iron-plate);margin-bottom:12px;box-shadow:3px 3px 0 rgba(0,0,0,.25)}
+body.ope-pg-haki .plate-h{background:var(--iron-edge);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:2px solid #000}
+body.ope-pg-haki .plate-h .t{font-family:var(--disp);font-weight:800;font-size:1.1rem;text-transform:uppercase;color:var(--paper);letter-spacing:.5px}
+body.ope-pg-haki .plate-h .c{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
+body.ope-pg-haki .plate-b{padding:13px}
+body.ope-pg-haki .plate-b p{font-family:var(--body);font-size:.85rem;color:var(--paper-dim);line-height:1.6}
+body.ope-pg-haki .flash{border:2px solid #000;padding:11px 14px;margin-bottom:16px;font-family:var(--mono);font-size:.74rem;font-weight:700;letter-spacing:.3px}
+body.ope-pg-haki .flash.ok{background:var(--patina);color:var(--iron)}
+body.ope-pg-haki .flash.error{background:var(--crack);color:#fff}
+body.ope-pg-haki .pj-empty{border:2px dashed var(--rivet);background:var(--iron-plate);padding:40px 22px;text-align:center;font-family:var(--mono);font-size:.8rem;color:var(--paper-dim)}
+body.ope-pg-haki .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
+body.ope-pg-haki .reveal.vis{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){body.ope-pg-haki *,body.ope-pg-haki *::before,body.ope-pg-haki *::after{animation:none!important;transition:none!important}body.ope-pg-haki .reveal{opacity:1;transform:none}}
+
 body.ope-pg-haki .ope-haki-bar{display:flex;gap:0.5rem;margin:1rem 0}
 body.ope-pg-haki .ope-haki-dot{flex:1;text-align:center;padding:0.5rem 0.75rem;background:var(--iron);border-radius:4px;font-size:0.75rem;color:var(--ash);border:2px solid var(--iron-edge);font-family:var(--mono)}
 body.ope-pg-haki .ope-haki-dot--on{background:var(--ember);color:var(--iron);border-color:#000;font-weight:700}
@@ -3853,3 +3874,54 @@ body.ope-pg-haki .ope-haki-locked{color:var(--ash);margin-top:0.5rem;font-family
 /* ── Subida de nivel en progresion.php ── */
 body.ope-pg-progresion .ope-lvl-plate{border-color:var(--ember)}
 body.ope-pg-progresion .ope-lvl-form{margin-top:1rem}
+
+/* ── Tab Combate en RPG System ── */
+body.ope-pg-newreply .ope-rpg-cbt-stats,
+body.ope-pg-newthread .ope-rpg-cbt-stats,
+body.ope-pg-editpost .ope-rpg-cbt-stats{padding:12px 0}
+body.ope-pg-newreply .ope-rpg-cbt-row,
+body.ope-pg-newthread .ope-rpg-cbt-row,
+body.ope-pg-editpost .ope-rpg-cbt-row{display:flex;gap:12px;margin-bottom:12px}
+body.ope-pg-newreply .ope-rpg-cbt-row label,
+body.ope-pg-newthread .ope-rpg-cbt-row label,
+body.ope-pg-editpost .ope-rpg-cbt-row label{font-family:var(--mono);font-size:.7rem;color:var(--paper-dim)}
+body.ope-pg-newreply .ope-rpg-cbt-row input,
+body.ope-pg-newthread .ope-rpg-cbt-row input,
+body.ope-pg-editpost .ope-rpg-cbt-row input{width:80px;padding:4px 6px;background:var(--iron);border:2px solid var(--iron-edge);color:var(--paper);font-family:var(--mono)}
+body.ope-pg-newreply .ope-rpg-cbt-pa,
+body.ope-pg-newthread .ope-rpg-cbt-pa,
+body.ope-pg-editpost .ope-rpg-cbt-pa{color:var(--ember-hi)}
+body.ope-pg-newreply .ope-rpg-cbt-label,
+body.ope-pg-newthread .ope-rpg-cbt-label,
+body.ope-pg-editpost .ope-rpg-cbt-label{display:block;font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;color:var(--ash);margin-bottom:6px}
+body.ope-pg-newreply .ope-rpg-cbt-estados,
+body.ope-pg-newreply .ope-rpg-cbt-mods,
+body.ope-pg-newthread .ope-rpg-cbt-estados,
+body.ope-pg-newthread .ope-rpg-cbt-mods,
+body.ope-pg-editpost .ope-rpg-cbt-estados,
+body.ope-pg-editpost .ope-rpg-cbt-mods{margin-bottom:14px}
+body.ope-pg-newreply .ope-rpg-cbt-estados label,
+body.ope-pg-newthread .ope-rpg-cbt-estados label,
+body.ope-pg-editpost .ope-rpg-cbt-estados label{display:inline-flex;align-items:center;gap:4px;margin-right:8px;margin-bottom:4px;font-family:var(--mono);font-size:.65rem;color:var(--paper-dim)}
+body.ope-pg-newreply .ope-rpg-cbt-modgroup,
+body.ope-pg-newthread .ope-rpg-cbt-modgroup,
+body.ope-pg-editpost .ope-rpg-cbt-modgroup{margin-bottom:8px}
+body.ope-pg-newreply .ope-rpg-cbt-sub,
+body.ope-pg-newthread .ope-rpg-cbt-sub,
+body.ope-pg-editpost .ope-rpg-cbt-sub{display:block;font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--patina);margin-bottom:4px}
+body.ope-pg-newreply .ope-rpg-cbt-mods label,
+body.ope-pg-newthread .ope-rpg-cbt-mods label,
+body.ope-pg-editpost .ope-rpg-cbt-mods label{display:inline-flex;align-items:center;gap:4px;margin-right:6px;margin-bottom:4px;font-family:var(--mono);font-size:.62rem;color:var(--paper-dim)}
+body.ope-pg-newreply .ope-rpg-cbt-mods input,
+body.ope-pg-newthread .ope-rpg-cbt-mods input,
+body.ope-pg-editpost .ope-rpg-cbt-mods input{width:55px;padding:2px 4px;background:var(--iron);border:2px solid var(--iron-edge);color:var(--paper);font-family:var(--mono);font-size:.65rem}
+body.ope-pg-newreply .ope-rpg-cbt-note,
+body.ope-pg-newthread .ope-rpg-cbt-note,
+body.ope-pg-editpost .ope-rpg-cbt-note{font-family:var(--mono);font-size:.6rem;color:var(--ash);margin-top:8px}
+
+/* ── PV/EN en postbit ── */
+body.ope-pg-showthread .ope-post-vitals{display:flex;gap:8px;margin-top:6px;font-family:var(--mono);font-size:.65rem}
+body.ope-pg-showthread .ope-post-vital{padding:3px 8px;border:2px solid #000;background:var(--iron)}
+body.ope-pg-showthread .ope-post-vital--pv{border-left:3px solid var(--crack)}
+body.ope-pg-showthread .ope-post-vital--en{border-left:3px solid var(--patina)}
+body.ope-pg-showthread .ope-post-vital b{color:var(--paper);font-size:.72rem}

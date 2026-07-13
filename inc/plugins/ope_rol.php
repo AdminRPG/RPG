@@ -41,6 +41,9 @@ require_once MYBB_ROOT . 'inc/ope_rol_oraculo.php';
 require_once MYBB_ROOT . 'inc/ope_rol_oraculo_post.php';
 require_once MYBB_ROOT . 'inc/ope_rol_viajes.php';
 
+// Sistema de rachas diarias (AV-16).
+require_once MYBB_ROOT . 'inc/ope_rol_rachas.php';
+
 $plugins->add_hook('global_start', 'ope_rol_global');
 
 // Posteo por personaje: estampa el pid del personaje activo en cada
@@ -1058,7 +1061,7 @@ function ope_rol_snapshot_post(&$dh)
         return $dh;
     }
 
-    $q = $db->simple_select('rol_personajes', 'datos, inventario', "pid = {$char_pid}", array('limit' => 1));
+    $q = $db->simple_select('rol_personajes', 'datos, inventario, pv_max, en_max, pa_por_turno', "pid = {$char_pid}", array('limit' => 1));
     if (!$db->num_rows($q)) {
         return $dh;
     }
@@ -1070,13 +1073,49 @@ function ope_rol_snapshot_post(&$dh)
     $inv    = json_decode((string) $row['inventario'], true);
     $encima = is_array($inv['encima'] ?? null) ? $inv['encima'] : array();
 
-    $db->insert_query('rol_post_snapshot', array(
+    $pv_max       = (int) ($row['pv_max'] ?? 0);
+    $en_max       = (int) ($row['en_max'] ?? 0);
+    $pa_por_turno = (int) ($row['pa_por_turno'] ?? 2);
+
+    // Valores por defecto: los máximos (primer post de combate).
+    $pv_actual = $pv_max;
+    $en_actual = $en_max;
+
+    // Buscar el último snapshot del mismo personaje en el mismo hilo para
+    // heredar PV/EN actuales (arrastre entre posts del mismo combate).
+    $tid = (int) ($dh->data['tid'] ?? ($dh->tid ?? 0));
+    if ($tid > 0 && $db->table_exists('posts')) {
+        $subquery = "SELECT pid FROM {$db->table_prefix}posts WHERE tid = {$tid} AND pid != {$post_pid} ORDER BY dateline DESC LIMIT 5";
+        $prev = $db->query("
+            SELECT pv_actual, en_actual FROM {$db->table_prefix}rol_post_snapshot
+            WHERE personaje_pid = {$char_pid} AND pid IN ({$subquery})
+            ORDER BY dateline DESC LIMIT 1
+        ");
+        if ($prev && $db->num_rows($prev) > 0) {
+            $prev_row = $db->fetch_array($prev);
+            if (isset($prev_row['pv_actual']) && $prev_row['pv_actual'] !== null) {
+                $pv_actual = (int) $prev_row['pv_actual'];
+            }
+            if (isset($prev_row['en_actual']) && $prev_row['en_actual'] !== null) {
+                $en_actual = (int) $prev_row['en_actual'];
+            }
+        }
+    }
+
+    $snap_data = array(
         'pid'           => $post_pid,
         'personaje_pid' => $char_pid,
         'atributos'     => $db->escape_string(json_encode($stats, JSON_UNESCAPED_UNICODE)),
         'objetos'       => $db->escape_string(json_encode($encima, JSON_UNESCAPED_UNICODE)),
         'dateline'      => TIME_NOW,
-    ));
+        'pv_actual'     => $pv_actual,
+        'en_actual'     => $en_actual,
+        'pa_actual'     => $pa_por_turno,
+        'estados_json'  => null,
+        'stats_mod_json'=> null,
+    );
+
+    $db->insert_query('rol_post_snapshot', $snap_data);
 
     return $dh;
 }
@@ -1196,15 +1235,18 @@ function ope_rol_post_snapshot($post_pid, array $char)
 
     $post_pid = (int) $post_pid;
     if ($db->table_exists('rol_post_snapshot')) {
-        $q = $db->simple_select('rol_post_snapshot', 'atributos, objetos', "pid = {$post_pid}", array('limit' => 1));
+        $q = $db->simple_select('rol_post_snapshot', 'atributos, objetos, pv_actual, en_actual, pa_actual, estados_json, stats_mod_json', "pid = {$post_pid}", array('limit' => 1));
         if ($db->num_rows($q)) {
             $row   = $db->fetch_array($q);
             $stats = json_decode((string) $row['atributos'], true);
             $items = json_decode((string) $row['objetos'], true);
             return array(
-                'stats'  => is_array($stats) ? $stats : array(),
-                'items'  => is_array($items) ? $items : array(),
-                'approx' => false,
+                'stats'     => is_array($stats) ? $stats : array(),
+                'items'     => is_array($items) ? $items : array(),
+                'approx'    => false,
+                'pv_actual' => $row['pv_actual'] ?? null,
+                'en_actual' => $row['en_actual'] ?? null,
+                'pa_actual' => $row['pa_actual'] ?? null,
             );
         }
     }
@@ -1219,7 +1261,8 @@ function ope_rol_post_snapshot($post_pid, array $char)
         $items = is_array($inv['encima'] ?? null) ? $inv['encima'] : array();
     }
 
-    return array('stats' => $stats, 'items' => $items, 'approx' => true);
+    return array('stats' => $stats, 'items' => $items, 'approx' => true,
+                 'pv_actual' => null, 'en_actual' => null, 'pa_actual' => null);
 }
 
 /** Relación tipo "tripulación" de un personaje (el otro extremo del vínculo), o null. */
@@ -1285,6 +1328,20 @@ function ope_rol_postbit_side(array $char, array $post)
 
     $snap = ope_rol_post_snapshot($pid_post, $char);
 
+    // ── PV / EN bajo avatar ──
+    $vitals_html = '';
+    if (function_exists('ope_combat_calc_pv') && function_exists('ope_combat_calc_en')) {
+        $snap_stats = $snap['stats'];
+        $pv_max = ope_combat_calc_pv($snap_stats);
+        $en_max = ope_combat_calc_en($snap_stats);
+        $pv_cur = isset($snap['pv_actual']) && $snap['pv_actual'] !== null ? (int) $snap['pv_actual'] : $pv_max;
+        $en_cur = isset($snap['en_actual']) && $snap['en_actual'] !== null ? (int) $snap['en_actual'] : $en_max;
+        $vitals_html = '<div class="ope-post-vitals">'
+            . '<span class="ope-post-vital ope-post-vital--pv"><b>' . $pv_cur . '</b>/' . $pv_max . ' PV</span>'
+            . '<span class="ope-post-vital ope-post-vital--en"><b>' . $en_cur . '</b>/' . $en_max . ' EN</span>'
+            . '</div>';
+    }
+
     if (empty($snap['items'])) {
         $mochila_body = '<p class="mono fs-76 c-dim">No llevaba nada encima en este post.</p>';
     } else {
@@ -1336,7 +1393,7 @@ function ope_rol_postbit_side(array $char, array $post)
     $modals = ope_rol_snapshot_modal($mochila_id, 'Mochila', $pid_post, $mochila_body, $approx_note)
             . ope_rol_snapshot_modal($atrib_id, 'Atributos', $pid_post, $atrib_body, $approx_note);
 
-    return $org_html . $tools . $modals;
+    return $org_html . $vitals_html . $tools . $modals;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1916,6 +1973,7 @@ function ope_rol_tpl_inserter_html()
     $html .= '<div class="ope-rpg-tabs" role="tablist">'
            . '<button type="button" class="ope-rpg-tab is-on" data-tab="plantillas">Plantillas</button>'
            . '<button type="button" class="ope-rpg-tab" data-tab="cartas">Cartas</button>'
+           . ($pid > 0 ? '<button type="button" class="ope-rpg-tab" data-tab="combate">Combate</button>' : '')
            . '</div>';
 
     // Panel Plantillas
@@ -1930,6 +1988,91 @@ function ope_rol_tpl_inserter_html()
     $html .= '<div class="ope-rpg-cards">' . $card_tiles . '</div>';
     $html .= '<div class="ope-rpg-selinfo" data-count="0">Ninguna carta seleccionada.</div>';
     $html .= '</div>';
+
+    // ── Panel Combate (AV-01) ──
+    if ($pid > 0) {
+        $cbt_pv = 0;
+        $cbt_en = 0;
+        $cbt_pa = 2;
+        $cbtq = $db->simple_select('rol_personajes', 'pv_max, en_max, pa_por_turno', "pid = {$pid}", array('limit' => 1));
+        if ($db->num_rows($cbtq)) {
+            $cbt_row = $db->fetch_array($cbtq);
+            $cbt_pv = (int) ($cbt_row['pv_max'] ?? 0);
+            $cbt_en = (int) ($cbt_row['en_max'] ?? 0);
+            $cbt_pa = (int) ($cbt_row['pa_por_turno'] ?? 2);
+        }
+
+        // Buscar último snapshot del personaje en este hilo para PV/EN actuales
+        $tid = (int) ($mybb->input['tid'] ?? 0);
+        if ($tid < 1 && isset($mybb->input['pid'])) {
+            $ep = $db->simple_select('posts', 'tid', 'pid = ' . (int) $mybb->input['pid'], array('limit' => 1));
+            if ($db->num_rows($ep)) {
+                $tid = (int) $db->fetch_field($ep, 'tid');
+            }
+        }
+        if ($tid > 0) {
+            $prev_snap = $db->query("
+                SELECT pv_actual, en_actual FROM {$db->table_prefix}rol_post_snapshot
+                WHERE personaje_pid = {$pid} AND pid IN (
+                    SELECT pid FROM {$db->table_prefix}posts WHERE tid = {$tid} ORDER BY dateline DESC LIMIT 5
+                )
+                ORDER BY dateline DESC LIMIT 1
+            ");
+            if ($prev_snap && $db->num_rows($prev_snap) > 0) {
+                $ps_row = $db->fetch_array($prev_snap);
+                if (isset($ps_row['pv_actual']) && $ps_row['pv_actual'] !== null) {
+                    $cbt_pv = (int) $ps_row['pv_actual'];
+                }
+                if (isset($ps_row['en_actual']) && $ps_row['en_actual'] !== null) {
+                    $cbt_en = (int) $ps_row['en_actual'];
+                }
+            }
+        }
+
+        // Estados alterados
+        $estados_html = '';
+        if (function_exists('ope_combat_estados')) {
+            $estados_cat = ope_combat_estados();
+            foreach ($estados_cat as $ek => $ev) {
+                $enom = htmlspecialchars_uni((string) ($ev['nombre'] ?? $ek));
+                $estados_html .= '<label><input type="checkbox" class="ope-rpg-cbt-est" value="' . $ek . '"> ' . $enom . '</label>';
+            }
+        }
+
+        // Modificadores de stats
+        $stats_html = '';
+        if (function_exists('ope_rol_stats')) {
+            $stat_groups = ope_rol_stats();
+            foreach ($stat_groups as $grupo) {
+                $stats_html .= '<div class="ope-rpg-cbt-modgroup">';
+                $stats_html .= '<span class="ope-rpg-cbt-sub">' . htmlspecialchars_uni($grupo['label']) . '</span>';
+                foreach ($grupo['stats'] as $ab => $nombre_stat) {
+                    $stats_html .= '<label>' . htmlspecialchars_uni($ab)
+                        . ' <input type="number" class="ope-rpg-cbt-mod" data-stat="' . $ab . '" value="0" step="1"></label>';
+                }
+                $stats_html .= '</div>';
+            }
+        }
+
+        $html .= '<div class="ope-rpg-panel" data-panel="combate">';
+        $html .= '<div class="ope-rpg-cbt-stats">';
+        $html .= '<div class="ope-rpg-cbt-row">';
+        $html .= '<label>PV <input type="number" id="ope_cbt_pv" value="' . $cbt_pv . '" min="0"></label>';
+        $html .= '<label>EN <input type="number" id="ope_cbt_en" value="' . $cbt_en . '" min="0"></label>';
+        $html .= '<label class="ope-rpg-cbt-pa">PA/turno <span id="ope_cbt_pa">' . $cbt_pa . '</span></label>';
+        $html .= '</div>';
+        $html .= '<div class="ope-rpg-cbt-estados">';
+        $html .= '<span class="ope-rpg-cbt-label">Estados <em>(m&aacute;x 3)</em></span>';
+        $html .= $estados_html;
+        $html .= '</div>';
+        $html .= '<div class="ope-rpg-cbt-mods">';
+        $html .= '<span class="ope-rpg-cbt-label">Modificadores</span>';
+        $html .= $stats_html;
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '<p class="ope-rpg-cbt-note">Los valores se guardan en el snapshot de este post.</p>';
+        $html .= '</div>';
+    }
 
     $html .= '</div>'; // .ope-rpg
 
@@ -1959,6 +2102,13 @@ function ope_rol_tpl_inserter_html()
         . 'var chip=ev.target.closest(".ope-rpg-chip");if(!chip)return;'
         . 'if(chip.hasAttribute("data-tpl")){var b=TPL[chip.getAttribute("data-tpl")];if(b!=null)ins(b,"");return;}'
         . 'var t=chip.getAttribute("data-insert");if(t!=null)ins(t,"");});'
+        // ── estados: máximo 3 activos ──
+        . 'root.addEventListener("change",function(ev){'
+        . 'var cb=ev.target.closest(".ope-rpg-cbt-est");'
+        . 'if(!cb)return;'
+        . 'var all=root.querySelectorAll(".ope-rpg-cbt-est:checked");'
+        . 'if(all.length>3){cb.checked=false;alert("M\u00e1ximo 3 estados activos.");}'
+        . '});'
         // ── preselección desde un [rpgsys] ya existente (editar post) ──
         . 'function editorVal(){var ed=window.MyBBEditor;if(ed&&typeof ed.val==="function"){try{return ed.val();}catch(x){}}return ta?ta.value:"";}'
         . 'var m=editorVal().match(/\\[rpgsys\\]([^\\[]*)\\[\\/rpgsys\\]/i);'

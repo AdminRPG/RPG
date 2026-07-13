@@ -319,9 +319,9 @@ header('Content-Type: text/html; charset=utf-8');
   <?php else: ?>
   <section class="reveal">
     <div class="ope-prog-ppbar">
-      <div class="ope-prog-ppbar-total" style="flex-basis:100%;text-align:center;">
+      <div class="ope-prog-ppbar-total ope-prog-ppbar-total--full">
         <span class="ope-prog-ppbar-label">Progreso de nivel: <?php echo $stats_ganados; ?> / <?php echo $pts_necesarios; ?> pts para Nivel <?php echo $nivel_actual + 1; ?></span>
-        <div class="ope-prog-hero-bar" style="margin-top:0.5rem;"><span style="width:<?php echo min(100, (int)(($stats_ganados / max(1, $pts_necesarios)) * 100)); ?>%"></span></div>
+        <div class="ope-prog-hero-bar ope-prog-hero-bar--mt"><span style="width:<?php echo min(100, (int)(($stats_ganados / max(1, $pts_necesarios)) * 100)); ?>%"></span></div>
       </div>
     </div>
   </section>
@@ -380,6 +380,35 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- ── Racha diaria ── -->
+  <?php
+  if (function_exists('ope_racha_get')) {
+      require_once MYBB_ROOT . 'inc/ope_rol_rachas.php';
+  }
+  $racha_data = function_exists('ope_racha_get') ? ope_racha_get($active_pid) : array('racha_dias' => 0);
+  $racha_dias = (int)($racha_data['racha_dias'] ?? 0);
+  $racha_hitos = array(7, 14, 21, 30);
+  ?>
+  <section class="reveal">
+    <div class="shead shead-sec"><h2>Racha diaria</h2><span class="code">// <?php echo $racha_dias; ?> días</span><span class="rule"></span></div>
+    <div class="plate"><div class="plate-b">
+      <div class="ope-racha-bar">
+        <?php foreach ($racha_hitos as $hito):
+          $alcanzado = $racha_dias >= $hito;
+          $flag = "recompensa_dia{$hito}";
+          $cobrado = $racha_data[$flag] ?? 0;
+          $cls = $cobrado ? 'ope-racha-dot--cobrado' : ($alcanzado ? 'ope-racha-dot--on' : '');
+        ?>
+        <div class="ope-racha-dot <?php echo $cls; ?>">
+          <span class="ope-racha-dot-dia">Día <?php echo $hito; ?></span>
+          <span class="ope-racha-dot-estado"><?php echo $cobrado ? '✓ Cobrado' : ($alcanzado ? 'Disponible' : ''); ?></span>
+        </div>
+        <?php endforeach; ?>
+      </div>
+      <p class="ope-racha-note">Postea al menos una vez cada 48h para mantener la racha. Si fallas, vuelve a 0.</p>
+    </div></div>
   </section>
 
   <!-- ── Stats y costes ── -->

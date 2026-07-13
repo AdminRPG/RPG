@@ -10,3 +10,13 @@ Rules:
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `py -m graphify update .` to keep the graph current (AST-only, no API cost).
+
+## Páginas PHP y CSS (crear/editar cualquier `.php` del RPG)
+
+Fuente de verdad: **`docs/DESIGN-ONE-PIECE-ETERNAL.md` §7.8**. Léela antes de crear o rediseñar una página.
+
+Reglas que NO se pueden saltar:
+- Las clases base **`.shead .plate .plate-h .plate-b .reveal .flash .pj-empty` NO son globales**: se re-declaran por cada scope `body.ope-pg-<pagina>`. Si estrenas un `<body class="ope-pg-nueva">` y usas esas clases sin pegar su scaffolding scopeado (bloque en §7.8), la página sale sin estilo (texto plano). Globales: `.wrap .breadcrumb .btn* .ope-prog-*`.
+- Prohibido `<style>` y `style="..."` estáticos; solo `style` con valor dinámico de PHP.
+- El navegador sirve `cache/themes/theme13/ope.css`, no el fuente. Tras editar CSS: `php scripts/sync-theme.php import` y `verify`.
+- Antes de terminar: `php scripts/check-inline-styles.php` limpio + `verify` en `OK CSS: in sync` + comprobación visual en navegador contra una página hermana.

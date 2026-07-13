@@ -596,6 +596,60 @@ textarea.input {
 
 ---
 
+### 7.8 Páginas PHP autónomas: scoping de CSS (OBLIGATORIO)
+
+> Fuente de verdad para crear/editar cualquier página `.php` del RPG. Todo el CSS
+> vive en `docs/themes/ope.css` y se sirve desde `cache/themes/theme13/ope.css`.
+
+**⚠️ GOTCHA nº1 (causa "la página se ve rota" — incidente `haki.php`, jul-2026):**
+las clases estructurales **`.shead` · `.plate` · `.plate-h` · `.plate-b` · `.reveal` ·
+`.flash` · `.pj-empty` NO son globales**. Cada página las **re-declara** bajo su scope
+(`body.ope-pg-personajes .plate`, `body.ope-pg-ficha .plate`, …). Si estrenas un
+`<body class="ope-pg-nueva">` y usas esas clases **sin añadir su CSS scopeado**, salen
+sin borde/fondo/sombra → texto plano flotando.
+
+**Sí son globales** (NO re-declarar): `.wrap`, `.breadcrumb` / `.breadcrumb-in`,
+`.btn` / `.btn-hot` / `.btn-ghost`, `.ope-prog-ppbar*`, `.ope-prog-hero-bar*`.
+
+**Al estrenar un scope `ope-pg-<pagina>` pega este scaffolding en `ope.css` ANTES de tus reglas propias:**
+
+```css
+body.ope-pg-<pagina> .shead{display:flex;align-items:baseline;gap:14px;margin:8px 0 14px}
+body.ope-pg-<pagina> .shead h1,body.ope-pg-<pagina> .shead h2{font-family:var(--disp);font-weight:800;font-size:2rem;text-transform:uppercase;color:var(--paper);line-height:1}
+body.ope-pg-<pagina> .shead .code{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ember-hi);letter-spacing:1px}
+body.ope-pg-<pagina> .shead .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--rivet) 0 6px,transparent 6px 12px)}
+body.ope-pg-<pagina> .plate{border:2px solid #000;background:var(--iron-plate);margin-bottom:12px;box-shadow:3px 3px 0 rgba(0,0,0,.25)}
+body.ope-pg-<pagina> .plate-h{background:var(--iron-edge);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:2px solid #000}
+body.ope-pg-<pagina> .plate-h .t{font-family:var(--disp);font-weight:800;font-size:1.1rem;text-transform:uppercase;color:var(--paper);letter-spacing:.5px}
+body.ope-pg-<pagina> .plate-h .c{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
+body.ope-pg-<pagina> .plate-b{padding:13px}
+body.ope-pg-<pagina> .flash{border:2px solid #000;padding:11px 14px;margin-bottom:16px;font-family:var(--mono);font-size:.74rem;font-weight:700}
+body.ope-pg-<pagina> .flash.ok{background:var(--patina);color:var(--iron)}
+body.ope-pg-<pagina> .flash.error{background:var(--crack);color:#fff}
+body.ope-pg-<pagina> .pj-empty{border:2px dashed var(--rivet);background:var(--iron-plate);padding:40px 22px;text-align:center;font-family:var(--mono);font-size:.8rem;color:var(--paper-dim)}
+body.ope-pg-<pagina> .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
+body.ope-pg-<pagina> .reveal.vis{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){body.ope-pg-<pagina> .reveal{opacity:1;transform:none}}
+```
+
+> Atajo: si la página es visualmente idéntica a otra, reutiliza su scope en el `<body>`
+> (`class="ope-pg-tramites ope-pg-nueva"`) y solo añade tus diferencias.
+
+**Otras reglas CSS:**
+- Prohibido `<style>` estático y `style="..."` con valores fijos. Solo se permite `style`
+  con valor **dinámico de PHP** (`style="width:<?=$pct?>%"`).
+- No inventar variables: usa las de `:root` (`--ember`, `--paper`, `--iron-plate`,
+  `--crack`…). No existen `--plate-bg`, `--ink-dim`, etc.
+
+**Verificación OBLIGATORIA antes de dar por hecha una página:**
+1. Cada clase del HTML resuelve (global, o `body.ope-pg-<pagina> .clase`).
+2. `php scripts/check-inline-styles.php` → limpio.
+3. `php scripts/sync-theme.php import` y `php scripts/sync-theme.php verify` → `OK CSS: in sync`
+   (el navegador sirve `cache/themes/theme13/ope.css`, NO el fuente — sin `import` no ves cambios).
+4. Comprobación visual real en navegador contra una página hermana ya correcta.
+
+---
+
 ## 8. Patrones de Diseño para One Piece Eternal
 
 ### 8.1 Patrón: Bounty Poster (Cartel de Recompensa)

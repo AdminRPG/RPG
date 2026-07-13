@@ -1,5 +1,8 @@
 # Guía de Estilos para Nuevas Páginas PHP
 
+> **Fuente de verdad: `docs/DESIGN-ONE-PIECE-ETERNAL.md` §7.8** (resumida también en `AGENTS.md`).
+> Este documento es el how-to práctico; ante cualquier duda o conflicto, manda §7.8.
+>
 > Regla de oro: **CERO `<style>` y CERO `style=""` estáticos en PHP.**
 > Todo el CSS va en `docs/themes/ope.css` bajo `body.ope-pg-<pagina>`.
 
@@ -81,6 +84,9 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:red
 </html>
 ```
 
+> ⚠️ **LEE ESTO ANTES DE USAR LOS COMPONENTES DE ABAJO** (causa nº1 de páginas rotas — incidente `haki.php`):
+> Las clases base **`.shead .plate .plate-h .plate-b .reveal .flash .pj-empty` NO son globales**. Cada página las **re-declara** bajo su scope (`body.ope-pg-personajes .plate`, `body.ope-pg-ficha .plate`, …). Si usas estos componentes en un `<body class="ope-pg-nueva">` **sin añadir su CSS scopeado** (§4), salen sin estilo (texto plano). SÍ son globales: `.wrap .breadcrumb .btn* .ope-prog-*`.
+
 ### 3. Componentes disponibles (CLASES CSS, no inventes nuevas)
 
 | Componente | HTML |
@@ -97,15 +103,22 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:red
 
 ### 4. Reglas CSS en ope.css
 
-**SIEMPRE** scopea bajo `body.ope-pg-mi-pagina`:
+**PASO 1 (OBLIGATORIO en scope nuevo)** — pega el scaffolding base para que `.shead/.plate/.reveal/.flash/.pj-empty` funcionen. Ver bloque completo en `.cursor/rules/page-scaffold.mdc` → "Scaffolding OBLIGATORIO". Sin esto, los componentes de §3 salen SIN estilo.
+
+**PASO 2** — tus reglas propias, **SIEMPRE** scopeadas bajo `body.ope-pg-mi-pagina`:
 
 ```css
 /* ═══════════════════════════════════════════════
    Mi Página — mi-pagina.php
    ═══════════════════════════════════════════════ */
 
+/* 1) scaffolding base (copiar de la regla page-scaffold, reemplazando <pagina>) */
+body.ope-pg-mi-pagina .shead{ ... }
+body.ope-pg-mi-pagina .plate{ ... }
+/* … resto del bloque scaffolding … */
+
+/* 2) reglas exclusivas de esta página */
 body.ope-pg-mi-pagina .mi-clase { ... }
-body.ope-pg-mi-pagina .mi-otra-clase { ... }
 ```
 
 ### 5. NO hacer NUNCA
@@ -126,10 +139,21 @@ body.ope-pg-mi-pagina .mi-otra-clase { ... }
 - ✅ Usar variables CSS del sistema: `var(--ember)`, `var(--paper)`, `var(--paper-dim)`, `var(--iron)`, `var(--iron-plate)`, `var(--iron-hi)`, `var(--iron-edge)`, `var(--ash)`, `var(--rivet)`, `var(--patina)`, `var(--gold)`, etc.
 - ❌ NO usar variables inventadas: `--plate-bg`, `--ink-dim`, `--plate-border`, `--plate-bg` NO existen
 
-### 7. Después de crear/modificar
+### 7. Después de crear/modificar (VERIFICACIÓN OBLIGATORIA)
 
 ```bash
-php scripts/sync-theme.php
+php scripts/check-inline-styles.php   # debe salir limpio
+php scripts/sync-theme.php import      # compila ope.css → cache/themes/theme13/ope.css
+php scripts/sync-theme.php verify      # debe decir: OK CSS: in sync
 ```
 
-Esto compila ope.css al cache del tema activo.
+El navegador carga `cache/themes/theme13/ope.css`, **NO** `docs/themes/ope.css`. Si no corres `import`, no verás tus cambios. Termina SIEMPRE con una verificación visual real en el navegador, comparando con una página hermana ya correcta.
+
+### 8. Auto-revisión de clases (evita el bug de haki.php)
+
+Antes de dar por terminada la página, revisa que **cada clase del HTML** resuelva:
+
+1. o es global (`.wrap .breadcrumb .btn* .ope-prog-*`), o
+2. tiene una regla `body.ope-pg-<tu-pagina> .esa-clase` en `ope.css`.
+
+Si estrenaste un scope, el scaffolding base del PASO 1 (§4) es innegociable.

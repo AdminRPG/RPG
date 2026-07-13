@@ -403,6 +403,11 @@ function ope_pp_on_post(&$dh)
         ope_pp_add($char_pid, $pp, 'post', $tid, $post_pid, $words);
     }
 
+    // Procesar racha diaria
+    if (function_exists('ope_racha_procesar_post')) {
+        ope_racha_procesar_post($char_pid);
+    }
+
     return $dh;
 }
 

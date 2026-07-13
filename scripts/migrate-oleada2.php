@@ -90,6 +90,19 @@ run($db, "
 // 3. Seed de estados (catálogo AV-01)
 // ═══════════════════════════════════════════════════════════════════════════
 
+echo "\n=== 2b. COLUMNAS DE COMBATE en rol_post_snapshot ===\n";
+
+add_col($db, "{$PREFIX}rol_post_snapshot", 'pv_actual',
+    "INT UNSIGNED NULL DEFAULT NULL COMMENT 'PV en el momento del post'");
+add_col($db, "{$PREFIX}rol_post_snapshot", 'en_actual',
+    "INT UNSIGNED NULL DEFAULT NULL COMMENT 'EN en el momento del post'");
+add_col($db, "{$PREFIX}rol_post_snapshot", 'pa_actual',
+    "TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'PA por turno en el momento del post'");
+add_col($db, "{$PREFIX}rol_post_snapshot", 'estados_json',
+    "JSON NULL COMMENT 'Estados alterados activos en el momento del post'");
+add_col($db, "{$PREFIX}rol_post_snapshot", 'stats_mod_json',
+    "JSON NULL COMMENT 'Modificadores de stats en el momento del post'");
+
 echo "\n=== 3. SEED ESTADOS ===\n";
 
 $estados = array(
