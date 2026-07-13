@@ -3875,28 +3875,65 @@ body.ope-pg-haki .ope-haki-locked{color:var(--ash);margin-top:0.5rem;font-family
 body.ope-pg-progresion .ope-lvl-plate{border-color:var(--ember)}
 body.ope-pg-progresion .ope-lvl-form{margin-top:1rem}
 
-/* ── Tab Combate en RPG System ── */
-.ope-rpg-cbt-stats{padding:2px 0}
-.ope-rpg-cbt-row{display:flex;gap:14px;margin-bottom:12px;align-items:flex-end}
-.ope-rpg-cbt-row label{font-family:var(--mono);font-size:.68rem;color:var(--paper-dim)}
-.ope-rpg-cbt-row input{width:74px;padding:5px 7px;background:var(--iron);border:2px solid var(--iron-edge);color:var(--paper);font-family:var(--mono);font-size:.72rem;font-weight:700}
-.ope-rpg-cbt-row input:focus-visible{border-color:var(--ember);outline:none}
-.ope-rpg-cbt-pa{font-family:var(--mono);font-size:.68rem;font-weight:700;color:var(--ember-hi)}
-.ope-rpg-cbt-pa span{font-size:.82rem}
-.ope-rpg-cbt-label{display:block;font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ash);margin-bottom:7px}
-.ope-rpg-cbt-label em{font-style:normal;font-weight:400;text-transform:none;letter-spacing:0;color:var(--rivet)}
-.ope-rpg-cbt-estados,
-.ope-rpg-cbt-mods{margin-bottom:14px}
-.ope-rpg-cbt-estados label{display:inline-flex;align-items:center;gap:5px;margin-right:10px;margin-bottom:5px;font-family:var(--mono);font-size:.64rem;color:var(--paper-dim);cursor:pointer}
-.ope-rpg-cbt-estados label:hover{color:var(--paper)}
-.ope-rpg-cbt-estados input[type="checkbox"]{accent-color:var(--ember);width:13px;height:13px;margin:0;cursor:pointer}
+/* ═══════════════════════════════════════════════════════════════════════════
+   Panel Combate RPG System — 2 columnas: vitales+estados | modificadores
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ope-rpg-cbt-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ope-rpg-cbt-left,.ope-rpg-cbt-right{min-width:0}
+
+/* --- PV / EN vital bars --- */
+.ope-rpg-cbt-vital{margin-bottom:10px;border:2px solid var(--iron-edge);background:var(--iron);padding:8px 10px}
+.ope-rpg-cbt-vital-head{display:flex;align-items:baseline;gap:4px;margin-bottom:5px}
+.ope-rpg-cbt-vital-label{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--ash);min-width:24px}
+.ope-rpg-cbt-vital-cur{font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--paper)}
+.ope-rpg-cbt-vital-sep{color:var(--ash);font-size:.65rem}
+.ope-rpg-cbt-vital-max{font-family:var(--mono);font-size:.65rem;color:var(--paper-dim)}
+.ope-rpg-cbt-vital-bar{height:5px;background:var(--iron-edge);border-radius:2px;margin-bottom:6px;overflow:hidden}
+.ope-rpg-cbt-vital-fill{display:block;height:100%;border-radius:2px;transition:width .15s}
+.ope-rpg-cbt-vital--pv .ope-rpg-cbt-vital-fill{background:var(--crack)}
+.ope-rpg-cbt-vital--en .ope-rpg-cbt-vital-fill{background:var(--patina)}
+.ope-rpg-cbt-vital-acts{display:flex;align-items:center;gap:4px}
+.ope-rpg-cbt-vital-btn{font-family:var(--mono);font-size:.6rem;font-weight:700;padding:3px 7px;background:var(--iron-hi);color:var(--paper);border:2px solid var(--iron-edge);cursor:pointer;min-width:24px;text-align:center;line-height:1}
+.ope-rpg-cbt-vital-btn:hover{background:var(--rivet)}
+.ope-rpg-cbt-vital-inp{width:52px;padding:3px 4px;background:var(--iron-edge);border:2px solid var(--iron-hi);color:var(--paper);font-family:var(--mono);font-size:.7rem;font-weight:700;text-align:center}
+.ope-rpg-cbt-vital-inp:focus{outline:none;border-color:var(--ember)}
+
+/* --- PA --- */
+.ope-rpg-cbt-pa{display:flex;align-items:center;gap:6px;margin-bottom:10px;font-family:var(--mono);font-size:.65rem;color:var(--ash)}
+.ope-rpg-cbt-pa b{font-size:.9rem;color:var(--ember-hi);font-weight:700}
+
+/* --- Estados: select + chips --- */
+.ope-rpg-cbt-estados-section{margin-bottom:10px}
+.ope-rpg-cbt-estados-label{display:block;font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;color:var(--ash);margin-bottom:4px}
+.ope-rpg-cbt-estados-label em{font-weight:400;text-transform:none;opacity:.7}
+.ope-rpg-cbt-estados-select{width:100%;padding:4px 6px;background:var(--iron-edge);border:2px solid var(--iron-hi);color:var(--paper);font-family:var(--mono);font-size:.62rem;margin-bottom:6px}
+.ope-rpg-cbt-estados-select:focus{outline:none;border-color:var(--ember)}
+.ope-rpg-cbt-estados-chips{display:flex;flex-wrap:wrap;gap:4px;min-height:24px}
+.ope-rpg-est-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 6px 2px 8px;font-family:var(--mono);font-size:.55rem;font-weight:700;border:2px solid #000;border-radius:2px;cursor:pointer;user-select:none;color:#fff}
+.ope-rpg-est-chip[data-tipo="negativo"]{background:var(--crack);border-color:var(--crack)}
+.ope-rpg-est-chip[data-tipo="positivo"]{background:var(--patina);border-color:var(--patina);color:var(--iron)}
+.ope-rpg-est-chip[data-tipo="neutral"]{background:var(--ash);border-color:var(--ash);color:var(--iron)}
+.ope-rpg-est-chip::after{content:'\00d7';font-size:.7rem;opacity:.6}
+.ope-rpg-est-chip:hover::after{opacity:1}
+
+/* --- Columna derecha: modificadores --- */
+.ope-rpg-cbt-section-label{display:block;font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ash);margin-bottom:8px;padding-bottom:3px;border-bottom:1px solid var(--iron-edge)}
 .ope-rpg-cbt-modgroup{margin-bottom:10px}
-.ope-rpg-cbt-sub{display:block;font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--patina);margin-bottom:5px}
-.ope-rpg-cbt-mods label{display:inline-flex;align-items:center;gap:5px;margin-right:8px;margin-bottom:5px;font-family:var(--mono);font-size:.62rem;color:var(--paper-dim);cursor:pointer}
-.ope-rpg-cbt-mods label:hover{color:var(--paper)}
-.ope-rpg-cbt-mods input{width:50px;padding:3px 5px;background:var(--iron);border:2px solid var(--iron-edge);color:var(--paper);font-family:var(--mono);font-size:.62rem;font-weight:700}
-.ope-rpg-cbt-mods input:focus-visible{border-color:var(--ember);outline:none}
-.ope-rpg-cbt-note{font-family:var(--mono);font-size:.58rem;color:var(--ash);margin-top:8px;padding-top:8px;border-top:1px dashed var(--rivet)}
+.ope-rpg-cbt-modgroup-label{display:block;font-family:var(--mono);font-size:.55rem;font-weight:700;text-transform:uppercase;color:var(--ember-hi);margin-bottom:4px}
+.ope-rpg-cbt-modgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px 8px}
+.ope-rpg-cbt-modrow{display:flex;align-items:center;gap:3px}
+.ope-rpg-cbt-statkey{font-family:var(--mono);font-size:.58rem;font-weight:700;color:var(--paper-dim);min-width:28px;text-align:right}
+.ope-rpg-cbt-modval{width:38px;padding:2px 3px;background:var(--iron-edge);border:2px solid var(--iron-hi);color:var(--paper);font-family:var(--mono);font-size:.62rem;text-align:center}
+.ope-rpg-cbt-modval:focus{outline:none;border-color:var(--ember)}
+.ope-rpg-cbt-toggle{display:inline-flex;border:2px solid var(--iron-hi);border-radius:2px;overflow:hidden;cursor:pointer;background:transparent;padding:0;font-family:var(--mono);font-size:.5rem;font-weight:700;line-height:1;flex-shrink:0}
+.ope-rpg-cbt-toggle span{padding:2px 4px;transition:background .12s,color .12s}
+.ope-rpg-cbt-toggle-raw{background:var(--iron-hi);color:var(--paper)}
+.ope-rpg-cbt-toggle-pct{background:transparent;color:var(--ash)}
+.ope-rpg-cbt-toggle.is-pct .ope-rpg-cbt-toggle-raw{background:transparent;color:var(--ash)}
+.ope-rpg-cbt-toggle.is-pct .ope-rpg-cbt-toggle-pct{background:var(--patina);color:var(--iron)}
+
+.ope-rpg-cbt-note{font-family:var(--mono);font-size:.55rem;color:var(--ash);margin-top:8px;padding-top:6px;border-top:1px dashed var(--iron-edge)}
 
 /* ── PV / EN en postbit ── */
 body.ope-pg-showthread .ope-post-vitals{display:flex;gap:10px;margin-top:8px;font-family:var(--mono);font-size:.64rem}
@@ -3905,57 +3942,3 @@ body.ope-pg-showthread .ope-post-vital--pv{border-left:3px solid var(--crack)}
 body.ope-pg-showthread .ope-post-vital--en{border-left:3px solid var(--patina)}
 body.ope-pg-showthread .ope-post-vital b{color:var(--paper);font-size:.74rem;font-weight:700}
 body.ope-pg-showthread .ope-post-vital span{color:var(--paper-dim)}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   Panel Combate RPG System — chips de estado, barras PV/EN, toggle bruto/%
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* --- PV / EN vital bars --- */
-.ope-rpg-cbt-vital{margin-bottom:14px;border:2px solid var(--iron-edge);background:var(--iron);padding:10px 12px}
-.ope-rpg-cbt-vital-head{display:flex;align-items:baseline;gap:4px;margin-bottom:6px}
-.ope-rpg-cbt-vital-label{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;color:var(--ash);min-width:28px}
-.ope-rpg-cbt-vital-cur{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--paper)}
-.ope-rpg-cbt-vital-sep{color:var(--ash);font-size:.7rem}
-.ope-rpg-cbt-vital-max{font-family:var(--mono);font-size:.72rem;color:var(--paper-dim)}
-.ope-rpg-cbt-vital-bar{height:6px;background:var(--iron-edge);border-radius:3px;margin-bottom:8px;overflow:hidden}
-.ope-rpg-cbt-vital-fill{display:block;height:100%;border-radius:3px;transition:width .2s}
-.ope-rpg-cbt-vital--pv .ope-rpg-cbt-vital-fill{background:var(--crack)}
-.ope-rpg-cbt-vital--en .ope-rpg-cbt-vital-fill{background:var(--patina)}
-.ope-rpg-cbt-vital-acts{display:flex;align-items:center;gap:6px}
-.ope-rpg-cbt-vital-btn{font-family:var(--mono);font-size:.62rem;font-weight:700;padding:2px 8px;background:var(--iron-hi);color:var(--paper);border:2px solid var(--iron-edge);cursor:pointer;min-width:32px;text-align:center}
-.ope-rpg-cbt-vital-btn:hover{background:var(--rivet)}
-.ope-rpg-cbt-vital-inp{width:56px;padding:2px 5px;background:var(--iron-edge);border:2px solid var(--iron-hi);color:var(--paper);font-family:var(--mono);font-size:.75rem;font-weight:700;text-align:center}
-
-/* --- PA display --- */
-.ope-rpg-cbt-pa{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;font-family:var(--mono);font-size:.7rem;color:var(--ash)}
-.ope-rpg-cbt-pa b{font-size:1rem;color:var(--ember-hi);font-weight:700}
-
-/* --- Estados chips --- */
-.ope-rpg-cbt-estados-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px}
-.ope-rpg-est-chip{display:inline-block;padding:3px 9px;font-family:var(--mono);font-size:.58rem;font-weight:700;border:2px solid var(--iron-edge);background:var(--iron);color:var(--paper-dim);border-radius:2px;cursor:pointer;user-select:none;transition:background .15s,color .15s,border-color .15s}
-.ope-rpg-est-chip:hover{border-color:var(--rivet);color:var(--paper)}
-.ope-rpg-est-chip[aria-checked="true"]{color:#fff;font-weight:700}
-.ope-rpg-est-chip[data-tipo="negativo"][aria-checked="true"]{background:var(--crack);border-color:var(--crack)}
-.ope-rpg-est-chip[data-tipo="positivo"][aria-checked="true"]{background:var(--patina);border-color:var(--patina);color:var(--iron)}
-.ope-rpg-est-chip[data-tipo="neutral"][aria-checked="true"]{background:var(--ash);border-color:var(--ash);color:var(--iron)}
-
-/* --- Modificadores de stats --- */
-.ope-rpg-cbt-modgroup{margin-bottom:12px}
-.ope-rpg-cbt-modgroup-label{display:block;font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ember-hi);margin-bottom:6px}
-.ope-rpg-cbt-modgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.ope-rpg-cbt-modrow{display:flex;align-items:center;gap:4px}
-.ope-rpg-cbt-statkey{font-family:var(--mono);font-size:.62rem;font-weight:700;color:var(--paper-dim);min-width:30px}
-.ope-rpg-cbt-modval{width:44px;padding:2px 4px;background:var(--iron-edge);border:2px solid var(--iron-hi);color:var(--paper);font-family:var(--mono);font-size:.68rem;text-align:center}
-.ope-rpg-cbt-modval:focus{outline:none;border-color:var(--ember)}
-/* Toggle bruto/% */
-.ope-rpg-cbt-toggle{display:inline-flex;border:2px solid var(--iron-hi);border-radius:2px;overflow:hidden;cursor:pointer;background:transparent;padding:0;font-family:var(--mono);font-size:.55rem;font-weight:700;line-height:1}
-.ope-rpg-cbt-toggle span{padding:2px 5px;transition:background .15s,color .15s}
-.ope-rpg-cbt-toggle-raw{background:var(--iron-hi);color:var(--paper)}
-.ope-rpg-cbt-toggle-pct{background:transparent;color:var(--ash)}
-.ope-rpg-cbt-toggle.is-pct .ope-rpg-cbt-toggle-raw{background:transparent;color:var(--ash)}
-.ope-rpg-cbt-toggle.is-pct .ope-rpg-cbt-toggle-pct{background:var(--patina);color:var(--iron)}
-
-/* --- Layout del panel combate --- */
-.ope-rpg-cbt-body{padding:0}
-.ope-rpg-cbt-section{margin-bottom:16px}
-.ope-rpg-cbt-section-label{display:block;font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ash);margin-bottom:8px;padding-bottom:3px;border-bottom:1px solid var(--iron-edge)}
