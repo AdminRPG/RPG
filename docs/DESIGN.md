@@ -185,6 +185,50 @@ php scripts/sync-theme.php verify   # comprobar que repo y BD coinciden
 Editar en Admin CP y no sincronizar rompe la fuente única. Flujo correcto:
 editar `ope.css` → `import` → `verify` → commit.
 
+### 1.8 Librerías externas (JS/CSS por CDN)
+
+Para experiencias **muy visuales** (Oráculo de Viaje, wizards, celebraciones) está
+**permitido y recomendado** usar librerías externas vía CDN cuando aporten motion,
+partículas o iconografía que no compensa reimplementar a mano.
+
+| Librería | Uso en el proyecto | Dónde se carga |
+|----------|-------------------|----------------|
+| [GSAP](https://gsap.com/) | Entradas escalonadas del oráculo, transiciones del wizard | `viajes.php`, hilos de viaje (`ope_oraculo_showthread_scripts()`) |
+| [canvas-confetti](https://www.npmjs.com/package/canvas-confetti) | Celebración al zarpar / al confirmar llegada | Mismo bloque que GSAP en viajes |
+| [@phosphor-icons](https://phosphoricons.com/) | Iconos opcionales en páginas autónomas | `<head>` de la página que los necesite |
+
+**Reglas:**
+
+1. **CSS del proyecto sigue en `ope.css`** — las librerías externas son para JS,
+   icon fonts o efectos puntuales; no sustituyen la hoja única del tema.
+2. **Cargar solo donde hace falta** — p. ej. GSAP en `viajes.php` y en
+   showthread si el hilo tiene un viaje (`{$ope_viaje_scripts}`), no en todo el foro.
+3. **Preferir jsDelivr** con versión fija en la URL (`@3.12.5`, `@1.9.3`).
+4. **Sin `<style>` inline en PHP** — animaciones visuales van en GSAP o en
+   `@keyframes` dentro de `ope.css`.
+5. Documentar aquí cualquier librería nueva antes de usarla en producción.
+
+### 1.9 Imágenes decorativas y prompts
+
+Cuando una página se beneficie de una ilustración, banner, retrato ambiental o
+fondo específico, hay que dejar la propuesta en
+**`docs/PROMPTS-DECORATIVOS.md`**, aunque la imagen no se genere en ese momento.
+
+Cada entrada debe incluir:
+
+1. Página y función visual de la imagen.
+2. Ruta y nombre exactos donde el código espera encontrarla.
+3. Proporción, tamaño recomendado y encuadre.
+4. Texto alternativo previsto.
+5. Prompt completo y *negative prompt*, sin nombres de artistas ni instrucciones
+   para copiar personajes, barcos o identidades protegidas.
+6. Estado **Pendiente** o **Añadida**.
+
+**Regla de implementación:** la ausencia de una imagen pendiente no puede romper
+la página ni mostrar un recurso roto. El PHP debe detectar el archivo y ofrecer
+una composición de respaldo coherente. Al añadir la imagen no debe ser necesario
+editar el código: basta con colocarla en la ruta documentada.
+
 ---
 
 ## 2. Tokens de color (valores reales de `ope.css`)
@@ -278,6 +322,8 @@ Este fondo es global: aplica a todas las páginas por venir del `body` de `ope.c
 - [ ] El `<body>` tiene `ope-pg-<pagina>` (+ variante si aplica, p. ej. `bib-akuma`).
 - [ ] Breadcrumb con `.breadcrumb` / `.breadcrumb-in` / `.sep` (§1.5) — **sin**
       CSS duplicado por página.
+- [ ] Si una imagen mejoraría la página, propuesta registrada en
+      `docs/PROMPTS-DECORATIVOS.md` con ruta, proporción, alt y prompt.
 - [ ] Contenido desde BD/helpers (`ope_rol_catalogos.php`, etc.), sin mockups.
 - [ ] Toda clase usada en HTML/JS tiene regla en `ope.css` (global o scope).
 - [ ] Modales/overlays: estado `hidden`, clase `.in` al abrir, `*-no-scroll` en

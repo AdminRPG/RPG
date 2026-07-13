@@ -144,10 +144,11 @@ if ($pid > 0 && $mybb->request_method === 'post'
                     }
                     foreach ($STAT_KEYS as $sk) {
                         if (isset($stats_in[$sk])) {
-                            $datos['stats_efectivas'][$sk] = max(0, min(9, (int) $stats_in[$sk]));
+                            $datos['stats_efectivas'][$sk] = max(0, min(10, (int) $stats_in[$sk]));
                         }
                     }
-                    $datos['rango_suma'] = array_sum($datos['stats_efectivas']);
+                    $datos['rango_suma'] = ope_rol_stat_sum($datos['stats_efectivas']);
+                    $rango = ope_rol_rank_from_sum((int) $datos['rango_suma']);
                 }
 
                 // ---- Virtudes y defectos (checkboxes reales del catálogo) ----
@@ -232,10 +233,26 @@ if ($pid > 0 && $mybb->request_method === 'post'
                     }
                 }
 
+                if (function_exists('ope_combat_recalc')) {
+                    ope_combat_recalc($pid);
+                }
+
                 header('Location: ' . $bburl . '/gestionar-personaje.php?pid=' . $pid . '&ok=1#top');
                 exit;
             }
         }
+
+    // ---- Añadir PP manual (misiones, arcos, eventos) ----
+    } elseif ($action === 'pp_add' && function_exists('ope_pp_add')) {
+        $pp_amt = (int) $mybb->get_input('pp_amount', MyBB::INPUT_INT);
+        $pp_tipo = (string) $mybb->get_input('pp_tipo');
+        $pp_notas = gp_clean($mybb->get_input('pp_notas'), 500);
+        $tipos_ok = array('mision', 'arco', 'evento', 'staff');
+        if ($pp_amt > 0 && in_array($pp_tipo, $tipos_ok, true)) {
+            ope_pp_add($pid, $pp_amt, $pp_tipo, 0, 0, 0, $pp_notas, $uid);
+        }
+        header('Location: ' . $bburl . '/gestionar-personaje.php?pid=' . $pid . '&ok=1#pp');
+        exit;
 
     // ---- Añadir objeto al inventario (encima/almacén) ----
     } elseif ($action === 'inv_add') {
@@ -347,6 +364,9 @@ if (!$pj && $db->table_exists('rol_personajes')) {
 }
 
 $stats_ef  = $datos['stats_efectivas'] ?? $datos['stats_base'] ?? array();
+$pp_saldo  = ($pj && function_exists('ope_pp_saldo'))
+    ? ope_pp_saldo((int) $pj['pid'])
+    : array('pp_total' => 0, 'pp_gastado' => 0, 'pp_disponible' => 0);
 $virtudes_sel_ids = is_array($datos['virtudes'] ?? null) ? $datos['virtudes'] : array();
 $defectos_sel_ids = is_array($datos['defectos'] ?? null) ? $datos['defectos'] : array();
 $pc_balance = (int) ($datos['pc_balance'] ?? $PC_BASE);
@@ -535,12 +555,34 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
 
     <div class="gp-section">
-      <div class="gp-section-h">Stats efectivas (0&ndash;9)</div>
+      <div class="gp-section-h">Stats efectivas (0&ndash;10)</div>
       <div class="gp-grid gp-stats">
 <?php foreach ($STAT_KEYS as $sk): ?>
-        <label class="gp-field"><span><?php echo $sk; ?></span><input type="number" name="stats_efectivas[<?php echo $sk; ?>]" min="0" max="9" value="<?php echo (int)($stats_ef[$sk] ?? 0); ?>"></label>
+        <label class="gp-field"><span><?php echo $sk; ?></span><input type="number" name="stats_efectivas[<?php echo $sk; ?>]" min="0" max="10" value="<?php echo (int)($stats_ef[$sk] ?? 0); ?>"></label>
 <?php endforeach; ?>
       </div>
+    </div>
+
+    <div class="gp-section" id="pp">
+      <div class="gp-section-h">Puntos de Progreso (PP)</div>
+      <p class="gp-hint">Saldo: <b><?php echo (int) $pp_saldo['pp_disponible']; ?></b> disponibles &middot; <?php echo (int) $pp_saldo['pp_total']; ?> ganados &middot; <?php echo (int) $pp_saldo['pp_gastado']; ?> gastados</p>
+      <form method="post" action="<?php echo $bburl; ?>/gestionar-personaje.php?pid=<?php echo (int) $pj['pid']; ?>" class="gp-grid mt-10">
+        <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+        <input type="hidden" name="action" value="pp_add">
+        <label class="gp-field"><span>Cantidad</span><input type="number" name="pp_amount" min="1" max="999" value="3" required></label>
+        <label class="gp-field"><span>Tipo</span>
+          <select name="pp_tipo">
+            <option value="mision">Misi&oacute;n</option>
+            <option value="arco">Arco narrativo</option>
+            <option value="evento">Evento</option>
+            <option value="staff" selected>Staff / ajuste</option>
+          </select>
+        </label>
+        <label class="gp-field gp-wide"><span>Notas</span><input type="text" name="pp_notas" maxlength="500" placeholder="Motivo del ajuste"></label>
+        <div class="gp-field jc-fe">
+          <button type="submit" class="btn btn-hot btn-sm">A&ntilde;adir PP</button>
+        </div>
+      </form>
     </div>
 
     <div class="gp-section">

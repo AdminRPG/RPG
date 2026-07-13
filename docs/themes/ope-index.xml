@@ -89,14 +89,14 @@
   <aside class="ope-tablon">
 
   <!-- Reloj on-rol: 4 estaciones &times; 65 d&iacute;as -->
-  <div class="ope-onrol" style="--season:{$ope_rol_season_color}">
+  <a href="{$mybb->settings['bburl']}/calendario-onrol.php" class="ope-onrol" style="--season:{$ope_rol_season_color}">
     <span class="ope-onrol-dot" aria-hidden="true"></span>
     <span class="ope-onrol-label">Calendario on-rol</span>
     <span class="ope-onrol-season">{$ope_rol_season}</span>
     <span class="ope-onrol-day">D&iacute;a {$ope_rol_day} <i>/ 65</i></span>
     <span class="ope-onrol-year">A&ntilde;o {$ope_rol_year_label}</span>
     <span class="ope-onrol-bar"><i style="width:{$ope_rol_progress}%"></i></span>
-  </div>
+  </a>
 
   <div class="ope-tablon-grid">
 

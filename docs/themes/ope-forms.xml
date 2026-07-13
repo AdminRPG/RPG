@@ -78,14 +78,19 @@
         </script>
         <div style="margin-bottom:12px">
           <label>Mensaje</label><br>
-          {$codebuttons}
+          <div class="ope-plate ope-tools">
+            <div class="ope-plate-h"><span class="ope-plate-h-t">Herramientas</span><span class="ope-plate-h-c">// editor completo</span></div>
+            <div class="ope-plate-b">
+              {$codebuttons}
+              <textarea name="message" id="message" rows="20" style="width:100%">{$message}</textarea>
+            </div>
+          </div>
           {$ope_tpl_inserter}
-          <textarea name="message" id="message" rows="20" style="width:100%">{$message}</textarea>
         </div>
         {$posticons}
         {$postoptions}
         <div style="margin-top:14px;display:flex;gap:10px">
-          <input type="submit" class="ope-btn ope-btn-hot" value="Publicar historia" />
+          <input type="submit" name="submit" class="ope-btn ope-btn-hot" value="Publicar historia" />
           <input type="submit" name="previewpost" class="ope-btn ope-btn-ghost" value="Previsualizar" />
           <input type="submit" name="savedraft" class="ope-btn ope-btn-ghost" value="Guardar borrador" />
         </div>
@@ -109,18 +114,26 @@
     <div class="ope-plate-b">
       <form action="newreply.php?tid={$tid}&amp;processed=1" method="post" enctype="multipart/form-data">
         <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+        <input type="hidden" name="action" value="do_newreply" />
+        <input type="hidden" name="tid" value="{$tid}" />
+        <input type="hidden" name="posthash" value="{$posthash}" />
         <div style="margin-bottom:12px">
           <label>Mensaje</label><br>
-          {$codebuttons}
-          {$ope_tpl_inserter}
-          <textarea name="message" id="message" rows="20" style="width:100%">{$message}</textarea>
+          <div class="ope-plate ope-tools">
+            <div class="ope-plate-h"><span class="ope-plate-h-t">Herramientas</span><span class="ope-plate-h-c">// editor completo</span></div>
+            <div class="ope-plate-b">
+              {$codebuttons}
+              <textarea name="message" id="message" rows="20" style="width:100%">{$message}</textarea>
+            </div>
+          </div>
           {$multiquote_external}
+          {$ope_tpl_inserter}
         </div>
         {$posticons}
         {$postoptions}
         {$modoptions}
         <div style="margin-top:14px;display:flex;gap:10px">
-          <input type="submit" class="ope-btn ope-btn-hot" value="Publicar respuesta" />
+          <input type="submit" name="submit" class="ope-btn ope-btn-hot" value="Publicar respuesta" />
           <input type="submit" name="previewpost" class="ope-btn ope-btn-ghost" value="Previsualizar" />
         </div>
       </form>
@@ -144,14 +157,22 @@
     <div class="ope-plate-b">
       <form action="editpost.php?pid={$pid}&amp;processed=1" method="post" enctype="multipart/form-data">
         <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+        <input type="hidden" name="action" value="do_editpost" />
+        <input type="hidden" name="pid" value="{$pid}" />
         <div style="margin-bottom:12px">
           <label>Asunto</label><br>
           <input type="text" name="subject" value="{$subject}" style="width:100%" />
         </div>
         <div style="margin-bottom:12px">
           <label>Mensaje</label><br>
-          {$codebuttons}
-          <textarea name="message" id="message" rows="20" style="width:100%">{$message}</textarea>
+          <div class="ope-plate ope-tools">
+            <div class="ope-plate-h"><span class="ope-plate-h-t">Herramientas</span><span class="ope-plate-h-c">// editor completo</span></div>
+            <div class="ope-plate-b">
+              {$codebuttons}
+              <textarea name="message" id="message" rows="20" style="width:100%">{$message}</textarea>
+            </div>
+          </div>
+          {$ope_tpl_inserter}
         </div>
         <div style="margin-bottom:12px">
           <label>Razón de edición</label><br>
@@ -160,7 +181,7 @@
         {$posticons}
         {$postoptions}
         <div style="margin-top:14px;display:flex;gap:10px">
-          <input type="submit" class="ope-btn ope-btn-hot" value="Actualizar" />
+          <input type="submit" name="submitbutton" class="ope-btn ope-btn-hot" value="Actualizar" />
           <input type="submit" name="previewpost" class="ope-btn ope-btn-ghost" value="Previsualizar" />
         </div>
       </form>
@@ -280,12 +301,45 @@
 </label>
 ]]></template>
 
-    <template name="codebuttons" version="1839"><![CDATA[
-<div class="ope-plate" style="margin-bottom:0;border-bottom:0">
-  <div class="ope-plate-h"><span class="ope-plate-h-t">Herramientas</span></div>
-  <div class="ope-plate-b">{$codebuttons}</div>
-</div>
-]]></template>
+    <template name="codebuttons" version="1839"><![CDATA[<link rel="stylesheet" href="{$mybb->asset_url}/jscripts/sceditor/themes/{$theme['editortheme']}" type="text/css" media="all" />
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/sceditor/jquery.sceditor.bbcode.min.js?ver=1832"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/bbcodes_sceditor.js?ver=1837"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/sceditor/plugins/undo.js?ver=1832"></script>
+<script type="text/javascript">
+var partialmode = {$mybb->settings['partialmode']},
+opt_editor = {
+	plugins: "undo",
+	format: "bbcode",
+	bbcodeTrim: false,
+	style: "{$mybb->asset_url}/jscripts/sceditor/styles/jquery.sceditor.{$theme['editortheme']}?ver=1832",
+	rtl: {$lang->settings['rtl']},
+	locale: "mybblang",
+	width: "100%",
+	enablePasteFiltering: true,
+	autoUpdate: true,
+	emoticonsEnabled: {$emoticons_enabled},
+	emoticons: {
+		dropdown: {
+			{$dropdownsmilies}
+		},
+		more: {
+			{$moresmilies}
+		},
+		hidden: {
+			{$hiddensmilies}
+		}
+	},
+	emoticonsCompat: true,
+	toolbar: "{$basic1}{$align}{$font}{$size}{$color}{$removeformat}{$basic2}image,{$email}{$link}|video{$emoticon}|{$list}{$code}quote|maximize,source",
+};
+{$editor_language}
+$(function() {
+	$("#{$bind}").sceditor(opt_editor);
+
+	MyBBEditor = $("#{$bind}").sceditor("instance");
+	{$sourcemode}
+});
+</script>]]></template>
 
   </templates>
 </theme>

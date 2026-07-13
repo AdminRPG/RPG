@@ -530,6 +530,25 @@ header('Content-Type: text/html; charset=utf-8');
     $obj_legacy  = trim((string) ($inventario['objeto_personal'] ?? ''));
     $berries     = (int) ($economia['berries'] ?? 0);
 
+    $pp_disponible = 0;
+    if ($puede_gestionar && function_exists('ope_pp_saldo')) {
+        $pp_row = ope_pp_saldo((int) $pj['pid']);
+        $pp_disponible = (int) ($pp_row['pp_disponible'] ?? 0);
+    }
+    $pv_max = (int) ($pj['pv_max'] ?? 0);
+    $en_max = (int) ($pj['en_max'] ?? 0);
+    $pa_turno = (int) ($pj['pa_por_turno'] ?? 0);
+    if ($pv_max < 1 && function_exists('ope_combat_recalc')) {
+        $vit = ope_combat_recalc((int) $pj['pid']);
+        if ($vit) {
+            $pv_max = (int) $vit['pv_max'];
+            $en_max = (int) $vit['en_max'];
+            $pa_turno = (int) $vit['pa_por_turno'];
+            $rango = (string) ($vit['rango'] ?? $rango);
+            $rango_e = htmlspecialchars_uni($rango);
+        }
+    }
+
     // Inventario libre: objetos "encima" y en "almacén" (defaults robustos).
     $norm_items = static function ($list) {
         $out = array();
@@ -844,6 +863,9 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if ($staff_rol_lbl !== ''): ?>
         <span class="tag staff"><?php echo htmlspecialchars_uni($staff_rol_lbl); ?></span>
 <?php endif; ?>
+<?php if ($puede_gestionar): ?>
+        <span class="tag act"><?php echo (int) $pp_disponible; ?> PP</span>
+<?php endif; ?>
 <?php if ((int) $pj['activo'] === 1): ?>
         <span class="tag act">&#9670; Personaje activo</span>
 <?php endif; ?>
@@ -887,12 +909,13 @@ header('Content-Type: text/html; charset=utf-8');
               <span class="bar"></span>
             </div>
 <?php foreach ($rows as $ab => $nm):
-              $v = (int) ($stats_ef[$ab] ?? 1);
-              if ($v < 1) $v = 1; if ($v > 10) $v = 10;
+              $v = ope_rol_stat_num($stats_ef, $ab);
+              if ($v > 10) $v = 10;
+              $rank_lbl = ope_rol_rank_from_val($v);
 ?>
             <div class="stat">
               <span class="nm"><?php echo htmlspecialchars_uni($nm); ?></span>
-              <div class="segbar" role="img" aria-label="<?php echo htmlspecialchars_uni($nm . ': ' . ($RANK_BY_NUM[$v] ?? 'F')); ?>">
+              <div class="segbar" role="img" aria-label="<?php echo htmlspecialchars_uni($nm . ': ' . $rank_lbl); ?>">
 <?php for ($i = 1; $i <= 10; $i++): ?>
                 <span class="seg<?php echo $i <= $v ? ' on' : ''; ?>"></span>
 <?php endfor; ?>
@@ -1000,6 +1023,30 @@ header('Content-Type: text/html; charset=utf-8');
 
     <!-- COMBATE -->
     <section class="panel" id="tab-combate" role="tabpanel">
+      <div class="plate">
+        <div class="plate-h"><span class="t">Vitales</span><span class="c">// AV-01</span></div>
+        <div class="plate-b">
+          <div class="ope-prog-vitals ope-ficha-vitals">
+            <div class="ope-prog-vital ope-prog-vital--pv">
+              <span class="ope-prog-vital-val"><?php echo (int) $pv_max; ?></span>
+              <span class="ope-prog-vital-label">PV m&aacute;x</span>
+            </div>
+            <div class="ope-prog-vital ope-prog-vital--en">
+              <span class="ope-prog-vital-val"><?php echo (int) $en_max; ?></span>
+              <span class="ope-prog-vital-label">EN m&aacute;x</span>
+            </div>
+            <div class="ope-prog-vital ope-prog-vital--pa">
+              <span class="ope-prog-vital-val"><?php echo (int) $pa_turno; ?></span>
+              <span class="ope-prog-vital-label">PA / turno</span>
+            </div>
+            <div class="ope-prog-vital ope-prog-vital--rango">
+              <span class="ope-prog-vital-val"><?php echo $rango_e; ?></span>
+              <span class="ope-prog-vital-label">Rango</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="plate">
         <div class="plate-h"><span class="t">Pasivas</span></div>
         <div class="plate-b">

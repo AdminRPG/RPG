@@ -86,6 +86,89 @@ if (!function_exists('ope_rol_stats')) {
         if ($sum >= 14) return 'E';
         return 'F';
     }
+
+    /** Valor numérico de una stat efectiva (0..10). Ausente → $default (1). */
+    function ope_rol_stat_num($stats, $key, $default = 1)
+    {
+        if (!is_array($stats) || !array_key_exists($key, $stats)) {
+            return max(0, (int) $default);
+        }
+        return max(0, min(10, (int) $stats[$key]));
+    }
+
+    /** Suma de las 12 stats efectivas (INI-04 / INI-01). */
+    function ope_rol_stat_sum($stats)
+    {
+        $sum = 0;
+        foreach (ope_rol_stat_keys() as $sk) {
+            $sum += ope_rol_stat_num($stats, $sk);
+        }
+        return $sum;
+    }
+
+    /** Rango de stat desde valor numérico (0 = penalizado por pasiva). */
+    function ope_rol_rank_from_val($val)
+    {
+        $val = (int) $val;
+        if ($val <= 0) return '0';
+        if ($val >= 10) return 'M+';
+        if ($val >= 9)  return 'M';
+        if ($val >= 8)  return 'SS';
+        if ($val >= 7)  return 'S';
+        if ($val >= 6)  return 'A';
+        if ($val >= 5)  return 'B';
+        if ($val >= 4)  return 'C';
+        if ($val >= 3)  return 'D';
+        if ($val >= 2)  return 'E';
+        return 'F';
+    }
+
+    /** Valor numérico desde rango de stat (F=1 … M+=10). */
+    function ope_rol_val_from_rank($rank)
+    {
+        $map = ope_rol_rank_scale();
+        return isset($map[(string) $rank]) ? $map[(string) $rank] : 1;
+    }
+
+    /**
+     * Coste PP para subir una stat al siguiente rango (INI-04).
+     * Desde 0 (pasiva negativa) cuesta 0→F + F→E = 10 PP.
+     *
+     * @return int|false
+     */
+    function ope_rol_stat_upgrade_cost($current_val)
+    {
+        $current = (int) $current_val;
+        if ($current >= 10) return false;
+        if ($current <= 0) return 10;
+        if ($current >= 9) return 200;
+        if ($current >= 8) return 150;
+        if ($current >= 7) return 110;
+        if ($current >= 6) return 80;
+        if ($current >= 5) return 55;
+        if ($current >= 4) return 35;
+        if ($current >= 3) return 20;
+        if ($current >= 2) return 10;
+        return 5;
+    }
+
+    /** Etiquetas legibles para rangos de stat en UI. */
+    function ope_rol_stat_rank_labels()
+    {
+        return array(
+            '0'  => 'Penalizado',
+            'F'  => 'Pésimo',
+            'E'  => 'Muy bajo',
+            'D'  => 'Bajo',
+            'C'  => 'Normal',
+            'B'  => 'Bueno',
+            'A'  => 'Notable',
+            'S'  => 'Excepcional',
+            'SS' => 'Legendario',
+            'M'  => 'Máximo',
+            'M+' => 'Trascendente',
+        );
+    }
 }
 
 if (!function_exists('ope_rol_razas')) {

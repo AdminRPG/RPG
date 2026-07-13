@@ -72,10 +72,11 @@ function ope_system_create_thread($fid, $subject, $message, $tag = '')
         'subject'     => $subject,
         'message'     => $message,
         'visible'     => 1,
+        'options'     => array(),
         'posthash'    => md5($sys_uid . time() . rand(0, 99999)),
     ));
 
-    $valid = $dh->verify_thread();
+    $valid = $dh->validate_thread();
     if (!$valid) {
         $errors = $dh->get_errors();
         if (!empty($errors)) {
@@ -88,9 +89,9 @@ function ope_system_create_thread($fid, $subject, $message, $tag = '')
     $dh->thread_insert_data['ope_pid'] = $sys_pid;
     $dh->post_insert_data['ope_pid']   = $sys_pid;
 
-    $tid = $dh->insert_thread();
+    $thread_info = $dh->insert_thread();
+    $tid = isset($thread_info['tid']) ? (int) $thread_info['tid'] : 0;
     if ($tid > 0) {
-        // Metadata del tema
         if ($db->table_exists('rol_thread_meta')) {
             ope_rol_store_thread_meta($tid, (int) $fid, 'presente', 0, $tag);
         }
@@ -119,10 +120,11 @@ function ope_system_create_post($tid, $message)
         'username' => 'OP-Eternal',
         'message'  => $message,
         'visible'  => 1,
+        'options'  => array(),
         'posthash' => md5($sys_uid . time() . rand(0, 99999)),
     ));
 
-    $valid = $dh->verify_post();
+    $valid = $dh->validate_post();
     if (!$valid) {
         $errors = $dh->get_errors();
         if (!empty($errors)) {
@@ -132,8 +134,8 @@ function ope_system_create_post($tid, $message)
     }
 
     $dh->post_insert_data['ope_pid'] = $sys_pid;
-    $pid = $dh->insert_post();
-    return $pid;
+    $post_info = $dh->insert_post();
+    return isset($post_info['pid']) ? (int) $post_info['pid'] : 0;
 }
 
 
@@ -322,70 +324,29 @@ function ope_pp_stat_cost_table()
 
 /**
  * Coste para subir una stat del valor actual al siguiente rango.
- * Las pasivas negativas encarecen (subir desde 0 cuesta 0→F + F→E, etc.).
- * @param int $current_val Valor numérico actual (0-10)
- * @return int|false Coste en PP, o false si ya está en M+ (máximo).
+ * @deprecated Use ope_rol_stat_upgrade_cost()
  */
 function ope_pp_stat_upgrade_cost($current_val)
 {
-    $current = (int) $current_val;
-    if ($current >= 10) return false; // M+ es el tope
-    if ($current >= 9) return 200;    // M → M+
-    if ($current >= 8) return 150;    // SS → M
-    if ($current >= 7) return 110;    // S → SS
-    if ($current >= 6) return 80;     // A → S
-    if ($current >= 5) return 55;     // B → A
-    if ($current >= 4) return 35;     // C → B
-    if ($current >= 3) return 20;     // D → C
-    if ($current >= 2) return 10;     // E → D
-    if ($current >= 1) return 5;      // F → E
-    return 5;                          // 0 → F (por pasiva negativa)
+    return ope_rol_stat_upgrade_cost($current_val);
 }
 
-/**
- * Rango del personaje basado en la suma de sus stats efectivas.
- */
+/** @deprecated Use ope_rol_rank_from_sum() */
 function ope_pp_rank_from_sum($sum)
 {
-    $sum = (int) $sum;
-    if ($sum >= 66) return 'M+';
-    if ($sum >= 56) return 'M';
-    if ($sum >= 47) return 'SS';
-    if ($sum >= 39) return 'S';
-    if ($sum >= 32) return 'A';
-    if ($sum >= 26) return 'B';
-    if ($sum >= 21) return 'C';
-    if ($sum >= 17) return 'D';
-    if ($sum >= 14) return 'E';
-    return 'F';
+    return ope_rol_rank_from_sum($sum);
 }
 
-/**
- * Valor numérico desde rango (F=1, E=2, ..., M+=10).
- */
-function ope_pp_val_from_rank($rank)
-{
-    $map = array('F' => 1, 'E' => 2, 'D' => 3, 'C' => 4, 'B' => 5,
-                 'A' => 6, 'S' => 7, 'SS' => 8, 'M' => 9, 'M+' => 10);
-    return isset($map[(string) $rank]) ? $map[(string) $rank] : 1;
-}
-
-/**
- * Rango desde valor numérico.
- */
+/** @deprecated Use ope_rol_rank_from_val() */
 function ope_pp_rank_from_val($val)
 {
-    $val = (int) $val;
-    if ($val >= 10) return 'M+';
-    if ($val >= 9)  return 'M';
-    if ($val >= 8)  return 'SS';
-    if ($val >= 7)  return 'S';
-    if ($val >= 6)  return 'A';
-    if ($val >= 5)  return 'B';
-    if ($val >= 4)  return 'C';
-    if ($val >= 3)  return 'D';
-    if ($val >= 2)  return 'E';
-    return 'F';
+    return ope_rol_rank_from_val($val);
+}
+
+/** @deprecated Use ope_rol_val_from_rank() */
+function ope_pp_val_from_rank($rank)
+{
+    return ope_rol_val_from_rank($rank);
 }
 
 /**
@@ -409,11 +370,25 @@ function ope_pp_on_post(&$dh)
     $uid  = (int) ($dh->data['uid'] ?? 0);
     $tid  = (int) ($dh->data['tid'] ?? ($dh->post_insert_data['tid'] ?? 0));
 
-    // No contar PP para OP-Eternal
+    // No contar PP para OP-Eternal ni posts del sistema
     if ($uid === ope_system_uid()) return $dh;
 
-    $char_pid = ope_rol_active_pid_for($uid);
+    // Personaje que firma el post (estampado en insert_post)
+    $char_pid = (int) ($dh->post_insert_data['ope_pid'] ?? 0);
+    if ($char_pid < 1) {
+        $char_pid = ope_rol_active_pid_for($uid);
+    }
     if ($char_pid < 1) return $dh;
+
+    // NPCs y personajes sistema no ganan PP
+    if ($db->table_exists('rol_personajes')) {
+        $cq = $db->simple_select('rol_personajes', 'es_npc, uid', "pid = {$char_pid}", array('limit' => 1));
+        if ($db->num_rows($cq)) {
+            $crow = $db->fetch_array($cq);
+            if ((int) ($crow['es_npc'] ?? 0) === 1) return $dh;
+            if ((int) ($crow['uid'] ?? 0) === ope_system_uid()) return $dh;
+        }
+    }
 
     // Idempotente: no duplicar PP para el mismo post
     $exists = $db->simple_select('rol_pp_log', 'log_id', "post_pid = {$post_pid} AND tipo = 'post'", array('limit' => 1));
@@ -452,10 +427,10 @@ function ope_combat_en_table()
  */
 function ope_combat_calc_pv($stats)
 {
-    $fue = (int) ($stats['FUE'] ?? 1);
-    $vig = (int) ($stats['VIG'] ?? 1);
-    $vol = (int) ($stats['VOL'] ?? 1);
-    $con = (int) ($stats['CON'] ?? 1);
+    $fue = ope_rol_stat_num($stats, 'FUE');
+    $vig = ope_rol_stat_num($stats, 'VIG');
+    $vol = ope_rol_stat_num($stats, 'VOL');
+    $con = ope_rol_stat_num($stats, 'CON');
     return ($fue + $vig) * 5 + ($vol + $con) * 2;
 }
 
@@ -487,10 +462,10 @@ function ope_combat_pa_bonus($rango)
  */
 function ope_combat_calc_pa($stats, $rango)
 {
-    $agi = (int) ($stats['AGI'] ?? 1);
-    $int = (int) ($stats['INT'] ?? 1);
-    $ing = (int) ($stats['ING'] ?? 1);
-    $car = (int) ($stats['CAR'] ?? 1);
+    $agi = ope_rol_stat_num($stats, 'AGI');
+    $int = ope_rol_stat_num($stats, 'INT');
+    $ing = ope_rol_stat_num($stats, 'ING');
+    $car = ope_rol_stat_num($stats, 'CAR');
     $bonus = ope_combat_pa_bonus($rango);
     return $agi + max($int, $ing, $car) + $bonus;
 }
@@ -512,7 +487,7 @@ function ope_combat_recalc($pid)
     $datos = json_decode((string) $pj['datos'], true);
     if (!is_array($datos)) $datos = array();
     $stats = is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array();
-    $rango = (string) $pj['rango'];
+    $rango = ope_rol_rank_from_sum(ope_rol_stat_sum($stats));
 
     $pv = ope_combat_calc_pv($stats);
     $en = ope_combat_calc_en($rango);
@@ -522,9 +497,10 @@ function ope_combat_recalc($pid)
         'pv_max'       => $pv,
         'en_max'       => $en,
         'pa_por_turno' => $pa,
+        'rango'        => $db->escape_string($rango),
     ), "pid = {$pid}");
 
-    return array('pv_max' => $pv, 'en_max' => $en, 'pa_por_turno' => $pa);
+    return array('pv_max' => $pv, 'en_max' => $en, 'pa_por_turno' => $pa, 'rango' => $rango);
 }
 
 /**

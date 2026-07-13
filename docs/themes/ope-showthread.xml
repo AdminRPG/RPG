@@ -66,6 +66,8 @@
   {$threadnotesbox}
   {$pollbox}
 
+  {$ope_viaje_panel}
+
   <div id="posts">{$posts}</div>
 
   <div class="ope-thread-bar">
@@ -83,6 +85,8 @@
   {$threadexbox}
   {$similarthreads}
   <div style="margin-top:12px">{$ratethread}</div>
+
+  {$ope_viaje_scripts}
 
   <div class="ope-thread-tools">
     <div class="float_left"><ul class="thread_tools">{$printthread}{$sendthread}{$addremovesubscription}</ul></div>
@@ -145,7 +149,8 @@
     {$post['attachments']}
     {$post['editedmsg']}
   </div>
-</article>]]></template>
+</article>
+{$post['ope_rpgsys']}]]></template>
 
     <template name="postbit_author_user" version="1839"><![CDATA[]]></template>
 

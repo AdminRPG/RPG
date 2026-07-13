@@ -76,6 +76,17 @@ $tramites = array(
         'link'     => 'tienda.php',
         'link_lbl' => 'Ir a la tienda',
     ),
+    array(
+        'title'    => 'Oráculo de Viaje',
+        'code'     => 'TRA-04',
+        'cat'      => 'navegacion',
+        'cat_lbl'  => 'Navegación',
+        'icon'     => '<path d="M3 18h18"/><path d="M5 16V8l7-4 7 4v8"/><path d="M9 16v-5h6v5"/><path d="M12 4v3"/>',
+        'body'     => 'Solicita una travesía entre islas. <b>OP-Eternal</b> tira el oráculo (clima, encuentros, hallazgos, peligros) y abre un hilo en Alta Mar. Cierras la llegada cuando la tripulación lo decida.',
+        'meta'     => '// oráculo · 4 mesas D100',
+        'link'     => 'viajes.php',
+        'link_lbl' => 'Solicitar viaje',
+    ),
 );
 
 // Categorías presentes (para la barra de filtros), en orden de aparición.

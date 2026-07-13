@@ -36,6 +36,11 @@ require_once MYBB_ROOT . 'inc/ope_rol_catalogos.php';
 // Sistema OP-Eternal + Motor de PP (Puntos de Progreso) — Oleada 1.
 require_once MYBB_ROOT . 'inc/ope_rol_system.php';
 
+// Oráculo de Viaje — Oleada 3.
+require_once MYBB_ROOT . 'inc/ope_rol_oraculo.php';
+require_once MYBB_ROOT . 'inc/ope_rol_oraculo_post.php';
+require_once MYBB_ROOT . 'inc/ope_rol_viajes.php';
+
 $plugins->add_hook('global_start', 'ope_rol_global');
 
 // Posteo por personaje: estampa el pid del personaje activo en cada
@@ -69,9 +74,19 @@ $plugins->add_hook('editpost_do_editpost_end', 'ope_rol_save_thread_meta_edit');
 // Spoilers anidables [spoiler]/[spoiler=Título] en todo el foro (antes de nl2br).
 $plugins->add_hook('parse_message', 'ope_rol_parse_spoilers');
 
+// Bloques del RPG System ([combate], [accion], [tecnica], [estado], [dado]).
+$plugins->add_hook('parse_message', 'ope_rol_parse_rpg');
+
+// Oráculo de Viaje: [viaje=ID] y [viaje-cierre=ID] → HTML visual OP-Eternal.
+$plugins->add_hook('parse_message', 'ope_rol_parse_viaje');
+
+// Panel de viaje activo en showthread (cierre manual).
+$plugins->add_hook('showthread_end', 'ope_rol_viaje_showthread_end');
+
 // Insertador de plantillas de post del personaje activo en newthread/newreply.
 $plugins->add_hook('newthread_end', 'ope_rol_tpl_inserter_newthread');
 $plugins->add_hook('newreply_end', 'ope_rol_tpl_inserter_newreply');
+$plugins->add_hook('editpost_end', 'ope_rol_tpl_inserter_newreply');
 
 // Muestra el personaje (no la cuenta) como autor visible del mensaje.
 $plugins->add_hook('postbit', 'ope_rol_postbit');
@@ -331,7 +346,7 @@ function ope_rol_navbar_html()
 
     $links   = '<a href="' . $bburl . '/personajes.php" class="ope-nav-link' . $isOn(array('personajes.php', 'ficha.php', 'crear-personaje.php')) . '">Personaje</a>';
     $links  .= '<a href="' . $bburl . '/tripulacion.php" class="ope-nav-link' . $isOn(array('tripulacion.php', 'tramite-tripulacion.php')) . '">Tripulaci&oacute;n</a>';
-    $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php', 'notificar-tema.php', 'tablon-misiones.php', 'aceptar-mision.php', 'tienda.php')) . '">Tr&aacute;mites</a>';
+    $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php', 'notificar-tema.php', 'tablon-misiones.php', 'aceptar-mision.php', 'tienda.php', 'viajes.php')) . '">Tr&aacute;mites</a>';
     // Mundo Vivo: sección desplegable (Periódicos + Estado del mundo).
     $mvOn = $isOn(array('periodicos.php', 'estado-mundo.php'));
     $links  .= '<div class="ope-nav-dd">'
@@ -997,6 +1012,18 @@ function ope_rol_postbit($post)
         $post['ope_fac_class'] = '';
     }
 
+    // Extrae el bloque RPG System del cuerpo del mensaje y lo expone como
+    // {$post['ope_rpgsys']} para renderizarlo FUERA del post, pegado debajo.
+    // Esto aplica a TODOS los posts (tengan o no personaje), y también al
+    // preview (previewpost usa build_postbit).
+    $post['ope_rpgsys'] = '';
+    if (!empty($post['message']) && strpos($post['message'], '<!--OPERPGSYS-->') !== false) {
+        if (preg_match('#<!--OPERPGSYS-->([\s\S]*?)<!--/OPERPGSYS-->#', $post['message'], $mm)) {
+            $post['ope_rpgsys'] = $mm[1];
+        }
+        $post['message'] = preg_replace('#(?:<br\s*/?>\s*)*<!--OPERPGSYS-->[\s\S]*?<!--/OPERPGSYS-->#', '', $post['message']);
+    }
+
     if (empty($post['ope_pid'])) {
         return $post;
     }
@@ -1483,6 +1510,170 @@ function ope_rol_parse_spoilers($message)
     return $message;
 }
 
+/**
+ * Parser de bloques de rol (RPG System) en los mensajes:
+ *   [combate=Título]…[/combate]  → panel de estado de combate
+ *   [accion=Tipo]…[/accion]      → declaración de acción
+ *   [tecnica=Nombre]…[/tecnica]  → carta de técnica en línea
+ *   [estado=tipo]Nombre[/estado] → chip de estado (positivo/negativo/neutral)
+ *   [dado]2d6+FUE[/dado]         → chip de tirada (visual)
+ * Se ejecuta en el hook parse_message, igual que los spoilers.
+ */
+function ope_rol_parse_rpg($message)
+{
+    if (stripos($message, '[combate') === false
+        && stripos($message, '[accion') === false
+        && stripos($message, '[tecnica') === false
+        && stripos($message, '[estado') === false
+        && stripos($message, '[dado') === false
+        && stripos($message, '[rpgsys') === false) {
+        return $message;
+    }
+
+    // Bloque RPG SYSTEM bajo el post: [rpgsys]id,id,id[/rpgsys] → cartas del
+    // personaje renderizadas como naipes. Zona extensible (más módulos vendrán).
+    if (stripos($message, '[rpgsys') !== false) {
+        $message = preg_replace_callback('#\[rpgsys\]([^\[]*)\[/rpgsys\]#is', function ($m) {
+            $ids = array_filter(array_map('intval', array_map('trim', explode(',', $m[1]))));
+            $ids = array_slice(array_values(array_unique($ids)), 0, 24);
+            $cards = '';
+            foreach ($ids as $cid) {
+                $carta = function_exists('ope_rol_tecnica_by_id') ? ope_rol_tecnica_by_id($cid) : null;
+                if ($carta) {
+                    $cards .= ope_rol_tecnica_card_html($carta);
+                }
+            }
+            if ($cards === '') {
+                return '';
+            }
+            $ncards = count($ids);
+            // Marcadores (sentinela) para que el hook `postbit` pueda sacar este
+            // bloque FUERA del cuerpo del post y pegarlo debajo del <article>.
+            // Colapsable y COLAPSADO por defecto (body con [hidden]).
+            return '<!--OPERPGSYS-->'
+                 . ope_rol_tecnica_card_css()
+                 . '<div class="ope-rpgsys is-collapsed">'
+                 . '<button type="button" class="ope-rpgsys-h" aria-expanded="false">'
+                 . '<span class="ope-rpgsys-badge">RPG System</span>'
+                 . '<span class="ope-rpgsys-meta">' . $ncards . ' carta' . ($ncards === 1 ? '' : 's') . '</span>'
+                 . '<span class="ope-rpgsys-toggle" aria-hidden="true">Mostrar</span>'
+                 . '</button>'
+                 . '<div class="ope-rpgsys-b" hidden>'
+                 . '<div class="ope-rpgsys-sec"><div class="ope-rpgsys-sec-h">Cartas usadas</div>'
+                 . '<div class="ope-tk-deck">' . $cards . '</div></div>'
+                 . '</div></div>'
+                 . '<!--/OPERPGSYS-->';
+        }, $message);
+    }
+
+    // Bloques con título opcional (combate / accion / tecnica).
+    $blocks = array(
+        'combate' => array('cls' => 'ope-cbt', 'def' => 'Estado de combate'),
+        'accion'  => array('cls' => 'ope-accion', 'def' => 'Acci&oacute;n'),
+        'tecnica' => array('cls' => 'ope-cbt-tk', 'def' => 'T&eacute;cnica'),
+    );
+    foreach ($blocks as $tag => $cfg) {
+        $pattern = '#\[' . $tag . '(?:=([^\]]*))?\]((?:(?!\[/?' . $tag . ').)*?)\[/' . $tag . '\]#is';
+        $guard = 0;
+        while ($guard < 40 && preg_match($pattern, $message)) {
+            $message = preg_replace_callback($pattern, function ($m) use ($cfg) {
+                $title = isset($m[1]) ? trim(trim($m[1]), "\"'") : '';
+                if ($title === '') $title = $cfg['def'];
+                $body = trim($m[2]);
+                return '<div class="' . $cfg['cls'] . '">'
+                     . '<div class="' . $cfg['cls'] . '-h">' . $title . '</div>'
+                     . '<div class="' . $cfg['cls'] . '-b">' . $body . '</div>'
+                     . '</div>';
+            }, $message);
+            $guard++;
+        }
+    }
+
+    // Chips inline: estado.
+    $message = preg_replace_callback('#\[estado(?:=(positivo|negativo|neutral))?\]((?:(?!\[/?estado).)*?)\[/estado\]#is', function ($m) {
+        $tipo = isset($m[1]) && $m[1] !== '' ? strtolower($m[1]) : 'negativo';
+        return '<span class="ope-estado ope-estado--' . $tipo . '">' . trim($m[2]) . '</span>';
+    }, $message);
+
+    // Chips inline: dado.
+    $message = preg_replace_callback('#\[dado\]((?:(?!\[/?dado).)*?)\[/dado\]#is', function ($m) {
+        return '<span class="ope-dado">&#9860; ' . trim($m[1]) . '</span>';
+    }, $message);
+
+    return $message;
+}
+
+/**
+ * Renderiza shortcodes del Oráculo de Viaje al mostrar posts.
+ *   [viaje=123]         → bloque completo del oráculo (primer post)
+ *   [viaje-cierre=123]  → post de llegada solicitada por el jugador
+ */
+function ope_rol_parse_viaje($message)
+{
+    if (stripos($message, '[viaje') === false) {
+        return $message;
+    }
+
+    $message = preg_replace_callback('#\[viaje=(\d+)\]#i', function ($m) {
+        $vid = (int) $m[1];
+        if ($vid < 1 || !function_exists('ope_viaje_por_id')) {
+            return '';
+        }
+        $v = ope_viaje_por_id($vid);
+        if (!$v) {
+            return '';
+        }
+        $oracle = json_decode((string) ($v['resultado_json'] ?? ''), true);
+        if (!is_array($oracle)) {
+            $oracle = array('tramos' => array(), 'mods' => array());
+        }
+        return ope_oraculo_post_html($v, $oracle);
+    }, $message);
+
+    $message = preg_replace_callback('#\[viaje-cierre=(\d+)\]#i', function ($m) {
+        $vid = (int) $m[1];
+        if ($vid < 1 || !function_exists('ope_viaje_por_id')) {
+            return '';
+        }
+        $v = ope_viaje_por_id($vid);
+        if (!$v) {
+            return '';
+        }
+        $cap = 'Capitán';
+        global $db;
+        if ($db->table_exists('rol_personajes')) {
+            $pq = $db->simple_select('rol_personajes', 'nombre', 'pid = ' . (int) ($v['pid_capitan'] ?? 0), array('limit' => 1));
+            if ($db->num_rows($pq)) {
+                $cap = (string) $db->fetch_field($pq, 'nombre');
+            }
+        }
+        return ope_oraculo_cierre_post_html($v, $cap);
+    }, $message);
+
+    return $message;
+}
+
+/** Inyecta panel de viaje activo en plantilla showthread. */
+function ope_rol_viaje_showthread_end()
+{
+    global $tid, $mybb;
+    $uid = (int) ($mybb->user['uid'] ?? 0);
+    $active_pid = (int) ($mybb->user['ope_active_pid'] ?? 0);
+    if ($active_pid < 1 && $uid > 0 && function_exists('ope_rol_active_pid_for')) {
+        $active_pid = ope_rol_active_pid_for($uid);
+    }
+    $GLOBALS['ope_viaje_panel'] = function_exists('ope_viaje_panel_showthread')
+        ? ope_viaje_panel_showthread((int) $tid, $uid, $active_pid)
+        : '';
+    $GLOBALS['ope_viaje_scripts'] = '';
+    if (function_exists('ope_viaje_por_tid') && function_exists('ope_oraculo_showthread_scripts')) {
+        $v = ope_viaje_por_tid((int) $tid);
+        if ($v) {
+            $GLOBALS['ope_viaje_scripts'] = ope_oraculo_showthread_scripts();
+        }
+    }
+}
+
 /** JS global del tema (toggle de spoilers). Delegado: funciona anidado. */
 function ope_rol_theme_js()
 {
@@ -1496,6 +1687,13 @@ function ope_rol_theme_js()
         . "e.preventDefault();var b=h.nextElementSibling;if(!b||!b.classList.contains('ope-spoiler-body'))return;"
         . "var open=b.hasAttribute('hidden');if(open){b.removeAttribute('hidden');h.classList.add('is-open');}"
         . "else{b.setAttribute('hidden','');h.classList.remove('is-open');}});})();\n"
+        // Toggle del bloque RPG System en los posts (colapsado por defecto).
+        . "(function(){document.addEventListener('click',function(e){"
+        . "var h=e.target.closest&&e.target.closest('.ope-rpgsys-h');if(!h)return;"
+        . "e.preventDefault();var box=h.parentNode;var b=box.querySelector('.ope-rpgsys-b');if(!b)return;"
+        . "var t=h.querySelector('.ope-rpgsys-toggle');var open=b.hasAttribute('hidden');"
+        . "if(open){b.removeAttribute('hidden');box.classList.remove('is-collapsed');h.setAttribute('aria-expanded','true');if(t)t.textContent='Ocultar';}"
+        . "else{b.setAttribute('hidden','');box.classList.add('is-collapsed');h.setAttribute('aria-expanded','false');if(t)t.textContent='Mostrar';}});})();\n"
         . "(function(){"
         . "document.addEventListener('click',function(e){"
         . "var dot=e.target.closest&&e.target.closest('.ope-theme-dot');"
@@ -1545,44 +1743,133 @@ function ope_rol_char_templates($pid)
     return $out;
 }
 
-/** HTML+JSON+JS del insertador de plantillas para el textarea #message. */
+/**
+ * Panel "RPG System" del editor. Vive DEBAJO del textarea del post y agrupa,
+ * por ahora, dos pestañas:
+ *   · Plantillas → inserta en el mensaje la plantilla elegida del personaje.
+ *   · Cartas     → muestra el deck del personaje; las cartas que se marquen se
+ *                  adjuntan al post (bloque [rpgsys]) y se renderizan bajo él.
+ * Es una zona extensible: aquí se irán añadiendo más módulos de rol.
+ */
 function ope_rol_tpl_inserter_html()
 {
-    global $mybb;
+    global $mybb, $db;
     $uid = (int) ($mybb->user['uid'] ?? 0);
     if ($uid < 1) {
         return '';
     }
+
     $pid = ope_rol_active_pid_for($uid);
-    if ($pid < 1) {
-        return '';
-    }
-    $tpls = ope_rol_char_templates($pid);
-    if (empty($tpls)) {
-        return '';
-    }
 
-    $bodies = array();
-    $buttons = '';
+    // ── Plantillas del personaje ──
+    $tpls = $pid > 0 ? ope_rol_char_templates($pid) : array();
+    $tpl_bodies = array();
+    $tpl_buttons = '';
     foreach ($tpls as $i => $t) {
-        $bodies[] = $t['cuerpo'];
-        $buttons .= '<button type="button" class="ope-tplbtn" data-tpl="' . $i . '">'
-                  . htmlspecialchars_uni($t['nombre']) . '</button>';
+        $tpl_bodies[] = $t['cuerpo'];
+        $tpl_buttons .= '<button type="button" class="ope-rpg-chip" data-tpl="' . $i . '">'
+                     . htmlspecialchars_uni($t['nombre']) . '</button>';
     }
-    $json = json_encode($bodies, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    if ($tpl_buttons === '') {
+        $tpl_buttons = '<span class="ope-rpg-empty">No tienes plantillas. Cr&eacute;alas en tu ficha &rsaquo; Gesti&oacute;n.</span>';
+    }
+    $tpl_json = json_encode($tpl_bodies, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
-    $html  = '<div class="ope-tplbar" id="ope-tplbar">';
-    $html .= '<span class="ope-tplbar-l">// insertar plantilla</span>';
-    $html .= $buttons;
+    // ── Cartas del personaje: naipe completo, seleccionable ──
+    $card_css = '';
+    $card_tiles = '';
+    if ($pid > 0 && function_exists('ope_rol_char_tecnicas')) {
+        $decks = ope_rol_char_tecnicas($pid);
+        if ($decks) {
+            $card_css = ope_rol_tecnica_card_css();
+        }
+        foreach ($decks as $tk) {
+            $cid = (int) ($tk['id'] ?? 0);
+            $nombre = (string) ($tk['nombre'] ?? '');
+            if ($cid < 1 || $nombre === '') continue;
+            $insig = !empty($tk['es_insignia']);
+            $card_tiles .= '<div class="ope-rpg-cardpick" data-card-id="' . $cid . '" role="button" tabindex="0" aria-pressed="false">'
+                . '<span class="ope-rpg-cardpick-check" aria-hidden="true">&#10003;</span>'
+                . '<span class="ope-rpg-cardpick-name">' . ($insig ? '&#9733; ' : '') . htmlspecialchars_uni($nombre) . '</span>'
+                . '<span class="ope-rpg-cardpick-pop">' . ope_rol_tecnica_card_html($tk) . '</span>'
+                . '</div>';
+        }
+    }
+    if ($card_tiles === '') {
+        $card_tiles = '<span class="ope-rpg-empty">Este personaje a&uacute;n no tiene cartas de t&eacute;cnica.</span>';
+    }
+
+    // ── Ensamblado ──
+    $html  = '<div class="ope-rpg" id="ope-rpg">';
+    $html .= '<div class="ope-rpg-head"><span class="ope-rpg-badge">RPG System</span>'
+           . '<span class="ope-rpg-hint">Se mostrar&aacute; justo debajo de tu post</span></div>';
+    $html .= '<div class="ope-rpg-tabs" role="tablist">'
+           . '<button type="button" class="ope-rpg-tab is-on" data-tab="plantillas">Plantillas</button>'
+           . '<button type="button" class="ope-rpg-tab" data-tab="cartas">Cartas</button>'
+           . '</div>';
+
+    // Panel Plantillas
+    $html .= '<div class="ope-rpg-panel is-on" data-panel="plantillas">';
+    $html .= '<div class="ope-rpg-chips">' . $tpl_buttons . '</div>';
     $html .= '</div>';
-    $html .= '<script>(function(){var D=' . $json . ';'
-           . 'var bar=document.getElementById("ope-tplbar");if(!bar)return;'
-           . 'var ta=document.getElementById("message");'
-           . 'bar.addEventListener("click",function(e){var b=e.target.closest(".ope-tplbtn");if(!b||!ta)return;'
-           . 'var body=D[b.getAttribute("data-tpl")];if(body==null)return;'
-           . 'var s=ta.selectionStart||0,en=ta.selectionEnd||0,v=ta.value;'
-           . 'ta.value=v.slice(0,s)+body+v.slice(en);ta.focus();var p=s+body.length;'
-           . 'try{ta.setSelectionRange(p,p);}catch(x){}});})();</script>';
+
+    // Panel Cartas
+    $html .= '<div class="ope-rpg-panel" data-panel="cartas">';
+    $html .= $card_css;
+    $html .= '<p class="ope-rpg-note">Haz clic para adjuntar una carta; pasa el cursor por encima para verla completa. Al publicar aparecer&aacute;n en un bloque <b>RPG SYSTEM</b> pegado debajo de tu post.</p>';
+    $html .= '<div class="ope-rpg-cards">' . $card_tiles . '</div>';
+    $html .= '<div class="ope-rpg-selinfo" data-count="0">Ninguna carta seleccionada.</div>';
+    $html .= '</div>';
+
+    $html .= '</div>'; // .ope-rpg
+
+    // ── Script ──
+    $html .= '<script>(function(){'
+        . 'var root=document.getElementById("ope-rpg");if(!root)return;'
+        . 'var TPL=' . $tpl_json . ';'
+        . 'var ta=document.getElementById("message");'
+        . 'function ins(pre,post){post=post||"";var ed=window.MyBBEditor;'
+        . 'if(ed&&typeof ed.insert==="function"){if(post){ed.insert(pre,post);}else{ed.insert(pre);}return;}'
+        . 'if(!ta)return;'
+        . 'var s=ta.selectionStart||0,e=ta.selectionEnd||0,v=ta.value,sel=v.slice(s,e);'
+        . 'var t=pre+sel+post;ta.value=v.slice(0,s)+t+v.slice(e);ta.focus();'
+        . 'var c=s+pre.length+sel.length;try{ta.setSelectionRange(c,c);}catch(x){}}'
+        // ── selección de cartas ──
+        . 'var info=root.querySelector(".ope-rpg-selinfo");'
+        . 'function selIds(){var out=[];root.querySelectorAll(".ope-rpg-cardpick.is-sel").forEach(function(c){out.push(c.getAttribute("data-card-id"));});return out;}'
+        . 'function refresh(){var n=selIds().length;if(info){info.setAttribute("data-count",n);info.textContent=n?(n+" carta"+(n>1?"s":"")+" se mostrar"+(n>1?"\u00e1n":"\u00e1")+" bajo tu post."):"Ninguna carta seleccionada.";}}'
+        // ── delegación de clicks ──
+        . 'root.addEventListener("click",function(ev){'
+        . 'var tab=ev.target.closest(".ope-rpg-tab");'
+        . 'if(tab){var name=tab.getAttribute("data-tab");'
+        . 'root.querySelectorAll(".ope-rpg-tab").forEach(function(t){t.classList.toggle("is-on",t===tab);});'
+        . 'root.querySelectorAll(".ope-rpg-panel").forEach(function(p){p.classList.toggle("is-on",p.getAttribute("data-panel")===name);});return;}'
+        . 'var card=ev.target.closest(".ope-rpg-cardpick");'
+        . 'if(card&&card.hasAttribute("data-card-id")){var on=!card.classList.contains("is-sel");card.classList.toggle("is-sel",on);card.setAttribute("aria-pressed",on?"true":"false");refresh();return;}'
+        . 'var chip=ev.target.closest(".ope-rpg-chip");if(!chip)return;'
+        . 'if(chip.hasAttribute("data-tpl")){var b=TPL[chip.getAttribute("data-tpl")];if(b!=null)ins(b,"");return;}'
+        . 'var t=chip.getAttribute("data-insert");if(t!=null)ins(t,"");});'
+        // ── preselección desde un [rpgsys] ya existente (editar post) ──
+        . 'function editorVal(){var ed=window.MyBBEditor;if(ed&&typeof ed.val==="function"){try{return ed.val();}catch(x){}}return ta?ta.value:"";}'
+        . 'var m=editorVal().match(/\\[rpgsys\\]([^\\[]*)\\[\\/rpgsys\\]/i);'
+        . 'if(m){var ids=m[1].split(",").map(function(s){return s.trim();});'
+        . 'root.querySelectorAll(".ope-rpg-cardpick").forEach(function(c){if(ids.indexOf(c.getAttribute("data-card-id"))>-1){c.classList.add("is-sel");c.setAttribute("aria-pressed","true");}});}'
+        . 'refresh();'
+        // ── al enviar: reconstruir el bloque [rpgsys] con la selección ──
+        . 'var form=ta?ta.form:null;'
+        . 'function applyBlock(){'
+        . 'var ids=selIds();var ed=window.MyBBEditor;'
+        . 'var cur=(ed&&typeof ed.val==="function")?ed.val():(ta?ta.value:"");'
+        . 'cur=cur.replace(/\\n*\\[rpgsys\\][\\s\\S]*?\\[\\/rpgsys\\]/gi,"");'
+        . 'if(ids.length){cur=cur.replace(/\\s+$/,"")+"\\n\\n[rpgsys]"+ids.join(",")+"[/rpgsys]";}'
+        // Escribe en el editor SCEditor (si existe) y SIEMPRE en el textarea real,
+        // que es el campo que se envía; así preview y publicación llevan el bloque.
+        . 'if(ed&&typeof ed.val==="function"){try{ed.val(cur);}catch(x){}}'
+        . 'if(ta){ta.value=cur;}'
+        . '}'
+        . 'if(form){form.addEventListener("submit",applyBlock,true);form.addEventListener("submit",applyBlock);}'
+        . '})();</script>';
+
     return $html;
 }
 
@@ -1625,6 +1912,27 @@ function ope_rol_char_tecnicas($pid)
         $out[] = $r;
     }
     return $out;
+}
+
+/**
+ * Una carta de técnica por su id (rol_tecnicas.id), con `tags` decodificado.
+ * Se usa al renderizar el bloque [rpgsys] bajo los posts.
+ */
+function ope_rol_tecnica_by_id($id)
+{
+    global $db;
+    $id = (int) $id;
+    if ($id < 1 || !$db->table_exists('rol_tecnicas')) {
+        return null;
+    }
+    $q = $db->simple_select('rol_tecnicas', '*', "id = {$id}", array('limit' => 1));
+    if (!$db->num_rows($q)) {
+        return null;
+    }
+    $r = $db->fetch_array($q);
+    $tags = json_decode((string) $r['tags'], true);
+    $r['tags'] = is_array($tags) ? $tags : array();
+    return $r;
 }
 
 /**

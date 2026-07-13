@@ -127,5 +127,79 @@ foreach ($estados as $e) {
 }
 $stmt->close();
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 4. Backfill PV / EN / PA para personajes existentes
+// ═══════════════════════════════════════════════════════════════════════════
+
+echo "\n=== 4. BACKFILL VITALES ===\n";
+
+$en_table = array(
+    'F' => 20, 'E' => 25, 'D' => 30, 'C' => 40, 'B' => 50,
+    'A' => 65, 'S' => 80, 'SS' => 100, 'M' => 130, 'M+' => 170,
+);
+$pa_bonus = array(
+    'F' => 0, 'E' => 0, 'D' => 0,
+    'C' => 1, 'B' => 1,
+    'A' => 2, 'S' => 2,
+    'SS' => 3, 'M' => 3, 'M+' => 3,
+);
+$stat_keys = array('FUE','DES','VIG','AGI','INT','ING','CON','PER','CAR','CTR','VOL','SEN');
+
+function oleada2_stat_num(array $stats, string $key): int
+{
+    if (!array_key_exists($key, $stats)) {
+        return 1;
+    }
+    return max(0, min(10, (int) $stats[$key]));
+}
+
+function oleada2_rank_from_sum(int $sum): string
+{
+    if ($sum >= 66) return 'M+';
+    if ($sum >= 56) return 'M';
+    if ($sum >= 47) return 'SS';
+    if ($sum >= 39) return 'S';
+    if ($sum >= 32) return 'A';
+    if ($sum >= 26) return 'B';
+    if ($sum >= 21) return 'C';
+    if ($sum >= 17) return 'D';
+    if ($sum >= 14) return 'E';
+    return 'F';
+}
+
+$res = $db->query("SELECT pid, datos FROM `{$PREFIX}rol_personajes`");
+$updated = 0;
+while ($row = $res->fetch_assoc()) {
+    $pid = (int) $row['pid'];
+    $datos = json_decode((string) $row['datos'], true);
+    if (!is_array($datos)) $datos = array();
+    $stats = is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array();
+
+    $sum = 0;
+    foreach ($stat_keys as $sk) {
+        $sum += oleada2_stat_num($stats, $sk);
+    }
+    $rango = oleada2_rank_from_sum($sum);
+
+    $fue = oleada2_stat_num($stats, 'FUE');
+    $vig = oleada2_stat_num($stats, 'VIG');
+    $vol = oleada2_stat_num($stats, 'VOL');
+    $con = oleada2_stat_num($stats, 'CON');
+    $pv = ($fue + $vig) * 5 + ($vol + $con) * 2;
+
+    $en = $en_table[$rango] ?? 20;
+
+    $agi = oleada2_stat_num($stats, 'AGI');
+    $int = oleada2_stat_num($stats, 'INT');
+    $ing = oleada2_stat_num($stats, 'ING');
+    $car = oleada2_stat_num($stats, 'CAR');
+    $pa = $agi + max($int, $ing, $car) + ($pa_bonus[$rango] ?? 0);
+
+    $rango_esc = $db->real_escape_string($rango);
+    $db->query("UPDATE `{$PREFIX}rol_personajes` SET pv_max = {$pv}, en_max = {$en}, pa_por_turno = {$pa}, rango = '{$rango_esc}' WHERE pid = {$pid}");
+    $updated++;
+}
+echo "  [OK] {$updated} personajes recalculados\n";
+
 echo "\n=== DONE ===\n";
 $db->close();

@@ -1,0 +1,376 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "One Piece Eternal" [ref=e4] [cursor=pointer]:
+        - /url: http://localhost/iforge/index.php
+      - generic [ref=e5]:
+        - link "Personaje" [ref=e6] [cursor=pointer]:
+          - /url: http://localhost/iforge/personajes.php
+        - link "Tripulación" [ref=e7] [cursor=pointer]:
+          - /url: http://localhost/iforge/tripulacion.php
+        - link "Trámites" [ref=e8] [cursor=pointer]:
+          - /url: http://localhost/iforge/tramites.php
+        - button "Mundo Vivo" [ref=e10] [cursor=pointer]:
+          - text: Mundo Vivo
+          - generic [ref=e11]: ▾
+        - link "Guías" [ref=e12] [cursor=pointer]:
+          - /url: http://localhost/iforge/guias.php
+        - button "Bibliotecas" [ref=e14] [cursor=pointer]:
+          - text: Bibliotecas
+          - generic [ref=e15]: ▾
+        - link "Zona Staff" [ref=e16] [cursor=pointer]:
+          - /url: http://localhost/iforge/zona-staff.php
+      - generic [ref=e17]:
+        - button "Tema visual" [ref=e19] [cursor=pointer]
+        - link "Alertas" [ref=e27] [cursor=pointer]:
+          - /url: http://localhost/iforge/alertas.php
+        - button "Dorr Kaskan" [ref=e31] [cursor=pointer]
+  - generic [ref=e33]:
+    - link "Inicio" [ref=e34] [cursor=pointer]:
+      - /url: http://localhost/iforge/index.php
+    - generic [ref=e35]: ›
+    - generic [ref=e36]: Calendario On-Rol
+  - generic [ref=e37]:
+    - generic [ref=e39]:
+      - heading "Calendario On-Rol" [level=1] [ref=e40]
+      - generic [ref=e41]: // 4 estaciones × 65 días
+    - generic [ref=e44]:
+      - generic [ref=e45]:
+        - generic [ref=e46]: Año II
+        - generic [ref=e47]: // año actual
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - link "← Año anterior" [ref=e50] [cursor=pointer]:
+            - /url: "?anio=1"
+          - link "Año siguiente →" [ref=e51] [cursor=pointer]:
+            - /url: "?anio=3"
+        - generic [ref=e52]: "Hoy: Día 56 · Verano"
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]: Primavera
+        - generic [ref=e59]: // 65 días
+      - generic [ref=e61]:
+        - button "1" [ref=e62] [cursor=pointer]
+        - button "2" [ref=e64] [cursor=pointer]
+        - button "3" [ref=e66] [cursor=pointer]
+        - button "4" [ref=e68] [cursor=pointer]
+        - button "5" [ref=e70] [cursor=pointer]
+        - button "6" [ref=e72] [cursor=pointer]
+        - button "7" [ref=e74] [cursor=pointer]
+        - button "8" [ref=e76] [cursor=pointer]
+        - button "9" [ref=e78] [cursor=pointer]
+        - button "10" [ref=e80] [cursor=pointer]
+        - button "11" [ref=e82] [cursor=pointer]
+        - button "12" [ref=e84] [cursor=pointer]
+        - button "13" [ref=e86] [cursor=pointer]
+        - button "14" [ref=e88] [cursor=pointer]
+        - button "15 Luna llena" [ref=e90] [cursor=pointer]:
+          - generic [ref=e91]: "15"
+          - generic "Luna llena" [ref=e92]
+        - button "16" [ref=e95] [cursor=pointer]
+        - button "17" [ref=e97] [cursor=pointer]
+        - button "18" [ref=e99] [cursor=pointer]
+        - button "19" [ref=e101] [cursor=pointer]
+        - button "20" [ref=e103] [cursor=pointer]
+        - button "21" [ref=e105] [cursor=pointer]
+        - button "22" [ref=e107] [cursor=pointer]
+        - button "23" [ref=e109] [cursor=pointer]
+        - button "24" [ref=e111] [cursor=pointer]
+        - button "25" [ref=e113] [cursor=pointer]
+        - button "26" [ref=e115] [cursor=pointer]
+        - button "27" [ref=e117] [cursor=pointer]
+        - button "28" [ref=e119] [cursor=pointer]
+        - button "29" [ref=e121] [cursor=pointer]
+        - button "30 Luna llena" [ref=e123] [cursor=pointer]:
+          - generic [ref=e124]: "30"
+          - generic "Luna llena" [ref=e125]
+        - button "31" [ref=e128] [cursor=pointer]
+        - button "32" [ref=e130] [cursor=pointer]
+        - button "33" [ref=e132] [cursor=pointer]
+        - button "34" [ref=e134] [cursor=pointer]
+        - button "35" [ref=e136] [cursor=pointer]
+        - button "36" [ref=e138] [cursor=pointer]
+        - button "37" [ref=e140] [cursor=pointer]
+        - button "38" [ref=e142] [cursor=pointer]
+        - button "39" [ref=e144] [cursor=pointer]
+        - button "40" [ref=e146] [cursor=pointer]
+        - button "41" [ref=e148] [cursor=pointer]
+        - button "42" [ref=e150] [cursor=pointer]
+        - button "43" [ref=e152] [cursor=pointer]
+        - button "44" [ref=e154] [cursor=pointer]
+        - button "45 Luna llena" [ref=e156] [cursor=pointer]:
+          - generic [ref=e157]: "45"
+          - generic "Luna llena" [ref=e158]
+        - button "46" [ref=e161] [cursor=pointer]
+        - button "47" [ref=e163] [cursor=pointer]
+        - button "48" [ref=e165] [cursor=pointer]
+        - button "49" [ref=e167] [cursor=pointer]
+        - button "50" [ref=e169] [cursor=pointer]
+        - button "51" [ref=e171] [cursor=pointer]
+        - button "52" [ref=e173] [cursor=pointer]
+        - button "53" [ref=e175] [cursor=pointer]
+        - button "54" [ref=e177] [cursor=pointer]
+        - button "55" [ref=e179] [cursor=pointer]
+        - button "56" [ref=e181] [cursor=pointer]
+        - button "57" [ref=e183] [cursor=pointer]
+        - button "58" [ref=e185] [cursor=pointer]
+        - button "59" [ref=e187] [cursor=pointer]
+        - button "60 Luna llena" [ref=e189] [cursor=pointer]:
+          - generic [ref=e190]: "60"
+          - generic "Luna llena" [ref=e191]
+        - button "61" [ref=e194] [cursor=pointer]
+        - button "62" [ref=e196] [cursor=pointer]
+        - button "63" [ref=e198] [cursor=pointer]
+        - button "64" [ref=e200] [cursor=pointer]
+        - button "65" [ref=e202] [cursor=pointer]
+    - generic [ref=e205]:
+      - generic [ref=e206]:
+        - generic [ref=e207]: Verano
+        - generic [ref=e209]: // 65 días · en curso
+      - generic [ref=e211]:
+        - button "1" [ref=e212] [cursor=pointer]
+        - button "2" [ref=e214] [cursor=pointer]
+        - button "3" [ref=e216] [cursor=pointer]
+        - button "4" [ref=e218] [cursor=pointer]
+        - button "5" [ref=e220] [cursor=pointer]
+        - button "6" [ref=e222] [cursor=pointer]
+        - button "7" [ref=e224] [cursor=pointer]
+        - button "8" [ref=e226] [cursor=pointer]
+        - button "9" [ref=e228] [cursor=pointer]
+        - button "10" [ref=e230] [cursor=pointer]
+        - button "11" [ref=e232] [cursor=pointer]
+        - button "12" [ref=e234] [cursor=pointer]
+        - button "13" [ref=e236] [cursor=pointer]
+        - button "14" [ref=e238] [cursor=pointer]
+        - button "15 Luna llena" [ref=e240] [cursor=pointer]:
+          - generic [ref=e241]: "15"
+          - generic "Luna llena" [ref=e242]
+        - button "16" [ref=e245] [cursor=pointer]
+        - button "17" [ref=e247] [cursor=pointer]
+        - button "18" [ref=e249] [cursor=pointer]
+        - button "19" [ref=e251] [cursor=pointer]
+        - button "20" [ref=e253] [cursor=pointer]
+        - button "21" [ref=e255] [cursor=pointer]
+        - button "22" [ref=e257] [cursor=pointer]
+        - button "23" [ref=e259] [cursor=pointer]
+        - button "24" [ref=e261] [cursor=pointer]
+        - button "25" [ref=e263] [cursor=pointer]
+        - button "26" [ref=e265] [cursor=pointer]
+        - button "27" [ref=e267] [cursor=pointer]
+        - button "28" [ref=e269] [cursor=pointer]
+        - button "29" [ref=e271] [cursor=pointer]
+        - button "30 Luna llena" [ref=e273] [cursor=pointer]:
+          - generic [ref=e274]: "30"
+          - generic "Luna llena" [ref=e275]
+        - button "31" [ref=e278] [cursor=pointer]
+        - button "32" [ref=e280] [cursor=pointer]
+        - button "33" [ref=e282] [cursor=pointer]
+        - button "34" [ref=e284] [cursor=pointer]
+        - button "35" [ref=e286] [cursor=pointer]
+        - button "36" [ref=e288] [cursor=pointer]
+        - button "37" [ref=e290] [cursor=pointer]
+        - button "38" [ref=e292] [cursor=pointer]
+        - button "39" [ref=e294] [cursor=pointer]
+        - button "40" [ref=e296] [cursor=pointer]
+        - button "41" [ref=e298] [cursor=pointer]
+        - button "42" [ref=e300] [cursor=pointer]
+        - button "43" [ref=e302] [cursor=pointer]
+        - button "44" [ref=e304] [cursor=pointer]
+        - button "45 Luna llena" [ref=e306] [cursor=pointer]:
+          - generic [ref=e307]: "45"
+          - generic "Luna llena" [ref=e308]
+        - button "46" [ref=e311] [cursor=pointer]
+        - button "47" [ref=e313] [cursor=pointer]
+        - button "48" [ref=e315] [cursor=pointer]
+        - button "49" [ref=e317] [cursor=pointer]
+        - button "50" [ref=e319] [cursor=pointer]
+        - button "51" [ref=e321] [cursor=pointer]
+        - button "52" [ref=e323] [cursor=pointer]
+        - button "53" [ref=e325] [cursor=pointer]
+        - button "54" [ref=e327] [cursor=pointer]
+        - button "55" [ref=e329] [cursor=pointer]
+        - button "56" [ref=e331] [cursor=pointer]
+        - button "57" [ref=e333] [cursor=pointer]
+        - button "58" [ref=e335] [cursor=pointer]
+        - button "59" [ref=e337] [cursor=pointer]
+        - button "60 Luna llena" [ref=e339] [cursor=pointer]:
+          - generic [ref=e340]: "60"
+          - generic "Luna llena" [ref=e341]
+        - button "61" [ref=e344] [cursor=pointer]
+        - button "62" [ref=e346] [cursor=pointer]
+        - button "63" [ref=e348] [cursor=pointer]
+        - button "64" [ref=e350] [cursor=pointer]
+        - button "65" [ref=e352] [cursor=pointer]
+    - generic [ref=e355]:
+      - generic [ref=e356]:
+        - generic [ref=e357]: Otoño
+        - generic [ref=e358]: // 65 días
+      - generic [ref=e360]:
+        - button "1" [ref=e361] [cursor=pointer]
+        - button "2" [ref=e363] [cursor=pointer]
+        - button "3" [ref=e365] [cursor=pointer]
+        - button "4" [ref=e367] [cursor=pointer]
+        - button "5" [ref=e369] [cursor=pointer]
+        - button "6" [ref=e371] [cursor=pointer]
+        - button "7" [ref=e373] [cursor=pointer]
+        - button "8" [ref=e375] [cursor=pointer]
+        - button "9" [ref=e377] [cursor=pointer]
+        - button "10" [ref=e379] [cursor=pointer]
+        - button "11" [ref=e381] [cursor=pointer]
+        - button "12" [ref=e383] [cursor=pointer]
+        - button "13" [ref=e385] [cursor=pointer]
+        - button "14" [ref=e387] [cursor=pointer]
+        - button "15 Luna llena" [ref=e389] [cursor=pointer]:
+          - generic [ref=e390]: "15"
+          - generic "Luna llena" [ref=e391]
+        - button "16" [ref=e394] [cursor=pointer]
+        - button "17" [ref=e396] [cursor=pointer]
+        - button "18" [ref=e398] [cursor=pointer]
+        - button "19" [ref=e400] [cursor=pointer]
+        - button "20" [ref=e402] [cursor=pointer]
+        - button "21" [ref=e404] [cursor=pointer]
+        - button "22" [ref=e406] [cursor=pointer]
+        - button "23" [ref=e408] [cursor=pointer]
+        - button "24" [ref=e410] [cursor=pointer]
+        - button "25" [ref=e412] [cursor=pointer]
+        - button "26" [ref=e414] [cursor=pointer]
+        - button "27" [ref=e416] [cursor=pointer]
+        - button "28" [ref=e418] [cursor=pointer]
+        - button "29" [ref=e420] [cursor=pointer]
+        - button "30 Luna llena" [ref=e422] [cursor=pointer]:
+          - generic [ref=e423]: "30"
+          - generic "Luna llena" [ref=e424]
+        - button "31" [ref=e427] [cursor=pointer]
+        - button "32" [ref=e429] [cursor=pointer]
+        - button "33" [ref=e431] [cursor=pointer]
+        - button "34" [ref=e433] [cursor=pointer]
+        - button "35" [ref=e435] [cursor=pointer]
+        - button "36" [ref=e437] [cursor=pointer]
+        - button "37" [ref=e439] [cursor=pointer]
+        - button "38" [ref=e441] [cursor=pointer]
+        - button "39" [ref=e443] [cursor=pointer]
+        - button "40" [ref=e445] [cursor=pointer]
+        - button "41" [ref=e447] [cursor=pointer]
+        - button "42" [ref=e449] [cursor=pointer]
+        - button "43" [ref=e451] [cursor=pointer]
+        - button "44" [ref=e453] [cursor=pointer]
+        - button "45 Luna llena" [ref=e455] [cursor=pointer]:
+          - generic [ref=e456]: "45"
+          - generic "Luna llena" [ref=e457]
+        - button "46" [ref=e460] [cursor=pointer]
+        - button "47" [ref=e462] [cursor=pointer]
+        - button "48" [ref=e464] [cursor=pointer]
+        - button "49" [ref=e466] [cursor=pointer]
+        - button "50" [ref=e468] [cursor=pointer]
+        - button "51" [ref=e470] [cursor=pointer]
+        - button "52" [ref=e472] [cursor=pointer]
+        - button "53" [ref=e474] [cursor=pointer]
+        - button "54" [ref=e476] [cursor=pointer]
+        - button "55" [ref=e478] [cursor=pointer]
+        - button "56" [ref=e480] [cursor=pointer]
+        - button "57" [ref=e482] [cursor=pointer]
+        - button "58" [ref=e484] [cursor=pointer]
+        - button "59" [ref=e486] [cursor=pointer]
+        - button "60 Luna llena" [ref=e488] [cursor=pointer]:
+          - generic [ref=e489]: "60"
+          - generic "Luna llena" [ref=e490]
+        - button "61" [ref=e493] [cursor=pointer]
+        - button "62" [ref=e495] [cursor=pointer]
+        - button "63" [ref=e497] [cursor=pointer]
+        - button "64" [ref=e499] [cursor=pointer]
+        - button "65" [ref=e501] [cursor=pointer]
+    - generic [ref=e504]:
+      - generic [ref=e505]:
+        - generic [ref=e506]: Invierno
+        - generic [ref=e507]: // 65 días
+      - generic [ref=e509]:
+        - button "1" [ref=e510] [cursor=pointer]
+        - button "2" [ref=e512] [cursor=pointer]
+        - button "3" [ref=e514] [cursor=pointer]
+        - button "4" [ref=e516] [cursor=pointer]
+        - button "5" [ref=e518] [cursor=pointer]
+        - button "6" [ref=e520] [cursor=pointer]
+        - button "7" [ref=e522] [cursor=pointer]
+        - button "8" [ref=e524] [cursor=pointer]
+        - button "9" [ref=e526] [cursor=pointer]
+        - button "10" [ref=e528] [cursor=pointer]
+        - button "11" [ref=e530] [cursor=pointer]
+        - button "12" [ref=e532] [cursor=pointer]
+        - button "13" [ref=e534] [cursor=pointer]
+        - button "14" [ref=e536] [cursor=pointer]
+        - button "15 Luna llena" [ref=e538] [cursor=pointer]:
+          - generic [ref=e539]: "15"
+          - generic "Luna llena" [ref=e540]
+        - button "16" [ref=e543] [cursor=pointer]
+        - button "17" [ref=e545] [cursor=pointer]
+        - button "18" [ref=e547] [cursor=pointer]
+        - button "19" [ref=e549] [cursor=pointer]
+        - button "20" [ref=e551] [cursor=pointer]
+        - button "21" [ref=e553] [cursor=pointer]
+        - button "22" [ref=e555] [cursor=pointer]
+        - button "23" [ref=e557] [cursor=pointer]
+        - button "24" [ref=e559] [cursor=pointer]
+        - button "25" [ref=e561] [cursor=pointer]
+        - button "26" [ref=e563] [cursor=pointer]
+        - button "27" [ref=e565] [cursor=pointer]
+        - button "28" [ref=e567] [cursor=pointer]
+        - button "29" [ref=e569] [cursor=pointer]
+        - button "30 Luna llena" [ref=e571] [cursor=pointer]:
+          - generic [ref=e572]: "30"
+          - generic "Luna llena" [ref=e573]
+        - button "31" [ref=e576] [cursor=pointer]
+        - button "32" [ref=e578] [cursor=pointer]
+        - button "33" [ref=e580] [cursor=pointer]
+        - button "34" [ref=e582] [cursor=pointer]
+        - button "35" [ref=e584] [cursor=pointer]
+        - button "36" [ref=e586] [cursor=pointer]
+        - button "37" [ref=e588] [cursor=pointer]
+        - button "38" [ref=e590] [cursor=pointer]
+        - button "39" [ref=e592] [cursor=pointer]
+        - button "40" [ref=e594] [cursor=pointer]
+        - button "41" [ref=e596] [cursor=pointer]
+        - button "42" [ref=e598] [cursor=pointer]
+        - button "43" [ref=e600] [cursor=pointer]
+        - button "44" [ref=e602] [cursor=pointer]
+        - button "45 Luna llena" [ref=e604] [cursor=pointer]:
+          - generic [ref=e605]: "45"
+          - generic "Luna llena" [ref=e606]
+        - button "46" [ref=e609] [cursor=pointer]
+        - button "47" [ref=e611] [cursor=pointer]
+        - button "48" [ref=e613] [cursor=pointer]
+        - button "49" [ref=e615] [cursor=pointer]
+        - button "50" [ref=e617] [cursor=pointer]
+        - button "51" [ref=e619] [cursor=pointer]
+        - button "52" [ref=e621] [cursor=pointer]
+        - button "53" [ref=e623] [cursor=pointer]
+        - button "54" [ref=e625] [cursor=pointer]
+        - button "55" [ref=e627] [cursor=pointer]
+        - button "56" [ref=e629] [cursor=pointer]
+        - button "57" [ref=e631] [cursor=pointer]
+        - button "58" [ref=e633] [cursor=pointer]
+        - button "59" [ref=e635] [cursor=pointer]
+        - button "60 Luna llena" [ref=e637] [cursor=pointer]:
+          - generic [ref=e638]: "60"
+          - generic "Luna llena" [ref=e639]
+        - button "61" [ref=e642] [cursor=pointer]
+        - button "62" [ref=e644] [cursor=pointer]
+        - button "63" [ref=e646] [cursor=pointer]
+        - button "64" [ref=e648] [cursor=pointer]
+        - button "65" [ref=e650] [cursor=pointer]
+    - generic [ref=e652]:
+      - generic [ref=e653]: Día actual
+      - generic [ref=e655]: Luna llena (cada 15 días)
+      - generic [ref=e658]: Día con anotación
+  - contentinfo [ref=e660]:
+    - generic [ref=e661]:
+      - generic [ref=e662]: One Piece Eternal
+      - generic [ref=e663]:
+        - link "Inicio" [ref=e664] [cursor=pointer]:
+          - /url: http://localhost/iforge/index.php
+        - link "Personaje" [ref=e665] [cursor=pointer]:
+          - /url: http://localhost/iforge/personajes.php
+        - link "Trámites" [ref=e666] [cursor=pointer]:
+          - /url: http://localhost/iforge/tramites.php
+        - link "Guías" [ref=e667] [cursor=pointer]:
+          - /url: http://localhost/iforge/guias.php
+      - generic [ref=e668]: One Piece Eternal

@@ -110,12 +110,23 @@ if ($db->table_exists('rol_tramites')) {
     );
 }
 
+// Contador de anotaciones del calendario on-rol
+$cal_notas = 0;
+if ($db->table_exists('rol_calendario')) {
+    $cal_notas = (int) $db->fetch_field($db->simple_select('rol_calendario', 'COUNT(*) c'), 'c');
+}
+
 $zonas = array(
     array('grp' => 'colaborador', 'code' => 'STF-01',
         'title' => 'Gesti&oacute;n de expedientes',
         'body'  => 'Revisa, aprueba, rechaza, devuelve a revisi&oacute;n o elimina fichas. Gesti&oacute;n completa del ciclo de vida de cada expediente.',
         'meta'  => $pendientes_count . ' pendiente(s)', 'cta' => 'Revisar', 'badge' => $pendientes_count, 'href' => $bburl . '/revisar-personaje.php',
         'icon'  => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 15h6"/><path d="M9 11h6"/><path d="M9 19h3"/>'),
+    array('grp' => 'colaborador', 'code' => 'STF-13',
+        'title' => 'Calendario on-rol',
+        'body'  => 'A&ntilde;ade y edita anotaciones en los d&iacute;as del calendario del mundo (4 estaciones &times; 65 d&iacute;as). Las anotaciones son visibles para todos los jugadores en el calendario p&uacute;blico.',
+        'meta'  => $cal_notas . ' anotaci&oacute;n(es)', 'cta' => 'Editar calendario', 'badge' => 0, 'href' => $bburl . '/gestionar-calendario.php',
+        'icon'  => '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/>'),
     array('grp' => 'webmaster', 'code' => 'STF-02',
         'title' => 'Gesti&oacute;n de staff',
         'body'  => 'Asigna el rol (Colaborador, Moderador, Administrador, Web Master) y el a&ntilde;adido de Narrador a cada personaje, y consulta los permisos de cada rol.',

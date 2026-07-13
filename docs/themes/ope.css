@@ -343,6 +343,91 @@ img.icon{width:16px;height:16px;vertical-align:middle;display:inline}
 .ope-tplbar-l{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:1px;color:var(--paper-dim)}
 .ope-tplbtn{font-family:var(--mono);font-size:.68rem;font-weight:700;padding:6px 11px;background:var(--iron);color:var(--paper);border:2px solid #000;box-shadow:2px 2px 0 #000;cursor:pointer}
 .ope-tplbtn:hover{background:var(--ember);color:var(--iron);transform:translate(-1px,-1px);box-shadow:3px 3px 0 #000}
+
+/* ============================================================
+   RPG SYSTEM — panel del editor (newthread/newreply/editpost)
+   ============================================================ */
+/* Panel RPG System del editor — vive DEBAJO del textarea del post.
+   position+z-index para que los popovers de cartas se dibujen POR ENCIMA
+   del editor/textarea (que en algunos casos crea su propio contexto). */
+.ope-rpg{position:relative;z-index:40;border:2px solid #000;background:var(--iron-plate);margin:10px 0 0;box-shadow:4px 4px 0 rgba(0,0,0,.35)}
+.ope-rpg .ope-rpg-panel.is-on{position:relative;z-index:40}
+.ope-rpg-head{display:flex;align-items:center;gap:10px;background:var(--iron-edge);border-bottom:2px solid #000;padding:8px 12px}
+.ope-rpg-badge{font-family:var(--disp);font-weight:900;font-size:.9rem;text-transform:uppercase;letter-spacing:1px;color:var(--iron);background:var(--ember);padding:3px 11px;border:2px solid #000}
+.ope-rpg-hint{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim)}
+.ope-rpg-tabs{display:flex;gap:3px;padding:10px 12px 0;background:var(--iron-plate)}
+.ope-rpg-tab{font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:8px 16px;background:var(--iron);color:var(--paper-dim);border:2px solid #000;border-bottom:none;cursor:pointer}
+.ope-rpg-tab:hover{color:var(--paper)}
+.ope-rpg-tab.is-on{background:var(--ember);color:var(--iron)}
+.ope-rpg-panel{display:none;padding:13px;border-top:2px solid #000;background:var(--iron-plate)}
+.ope-rpg-panel.is-on{display:block}
+.ope-rpg-chips{display:flex;flex-wrap:wrap;gap:7px}
+.ope-rpg-chip{font-family:var(--mono);font-size:.68rem;font-weight:700;padding:6px 11px;background:var(--iron);color:var(--paper);border:2px solid #000;box-shadow:2px 2px 0 #000;cursor:pointer}
+.ope-rpg-chip:hover{background:var(--ember);color:var(--iron);transform:translate(-1px,-1px);box-shadow:3px 3px 0 #000}
+.ope-rpg-note{font-family:var(--mono);font-size:.64rem;line-height:1.5;color:var(--paper-dim);margin:0 0 11px}
+.ope-rpg-note b{color:var(--ember-hi)}
+.ope-rpg-empty{font-family:var(--mono);font-size:.62rem;color:var(--ash);font-style:italic}
+/* Selector de cartas: chip con NOMBRE; al pasar el cursor, naipe completo */
+.ope-rpg-cards{display:flex;flex-wrap:wrap;gap:8px}
+.ope-rpg-cardpick{position:relative;display:inline-flex;align-items:center;gap:8px;padding:7px 12px;background:var(--iron);color:var(--paper);border:2px solid #000;box-shadow:2px 2px 0 #000;cursor:pointer;font-family:var(--mono);font-size:.7rem;font-weight:700}
+.ope-rpg-cardpick:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 #000;z-index:2}
+.ope-rpg-cardpick:focus-visible{outline:3px solid var(--ember-hi);outline-offset:2px}
+.ope-rpg-cardpick-check{flex:0 0 auto;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--rivet);color:transparent;font-size:.6rem;line-height:1;background:var(--iron-plate)}
+.ope-rpg-cardpick-name{white-space:nowrap}
+.ope-rpg-cardpick.is-sel{background:var(--iron-edge);box-shadow:2px 2px 0 #000,0 0 0 2px var(--ember) inset}
+.ope-rpg-cardpick.is-sel .ope-rpg-cardpick-check{border-color:#000;background:var(--ember);color:var(--iron)}
+/* Popover con el naipe entero al hacer hover/focus */
+.ope-rpg-cardpick-pop{position:absolute;left:0;bottom:calc(100% + 10px);z-index:9999;width:280px;display:none;cursor:default;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+.ope-rpg-cardpick-pop::after{content:"";position:absolute;top:100%;left:22px;border:8px solid transparent;border-top-color:#000}
+.ope-rpg-cardpick:hover .ope-rpg-cardpick-pop,.ope-rpg-cardpick:focus-within .ope-rpg-cardpick-pop{display:block}
+.ope-rpg-selinfo{margin-top:12px;font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.3px;color:var(--paper-dim)}
+.ope-rpg-selinfo[data-count="0"]{color:var(--ash);font-style:italic;font-weight:400}
+@media(max-width:560px){.ope-rpg-cardpick-pop{width:230px}}
+
+/* ============================================================
+   RPG SYSTEM — bloque pegado FUERA del post (bajo el <article>),
+   COLAPSABLE y colapsado por defecto. Zona extensible.
+   ============================================================ */
+.ope-post:has(+ .ope-rpgsys){margin-bottom:0}
+.ope-rpgsys{position:relative;border:2px solid #000;border-top:none;background:var(--iron-plate);box-shadow:4px 6px 0 rgba(0,0,0,.28);margin:-2px 0 22px;overflow:hidden}
+.ope-rpgsys::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ember),var(--ember-hi));z-index:1}
+.ope-rpgsys-h{width:100%;display:flex;align-items:center;gap:10px;background:var(--iron-edge);border:none;border-bottom:2px solid #000;padding:10px 14px;cursor:pointer;text-align:left;font:inherit}
+.ope-rpgsys.is-collapsed .ope-rpgsys-h{border-bottom:none}
+.ope-rpgsys-h:hover{background:var(--iron)}
+.ope-rpgsys-badge{font-family:var(--disp);font-weight:900;font-size:.86rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--iron);background:var(--ember);padding:3px 12px;border:2px solid #000}
+.ope-rpgsys-meta{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--paper-dim)}
+.ope-rpgsys-toggle{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--paper);background:var(--iron-plate);border:2px solid #000;padding:3px 10px;box-shadow:2px 2px 0 #000}
+.ope-rpgsys-toggle::after{content:"\25BC";font-size:.55rem;transition:transform .15s ease}
+.ope-rpgsys-h[aria-expanded="true"] .ope-rpgsys-toggle::after{transform:rotate(180deg)}
+.ope-rpgsys-b[hidden]{display:none}
+.ope-rpgsys-b{padding:16px 14px}
+.ope-rpgsys-sec+.ope-rpgsys-sec{margin-top:18px;padding-top:15px;border-top:2px dashed var(--rivet)}
+.ope-rpgsys-sec-h{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--paper-dim);margin-bottom:12px}
+
+/* Editor completo (SCEditor) dentro de la placa Herramientas: que el widget
+   ocupe el ancho y no se salga del recuadro. */
+.ope-tools .ope-plate-b{padding-top:12px}
+.ope-tools .sceditor-container{width:100%!important;max-width:100%;border:2px solid #000;box-sizing:border-box;background:var(--iron)}
+.ope-tools .sceditor-container textarea,.ope-tools .sceditor-container iframe{box-sizing:border-box}
+.ope-tools div.sceditor-toolbar{background:var(--iron-edge);border-bottom:2px solid #000}
+.ope-tools .sceditor-button{background:var(--iron-plate)}
+.ope-tools textarea#message{box-sizing:border-box}
+
+/* ============================================================
+   RPG SYSTEM — bloques renderizados dentro de los posts
+   ============================================================ */
+.ope-cbt,.ope-accion,.ope-cbt-tk{border:2px solid #000;margin:10px 0;box-shadow:3px 3px 0 rgba(0,0,0,.2);background:var(--concrete)}
+.ope-cbt-h,.ope-accion-h,.ope-cbt-tk-h{font-family:var(--disp);font-weight:800;font-size:.95rem;text-transform:uppercase;letter-spacing:.5px;padding:7px 12px;border-bottom:2px solid #000;color:var(--paper);background:var(--iron)}
+.ope-cbt-b,.ope-accion-b,.ope-cbt-tk-b{padding:10px 12px;font-family:var(--mono);font-size:.8rem;line-height:1.6;color:var(--ink)}
+.ope-accion{border-left:4px solid var(--ember)}
+.ope-accion-h{background:var(--iron-edge)}
+.ope-cbt-tk{border-color:var(--gold-deep)}
+.ope-cbt-tk-h{background:var(--gold-deep);color:var(--iron)}
+.ope-estado{display:inline-block;font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:2px 9px;border:2px solid #000;margin:0 3px 3px 0;color:var(--iron);background:var(--paper-dim)}
+.ope-estado--positivo{background:var(--patina);color:#06121f}
+.ope-estado--negativo{background:var(--crack);color:#fff}
+.ope-estado--neutral{background:var(--concrete-2);color:var(--ink)}
+.ope-dado{display:inline-block;font-family:var(--mono);font-size:.72rem;font-weight:700;padding:2px 9px;border:2px dashed var(--ink-2);color:var(--ink);background:var(--concrete-2);margin:0 3px 3px 0}
 /* Barra de acciones del post (Citar/Responder/Edit/Delete/Restore/Report/Warn):
    vive en .ope-post-head, ARRIBA del mensaje, compacta y alineada a la derecha. */
 .ope-post-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
@@ -3315,12 +3400,48 @@ body.ope-pg-calendario-onrol .ocal-form-actions{display:flex;gap:8px;padding:0 1
   body.ope-pg-calendario-onrol .ocal-nav{flex-direction:column;align-items:flex-start}
 }
 
+body.ope-pg-ficha .ope-ficha-vitals{margin:0}
+body.ope-pg-ficha .ope-ficha-vitals .ope-prog-vital{background:var(--fac-surface2)}
+
 /* ============================================================
    PROGRESIÓN — página progresion.php (PP + stats)
    ============================================================ */
 
+body.ope-pg-progresion .btn{font-family:var(--mono);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 20px;border:2px solid #000;cursor:pointer;transition:transform .12s,box-shadow .12s;display:inline-block}
+body.ope-pg-progresion .plate{border:2px solid #000;background:var(--iron-plate);margin-bottom:12px;box-shadow:3px 3px 0 rgba(0,0,0,.25)}
+body.ope-pg-progresion .plate-b{padding:13px}
+body.ope-pg-progresion .shead{display:flex;align-items:baseline;gap:14px;margin:8px 0 14px}
+body.ope-pg-progresion .shead h1,body.ope-pg-progresion .shead h2{font-family:var(--disp);font-weight:800;font-size:2rem;text-transform:uppercase;color:var(--paper);line-height:1}
+body.ope-pg-progresion .shead .code{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ember-hi);letter-spacing:1px}
+body.ope-pg-progresion .shead .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--rivet) 0 6px,transparent 6px 12px)}
+body.ope-pg-progresion .pj-intro{font-size:.92rem;color:var(--paper-dim);max-width:70ch;margin:-6px 0 18px;line-height:1.55}
+body.ope-pg-progresion .pj-intro b{color:var(--paper);font-weight:600}
+body.ope-pg-progresion .pj-empty{color:var(--paper-dim);font-size:.9rem;line-height:1.55}
+body.ope-pg-progresion .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
+body.ope-pg-progresion .reveal.vis{opacity:1;transform:none}
+body.ope-pg-progresion .flash{border:2px solid #000;padding:11px 14px;margin-bottom:16px;font-family:var(--mono);font-size:.74rem;font-weight:700;letter-spacing:.3px;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+body.ope-pg-progresion .flash.ok{background:var(--patina);color:var(--iron)}
+body.ope-pg-progresion .flash.error{background:var(--crack);color:#fff}
+body.ope-pg-progresion .flash.warn{background:var(--h6);color:var(--iron)}
+
+/* Hero de progreso (rango + barra al siguiente + PP) */
+.ope-prog-hero{display:grid;grid-template-columns:auto 1fr auto;gap:0;border:2px solid #000;background:var(--iron-plate);box-shadow:5px 5px 0 rgba(0,0,0,.35);margin-bottom:18px}
+.ope-prog-hero-rank{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 22px;background:var(--iron-edge);border-right:2px solid #000}
+.ope-prog-hero-rank-val{font-family:var(--disp);font-weight:900;font-size:3.2rem;line-height:.9;color:var(--gold-hi);text-shadow:0 2px 0 #000}
+.ope-prog-hero-rank-lbl{font-family:var(--mono);font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);margin-top:4px}
+.ope-prog-hero-track{padding:16px 22px;display:flex;flex-direction:column;justify-content:center;gap:8px;min-width:0}
+.ope-prog-hero-track-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.4px;color:var(--paper-dim)}
+.ope-prog-hero-track-top b{color:var(--gold-hi)}
+.ope-prog-hero-bar{height:14px;border:2px solid #000;background:var(--iron);overflow:hidden;box-shadow:inset 0 0 0 1px var(--rivet)}
+.ope-prog-hero-bar span{display:block;height:100%;background:repeating-linear-gradient(45deg,var(--patina) 0 8px,var(--patina-hi) 8px 16px);transition:width .4s}
+.ope-prog-hero-note{font-family:var(--mono);font-size:.66rem;line-height:1.5;color:var(--paper-dim);margin:0}
+.ope-prog-hero-note b{color:var(--paper)}
+.ope-prog-hero-pp{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 24px;background:var(--iron-edge);border-left:2px solid #000}
+.ope-prog-hero-pp-val{font-family:var(--disp);font-weight:900;font-size:2.6rem;line-height:.9;color:var(--gold-hi);text-shadow:0 2px 0 #000}
+.ope-prog-hero-pp-lbl{font-family:var(--mono);font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);margin-top:4px}
+@media(max-width:760px){.ope-prog-hero{grid-template-columns:1fr}.ope-prog-hero-rank{border-right:none;border-bottom:2px solid #000;flex-direction:row;gap:12px}.ope-prog-hero-pp{border-left:none;border-top:2px solid #000;flex-direction:row;gap:12px}}
+
 /* Barra de PP */
-/* Progresión: barra de PP */
 .ope-prog-ppbar{border:2px solid #000;background:var(--iron-plate);display:grid;grid-template-columns:1fr auto;margin-bottom:18px;box-shadow:5px 5px 0 rgba(0,0,0,.35)}
 
 /* Progresión: vitales de combate (PV/EN/PA/Rango) */
@@ -3351,6 +3472,9 @@ body.ope-pg-calendario-onrol .ocal-form-actions{display:flex;gap:8px;padding:0 1
 .ope-prog-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .ope-prog-stat{border:2px solid #000;background:var(--iron-plate);padding:12px;box-shadow:3px 3px 0 rgba(0,0,0,.25);transition:border-color .15s}
 .ope-prog-stat--up{border-color:var(--gold);box-shadow:3px 3px 0 rgba(255,203,147,.25)}
+.ope-prog-stat--penalized{border-color:var(--crack);box-shadow:3px 3px 0 rgba(255,90,90,.2)}
+.ope-prog-stat-dot--zero{flex:0 0 8px;background:var(--crack);border-color:#000}
+.ope-prog-stat-hint{font-family:var(--mono);font-size:.55rem;color:var(--crack);text-transform:uppercase;letter-spacing:.3px}
 .ope-prog-stat-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .ope-prog-stat-key{font-family:var(--disp);font-weight:900;font-size:1.1rem;color:var(--patina-hi);line-height:1;text-transform:uppercase}
 .ope-prog-stat-name{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim);letter-spacing:.3px}
@@ -3371,22 +3495,298 @@ body.ope-pg-calendario-onrol .ocal-form-actions{display:flex;gap:8px;padding:0 1
 @media(max-width:400px){.ope-prog-stats-grid{grid-template-columns:1fr}}
 
 /* Tabla de historial */
-.ope-prog-log{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.68rem}
-.ope-prog-log thead{background:var(--iron-edge)}
-.ope-prog-log th{text-align:left;padding:8px 12px;font-weight:700;text-transform:uppercase;font-size:.58rem;letter-spacing:.5px;color:var(--paper-dim);border-bottom:2px solid #000}
-.ope-prog-log td{padding:7px 12px;border-bottom:1px solid var(--concrete-line);color:var(--ink)}
-.ope-prog-log-pp{font-weight:700;text-align:center;font-family:var(--disp);font-size:.95rem}
-.ope-prog-log-gan .ope-prog-log-pp{color:var(--patina-hi)}
-.ope-prog-log-gas .ope-prog-log-pp{color:var(--crack)}
-.ope-prog-log-gan td:first-child{border-left:3px solid var(--patina)}
-.ope-prog-log-gas td:first-child{border-left:3px solid var(--crack)}
-
-/* Flash messages (reusable) */
-.flash{padding:12px 16px;margin-bottom:14px;border:2px solid #000;font-family:var(--mono);font-size:.75rem;font-weight:700;box-shadow:4px 4px 0 rgba(0,0,0,.25)}
-.flash.ok{background:var(--patina);color:var(--iron)}
-.flash.error{background:var(--crack);color:#fff}
-.flash.warn{background:var(--gold);color:var(--iron)}
+body.ope-pg-progresion .ope-prog-log{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.68rem}
+body.ope-pg-progresion .ope-prog-log thead{background:var(--iron-edge)}
+body.ope-pg-progresion .ope-prog-log th{text-align:left;padding:8px 12px;font-weight:700;text-transform:uppercase;font-size:.58rem;letter-spacing:.5px;color:var(--paper-dim);border-bottom:2px solid #000}
+body.ope-pg-progresion .ope-prog-log td{padding:7px 12px;border-bottom:1px solid var(--iron-hi);color:var(--paper-dim)}
+body.ope-pg-progresion .ope-prog-log-pp{font-weight:700;text-align:center;font-family:var(--disp);font-size:.95rem;color:var(--paper)}
+body.ope-pg-progresion .ope-prog-log-gan .ope-prog-log-pp{color:var(--patina-hi)}
+body.ope-pg-progresion .ope-prog-log-gas .ope-prog-log-pp{color:var(--crack)}
+body.ope-pg-progresion .ope-prog-log-gan td:first-child{border-left:3px solid var(--patina)}
+body.ope-pg-progresion .ope-prog-log-gas td:first-child{border-left:3px solid var(--crack)}
 
 /* Utility: form inline + plate sin padding */
-.ope-prog-form-inline{display:inline}
-.ope-prog-plate-nopad{padding:0!important}
+body.ope-pg-progresion .ope-prog-form-inline{display:inline}
+body.ope-pg-progresion .ope-prog-plate-nopad{padding:0!important}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Oráculo de Viaje — post OP-Eternal + panel showthread + wizard viajes.php
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* --- Bloque del oráculo dentro del post --- */
+.ope-viaje-oraculo{
+  --vo-sea:var(--op-ocean,#10477B);
+  --vo-sky:var(--op-sky,#41A4E0);
+  --vo-peach:var(--op-peach,#FFCB93);
+  --vo-glow:rgba(65,164,224,.35);
+  position:relative;margin:14px 0 0;padding:0;border:3px solid #000;
+  background:linear-gradient(165deg,#0a2f52 0%,var(--vo-sea) 38%,#062238 100%);
+  box-shadow:8px 8px 0 rgba(0,0,0,.45),inset 0 0 80px rgba(65,164,224,.08);
+  overflow:hidden;
+}
+.ope-viaje-oraculo::before{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.45;
+  background:
+    radial-gradient(ellipse 120% 60% at 50% -10%,rgba(255,233,163,.25),transparent 55%),
+    repeating-linear-gradient(90deg,transparent 0 48px,rgba(255,255,255,.015) 48px 49px);
+  animation:ope-vo-shimmer 12s ease-in-out infinite alternate;
+}
+@keyframes ope-vo-shimmer{0%{opacity:.35}100%{opacity:.55}}
+
+.ope-vo-head{position:relative;padding:22px 24px 18px;border-bottom:3px solid #000;background:rgba(0,0,0,.22)}
+.ope-vo-kicker{font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--vo-peach);margin-bottom:6px}
+.ope-vo-titulo{font-family:var(--disp);font-weight:900;font-size:clamp(1.25rem,3vw,1.85rem);line-height:1.1;color:#fff;text-shadow:0 3px 0 #000;margin:0 0 12px}
+.ope-vo-meta{display:flex;flex-wrap:wrap;gap:8px 14px;font-family:var(--mono);font-size:.62rem;color:rgba(255,255,255,.75)}
+.ope-vo-meta span{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.12);padding:4px 10px;border-radius:2px}
+.ope-vo-trip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.ope-vo-trip{font-family:var(--mono);font-size:.62rem;background:var(--iron-plate);color:var(--paper);border:2px solid #000;padding:4px 10px;box-shadow:2px 2px 0 rgba(0,0,0,.3)}
+.ope-vo-trip small{color:var(--paper-dim);text-transform:uppercase;font-size:.52rem}
+
+.ope-vo-tramo{position:relative;padding:20px 22px;border-bottom:2px solid rgba(0,0,0,.35)}
+.ope-vo-tramo:last-of-type{border-bottom:none}
+.ope-vo-tramo-titulo{font-family:var(--disp);font-weight:800;font-size:1rem;text-transform:uppercase;letter-spacing:.6px;color:var(--vo-peach);margin:0 0 14px;padding-left:12px;border-left:4px solid var(--ember)}
+
+.ope-vo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;perspective:900px}
+@media(max-width:860px){.ope-vo-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.ope-vo-grid{grid-template-columns:1fr}}
+
+.ope-vo-card{
+  position:relative;border:2px solid #000;background:var(--iron-plate);
+  padding:14px 12px 12px;text-align:center;min-height:148px;
+  box-shadow:4px 4px 0 rgba(0,0,0,.35);
+  transform-style:preserve-3d;transition:transform .2s,box-shadow .2s;
+}
+.ope-vo-card:hover{transform:translateY(-3px) rotateX(4deg);box-shadow:6px 8px 0 rgba(0,0,0,.4)}
+.ope-vo-card-icon{font-size:2rem;line-height:1;margin-bottom:6px;filter:drop-shadow(0 2px 0 #000)}
+.ope-vo-card-label{font-family:var(--mono);font-size:.52rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);margin-bottom:4px}
+.ope-vo-card-valor{font-family:var(--disp);font-weight:800;font-size:.82rem;line-height:1.25;color:var(--paper);margin-bottom:6px}
+.ope-vo-card-efecto{font-family:var(--mono);font-size:.58rem;line-height:1.45;color:var(--paper-dim);margin-bottom:8px}
+.ope-vo-card-roll{font-family:var(--mono);font-size:.52rem;color:var(--ash);border-top:1px dashed var(--iron-hi);padding-top:6px;margin-top:auto}
+
+/* Tonos de carta */
+.ope-vo-card.tone-crit{border-top:4px solid #ff3b3b;background:linear-gradient(180deg,#3a1010,var(--iron-plate))}
+.ope-vo-card.tone-bad{border-top:4px solid var(--crack)}
+.ope-vo-card.tone-warn{border-top:4px solid var(--gold)}
+.ope-vo-card.tone-neutral{border-top:4px solid var(--ash)}
+.ope-vo-card.tone-good{border-top:4px solid var(--patina-hi)}
+.ope-vo-card.tone-great{border-top:4px solid var(--vo-peach);box-shadow:4px 4px 0 rgba(255,203,147,.25)}
+
+.ope-vo-clima .ope-vo-card-label{color:var(--vo-sky)}
+.ope-vo-encuentro .ope-vo-card-label{color:var(--ember-hi)}
+.ope-vo-hallazgo .ope-vo-card-label{color:var(--gold-hi)}
+.ope-vo-peligro .ope-vo-card-label{color:var(--crack)}
+
+.ope-vo-narrativa{margin-top:14px;padding:12px 14px;border:2px dashed rgba(255,203,147,.35);background:rgba(0,0,0,.2)}
+.ope-vo-narrativa p{font-family:var(--mono);font-size:.68rem;line-height:1.6;color:rgba(255,255,255,.82);margin:0;font-style:italic}
+
+.ope-vo-footer{display:grid;grid-template-columns:1.2fr .8fr;gap:0;border-top:3px solid #000;background:rgba(0,0,0,.25)}
+@media(max-width:720px){.ope-vo-footer{grid-template-columns:1fr}}
+.ope-vo-reglas,.ope-vo-oficios{padding:18px 20px}
+.ope-vo-oficios{border-left:2px solid #000}
+@media(max-width:720px){.ope-vo-oficios{border-left:none;border-top:2px solid #000}}
+.ope-vo-reglas h4,.ope-vo-oficios h4{font-family:var(--disp);font-size:.78rem;text-transform:uppercase;color:var(--vo-peach);margin:0 0 10px}
+.ope-vo-reglas ul{margin:0;padding-left:18px;font-family:var(--mono);font-size:.62rem;line-height:1.65;color:rgba(255,255,255,.78)}
+.ope-vo-oficios-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.ope-vo-oficio{display:flex;justify-content:space-between;align-items:center;background:var(--iron-plate);border:2px solid #000;padding:6px 10px;font-family:var(--mono);font-size:.62rem}
+.ope-vo-oficio-v{font-family:var(--disp);font-weight:900;color:var(--gold-hi)}
+
+/* Cierre manual */
+.ope-vo-cierre .ope-vo-head--cierre{background:linear-gradient(135deg,#0d3d2a,#10477B)}
+.ope-vo-cierre-lead{font-family:var(--mono);font-size:.72rem;line-height:1.6;color:rgba(255,255,255,.85);margin:0}
+.ope-vo-narrativa--cierre{border-style:solid;border-color:var(--patina);margin:0 22px 22px}
+
+/* Panel lateral en showthread */
+.ope-viaje-panel{
+  margin:0 0 18px;border:3px solid #000;background:linear-gradient(135deg,var(--iron-plate),var(--iron-edge));
+  box-shadow:6px 6px 0 rgba(0,0,0,.35);overflow:hidden;
+}
+.ope-viaje-panel-h{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 16px;background:var(--iron-edge);border-bottom:2px solid #000}
+.ope-viaje-panel-badge{font-family:var(--disp);font-weight:900;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;background:var(--op-ocean);color:var(--vo-peach,#FFCB93);padding:4px 12px;border:2px solid #000}
+.ope-viaje-panel-route{font-family:var(--mono);font-size:.68rem;color:var(--paper);font-weight:700}
+.ope-viaje-panel-b{padding:16px 18px}
+.ope-viaje-panel-stats{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.ope-viaje-panel-stats span{flex:1;min-width:72px;text-align:center;border:2px solid #000;background:var(--iron);padding:10px 8px}
+.ope-viaje-panel-stats b{display:block;font-family:var(--disp);font-size:1.35rem;color:var(--gold-hi);line-height:1}
+.ope-viaje-panel-stats small{display:block;font-family:var(--mono);font-size:.52rem;text-transform:uppercase;color:var(--paper-dim);margin-top:4px}
+.ope-viaje-st-on b{color:var(--patina-hi)}
+.ope-viaje-st-off b{color:var(--ash)}
+.ope-viaje-panel-note{font-family:var(--mono);font-size:.64rem;line-height:1.55;color:var(--paper-dim);margin:0 0 12px}
+.ope-viaje-panel-note--done{color:var(--patina-hi)}
+.ope-viaje-cerrar-form{margin-bottom:12px}
+.ope-btn-sm{padding:6px 12px!important;font-size:.62rem!important}
+
+/* --- Wizard viajes.php --- */
+body.ope-pg-viajes .ope-vj-lead{
+  max-width:75ch;margin:14px 0 0;font-family:var(--body);font-size:1rem;line-height:1.7;
+  color:var(--paper-dim);text-wrap:pretty;
+}
+body.ope-pg-viajes .ope-vj-lead strong{color:var(--paper)}
+body.ope-pg-viajes .ope-vj-facts{
+  display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin-top:22px;
+  border:2px solid rgba(255,255,255,.12);
+}
+body.ope-pg-viajes .ope-vj-facts span{
+  flex:1;min-width:180px;display:grid;grid-template-columns:32px 1fr;grid-template-rows:auto auto;
+  align-items:center;padding:14px 16px;border-right:2px solid rgba(255,255,255,.12);
+  font-family:var(--mono);font-size:.66rem;line-height:1.35;color:var(--ash);
+}
+body.ope-pg-viajes .ope-vj-facts span:last-child{border-right:0}
+body.ope-pg-viajes .ope-vj-facts i{grid-row:1/3;font-size:1.35rem;color:var(--ember-hi)}
+body.ope-pg-viajes .ope-vj-facts b{display:block;font-size:.72rem;color:var(--paper)}
+
+/* Layout de dos columnas: imagen izquierda + wizard derecha */
+body.ope-pg-viajes .ope-vj-layout{
+  display:grid;grid-template-columns:minmax(260px,340px) 1fr;gap:24px;align-items:start;margin-top:28px;
+}
+body.ope-pg-viajes .ope-vj-aside{
+  position:sticky;top:20px;margin:0;border:3px solid #000;overflow:hidden;
+  background:var(--iron);box-shadow:6px 6px 0 rgba(0,0,0,.4);
+}
+body.ope-pg-viajes .ope-vj-aside img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;object-position:center}
+body.ope-pg-viajes .ope-vj-aside-placeholder{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  aspect-ratio:4/5;padding:24px;color:var(--rivet);text-align:center;
+  background:linear-gradient(135deg,var(--iron-edge),var(--iron-plate));
+}
+body.ope-pg-viajes .ope-vj-aside-placeholder i{font-size:4.5rem;color:var(--patina);filter:drop-shadow(4px 4px 0 #000)}
+body.ope-pg-viajes .ope-vj-aside-placeholder span{font-family:var(--mono);font-size:.68rem;color:var(--paper-dim)}
+body.ope-pg-viajes .ope-vj-aside figcaption{
+  padding:14px 16px;border-top:2px solid #000;background:var(--iron-plate);
+  font-family:var(--body);font-size:.8rem;line-height:1.45;color:var(--paper-dim);
+}
+body.ope-pg-viajes .ope-vj-aside figcaption span{
+  display:block;margin-bottom:3px;font-family:var(--mono);font-size:.62rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ember-hi);
+}
+body.ope-pg-viajes .ope-vj-layout .ope-vj-wizard{min-width:0}
+
+body.ope-pg-viajes .ope-vj-wizard{
+  border:3px solid #000;background:var(--iron-plate);
+  box-shadow:8px 8px 0 rgba(0,0,0,.4);overflow:hidden;
+}
+body.ope-pg-viajes .ope-vj-steps{
+  display:grid;grid-template-columns:repeat(4,1fr);border-bottom:3px solid #000;background:var(--iron-edge);
+}
+body.ope-pg-viajes .ope-vj-step{
+  display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:10px 14px;
+  border:0;border-right:2px solid #000;background:transparent;color:var(--paper-dim);cursor:pointer;
+  font-family:var(--mono);font-size:.7rem;font-weight:700;transition:background .18s,color .18s;
+}
+body.ope-pg-viajes .ope-vj-step:last-child{border-right:none}
+body.ope-pg-viajes .ope-vj-step span{
+  display:grid;place-items:center;width:30px;height:30px;border:2px solid var(--rivet);
+  background:var(--iron);font-size:.62rem;color:var(--ash);
+}
+body.ope-pg-viajes .ope-vj-step:hover{background:var(--iron-hi);color:var(--paper)}
+body.ope-pg-viajes .ope-vj-step.is-on{background:var(--ember);color:var(--iron-edge)}
+body.ope-pg-viajes .ope-vj-step.is-on span{border-color:#000;background:var(--iron-edge);color:var(--ember-hi)}
+body.ope-pg-viajes .ope-vj-step:focus-visible,
+body.ope-pg-viajes .ope-vj-sel:focus-visible,
+body.ope-pg-viajes .ope-vj-inp:focus-visible,
+body.ope-pg-viajes .ope-vj-ta:focus-visible{outline:3px solid var(--ember-hi);outline-offset:-3px}
+
+body.ope-pg-viajes .ope-vj-panel{display:none;padding:32px}
+body.ope-pg-viajes .ope-vj-panel.is-on{display:block}
+body.ope-pg-viajes .ope-vj-panel[hidden]{display:none}
+body.ope-pg-viajes .ope-vj-panel-head{max-width:68ch;margin-bottom:28px}
+body.ope-pg-viajes .ope-vj-panel-head h2{
+  margin:0 0 6px;font-family:var(--disp);font-size:1.7rem;font-weight:900;
+  line-height:1;text-transform:uppercase;color:var(--paper);
+}
+body.ope-pg-viajes .ope-vj-panel-head p{margin:0;font-family:var(--body);font-size:1rem;line-height:1.55;color:var(--paper-dim)}
+
+body.ope-pg-viajes .ope-vj-route-grid{display:grid;grid-template-columns:1fr 54px 1fr;gap:12px;align-items:end;margin-bottom:16px}
+body.ope-pg-viajes .ope-vj-route-arrow{
+  display:grid;place-items:center;width:54px;height:48px;margin-bottom:14px;border:2px solid #000;
+  background:var(--iron-edge);font-family:var(--disp);font-size:1.8rem;color:var(--ember-hi);
+}
+
+body.ope-pg-viajes .ope-vj-field{margin-bottom:16px}
+body.ope-pg-viajes .ope-vj-field label{
+  display:block;margin-bottom:7px;font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--paper);
+}
+body.ope-pg-viajes .ope-vj-sel,body.ope-pg-viajes .ope-vj-inp,body.ope-pg-viajes .ope-vj-ta{
+  width:100%;min-height:48px;padding:11px 13px;border:2px solid #000;background:var(--iron);color:var(--paper);
+  font-family:var(--body);font-size:1rem;line-height:1.45;transition:border-color .18s,background .18s;
+}
+body.ope-pg-viajes .ope-vj-ta{min-height:104px;resize:vertical}
+body.ope-pg-viajes .ope-vj-sel:hover,body.ope-pg-viajes .ope-vj-inp:hover,body.ope-pg-viajes .ope-vj-ta:hover{border-color:var(--rivet)}
+body.ope-pg-viajes .ope-vj-inp::placeholder,body.ope-pg-viajes .ope-vj-ta::placeholder{color:var(--ash);opacity:1}
+body.ope-pg-viajes .ope-vj-preview{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:16px 18px;margin-bottom:20px;border:2px solid var(--rivet);background:var(--iron-edge);
+}
+body.ope-pg-viajes .ope-vj-preview-k{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--paper-dim)}
+body.ope-pg-viajes .ope-vj-preview-v{font-family:var(--disp);font-weight:900;font-size:1.55rem;color:var(--ember-hi)}
+
+body.ope-pg-viajes .ope-vj-barco-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+body.ope-pg-viajes .ope-vj-barco-card{cursor:pointer}
+body.ope-pg-viajes .ope-vj-barco-card input,
+body.ope-pg-viajes .ope-vj-crew-chip input{position:absolute;width:1px;height:1px;opacity:0}
+body.ope-pg-viajes .ope-vj-barco-in{
+  display:block;min-height:92px;padding:16px 14px;border:2px solid #000;background:var(--iron);
+  box-shadow:3px 3px 0 rgba(0,0,0,.25);transition:transform .18s,border-color .18s,box-shadow .18s,background .18s;
+}
+body.ope-pg-viajes .ope-vj-barco-card input:checked + .ope-vj-barco-in{
+  border-color:var(--ember-hi);box-shadow:4px 4px 0 rgba(255,203,147,.3);transform:translateY(-2px);background:var(--iron-hi);
+}
+body.ope-pg-viajes .ope-vj-barco-card input:focus-visible + .ope-vj-barco-in,
+body.ope-pg-viajes .ope-vj-crew-chip input:focus-visible + span{outline:3px solid var(--ember-hi);outline-offset:2px}
+body.ope-pg-viajes .ope-vj-barco-in strong{display:block;margin-bottom:5px;font-family:var(--disp);font-size:1rem;color:var(--paper)}
+body.ope-pg-viajes .ope-vj-barco-in small{font-family:var(--mono);font-size:.66rem;line-height:1.45;color:var(--paper-dim)}
+
+body.ope-pg-viajes .ope-vj-crew{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+body.ope-pg-viajes .ope-vj-crew-chip{cursor:pointer}
+body.ope-pg-viajes .ope-vj-crew-chip span{
+  display:inline-grid;place-items:center;min-height:44px;padding:9px 14px;border:2px solid #000;
+  background:var(--iron);font-family:var(--mono);font-size:.72rem;transition:background .18s,color .18s,box-shadow .18s;
+}
+body.ope-pg-viajes .ope-vj-crew-chip input:checked + span{background:var(--ember);color:var(--iron-edge);box-shadow:3px 3px 0 #000}
+
+body.ope-pg-viajes .ope-vj-note,body.ope-pg-viajes .ope-vj-empty,body.ope-pg-viajes .ope-vj-warn{
+  margin:0 0 16px;font-family:var(--body);font-size:1rem;line-height:1.55;color:var(--paper-dim);
+}
+body.ope-pg-viajes .ope-vj-warn{padding:14px 16px;border:2px solid var(--gold);background:rgba(255,203,147,.1);color:var(--paper)}
+
+body.ope-pg-viajes .ope-vj-nav-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:16px}
+body.ope-pg-viajes .ope-vj-summary{
+  border:2px solid #000;background:var(--iron);padding:16px;margin-bottom:14px;
+}
+body.ope-pg-viajes .ope-vj-sum-row{display:flex;justify-content:space-between;gap:20px;padding:12px 0;border-bottom:1px solid var(--iron-hi);font-family:var(--mono)}
+body.ope-pg-viajes .ope-vj-sum-row:last-child{border-bottom:none}
+body.ope-pg-viajes .ope-vj-sum-row span{color:var(--paper-dim);font-size:.7rem}
+body.ope-pg-viajes .ope-vj-sum-row b{color:var(--paper);text-align:right;font-size:.78rem}
+
+body.ope-pg-viajes .ope-vj-gate .ope-plate-b,body.ope-pg-viajes .ope-vj-active .ope-plate-b{text-align:center;padding:28px}
+body.ope-pg-viajes .ope-vj-submit{padding:12px 22px!important}
+
+@media(max-width:900px){
+  body.ope-pg-viajes .ope-vj-layout{grid-template-columns:1fr;gap:20px}
+  body.ope-pg-viajes .ope-vj-aside{position:static;max-width:420px}
+  body.ope-pg-viajes .ope-vj-facts{flex-direction:column}
+  body.ope-pg-viajes .ope-vj-facts span{border-right:0;border-bottom:2px solid rgba(255,255,255,.12)}
+  body.ope-pg-viajes .ope-vj-facts span:last-child{border-bottom:0}
+}
+@media(max-width:700px){
+  body.ope-pg-viajes .ope-vj-steps{grid-template-columns:repeat(2,1fr)}
+  body.ope-pg-viajes .ope-vj-step:nth-child(2){border-right:0}
+  body.ope-pg-viajes .ope-vj-step:nth-child(-n+2){border-bottom:2px solid #000}
+  body.ope-pg-viajes .ope-vj-panel{padding:24px 18px}
+  body.ope-pg-viajes .ope-vj-route-grid{grid-template-columns:1fr}
+  body.ope-pg-viajes .ope-vj-route-arrow{margin:0 auto;transform:rotate(90deg)}
+}
+@media(max-width:430px){
+  body.ope-pg-viajes .ope-vj-facts span{padding-inline:10px}
+  body.ope-pg-viajes .ope-vj-step{justify-content:flex-start;gap:7px;padding-inline:9px}
+  body.ope-pg-viajes .ope-vj-nav-row .ope-btn{width:100%;text-align:center}
+  body.ope-pg-viajes .ope-vj-sum-row{display:grid;gap:5px}
+  body.ope-pg-viajes .ope-vj-sum-row b{text-align:left}
+}
+@media(prefers-reduced-motion:reduce){
+  body.ope-pg-viajes .ope-vj-step,
+  body.ope-pg-viajes .ope-vj-sel,
+  body.ope-pg-viajes .ope-vj-inp,
+  body.ope-pg-viajes .ope-vj-ta,
+  body.ope-pg-viajes .ope-vj-barco-in,
+  body.ope-pg-viajes .ope-vj-crew-chip span{transition:none}
+}
