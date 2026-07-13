@@ -2024,48 +2024,89 @@ function ope_rol_tpl_inserter_html()
             }
         }
 
-        // Estados alterados
-        $estados_html = '';
+        $cbt_pv_max = (int)($cbt_row['pv_max'] ?? 0);
+        $cbt_en_max = (int)($cbt_row['en_max'] ?? 0);
+
+        $html .= '<div class="ope-rpg-panel" data-panel="combate">';
+        $html .= '<div class="ope-rpg-cbt-body">';
+
+        // ── PV / EN / PA ──
+        $html .= '<div class="ope-rpg-cbt-section">';
+        $html .= '<span class="ope-rpg-cbt-section-label">Vitales</span>';
+
+        $pv_pct = $cbt_pv_max > 0 ? round(($cbt_pv / $cbt_pv_max) * 100) : 100;
+        $html .= '<div class="ope-rpg-cbt-vital ope-rpg-cbt-vital--pv">';
+        $html .= '<div class="ope-rpg-cbt-vital-head">';
+        $html .= '<span class="ope-rpg-cbt-vital-label">PV</span>';
+        $html .= '<span class="ope-rpg-cbt-vital-cur">' . $cbt_pv . '</span>';
+        $html .= '<span class="ope-rpg-cbt-vital-sep">/</span>';
+        $html .= '<span class="ope-rpg-cbt-vital-max">' . $cbt_pv_max . '</span>';
+        $html .= '</div>';
+        $html .= '<div class="ope-rpg-cbt-vital-bar"><span class="ope-rpg-cbt-vital-fill" style="width:' . $pv_pct . '%"></span></div>';
+        $html .= '<div class="ope-rpg-cbt-vital-acts">';
+        $html .= '<button type="button" class="ope-rpg-cbt-vital-btn" data-dir="-1">-5</button>';
+        $html .= '<input type="number" class="ope-rpg-cbt-vital-inp ope-rpg-cbt-pvinp" value="' . $cbt_pv . '" min="0">';
+        $html .= '<button type="button" class="ope-rpg-cbt-vital-btn" data-dir="+1">+5</button>';
+        $html .= '</div></div>';
+
+        $en_pct = $cbt_en_max > 0 ? round(($cbt_en / $cbt_en_max) * 100) : 100;
+        $html .= '<div class="ope-rpg-cbt-vital ope-rpg-cbt-vital--en">';
+        $html .= '<div class="ope-rpg-cbt-vital-head">';
+        $html .= '<span class="ope-rpg-cbt-vital-label">EN</span>';
+        $html .= '<span class="ope-rpg-cbt-vital-cur">' . $cbt_en . '</span>';
+        $html .= '<span class="ope-rpg-cbt-vital-sep">/</span>';
+        $html .= '<span class="ope-rpg-cbt-vital-max">' . $cbt_en_max . '</span>';
+        $html .= '</div>';
+        $html .= '<div class="ope-rpg-cbt-vital-bar"><span class="ope-rpg-cbt-vital-fill" style="width:' . $en_pct . '%"></span></div>';
+        $html .= '<div class="ope-rpg-cbt-vital-acts">';
+        $html .= '<button type="button" class="ope-rpg-cbt-vital-btn" data-dir="-1">-5</button>';
+        $html .= '<input type="number" class="ope-rpg-cbt-vital-inp ope-rpg-cbt-eninp" value="' . $cbt_en . '" min="0">';
+        $html .= '<button type="button" class="ope-rpg-cbt-vital-btn" data-dir="+1">+5</button>';
+        $html .= '</div></div>';
+
+        $html .= '<div class="ope-rpg-cbt-pa">PA / turno <b>' . $cbt_pa . '</b></div>';
+        $html .= '</div>';
+
+        // ── Estados ──
+        $html .= '<div class="ope-rpg-cbt-section">';
+        $html .= '<span class="ope-rpg-cbt-section-label">Estados <em>(m&aacute;x 3)</em></span>';
+        $html .= '<div class="ope-rpg-cbt-estados-grid">';
         if (function_exists('ope_combat_estados')) {
             $estados_cat = ope_combat_estados();
             foreach ($estados_cat as $ek => $ev) {
-                $enom = htmlspecialchars_uni((string) ($ev['nombre'] ?? $ek));
-                $estados_html .= '<label><input type="checkbox" class="ope-rpg-cbt-est" value="' . $ek . '"> ' . $enom . '</label>';
+                $enom = htmlspecialchars_uni((string)($ev['nombre'] ?? $ek));
+                $tipo = htmlspecialchars_uni((string)($ev['tipo'] ?? 'negativo'));
+                $html .= '<span class="ope-rpg-est-chip" data-est="' . $ek . '" data-tipo="' . $tipo . '" role="checkbox" aria-checked="false">' . $enom . '</span>';
             }
         }
+        $html .= '</div></div>';
 
-        // Modificadores de stats
-        $stats_html = '';
+        // ── Modificadores de stats ──
+        $html .= '<div class="ope-rpg-cbt-section">';
+        $html .= '<span class="ope-rpg-cbt-section-label">Modificadores de stats</span>';
         if (function_exists('ope_rol_stats')) {
             $stat_groups = ope_rol_stats();
             foreach ($stat_groups as $grupo) {
-                $stats_html .= '<div class="ope-rpg-cbt-modgroup">';
-                $stats_html .= '<span class="ope-rpg-cbt-sub">' . htmlspecialchars_uni($grupo['label']) . '</span>';
+                $html .= '<div class="ope-rpg-cbt-modgroup">';
+                $html .= '<span class="ope-rpg-cbt-modgroup-label">' . htmlspecialchars_uni($grupo['label']) . '</span>';
+                $html .= '<div class="ope-rpg-cbt-modgrid">';
                 foreach ($grupo['stats'] as $ab => $nombre_stat) {
-                    $stats_html .= '<label>' . htmlspecialchars_uni($ab)
-                        . ' <input type="number" class="ope-rpg-cbt-mod" data-stat="' . $ab . '" value="0" step="1"></label>';
+                    $html .= '<div class="ope-rpg-cbt-modrow">';
+                    $html .= '<span class="ope-rpg-cbt-statkey">' . htmlspecialchars_uni($ab) . '</span>';
+                    $html .= '<input type="number" class="ope-rpg-cbt-modval" data-stat="' . $ab . '" value="0">';
+                    $html .= '<button type="button" class="ope-rpg-cbt-toggle is-raw" data-stat="' . $ab . '" aria-pressed="false">';
+                    $html .= '<span class="ope-rpg-cbt-toggle-raw">+N</span>';
+                    $html .= '<span class="ope-rpg-cbt-toggle-pct">%</span>';
+                    $html .= '</button>';
+                    $html .= '</div>';
                 }
-                $stats_html .= '</div>';
+                $html .= '</div></div>';
             }
         }
+        $html .= '</div>';
 
-        $html .= '<div class="ope-rpg-panel" data-panel="combate">';
-        $html .= '<div class="ope-rpg-cbt-stats">';
-        $html .= '<div class="ope-rpg-cbt-row">';
-        $html .= '<label>PV <input type="number" id="ope_cbt_pv" value="' . $cbt_pv . '" min="0"></label>';
-        $html .= '<label>EN <input type="number" id="ope_cbt_en" value="' . $cbt_en . '" min="0"></label>';
-        $html .= '<label class="ope-rpg-cbt-pa">PA/turno <span id="ope_cbt_pa">' . $cbt_pa . '</span></label>';
-        $html .= '</div>';
-        $html .= '<div class="ope-rpg-cbt-estados">';
-        $html .= '<span class="ope-rpg-cbt-label">Estados <em>(m&aacute;x 3)</em></span>';
-        $html .= $estados_html;
-        $html .= '</div>';
-        $html .= '<div class="ope-rpg-cbt-mods">';
-        $html .= '<span class="ope-rpg-cbt-label">Modificadores</span>';
-        $html .= $stats_html;
-        $html .= '</div>';
-        $html .= '</div>';
         $html .= '<p class="ope-rpg-cbt-note">Los valores se guardan en el snapshot de este post.</p>';
+        $html .= '</div>';
         $html .= '</div>';
     }
 
@@ -2094,15 +2135,43 @@ function ope_rol_tpl_inserter_html()
         . 'root.querySelectorAll(".ope-rpg-panel").forEach(function(p){p.classList.toggle("is-on",p.getAttribute("data-panel")===name);});return;}'
         . 'var card=ev.target.closest(".ope-rpg-cardpick");'
         . 'if(card&&card.hasAttribute("data-card-id")){var on=!card.classList.contains("is-sel");card.classList.toggle("is-sel",on);card.setAttribute("aria-pressed",on?"true":"false");refresh();return;}'
+        // ── Combate: chips de estado ──
+        . 'var estChip=ev.target.closest(".ope-rpg-est-chip");'
+        . 'if(estChip){var on=estChip.getAttribute("aria-checked")==="true";'
+        . 'if(!on){var sel=root.querySelectorAll(\'.ope-rpg-est-chip[aria-checked="true"]\');'
+        . 'if(sel.length>=3){alert("M\u00e1ximo 3 estados activos.");return;}}'
+        . 'estChip.setAttribute("aria-checked",on?"false":"true");return;}'
+        // ── Combate: toggle bruto/porcentaje ──
+        . 'var tog=ev.target.closest(".ope-rpg-cbt-toggle");'
+        . 'if(tog){var isRaw=tog.classList.contains("is-raw");'
+        . 'tog.classList.toggle("is-raw",!isRaw);tog.classList.toggle("is-pct",isRaw);'
+        . 'tog.setAttribute("aria-pressed",isRaw?"true":"false");return;}'
+        // ── Combate: botones +/- PV/EN ──
+        . 'var btn=ev.target.closest(".ope-rpg-cbt-vital-btn");'
+        . 'if(btn){var dir=parseInt(btn.getAttribute("data-dir"));'
+        . 'var wrap=btn.closest(".ope-rpg-cbt-vital");'
+        . 'var inp=wrap.querySelector(".ope-rpg-cbt-vital-inp");'
+        . 'var fill=wrap.querySelector(".ope-rpg-cbt-vital-fill");'
+        . 'var cur=wrap.querySelector(".ope-rpg-cbt-vital-cur");'
+        . 'var maxEl=wrap.querySelector(".ope-rpg-cbt-vital-max");'
+        . 'var val=parseInt(inp.value)||0;var max=parseInt(maxEl.textContent)||100;'
+        . 'var nv=Math.max(0,Math.min(max,val+dir*5));'
+        . 'inp.value=nv;cur.textContent=nv;'
+        . 'if(fill)fill.style.width=Math.round((nv/max)*100)+"%";return;}'
         . 'var chip=ev.target.closest(".ope-rpg-chip");if(!chip)return;'
         . 'if(chip.hasAttribute("data-tpl")){var b=TPL[chip.getAttribute("data-tpl")];if(b!=null)ins(b,"");return;}'
         . 'var t=chip.getAttribute("data-insert");if(t!=null)ins(t,"");});'
-        // ── estados: máximo 3 activos ──
-        . 'root.addEventListener("change",function(ev){'
-        . 'var cb=ev.target.closest(".ope-rpg-cbt-est");'
-        . 'if(!cb)return;'
-        . 'var all=root.querySelectorAll(".ope-rpg-cbt-est:checked");'
-        . 'if(all.length>3){cb.checked=false;alert("M\u00e1ximo 3 estados activos.");}'
+        // ── Combate: inputs directos PV/EN actualizan barra ──
+        . 'root.addEventListener("input",function(ev){'
+        . 'var inp=ev.target.closest(".ope-rpg-cbt-vital-inp");'
+        . 'if(!inp)return;'
+        . 'var wrap=inp.closest(".ope-rpg-cbt-vital");'
+        . 'var fill=wrap.querySelector(".ope-rpg-cbt-vital-fill");'
+        . 'var cur=wrap.querySelector(".ope-rpg-cbt-vital-cur");'
+        . 'var maxEl=wrap.querySelector(".ope-rpg-cbt-vital-max");'
+        . 'var val=parseInt(inp.value)||0;var max=parseInt(maxEl.textContent)||100;'
+        . 'cur.textContent=val;'
+        . 'if(fill)fill.style.width=Math.round((val/max)*100)+"%";'
         . '});'
         // ── preselección desde un [rpgsys] ya existente (editar post) ──
         . 'function editorVal(){var ed=window.MyBBEditor;if(ed&&typeof ed.val==="function"){try{return ed.val();}catch(x){}}return ta?ta.value:"";}'
