@@ -3844,11 +3844,11 @@ body.ope-pg-viajes .ope-vj-submit{padding:12px 22px!important}
    ═══════════════════════════════════════════════════════════════════════════ */
 
 body.ope-pg-haki .ope-haki-bar{display:flex;gap:0.5rem;margin:1rem 0}
-body.ope-pg-haki .ope-haki-dot{flex:1;text-align:center;padding:0.5rem;background:var(--plate-bg);border-radius:6px;font-size:0.8rem;color:var(--ink-dim);border:1px solid var(--plate-border)}
-body.ope-pg-haki .ope-haki-dot--on{background:var(--ember);color:#fff;border-color:var(--ember);font-weight:bold}
-body.ope-pg-haki .ope-haki-max{color:var(--ember);font-weight:bold;margin-top:0.5rem}
-body.ope-pg-haki .ope-haki-pl{color:var(--patina);font-style:italic;margin-top:0.5rem}
-body.ope-pg-haki .ope-haki-locked{color:var(--ink-dim);margin-top:0.5rem}
+body.ope-pg-haki .ope-haki-dot{flex:1;text-align:center;padding:0.5rem 0.75rem;background:var(--iron);border-radius:4px;font-size:0.75rem;color:var(--ash);border:2px solid var(--iron-edge);font-family:var(--mono)}
+body.ope-pg-haki .ope-haki-dot--on{background:var(--ember);color:var(--iron);border-color:#000;font-weight:700}
+body.ope-pg-haki .ope-haki-max{color:var(--ember);font-weight:700;margin-top:0.5rem;font-family:var(--mono);font-size:0.8rem}
+body.ope-pg-haki .ope-haki-pl{color:var(--patina);font-style:italic;margin-top:0.5rem;font-family:var(--mono)}
+body.ope-pg-haki .ope-haki-locked{color:var(--ash);margin-top:0.5rem;font-family:var(--mono);font-size:0.8rem}
 
 /* ── Subida de nivel en progresion.php ── */
 body.ope-pg-progresion .ope-lvl-plate{border-color:var(--ember)}

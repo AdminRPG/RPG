@@ -123,7 +123,8 @@ body.ope-pg-mi-pagina .mi-otra-clase { ... }
 - ✅ `style="width:<?php echo $pct; ?>%"` para barras de progreso dinámicas
 - ✅ `style="background:<?php echo $color; ?>"` para colores calculados en PHP
 - ✅ `style="display:<?php echo $visible ? 'block' : 'none'; ?>"` para toggle condicional
-- ✅ Usar variables CSS del sistema: `var(--ember)`, `var(--paper)`, `var(--ink-dim)`, `var(--plate-bg)`, etc.
+- ✅ Usar variables CSS del sistema: `var(--ember)`, `var(--paper)`, `var(--paper-dim)`, `var(--iron)`, `var(--iron-plate)`, `var(--iron-hi)`, `var(--iron-edge)`, `var(--ash)`, `var(--rivet)`, `var(--patina)`, `var(--gold)`, etc.
+- ❌ NO usar variables inventadas: `--plate-bg`, `--ink-dim`, `--plate-border`, `--plate-bg` NO existen
 
 ### 7. Después de crear/modificar
 
