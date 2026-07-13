@@ -2012,11 +2012,10 @@ function ope_rol_tpl_inserter_html()
         }
         if ($tid > 0) {
             $prev_snap = $db->query("
-                SELECT pv_actual, en_actual FROM {$db->table_prefix}rol_post_snapshot
-                WHERE personaje_pid = {$pid} AND pid IN (
-                    SELECT pid FROM {$db->table_prefix}posts WHERE tid = {$tid} ORDER BY dateline DESC LIMIT 5
-                )
-                ORDER BY dateline DESC LIMIT 1
+                SELECT s.pv_actual, s.en_actual FROM {$db->table_prefix}rol_post_snapshot s
+                JOIN {$db->table_prefix}posts p ON s.pid = p.pid
+                WHERE s.personaje_pid = {$pid} AND p.tid = {$tid}
+                ORDER BY p.dateline DESC LIMIT 1
             ");
             if ($prev_snap && $db->num_rows($prev_snap) > 0) {
                 $ps_row = $db->fetch_array($prev_snap);
