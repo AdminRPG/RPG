@@ -3894,10 +3894,13 @@ body.ope-pg-progresion .ope-lvl-form{margin-top:1rem}
 .ope-rpg-cbt-vital--pv .ope-rpg-cbt-vital-fill{background:var(--crack)}
 .ope-rpg-cbt-vital--en .ope-rpg-cbt-vital-fill{background:var(--patina)}
 .ope-rpg-cbt-vital-acts{display:flex;align-items:center;gap:4px}
-.ope-rpg-cbt-vital-btn{font-family:var(--mono);font-size:.6rem;font-weight:700;padding:3px 7px;background:var(--iron-hi);color:var(--paper);border:2px solid var(--iron-edge);cursor:pointer;min-width:24px;text-align:center;line-height:1}
+.ope-rpg-cbt-vital-btn{font-family:var(--mono);font-size:.6rem;font-weight:700;padding:3px 7px;background:var(--iron-hi);color:var(--paper);border:2px solid var(--iron-edge);cursor:pointer;min-width:28px;text-align:center;line-height:1}
 .ope-rpg-cbt-vital-btn:hover{background:var(--rivet)}
 .ope-rpg-cbt-vital-inp{width:52px;padding:3px 4px;background:var(--iron-edge);border:2px solid var(--iron-hi);color:var(--paper);font-family:var(--mono);font-size:.7rem;font-weight:700;text-align:center}
 .ope-rpg-cbt-vital-inp:focus{outline:none;border-color:var(--ember)}
+.ope-rpg-cbt-vital-inp::placeholder{color:var(--ash);font-weight:400;font-size:.6rem}
+.ope-rpg-cbt-vital-apply{font-family:var(--mono);font-size:.55rem;font-weight:700;padding:3px 6px;background:var(--ember);color:var(--iron);border:2px solid #000;cursor:pointer;white-space:nowrap}
+.ope-rpg-cbt-vital-apply:hover{background:var(--ember-hi)}
 
 /* --- PA --- */
 .ope-rpg-cbt-pa{display:flex;align-items:center;gap:6px;margin-bottom:10px;font-family:var(--mono);font-size:.65rem;color:var(--ash)}
@@ -3926,8 +3929,8 @@ body.ope-pg-progresion .ope-lvl-form{margin-top:1rem}
 .ope-rpg-cbt-statkey{font-family:var(--mono);font-size:.58rem;font-weight:700;color:var(--paper-dim);min-width:28px;text-align:right}
 .ope-rpg-cbt-modval{width:38px;padding:2px 3px;background:var(--iron-edge);border:2px solid var(--iron-hi);color:var(--paper);font-family:var(--mono);font-size:.62rem;text-align:center}
 .ope-rpg-cbt-modval:focus{outline:none;border-color:var(--ember)}
-.ope-rpg-cbt-toggle{display:inline-flex;border:2px solid var(--iron-hi);border-radius:2px;overflow:hidden;cursor:pointer;background:transparent;padding:0;font-family:var(--mono);font-size:.5rem;font-weight:700;line-height:1;flex-shrink:0}
-.ope-rpg-cbt-toggle span{padding:2px 4px;transition:background .12s,color .12s}
+.ope-rpg-cbt-toggle{display:inline-flex;border:2px solid var(--iron-hi);border-radius:2px;overflow:hidden;cursor:pointer;background:transparent;padding:0;font-family:var(--mono);font-size:.6rem;font-weight:700;line-height:1;flex-shrink:0}
+.ope-rpg-cbt-toggle span{padding:3px 6px;transition:background .12s,color .12s}
 .ope-rpg-cbt-toggle-raw{background:var(--iron-hi);color:var(--paper)}
 .ope-rpg-cbt-toggle-pct{background:transparent;color:var(--ash)}
 .ope-rpg-cbt-toggle.is-pct .ope-rpg-cbt-toggle-raw{background:transparent;color:var(--ash)}

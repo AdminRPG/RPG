@@ -2044,9 +2044,10 @@ function ope_rol_tpl_inserter_html()
         $html .= '</div>';
         $html .= '<div class="ope-rpg-cbt-vital-bar"><span class="ope-rpg-cbt-vital-fill" style="width:' . $pv_pct . '%"></span></div>';
         $html .= '<div class="ope-rpg-cbt-vital-acts">';
-        $html .= '<button type="button" class="ope-rpg-cbt-vital-btn" data-dir="-1">-</button>';
-        $html .= '<input type="number" class="ope-rpg-cbt-vital-inp ope-rpg-cbt-pvinp" value="' . $cbt_pv . '" min="0" max="' . $cbt_pv_max . '">';
-        $html .= '<button type="button" class="ope-rpg-cbt-vital-btn" data-dir="+1">+</button>';
+        $html .= '<button type="button" class="ope-rpg-cbt-vital-btn" data-dir="-5">-5</button>';
+        $html .= '<button type="button" class="ope-rpg-cbt-vital-btn" data-dir="+5">+5</button>';
+        $html .= '<input type="text" class="ope-rpg-cbt-vital-inp ope-rpg-cbt-pvinp" value="" placeholder="+0">';
+        $html .= '<button type="button" class="ope-rpg-cbt-vital-apply">Aplicar</button>';
         $html .= '</div></div>';
         
         // EN
@@ -2070,7 +2071,7 @@ function ope_rol_tpl_inserter_html()
         
         // Estados con select
         $html .= '<div class="ope-rpg-cbt-estados-section">';
-        $html .= '<label class="ope-rpg-cbt-estados-label">Añadir estados <em>(máx 3)</em></label>';
+        $html .= '<label class="ope-rpg-cbt-estados-label">Añadir estados</label>';
         $html .= '<select class="ope-rpg-cbt-estados-select" id="ope_cbt_estados_sel">';
         $html .= '<option value="">-- Seleccionar --</option>';
         if (function_exists('ope_combat_estados')) {
@@ -2142,12 +2143,14 @@ function ope_rol_tpl_inserter_html()
         . 'root.querySelectorAll(".ope-rpg-panel").forEach(function(p){p.classList.toggle("is-on",p.getAttribute("data-panel")===name);});return;}'
         . 'var card=ev.target.closest(".ope-rpg-cardpick");'
         . 'if(card&&card.hasAttribute("data-card-id")){var on=!card.classList.contains("is-sel");card.classList.toggle("is-sel",on);card.setAttribute("aria-pressed",on?"true":"false");refresh();return;}'
-        // ── Combate: botones +/- PV/EN (auto-cálculo) ──
-        . 'root.addEventListener("click",function(ev){var btn=ev.target.closest(".ope-rpg-cbt-vital-btn");if(!btn)return;var dir=parseInt(btn.getAttribute("data-dir"));var wrap=btn.closest(".ope-rpg-cbt-vital");var inp=wrap.querySelector(".ope-rpg-cbt-vital-inp");var fill=wrap.querySelector(".ope-rpg-cbt-vital-fill");var cur=wrap.querySelector(".ope-rpg-cbt-vital-cur");var maxEl=wrap.querySelector(".ope-rpg-cbt-vital-max");var max=parseInt(maxEl.textContent)||100;var val=parseInt(inp.value)||0;var nv=Math.max(0,Math.min(max,val+dir*(wrap.classList.contains("ope-rpg-cbt-vital--pv")?5:5)));inp.value=nv;cur.textContent=nv;if(fill)fill.style.width=Math.round((nv/max)*100)+"%";});'
-        // ── Combate: inputs PV/EN actualizan barra ──
-        . 'root.addEventListener("input",function(ev){var inp=ev.target.closest(".ope-rpg-cbt-vital-inp");if(!inp)return;var wrap=inp.closest(".ope-rpg-cbt-vital");var fill=wrap.querySelector(".ope-rpg-cbt-vital-fill");var cur=wrap.querySelector(".ope-rpg-cbt-vital-cur");var maxEl=wrap.querySelector(".ope-rpg-cbt-vital-max");var max=parseInt(maxEl.textContent)||100;var val=parseInt(inp.value)||0;cur.textContent=val;if(fill)fill.style.width=Math.round((val/max)*100)+"%";});'
+        // ── Combate: botones +/- PV/EN (aplican delta directo) ──
+        . 'root.addEventListener("click",function(ev){var btn=ev.target.closest(".ope-rpg-cbt-vital-btn");if(!btn)return;var dir=parseInt(btn.getAttribute("data-dir"));var wrap=btn.closest(".ope-rpg-cbt-vital");var fill=wrap.querySelector(".ope-rpg-cbt-vital-fill");var cur=wrap.querySelector(".ope-rpg-cbt-vital-cur");var maxEl=wrap.querySelector(".ope-rpg-cbt-vital-max");var max=parseInt(maxEl.textContent)||100;var val=parseInt(cur.textContent)||0;var nv=Math.max(0,Math.min(max,val+dir));cur.textContent=nv;if(fill)fill.style.width=Math.round((nv/max)*100)+"%";});'
+        // ── Combate: botón Aplicar (aplica delta del input a PV/EN actual) ──
+        . 'root.addEventListener("click",function(ev){var app=ev.target.closest(".ope-rpg-cbt-vital-apply");if(!app)return;var wrap=app.closest(".ope-rpg-cbt-vital");var inp=wrap.querySelector(".ope-rpg-cbt-vital-inp");var fill=wrap.querySelector(".ope-rpg-cbt-vital-fill");var cur=wrap.querySelector(".ope-rpg-cbt-vital-cur");var maxEl=wrap.querySelector(".ope-rpg-cbt-vital-max");var max=parseInt(maxEl.textContent)||100;var val=parseInt(cur.textContent)||0;var delta=parseInt(inp.value)||0;var nv=Math.max(0,Math.min(max,val+delta));cur.textContent=nv;if(fill)fill.style.width=Math.round((nv/max)*100)+"%";inp.value="";});'
+        // ── Combate: Enter en input delta aplica ──
+        . 'root.addEventListener("keydown",function(ev){if(ev.key!=="Enter")return;var inp=ev.target.closest(".ope-rpg-cbt-vital-inp");if(!inp)return;var wrap=inp.closest(".ope-rpg-cbt-vital");var fill=wrap.querySelector(".ope-rpg-cbt-vital-fill");var cur=wrap.querySelector(".ope-rpg-cbt-vital-cur");var maxEl=wrap.querySelector(".ope-rpg-cbt-vital-max");var max=parseInt(maxEl.textContent)||100;var val=parseInt(cur.textContent)||0;var delta=parseInt(inp.value)||0;var nv=Math.max(0,Math.min(max,val+delta));cur.textContent=nv;if(fill)fill.style.width=Math.round((nv/max)*100)+"%";inp.value="";ev.preventDefault();});'
         // ── Combate: select de estados → chips ──
-        . 'root.addEventListener("change",function(ev){var sel=ev.target.closest("#ope_cbt_estados_sel");if(!sel)return;var val=sel.value;if(!val){sel.value="";return;}var tipo=sel.options[sel.selectedIndex].getAttribute("data-tipo")||"negativo";var chips=root.querySelector("#ope_cbt_estados_chips");var exist=chips.querySelector("[data-est=\'"+val+"\']");if(exist){sel.value="";return;}if(chips.children.length>=3){sel.value="";alert("M\u00e1ximo 3 estados activos.");return;}var chip=document.createElement("span");chip.className="ope-rpg-est-chip";chip.setAttribute("data-est",val);chip.setAttribute("data-tipo",tipo);chip.setAttribute("aria-checked","true");chip.textContent=sel.options[sel.selectedIndex].textContent;chip.title="Click para quitar";chip.addEventListener("click",function(){this.remove();});chips.appendChild(chip);sel.value="";});'
+        . 'root.addEventListener("change",function(ev){var sel=ev.target.closest("#ope_cbt_estados_sel");if(!sel)return;var val=sel.value;if(!val){sel.value="";return;}var tipo=sel.options[sel.selectedIndex].getAttribute("data-tipo")||"negativo";var chips=root.querySelector("#ope_cbt_estados_chips");var exist=chips.querySelector("[data-est=\'"+val+"\']");if(exist){sel.value="";return;}var chip=document.createElement("span");chip.className="ope-rpg-est-chip";chip.setAttribute("data-est",val);chip.setAttribute("data-tipo",tipo);chip.setAttribute("aria-checked","true");chip.textContent=sel.options[sel.selectedIndex].textContent;chip.title="Click para quitar";chip.addEventListener("click",function(){this.remove();});chips.appendChild(chip);sel.value="";});'
         // ── Combate: toggle bruto/porcentaje ──
         . 'root.addEventListener("click",function(ev){var tog=ev.target.closest(".ope-rpg-cbt-toggle");if(!tog)return;var isRaw=tog.classList.contains("is-raw");tog.classList.toggle("is-raw",!isRaw);tog.classList.toggle("is-pct",isRaw);tog.setAttribute("aria-pressed",isRaw?"true":"false");});'
         // ── template chips (insertan BBcode) ──
