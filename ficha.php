@@ -371,8 +371,6 @@ if ($puede_gestionar && $mybb->request_method === 'post'
 }
 
 // ── Datos de rol ──
-$RANK_SCALE  = ope_rol_rank_scale();      // letra => num
-$RANK_BY_NUM = array_flip($RANK_SCALE);      // num => letra
 $STAT_GROUPS = ope_rol_stats();
 $RAZAS       = ope_rol_razas();
 $FACCIONES   = ope_rol_facciones();
@@ -572,27 +570,17 @@ header('Content-Type: text/html; charset=utf-8');
     $inv_encima  = $norm_items($inventario['encima'] ?? null);
     $inv_almacen = $norm_items($inventario['almacen'] ?? null);
 
-    // Medias por pilar (Cuerpo/Mente/Espíritu) y temperatura de forja global,
-    // reutilizadas tanto en la barra de resumen como en la pestaña Crisol.
+    // Medias por pilar (Cuerpo/Mente/Espíritu) para la pestaña Crisol.
     $group_calc = array();
-    $all_vals   = array();
     foreach ($STAT_GROUPS as $gkey => $grupo) {
         $vals = array();
         foreach ($grupo['stats'] as $ab => $nm) {
-            $v = (int) ($stats_ef[$ab] ?? 1);
-            $vals[] = $v;
-            $all_vals[] = $v;
+            $vals[] = (int) ($stats_ef[$ab] ?? 1);
         }
-        $g_avg = count($vals) ? array_sum($vals) / count($vals) : 1;
         $group_calc[$gkey] = array(
-            'avg'    => $g_avg,
-            'letter' => $RANK_BY_NUM[(int) round($g_avg)] ?? 'F',
-            'heat'   => ope_heat_val((int) round($g_avg)),
+            'avg' => count($vals) ? array_sum($vals) / count($vals) : 1,
         );
     }
-    $forge_avg    = count($all_vals) ? array_sum($all_vals) / count($all_vals) : 1;
-    $forge_letter = $RANK_BY_NUM[(int) round($forge_avg)] ?? 'F';
-    $forge_heat   = ope_heat_val((int) round($forge_avg));
 
     // Pasivas raciales: la primaria de la raza principal siempre se aplica;
     // la secundaria de esa misma raza SOLO si el personaje es puro (no
@@ -881,10 +869,6 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
 
     <!-- CRISOL (ATRIBUTOS) -->
-<?php
-      // Escala F..M+ (10 rangos) para etiquetar los segmentos de cada barra.
-      $SEG_LETTERS = array_keys($RANK_SCALE); // F E D C B A S SS M M+
-?>
     <section class="panel on" id="tab-crisol" role="tabpanel">
       <div class="plate">
         <div class="plate-h">
@@ -894,7 +878,7 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="ope-scalekey" aria-hidden="true">
             <span class="k">Escala</span>
             <div class="segs">
-<?php foreach ($SEG_LETTERS as $sl): ?>
+<?php foreach (array('1','2','3','4','5','6','7','8','9','10') as $sl): ?>
               <span><?php echo htmlspecialchars_uni($sl); ?></span>
 <?php endforeach; ?>
             </div>
@@ -911,7 +895,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php foreach ($rows as $ab => $nm):
               $v = ope_rol_stat_num($stats_ef, $ab);
               if ($v > 10) $v = 10;
-              $rank_lbl = ope_rol_rank_from_val($v);
+              $rank_lbl = ope_rol_stat_label($v);
 ?>
             <div class="stat">
               <span class="nm"><?php echo htmlspecialchars_uni($nm); ?></span>

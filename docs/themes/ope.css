@@ -3876,52 +3876,32 @@ body.ope-pg-progresion .ope-lvl-plate{border-color:var(--ember)}
 body.ope-pg-progresion .ope-lvl-form{margin-top:1rem}
 
 /* ── Tab Combate en RPG System ── */
-body.ope-pg-newreply .ope-rpg-cbt-stats,
-body.ope-pg-newthread .ope-rpg-cbt-stats,
-body.ope-pg-editpost .ope-rpg-cbt-stats{padding:12px 0}
-body.ope-pg-newreply .ope-rpg-cbt-row,
-body.ope-pg-newthread .ope-rpg-cbt-row,
-body.ope-pg-editpost .ope-rpg-cbt-row{display:flex;gap:12px;margin-bottom:12px}
-body.ope-pg-newreply .ope-rpg-cbt-row label,
-body.ope-pg-newthread .ope-rpg-cbt-row label,
-body.ope-pg-editpost .ope-rpg-cbt-row label{font-family:var(--mono);font-size:.7rem;color:var(--paper-dim)}
-body.ope-pg-newreply .ope-rpg-cbt-row input,
-body.ope-pg-newthread .ope-rpg-cbt-row input,
-body.ope-pg-editpost .ope-rpg-cbt-row input{width:80px;padding:4px 6px;background:var(--iron);border:2px solid var(--iron-edge);color:var(--paper);font-family:var(--mono)}
-body.ope-pg-newreply .ope-rpg-cbt-pa,
-body.ope-pg-newthread .ope-rpg-cbt-pa,
-body.ope-pg-editpost .ope-rpg-cbt-pa{color:var(--ember-hi)}
-body.ope-pg-newreply .ope-rpg-cbt-label,
-body.ope-pg-newthread .ope-rpg-cbt-label,
-body.ope-pg-editpost .ope-rpg-cbt-label{display:block;font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;color:var(--ash);margin-bottom:6px}
-body.ope-pg-newreply .ope-rpg-cbt-estados,
-body.ope-pg-newreply .ope-rpg-cbt-mods,
-body.ope-pg-newthread .ope-rpg-cbt-estados,
-body.ope-pg-newthread .ope-rpg-cbt-mods,
-body.ope-pg-editpost .ope-rpg-cbt-estados,
-body.ope-pg-editpost .ope-rpg-cbt-mods{margin-bottom:14px}
-body.ope-pg-newreply .ope-rpg-cbt-estados label,
-body.ope-pg-newthread .ope-rpg-cbt-estados label,
-body.ope-pg-editpost .ope-rpg-cbt-estados label{display:inline-flex;align-items:center;gap:4px;margin-right:8px;margin-bottom:4px;font-family:var(--mono);font-size:.65rem;color:var(--paper-dim)}
-body.ope-pg-newreply .ope-rpg-cbt-modgroup,
-body.ope-pg-newthread .ope-rpg-cbt-modgroup,
-body.ope-pg-editpost .ope-rpg-cbt-modgroup{margin-bottom:8px}
-body.ope-pg-newreply .ope-rpg-cbt-sub,
-body.ope-pg-newthread .ope-rpg-cbt-sub,
-body.ope-pg-editpost .ope-rpg-cbt-sub{display:block;font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--patina);margin-bottom:4px}
-body.ope-pg-newreply .ope-rpg-cbt-mods label,
-body.ope-pg-newthread .ope-rpg-cbt-mods label,
-body.ope-pg-editpost .ope-rpg-cbt-mods label{display:inline-flex;align-items:center;gap:4px;margin-right:6px;margin-bottom:4px;font-family:var(--mono);font-size:.62rem;color:var(--paper-dim)}
-body.ope-pg-newreply .ope-rpg-cbt-mods input,
-body.ope-pg-newthread .ope-rpg-cbt-mods input,
-body.ope-pg-editpost .ope-rpg-cbt-mods input{width:55px;padding:2px 4px;background:var(--iron);border:2px solid var(--iron-edge);color:var(--paper);font-family:var(--mono);font-size:.65rem}
-body.ope-pg-newreply .ope-rpg-cbt-note,
-body.ope-pg-newthread .ope-rpg-cbt-note,
-body.ope-pg-editpost .ope-rpg-cbt-note{font-family:var(--mono);font-size:.6rem;color:var(--ash);margin-top:8px}
+.ope-rpg-cbt-stats{padding:2px 0}
+.ope-rpg-cbt-row{display:flex;gap:14px;margin-bottom:12px;align-items:flex-end}
+.ope-rpg-cbt-row label{font-family:var(--mono);font-size:.68rem;color:var(--paper-dim)}
+.ope-rpg-cbt-row input{width:74px;padding:5px 7px;background:var(--iron);border:2px solid var(--iron-edge);color:var(--paper);font-family:var(--mono);font-size:.72rem;font-weight:700}
+.ope-rpg-cbt-row input:focus-visible{border-color:var(--ember);outline:none}
+.ope-rpg-cbt-pa{font-family:var(--mono);font-size:.68rem;font-weight:700;color:var(--ember-hi)}
+.ope-rpg-cbt-pa span{font-size:.82rem}
+.ope-rpg-cbt-label{display:block;font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ash);margin-bottom:7px}
+.ope-rpg-cbt-label em{font-style:normal;font-weight:400;text-transform:none;letter-spacing:0;color:var(--rivet)}
+.ope-rpg-cbt-estados,
+.ope-rpg-cbt-mods{margin-bottom:14px}
+.ope-rpg-cbt-estados label{display:inline-flex;align-items:center;gap:5px;margin-right:10px;margin-bottom:5px;font-family:var(--mono);font-size:.64rem;color:var(--paper-dim);cursor:pointer}
+.ope-rpg-cbt-estados label:hover{color:var(--paper)}
+.ope-rpg-cbt-estados input[type="checkbox"]{accent-color:var(--ember);width:13px;height:13px;margin:0;cursor:pointer}
+.ope-rpg-cbt-modgroup{margin-bottom:10px}
+.ope-rpg-cbt-sub{display:block;font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--patina);margin-bottom:5px}
+.ope-rpg-cbt-mods label{display:inline-flex;align-items:center;gap:5px;margin-right:8px;margin-bottom:5px;font-family:var(--mono);font-size:.62rem;color:var(--paper-dim);cursor:pointer}
+.ope-rpg-cbt-mods label:hover{color:var(--paper)}
+.ope-rpg-cbt-mods input{width:50px;padding:3px 5px;background:var(--iron);border:2px solid var(--iron-edge);color:var(--paper);font-family:var(--mono);font-size:.62rem;font-weight:700}
+.ope-rpg-cbt-mods input:focus-visible{border-color:var(--ember);outline:none}
+.ope-rpg-cbt-note{font-family:var(--mono);font-size:.58rem;color:var(--ash);margin-top:8px;padding-top:8px;border-top:1px dashed var(--rivet)}
 
-/* ── PV/EN en postbit ── */
-body.ope-pg-showthread .ope-post-vitals{display:flex;gap:8px;margin-top:6px;font-family:var(--mono);font-size:.65rem}
-body.ope-pg-showthread .ope-post-vital{padding:3px 8px;border:2px solid #000;background:var(--iron)}
+/* ── PV / EN en postbit ── */
+body.ope-pg-showthread .ope-post-vitals{display:flex;gap:10px;margin-top:8px;font-family:var(--mono);font-size:.64rem}
+body.ope-pg-showthread .ope-post-vital{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border:2px solid #000;background:var(--iron);box-shadow:2px 2px 0 rgba(0,0,0,.3)}
 body.ope-pg-showthread .ope-post-vital--pv{border-left:3px solid var(--crack)}
 body.ope-pg-showthread .ope-post-vital--en{border-left:3px solid var(--patina)}
-body.ope-pg-showthread .ope-post-vital b{color:var(--paper);font-size:.72rem}
+body.ope-pg-showthread .ope-post-vital b{color:var(--paper);font-size:.74rem;font-weight:700}
+body.ope-pg-showthread .ope-post-vital span{color:var(--paper-dim)}

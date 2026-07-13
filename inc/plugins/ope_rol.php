@@ -1361,18 +1361,14 @@ function ope_rol_postbit_side(array $char, array $post)
         $mochila_body .= '</div>';
     }
 
-    // Misma escala F..M+ que la ficha (ope_rol_rank_scale): la letra, no el
-    // número crudo, es la unidad que ve el jugador en todo el sitio.
-    $rank_by_num = function_exists('ope_rol_rank_scale') ? array_flip(ope_rol_rank_scale()) : array();
     $stat_groups = function_exists('ope_rol_stats') ? ope_rol_stats() : array();
     $atrib_body  = '<div class="ope-snap-stats">';
     foreach ($stat_groups as $grupo) {
         $atrib_body .= '<div class="ope-snap-pillar"><div class="ope-snap-pillar-h">' . htmlspecialchars_uni($grupo['label']) . '</div>';
         foreach ($grupo['stats'] as $ab => $nombre_stat) {
-            $v      = (int) ($snap['stats'][$ab] ?? 1);
-            $v      = max(1, min(10, $v));
-            $letra  = $rank_by_num[$v] ?? 'F';
-            $atrib_body .= '<div class="ope-snap-stat-row"><span>' . htmlspecialchars_uni($nombre_stat) . '</span><b>' . htmlspecialchars_uni($letra) . '</b></div>';
+            $v     = ope_rol_stat_num($snap['stats'], $ab);
+            $lbl   = ope_rol_stat_label($v);
+            $atrib_body .= '<div class="ope-snap-stat-row"><span>' . htmlspecialchars_uni($nombre_stat) . '</span><b>' . $v . ' ' . htmlspecialchars_uni($lbl) . '</b></div>';
         }
         $atrib_body .= '</div>';
     }

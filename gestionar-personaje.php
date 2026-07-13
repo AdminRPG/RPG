@@ -96,9 +96,9 @@ if ($pid > 0 && $mybb->request_method === 'post'
                     $estado = (string) $pj['estado'];
                 }
 
-                $rango = strtoupper(trim((string) $mybb->get_input('rango')));
-                if (!in_array($rango, $RANGOS, true)) {
-                    $rango = (string) $pj['rango'];
+                $nivel = strtoupper(trim((string) $mybb->get_input('rango')));
+                if (!in_array($nivel, $RANGOS, true)) {
+                    $nivel = (string) $pj['rango'];
                 }
 
                 $nivel  = max(1, (int) $mybb->get_input('nivel', MyBB::INPUT_INT));
@@ -148,7 +148,7 @@ if ($pid > 0 && $mybb->request_method === 'post'
                         }
                     }
                     $datos['rango_suma'] = ope_rol_stat_sum($datos['stats_efectivas']);
-                    $rango = ope_rol_rank_from_sum((int) $datos['rango_suma']);
+                    $nivel = ope_rol_nivel_from_sum((int) ($datos['rango_suma'] ?? 0));
                 }
 
                 // ---- Virtudes y defectos (checkboxes reales del catálogo) ----
@@ -210,7 +210,7 @@ if ($pid > 0 && $mybb->request_method === 'post'
                     'slug'          => $db->escape_string($slug),
                     'estado'        => $db->escape_string($estado),
                     'activo'        => $activo,
-                    'rango'         => $db->escape_string($rango),
+                    'rango'         => $db->escape_string($nivel),
                     'nivel'         => $nivel,
                     'avatar'        => $db->escape_string($avatar),
                     'icono'         => $db->escape_string($icono),

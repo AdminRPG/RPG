@@ -153,7 +153,8 @@ if ($mybb->request_method === 'post') {
             $stats_efectivas[$b] = ($stats_efectivas[$b] ?? 1) + 1;
         }
         $suma = array_sum($stats_efectivas);
-        $rango = ope_rol_rank_from_sum($suma);
+        $nivel = ope_rol_nivel_from_sum($suma);
+        $nivel_label = ope_rol_nivel_label($nivel);
 
         // ---- Virtudes y Defectos ----
         $virtudes_in = $mybb->get_input('virtudes', MyBB::INPUT_ARRAY);
@@ -266,8 +267,8 @@ if ($mybb->request_method === 'post') {
                 'estado' => 'aprobado',
                 'es_npc' => 1,
                 'activo' => 0,
-                'rango' => $rango,
-                'nivel' => 1,
+                'rango' => $nivel_label,
+                'nivel' => $nivel,
                 'avatar' => '',
                 'datos' => $db->escape_string(json_encode($datos, JSON_UNESCAPED_UNICODE)),
                 'inventario' => $db->escape_string(json_encode($inventario, JSON_UNESCAPED_UNICODE)),

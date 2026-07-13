@@ -304,52 +304,6 @@ function ope_pp_spend($pid, $cost, $tipo = 'gasto_stat', $notas = '')
 }
 
 /**
- * Tabla de costes de stats (INI-04).
- * Devuelve [de_rango, a_rango, coste_pp, coste_acumulado].
- */
-function ope_pp_stat_cost_table()
-{
-    return array(
-        array('F', 'E',   5,  5),
-        array('E', 'D',  10,  15),
-        array('D', 'C',  20,  35),
-        array('C', 'B',  35,  70),
-        array('B', 'A',  55,  125),
-        array('A', 'S',  80,  205),
-        array('S', 'SS', 110, 315),
-        array('SS','M',  150, 465),
-        array('M', 'M+', 200, 665),
-    );
-}
-
-/**
- * Coste para subir una stat del valor actual al siguiente rango.
- * @deprecated Use ope_rol_stat_upgrade_cost()
- */
-function ope_pp_stat_upgrade_cost($current_val)
-{
-    return ope_rol_stat_upgrade_cost($current_val);
-}
-
-/** @deprecated Use ope_rol_rank_from_sum() */
-function ope_pp_rank_from_sum($sum)
-{
-    return ope_rol_rank_from_sum($sum);
-}
-
-/** @deprecated Use ope_rol_rank_from_val() */
-function ope_pp_rank_from_val($val)
-{
-    return ope_rol_rank_from_val($val);
-}
-
-/** @deprecated Use ope_rol_val_from_rank() */
-function ope_pp_val_from_rank($rank)
-{
-    return ope_rol_val_from_rank($rank);
-}
-
-/**
  * Hook: cuenta palabras de cada post y asigna PP automáticamente.
  * Se ejecuta tras snapshot_post para no interferir.
  */
