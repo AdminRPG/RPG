@@ -35,7 +35,13 @@ function rolbridge_login_end()
         'exp'          => time() + (int) (getenv('ROL_JWT_EXPIRY') ?: 3600),
     ];
 
-    $jwt = \App\Auth\JWTService::encode($payload, getenv('ROL_JWT_SECRET'));
+    $secret = getenv('ROL_JWT_SECRET');
+    if (!$secret || $secret === 'change-this-to-a-random-secret') {
+        error_log('ROL_JWT_SECRET not properly configured');
+        return;
+    }
+
+    $jwt = \App\Auth\JWTService::encode($payload, $secret);
     my_setcookie(ROL_JWT_COOKIE, $jwt, time() + 3600, true);
 
     // Asegurar que existe la cuenta de rol
@@ -45,8 +51,14 @@ function rolbridge_login_end()
         CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $jwt],
         CURLOPT_TIMEOUT => 5,
     ]);
-    curl_exec($ch);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
+
+    if ($httpCode >= 400 || $response === false) {
+        error_log("ROL API error: HTTP {$httpCode} for /cuenta/mi-cuenta. Response: " . ($response ?: 'false'));
+        return;
+    }
 }
 $plugins->add_hook('member_do_login_end', 'rolbridge_login_end');
 
@@ -97,7 +109,7 @@ function rolbridge_newreply_start()
     global $mybb, $templates;
 
     if ($mybb->user['uid']) {
-        echo '<div id="rol-char-selector" style="margin-bottom:12px">
+        echo '<div id="rol-char-selector" class="rol-char-selector">
             <label><strong>Publicando como:</strong></label>
             <select id="rol-active-char" name="rol_char_id">
                 <option value="">Cargando personajes...</option>
@@ -118,6 +130,13 @@ function rolbridge_datahandler_post_insert(&$post)
 {
     $charId = (int) ($_POST['rol_char_id'] ?? 0);
     if ($charId > 0) {
+        global $db;
+        $check = $db->simple_select('rol_personajes', 'pid', "pid = {$charId} AND uid = " . (int)$mybb->user['uid']);
+        if (!$check || $db->num_rows($check) === 0) {
+            $charId = 0;
+        }
+    }
+    if ($charId > 0) {
         global $mybb;
         my_setcookie(ROL_CHAR_COOKIE, $charId, time() + 86400 * 30, true);
     }
@@ -129,7 +148,7 @@ function rolbridge_info()
 {
     return [
         'name' => 'I-Forge-RPG Bridge',
-        'description' => 'Puente entre MyBB y la API de rol. Proporciona autenticacion JWT, gestion de personajes y widgets.',
+        'description' => 'Puente entre MyBB y la API de rol. Proporciona autenticacion JWT, gestion de personajes y widgets. Requiere \App\Auth\JWTService.',
         'website' => '',
         'author' => 'I-Forge-RPG',
         'authorsite' => '',

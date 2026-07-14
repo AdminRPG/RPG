@@ -71,7 +71,8 @@ if ($loggedin && $activePid > 0 && $mybb->request_method === 'post' && is_array(
                 $mesCreacion = date('Y-m', (int)$th['dateline']);
 
                 // Duplicado
-                $dup = $db->fetch_field($db->simple_select('rol_mv_eventos', 'COUNT(*) c', "tid = {$tid} AND pid = {$activePid} AND ciclo_id = " . (int)$ciclo['ciclo_id']), 'c');
+                $dup_result = $db->fetch_field($db->simple_select('rol_mv_eventos', 'COUNT(*) c', "tid = {$tid} AND pid = {$activePid} AND ciclo_id = " . (int)$ciclo['ciclo_id']), 'c');
+                $dup = $dup_result !== null ? $dup_result : 0;
 
                 if ($zona === '') {
                     $flash = 'Ese tema no pertenece a ninguna región del mundo (¿es Off Topic?). Solo se notifican temas del mundo.'; $flash_kind = 'warn';

@@ -44,7 +44,7 @@
       try {
         const res = await fetch(ROL_API_URL + '/personajes/activo/' + userId, {
           headers: apiHeaders(),
-          signal: AbortSignal.timeout(3000),
+          signal: fetchTimeout(3000),
         });
         const json = await res.json();
 
@@ -84,7 +84,7 @@
     try {
       const res = await fetch(ROL_API_URL + '/cuenta/mi-cuenta', {
         headers: apiHeaders(),
-        signal: AbortSignal.timeout(3000),
+        signal: fetchTimeout(3000),
       });
       const json = await res.json();
 
@@ -135,7 +135,7 @@
     try {
       const res = await fetch(ROL_API_URL + '/personajes/activo/' + userId, {
         headers: apiHeaders(),
-        signal: AbortSignal.timeout(3000),
+        signal: fetchTimeout(3000),
       });
       const json = await res.json();
 
@@ -169,6 +169,15 @@
     } catch (e) {
       // Fallback silencioso
     }
+  }
+
+  function fetchTimeout(ms) {
+    if (typeof AbortSignal.timeout === 'function') {
+      return AbortSignal.timeout(ms);
+    }
+    const controller = new AbortController();
+    setTimeout(function () { controller.abort(); }, ms);
+    return controller.signal;
   }
 
   // ─── Util: escape HTML basico ───

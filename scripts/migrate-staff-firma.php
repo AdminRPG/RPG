@@ -25,37 +25,12 @@
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-$db = new mysqli('127.0.0.1', 'root', '', 'mybb_foro');
-if ($db->connect_error) {
-    fwrite(STDERR, "DB connection error: " . $db->connect_error . "\n");
-    exit(1);
-}
-$db->set_charset('utf8mb4');
+require __DIR__ . '/_db-config.php';
+require __DIR__ . '/_migrate-lib.php';
 
 $PREFIX = 'mybb_';
 
-function col_exists(mysqli $db, string $table, string $col): bool
-{
-    $t = $db->real_escape_string($table);
-    $c = $db->real_escape_string($col);
-    $res = $db->query("SHOW COLUMNS FROM `{$t}` LIKE '{$c}'");
-    return $res && $res->num_rows > 0;
-}
-
-function add_col(mysqli $db, string $table, string $col, string $definition): void
-{
-    if (col_exists($db, $table, $col)) {
-        echo "  [skip] {$table}.{$col} ya existe\n";
-        return;
-    }
-    if ($db->query("ALTER TABLE `{$table}` ADD COLUMN `{$col}` {$definition}") === false) {
-        fwrite(STDERR, "  [ERROR] {$table}.{$col}: " . $db->error . "\n");
-        exit(1);
-    }
-    echo "  [OK] {$table}.{$col} añadida\n";
-}
-
-function run(mysqli $db, string $sql, string $label): void
+function staff_firma_run(mysqli $db, string $sql, string $label): void
 {
     if ($db->query($sql) === false) {
         fwrite(STDERR, "  [ERROR] {$label}: " . $db->error . "\n");
@@ -73,7 +48,7 @@ add_col($db, "{$PREFIX}rol_personajes", 'icono',          "VARCHAR(255) NOT NULL
 add_col($db, "{$PREFIX}rol_personajes", 'firma',          "TEXT NULL COMMENT 'firma BBCode por personaje'");
 
 echo "\n--- Tablas de apoyo (fases siguientes) ---\n";
-run($db, "
+staff_firma_run($db, "
     CREATE TABLE IF NOT EXISTS `{$PREFIX}rol_post_templates` (
         tpl_id    INT UNSIGNED NOT NULL AUTO_INCREMENT,
         pid       INT UNSIGNED NOT NULL,
@@ -86,7 +61,7 @@ run($db, "
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ", "rol_post_templates");
 
-run($db, "
+staff_firma_run($db, "
     CREATE TABLE IF NOT EXISTS `{$PREFIX}rol_relaciones` (
         rid         INT UNSIGNED NOT NULL AUTO_INCREMENT,
         pid         INT UNSIGNED NOT NULL COMMENT 'personaje dueño del mapa',
@@ -103,7 +78,7 @@ run($db, "
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ", "rol_relaciones");
 
-run($db, "
+staff_firma_run($db, "
     CREATE TABLE IF NOT EXISTS `{$PREFIX}rol_thread_meta` (
         tid       INT UNSIGNED NOT NULL,
         era       ENUM('pasado','presente') NOT NULL DEFAULT 'presente',

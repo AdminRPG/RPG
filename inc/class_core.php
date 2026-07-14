@@ -309,10 +309,10 @@ class MyBB {
 		}
 
 		// Are we running in debug mode?
-		if(isset($this->input['debug']) && $this->input['debug'] == 1)
-		{
-			$this->debug_mode = true;
-		}
+	if(isset($this->input['debug']) && $this->input['debug'] == 1 && !empty($this->user['cancp']) && $this->user['cancp'] == 1)
+	{
+		$this->debug_mode = true;
+	}
 
 		if(isset($this->input['action']) && $this->input['action'] == "mybb_logo")
 		{

@@ -20,12 +20,7 @@ if ($codename === '' || !in_array($state, array('on', 'off'), true)) {
     exit(1);
 }
 
-$db = new mysqli('127.0.0.1', 'root', '', 'mybb_foro');
-if ($db->connect_error) {
-    fwrite(STDERR, "DB connection error: " . $db->connect_error . "\n");
-    exit(1);
-}
-$db->set_charset('utf8mb4');
+require __DIR__ . '/_db-config.php';
 $PREFIX = 'mybb_';
 
 $res = $db->query("SELECT cache FROM {$PREFIX}datacache WHERE title = 'plugins' LIMIT 1");

@@ -11,6 +11,7 @@
  */
 
 define('IN_MYBB', 1);
+$oldCwd = getcwd();
 chdir(__DIR__ . '/..');
 require_once './global.php';
 
@@ -39,3 +40,4 @@ while ($row = $db->fetch_array($q)) {
 }
 
 echo "Corregidos: $fixed\n";
+chdir($oldCwd);

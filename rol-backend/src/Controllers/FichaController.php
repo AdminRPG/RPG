@@ -170,6 +170,13 @@ class FichaController
     public function aprobar(Request $request, Response $response, array $args): Response
     {
         $cuenta = $this->getCuenta($request);
+
+        if (!$cuenta->es_narrador) {
+            return $this->json($response, [
+                'success' => false, 'error' => 'No tienes permisos para aprobar personajes',
+            ], 403);
+        }
+
         $personaje = Personaje::find((int) $args['id']);
 
         if (!$personaje) {
@@ -197,6 +204,13 @@ class FichaController
     public function rechazar(Request $request, Response $response, array $args): Response
     {
         $cuenta = $this->getCuenta($request);
+
+        if (!$cuenta->es_narrador) {
+            return $this->json($response, [
+                'success' => false, 'error' => 'No tienes permisos para rechazar personajes',
+            ], 403);
+        }
+
         $personaje = Personaje::find((int) $args['id']);
 
         if (!$personaje) {

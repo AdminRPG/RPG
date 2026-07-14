@@ -53,21 +53,24 @@ function ope_racha_procesar_post($pid) {
         $recompensa_otorgada = null;
         foreach (array(7, 14, 21, 30) as $hito) {
             $flag = "recompensa_dia{$hito}";
-            if ($dias_actual >= $hito && !$racha[$flag] && isset($recompensas[$hito])) {
+            if ($dias_actual >= $hito && isset($recompensas[$hito])) {
                 $r = $recompensas[$hito];
-                if (function_exists('ope_pp_add')) {
-                    ope_pp_add($pid, $r['pp'], 'racha', 0, 0, 0, "Racha día {$hito}");
+                $updated = $db->write_query("UPDATE " . TABLE_PREFIX . "rol_rachas SET {$flag} = 1, updated_at = {$ahora} WHERE pid = {$pid} AND {$flag} = 0");
+                if ($db->affected_rows() > 0) {
+                    if (function_exists('ope_pp_add')) {
+                        ope_pp_add($pid, $r['pp'], 'racha', 0, 0, 0, "Racha día {$hito}");
+                    }
+                    $pj_q = $db->simple_select('rol_personajes', 'economia', "pid = {$pid}", array('limit' => 1));
+                    if ($db->num_rows($pj_q)) {
+                        $eco = json_decode((string)$db->fetch_field($pj_q, 'economia'), true);
+                        if (!is_array($eco)) $eco = array();
+                        $eco['berries'] = ((int)($eco['berries'] ?? 0)) + $r['berries'];
+                        $db->update_query('rol_personajes', array('economia' => $db->escape_string(json_encode($eco, JSON_UNESCAPED_UNICODE))), "pid = {$pid}");
+                    }
+                    $update[$flag] = 1;
+                    $recompensa_otorgada = $r;
+                    break;
                 }
-                $pj_q = $db->simple_select('rol_personajes', 'economia', "pid = {$pid}", array('limit' => 1));
-                if ($db->num_rows($pj_q)) {
-                    $eco = json_decode((string)$db->fetch_field($pj_q, 'economia'), true);
-                    if (!is_array($eco)) $eco = array();
-                    $eco['berries'] = ((int)($eco['berries'] ?? 0)) + $r['berries'];
-                    $db->update_query('rol_personajes', array('economia' => $db->escape_string(json_encode($eco, JSON_UNESCAPED_UNICODE))), "pid = {$pid}");
-                }
-                $update[$flag] = 1;
-                $recompensa_otorgada = $r;
-                break;
             }
         }
 

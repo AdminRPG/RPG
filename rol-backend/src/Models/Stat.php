@@ -14,13 +14,10 @@ class Stat extends Model
         'personaje_id',
         'pilar',
         'stat_key',
-        'rango',
         'valor',
-        'es_mejorada',
     ];
 
     protected $casts = [
-        'es_mejorada' => 'boolean',
         'valor' => 'integer',
     ];
 
@@ -32,9 +29,9 @@ class Stat extends Model
     public static function crearPorDefecto(int $personajeId): void
     {
         $stats = [
-            'cuerpo'  => ['fuerza', 'destreza', 'vigor', 'agilidad'],
-            'mente'   => ['intelecto', 'ingenio', 'concentracion', 'percepcion'],
-            'espiritu'=> ['carisma', 'control', 'voluntad', 'sensibilidad'],
+            'cuerpo'   => ['FUE', 'DES', 'VIG', 'AGI'],
+            'mente'    => ['INT', 'ING', 'CON', 'PER'],
+            'espiritu' => ['CAR', 'CTR', 'VOL', 'SEN'],
         ];
 
         foreach ($stats as $pilar => $keys) {
@@ -43,9 +40,7 @@ class Stat extends Model
                     'personaje_id' => $personajeId,
                     'pilar' => $pilar,
                     'stat_key' => $key,
-                    'rango' => 'F',
-                    'valor' => 1,
-                    'es_mejorada' => false,
+                    'valor' => 5,
                 ]);
             }
         }

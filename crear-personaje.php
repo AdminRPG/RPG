@@ -25,29 +25,11 @@ $loggedin = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int)($mybb->user['uid'] ?? 0);
 $username = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
-$staff_level = 0;
-if ($loggedin) {
-    if (isset($mybb->user['ope_staff_level'])) {
-        $staff_level = (int)$mybb->user['ope_staff_level'];
-    } elseif ($db->table_exists('rol_cuentas')) {
-        $cq = $db->simple_select('rol_cuentas', 'staff_level', "uid = {$uid}", array('limit' => 1));
-        if ($db->num_rows($cq)) {
-            $staff_level = (int)$db->fetch_field($cq, 'staff_level');
-        }
-    }
-}
+require_once MYBB_ROOT . 'inc/ope_user_init.php';
 
-$initials = '';
-if ($loggedin) {
-    $parts = preg_split('/\s+/', trim((string)$mybb->user['username']));
-    foreach ($parts as $p) {
-        if ($p !== '') {
-            $initials .= function_exists('mb_substr') ? mb_substr($p, 0, 1, 'UTF-8') : substr($p, 0, 1);
-        }
-    }
-    $initials = function_exists('mb_substr') ? mb_substr($initials, 0, 2, 'UTF-8') : substr($initials, 0, 2);
-    $initials = function_exists('mb_strtoupper') ? mb_strtoupper($initials, 'UTF-8') : strtoupper($initials);
-}
+$staff_level = ope_get_staff_level($uid);
+
+$initials   = ope_get_initials($mybb->user['username'] ?? '');
 $initials_e = htmlspecialchars_uni($initials);
 
 $RAZAS      = ope_rol_razas();
@@ -346,15 +328,19 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             ));
 
             if ($pid && $db->table_exists('rol_tramites')) {
-                $db->insert_query('rol_tramites', array(
-                    'uid' => $uid,
-                    'pid' => (int)$pid,
-                    'tipo' => 'crear_personaje',
-                    'estado' => 'pendiente',
-                    'datos' => $db->escape_string(json_encode(array('nombre' => $nombre, 'faccion' => $faccion), JSON_UNESCAPED_UNICODE)),
-                    'dateline' => TIME_NOW,
-                    'lastedit' => TIME_NOW,
-                ));
+                $nuevo_pid = (int)$pid;
+                $existing = $db->simple_select('rol_tramites', 'id', "pid = {$nuevo_pid} AND tipo = 'crear_personaje' AND estado = 'pendiente'", array('limit' => 1));
+                if ($db->num_rows($existing) == 0) {
+                    $db->insert_query('rol_tramites', array(
+                        'uid' => $uid,
+                        'pid' => $nuevo_pid,
+                        'tipo' => 'crear_personaje',
+                        'estado' => 'pendiente',
+                        'datos' => $db->escape_string(json_encode(array('nombre' => $nombre, 'faccion' => $faccion), JSON_UNESCAPED_UNICODE)),
+                        'dateline' => TIME_NOW,
+                        'lastedit' => TIME_NOW,
+                    ));
+                }
             }
 
             $ok = true;

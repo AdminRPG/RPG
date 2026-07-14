@@ -18,46 +18,14 @@
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-$db = new mysqli('127.0.0.1', 'root', '', 'mybb_foro');
-if ($db->connect_error) {
-    fwrite(STDERR, "DB connection error: " . $db->connect_error . "\n");
-    exit(1);
-}
-$db->set_charset('utf8mb4');
+require __DIR__ . '/_db-config.php';
+require __DIR__ . '/_migrate-lib.php';
 
 $PREFIX = 'mybb_';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function col_exists(mysqli $db, string $table, string $col): bool
-{
-    $t = $db->real_escape_string($table);
-    $c = $db->real_escape_string($col);
-    $res = $db->query("SHOW COLUMNS FROM `{$t}` LIKE '{$c}'");
-    return $res && $res->num_rows > 0;
-}
-
-function add_col(mysqli $db, string $table, string $col, string $definition): void
-{
-    if (col_exists($db, $table, $col)) {
-        echo "  [skip] {$table}.{$col} ya existe\n";
-        return;
-    }
-    if ($db->query("ALTER TABLE `{$table}` ADD COLUMN `{$col}` {$definition}") === false) {
-        fwrite(STDERR, "  [ERROR] {$table}.{$col}: " . $db->error . "\n");
-        exit(1);
-    }
-    echo "  [OK] {$table}.{$col} añadida\n";
-}
-
-function table_exists(mysqli $db, string $table): bool
-{
-    $t = $db->real_escape_string($table);
-    $res = $db->query("SHOW TABLES LIKE '{$t}'");
-    return $res && $res->num_rows > 0;
-}
-
-function run(mysqli $db, string $sql, string $label): void
+function oleada1_run(mysqli $db, string $sql, string $label): void
 {
     if ($db->query($sql) === false) {
         fwrite(STDERR, "  [ERROR] {$label}: " . $db->error . "\n");
@@ -199,7 +167,7 @@ if ($sys_uid > 0 && table_exists($db, "{$PREFIX}rol_personajes")) {
 echo "\n=== 2. TABLAS DE PP ===\n";
 
 // 2a. rol_pp_saldo — saldo de PP por personaje (cache vivo).
-run($db, "
+oleada1_run($db, "
     CREATE TABLE IF NOT EXISTS `{$PREFIX}rol_pp_saldo` (
         `pid`         INT UNSIGNED NOT NULL,
         `pp_total`    INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'PP ganados totales (suma de todos los logs)',
@@ -211,7 +179,7 @@ run($db, "
 ", 'rol_pp_saldo');
 
 // 2b. rol_pp_log — registro de cada ganancia/gasto de PP.
-run($db, "
+oleada1_run($db, "
     CREATE TABLE IF NOT EXISTS `{$PREFIX}rol_pp_log` (
         `log_id`    BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         `pid`       INT UNSIGNED NOT NULL COMMENT 'personaje que gana/gasta PP',

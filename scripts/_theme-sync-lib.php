@@ -29,12 +29,7 @@ define('OPE_TEMPLATE_XML_FILES', [
 
 function ope_db_connect(): mysqli
 {
-    $db = new mysqli('127.0.0.1', 'root', '', 'mybb_foro');
-    if ($db->connect_error) {
-        fwrite(STDERR, "DB connection error: {$db->connect_error}\n");
-        exit(1);
-    }
-    $db->set_charset('utf8mb4');
+    require __DIR__ . '/_db-config.php';
     return $db;
 }
 
@@ -142,7 +137,7 @@ function ope_import_css(mysqli $db, int $tid, bool $quiet = false): void
 
     $theme_dir = dirname(__DIR__) . "/cache/themes/theme{$tid}";
     if (!is_dir($theme_dir)) {
-        @mkdir($theme_dir, 0777, true);
+        @mkdir($theme_dir, 0755, true);
     }
     $cache_path = "{$theme_dir}/ope.css";
     if (@file_put_contents($cache_path, $css) === false) {
@@ -233,13 +228,20 @@ function ope_update_template_in_xml_file(string $path, string $title, string $co
     }
 
     $xpath = new DOMXPath($dom);
-    $nodes = $xpath->query("/theme/templates/template[@name='" . str_replace("'", '', $title) . "']");
-    if ($nodes->length === 0) {
+    $allTemplates = $xpath->query("/theme/templates/template");
+    $nodes = [];
+    foreach ($allTemplates as $template) {
+        if ((string)$template->getAttribute('name') === $title) {
+            $nodes[] = $template;
+            break;
+        }
+    }
+    if (count($nodes) === 0) {
         return false;
     }
 
     /** @var DOMElement $node */
-    $node = $nodes->item(0);
+    $node = $nodes[0];
     while ($node->firstChild) {
         $node->removeChild($node->firstChild);
     }

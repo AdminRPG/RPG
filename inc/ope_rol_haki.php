@@ -91,26 +91,36 @@ function ope_haki_subir($pid, $tipo) {
         return "Necesitas nivel {$info['requiere_nivel']} (tienes {$pj_nivel}).";
     }
 
-    // Gastar PP
-    $ok = ope_pp_spend($pid, $coste, 'gasto_haki', "{$tipos[$tipo]['nombre']} Nivel {$siguiente}");
-    if (!$ok) return "No tienes suficientes PP. Necesitas {$coste}.";
+    // Gastar PP y guardar Haki atómicamente
+    $db->write_query('START TRANSACTION');
+    try {
+        $ok = ope_pp_spend($pid, $coste, 'gasto_haki', "{$tipos[$tipo]['nombre']} Nivel {$siguiente}");
+        if (!$ok) {
+            $db->write_query('ROLLBACK');
+            return "No tienes suficientes PP. Necesitas {$coste}.";
+        }
 
-    // Guardar
-    $exist = $db->simple_select('rol_haki', 'id', "pid = {$pid} AND tipo = '{$db->escape_string($tipo)}'", array('limit' => 1));
-    if ($db->num_rows($exist)) {
-        $db->update_query('rol_haki', array(
-            'nivel' => $siguiente,
-            'pp_gastado' => $haki[$tipo]['pp_gastado'] + $coste,
-            'unlocked_at' => $nivel_actual === 0 ? date('Y-m-d H:i:s') : null,
-        ), "pid = {$pid} AND tipo = '{$db->escape_string($tipo)}'");
-    } else {
-        $db->insert_query('rol_haki', array(
-            'pid' => $pid,
-            'tipo' => $db->escape_string($tipo),
-            'nivel' => $siguiente,
-            'pp_gastado' => $coste,
-            'unlocked_at' => date('Y-m-d H:i:s'),
-        ));
+        $exist = $db->simple_select('rol_haki', 'id', "pid = {$pid} AND tipo = '{$db->escape_string($tipo)}'", array('limit' => 1));
+        if ($db->num_rows($exist)) {
+            $db->update_query('rol_haki', array(
+                'nivel' => $siguiente,
+                'pp_gastado' => $haki[$tipo]['pp_gastado'] + $coste,
+                'unlocked_at' => $nivel_actual === 0 ? date('Y-m-d H:i:s') : null,
+            ), "pid = {$pid} AND tipo = '{$db->escape_string($tipo)}'");
+        } else {
+            $db->insert_query('rol_haki', array(
+                'pid' => $pid,
+                'tipo' => $db->escape_string($tipo),
+                'nivel' => $siguiente,
+                'pp_gastado' => $coste,
+                'unlocked_at' => date('Y-m-d H:i:s'),
+            ));
+        }
+
+        $db->write_query('COMMIT');
+    } catch (Exception $e) {
+        $db->write_query('ROLLBACK');
+        return 'Error interno al procesar la mejora.';
     }
 
     return ''; // éxito

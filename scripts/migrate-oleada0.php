@@ -18,37 +18,12 @@
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-$db = new mysqli('127.0.0.1', 'root', '', 'mybb_foro');
-if ($db->connect_error) {
-    fwrite(STDERR, "DB connection error: " . $db->connect_error . "\n");
-    exit(1);
-}
-$db->set_charset('utf8mb4');
+require __DIR__ . '/_db-config.php';
+require __DIR__ . '/_migrate-lib.php';
 
 $PREFIX = 'mybb_';
 
-function col_exists(mysqli $db, string $table, string $col): bool
-{
-    $t = $db->real_escape_string($table);
-    $c = $db->real_escape_string($col);
-    $res = $db->query("SHOW COLUMNS FROM `{$t}` LIKE '{$c}'");
-    return $res && $res->num_rows > 0;
-}
-
-function add_col(mysqli $db, string $table, string $col, string $definition): void
-{
-    if (col_exists($db, $table, $col)) {
-        echo "  [skip] {$table}.{$col} ya existe\n";
-        return;
-    }
-    if ($db->query("ALTER TABLE `{$table}` ADD COLUMN `{$col}` {$definition}") === false) {
-        fwrite(STDERR, "  [ERROR] {$table}.{$col}: " . $db->error . "\n");
-        exit(1);
-    }
-    echo "  [OK] {$table}.{$col} añadida\n";
-}
-
-function run(mysqli $db, string $sql, string $label): void
+function oleada0_run(mysqli $db, string $sql, string $label): void
 {
     if ($db->query($sql) === false) {
         fwrite(STDERR, "  [ERROR] {$label}: " . $db->error . "\n");
@@ -76,7 +51,7 @@ add_col($db, "{$PREFIX}rol_personajes", 'ps_gastados',
 
 echo "\n=== 2. TABLAS NUEVAS ===\n";
 
-run($db, "
+oleada0_run($db, "
     CREATE TABLE IF NOT EXISTS `{$PREFIX}rol_haki` (
         `id`        INT PRIMARY KEY AUTO_INCREMENT,
         `pid`       INT NOT NULL,
@@ -90,7 +65,7 @@ run($db, "
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ", 'rol_haki');
 
-run($db, "
+oleada0_run($db, "
     CREATE TABLE IF NOT EXISTS `{$PREFIX}rol_pl` (
         `pid`            INT PRIMARY KEY,
         `pl_total`       INT NOT NULL DEFAULT 0,
@@ -100,7 +75,7 @@ run($db, "
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ", 'rol_pl');
 
-run($db, "
+oleada0_run($db, "
     CREATE TABLE IF NOT EXISTS `{$PREFIX}rol_pl_log` (
         `log_id`     INT PRIMARY KEY AUTO_INCREMENT,
         `pid`        INT NOT NULL,
@@ -112,7 +87,7 @@ run($db, "
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ", 'rol_pl_log');
 
-run($db, "
+oleada0_run($db, "
     CREATE TABLE IF NOT EXISTS `{$PREFIX}rol_wanted` (
         `pid`         INT PRIMARY KEY,
         `bounty`      BIGINT NOT NULL DEFAULT 0 COMMENT 'Recompensa en berries (cosmético)',

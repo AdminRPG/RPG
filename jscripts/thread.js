@@ -443,7 +443,9 @@ var Thread = {
 
 			// Eval javascript
 			$(json.data).filter("script").each(function(e) {
-				eval($(this).text());
+				if ($(this).text()) {
+					$.globalEval($(this).text());
+				}
 			});
 
 			$('#quick_reply_form')[0].reset();
@@ -458,7 +460,9 @@ var Thread = {
 		{
 			// Eval javascript
 			$(json.data).filter("script").each(function(e) {
-				eval($(this).text());
+				if ($(this).text()) {
+					$.globalEval($(this).text());
+				}
 			});
 		}
 
@@ -617,7 +621,7 @@ var Thread = {
 
 	splitToolHandler: function()
 	{
-		if($(thread_deleted !== "1" && "#moderator_options_selector").length !== 0){
+		if (thread_deleted !== "1" && $("#moderator_options_selector").length !== 0) {
 			var splitTool = $("#moderator_options_selector").find("option[value=split]");
 			if(visible_replies > 0) {
 				splitTool.prop("disabled", false);

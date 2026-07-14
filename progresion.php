@@ -32,20 +32,13 @@ if ($loggedin) {
     }
 }
 
+require_once MYBB_ROOT . 'inc/ope_user_init.php';
+
 // Staff level
-$staff_level = 0;
-if ($loggedin && $active_pid > 0 && $db->table_exists('rol_personajes')) {
-    $staff_level = (int) ($mybb->user['ope_staff_level'] ?? 0);
-    if ($staff_level < 1) {
-        $sq = $db->simple_select('rol_cuentas', 'staff_level', "uid = {$uid}", array('limit' => 1));
-        if ($db->num_rows($sq)) {
-            $staff_level = (int) $db->fetch_field($sq, 'staff_level');
-        }
-    }
-}
+$staff_level = ope_get_staff_level($uid, $active_pid);
 
 // Nombre a mostrar en navbar
-$display_name = (string) ($mybb->user['ope_display_name'] ?? ($mybb->user['username'] ?? ''));
+$display_name   = ope_get_display_name();
 $display_name_e = htmlspecialchars_uni($display_name);
 
 // ── Cargar personaje ──

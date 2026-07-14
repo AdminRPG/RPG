@@ -386,7 +386,7 @@ var MyBB = {
 
 	HTMLchars: function(text)
 	{
-		text = text.replace(new RegExp("&(?!#[0-9]+;)", "g"), "&amp;");
+		text = text.replace(new RegExp("&(?!#[0-9]+;)(?!#x[0-9a-fA-F]+;)", "g"), "&amp;");
 		text = text.replace(/</g, "&lt;");
 		text = text.replace(/>/g, "&gt;");
 		text = text.replace(/"/g, "&quot;");
@@ -629,7 +629,7 @@ var Cookie = {
 			expires: expire,
 			path: cookiePath,
 			domain: cookieDomain,
-			secure: cookieSecureFlag == true,
+			secure: cookieSecureFlag === true,
 		};
 
 		return Cookies.set(name, value, options);

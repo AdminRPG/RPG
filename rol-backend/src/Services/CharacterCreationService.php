@@ -13,19 +13,16 @@ use Illuminate\Database\Capsule\Manager as DB;
 class CharacterCreationService
 {
     const PUNTOS_VIRTUD_GRATIS = 6;
-    const MAX_UPGRADES_CREACION = 1;
-    const STATS_POR_RAZA = 12;
+    const STAT_CAP_CREACION = 20;
+    const STAT_MINIMO = 5;
+    const PS_DEFAULT = 30;
+    const PS_HUMANO = 40;
 
     const PILARES = ['cuerpo', 'mente', 'espiritu'];
     const STATS = [
-        'cuerpo'  => ['fuerza', 'destreza', 'vigor', 'agilidad'],
-        'mente'   => ['intelecto', 'ingenio', 'concentracion', 'percepcion'],
-        'espiritu'=> ['carisma', 'control', 'voluntad', 'sensibilidad'],
-    ];
-
-    const RANGOS = [
-        'F' => 1, 'E' => 2, 'D' => 3, 'C' => 4, 'B' => 5,
-        'A' => 6, 'S' => 7, 'SS' => 8, 'SSS' => 9, 'M+' => 10,
+        'cuerpo'   => ['FUE', 'DES', 'VIG', 'AGI'],
+        'mente'    => ['INT', 'ING', 'CON', 'PER'],
+        'espiritu' => ['CAR', 'CTR', 'VOL', 'SEN'],
     ];
 
     /**
@@ -67,7 +64,8 @@ class CharacterCreationService
             ];
         } catch (\Exception $e) {
             DB::rollBack();
-            return ['success' => false, 'errors' => ['Error interno: ' . $e->getMessage()]];
+            error_log('CharacterCreationService error: ' . $e->getMessage());
+            return ['success' => false, 'errors' => ['Error interno al crear el personaje. Intentalo de nuevo.']];
         }
     }
 
@@ -100,26 +98,21 @@ class CharacterCreationService
             $errors[] = 'Faltan stats requeridas: ' . implode(', ', $diff);
         }
 
-        $mejoradas = 0;
         foreach ($stats as $key => $stat) {
-            $rango = $stat['rango'] ?? 'F';
-            if (!isset(self::RANGOS[$rango])) {
-                $errors[] = "Stat '$key': rango '$rango' no válido.";
+            $valor = $stat['valor'] ?? $stat;
+            if (!is_numeric($valor)) {
+                $errors[] = "Stat '$key': valor no numerico.";
                 continue;
             }
 
-            $valorEsperado = self::RANGOS[$rango];
-            if (($stat['valor'] ?? 0) !== $valorEsperado) {
-                $errors[] = "Stat '$key': valor {$stat['valor']} no coincide con rango $rango (esperado $valorEsperado).";
+            $valor = (int) $valor;
+            if ($valor < self::STAT_MINIMO) {
+                $errors[] = "Stat '$key': valor {$valor} menor que el minimo (" . self::STAT_MINIMO . ").";
             }
 
-            if ($rango !== 'F') {
-                $mejoradas++;
+            if ($valor > self::STAT_CAP_CREACION) {
+                $errors[] = "Stat '$key': {$valor} supera el maximo de creacion (" . self::STAT_CAP_CREACION . ").";
             }
-        }
-
-        if ($mejoradas > self::MAX_UPGRADES_CREACION) {
-            $errors[] = "Solo puedes mejorar " . self::MAX_UPGRADES_CREACION . " stat en creación. Has mejorado $mejoradas.";
         }
     }
 
@@ -181,14 +174,13 @@ class CharacterCreationService
 
         foreach ($stats as $key => $stat) {
             $pilar = $this->findPilarByStatKey($key);
+            $valor = is_array($stat) ? (int) ($stat['valor'] ?? 5) : (int) $stat;
 
             Stat::create([
                 'personaje_id' => $personajeId,
                 'pilar' => $pilar,
                 'stat_key' => $key,
-                'rango' => $stat['rango'] ?? 'F',
-                'valor' => $stat['valor'] ?? 1,
-                'es_mejorada' => ($stat['rango'] ?? 'F') !== 'F',
+                'valor' => $valor,
             ]);
         }
     }
@@ -266,7 +258,7 @@ class CharacterCreationService
                 return $pilar;
             }
         }
-        return 'cuerpo';
+        throw new \InvalidArgumentException("Unknown stat key: '$key'");
     }
 
     public function nextSlotIndex(int $cuentaId): int

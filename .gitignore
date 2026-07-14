@@ -46,3 +46,26 @@ backups/
 
 # Graphify generated graph (rebuild with: py -m graphify extract . --code-only)
 graphify-out/
+
+# Large source images
+images/ope/_source/
+images/mundo-vivo/paper.jpg
+images/mundo-vivo/estado-hero.jpg
+images/mundo-vivo/noticia-placeholder.jpg
+images/mundo-vivo/masthead.png
+images/foros/19.jpg
+images/foros/23.jpg
+
+# Root screenshots (development artifacts)
+ficha-full.png
+forum-*.png
+guias-*.png
+prototype-*.png
+tienda-*.png
+tramites-*.png
+index-full.png
+calendario-page.png
+
+# Development artifacts
+guia_3728.html
+calendario-snapshot.md

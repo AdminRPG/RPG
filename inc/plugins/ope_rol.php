@@ -500,56 +500,7 @@ function ope_rol_navbar_css()
     }
     $done = true;
 
-    return '<style id="ope-navbar-css">'
-        . 'body{padding-top:52px}'
-        . '#ope-navbar{position:fixed;inset:0 0 auto 0;height:52px;z-index:1000;background:var(--iron-edge);border-bottom:2px solid #000;font-size:15px}'
-        . '#ope-navbar *{box-sizing:border-box}'
-        // Reset explícito de <button>: páginas del pipeline MyBB heredan un
-        // reset de botón desde global.css/css3.css, pero páginas propias en
-        // PHP puro (ficha.php, personajes.php, etc.) SOLO cargan ope.css, así
-        // que sin esto el navegador pinta el chrome nativo (fondo blanco,
-        // borde "outset") en los botones de la navbar. Fuente única: no
-        // depender de que cada página cargue el reset de MyBB.
-        . '#ope-navbar button{background:none;border:none;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none}'
-        . '#ope-navbar .ope-nav{max-width:1300px;margin:0 auto;height:100%;padding:0 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}'
-        . '#ope-navbar .ope-nav-logo{font-family:var(--disp);font-weight:900;font-size:1.45rem;letter-spacing:1px;color:var(--paper);text-transform:uppercase;line-height:1;display:flex;align-items:center;gap:9px;text-decoration:none}'
-        . '#ope-navbar .ope-nav-logo::before{content:"";width:11px;height:11px;background:var(--ember);box-shadow:0 0 10px var(--ember);flex:0 0 auto}'
-        . '#ope-navbar .ope-nav-logo:hover{color:#fff}'
-        . '#ope-navbar .ope-nav-links{display:flex;gap:2px}'
-        . '#ope-navbar .ope-nav-link{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--paper-dim);text-transform:uppercase;letter-spacing:1px;padding:7px 11px;border:1px solid transparent;text-decoration:none;line-height:1}'
-        . '#ope-navbar .ope-nav-link:hover,#ope-navbar .ope-nav-link.on{color:var(--iron);background:var(--ember);border-color:#000}'
-        . '#ope-navbar .ope-nav-dd{position:relative;display:flex}'
-        . '#ope-navbar .ope-nav-dd-btn{display:inline-flex;align-items:center;gap:5px;cursor:pointer}'
-        . '#ope-navbar .ope-dd-caret{font-size:.6rem;line-height:1;transition:transform .12s}'
-        . '#ope-navbar .ope-nav-dd-menu{left:0;right:auto;top:40px}'
-        . '#ope-navbar .ope-nav-right{display:flex;align-items:center;gap:10px}'
-        . '#ope-navbar .ope-nav-cta{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--iron);background:var(--paper);padding:7px 12px;border:2px solid #000;text-decoration:none;transition:transform .12s,box-shadow .12s;line-height:1}'
-        . '#ope-navbar .ope-nav-cta:hover{transform:translate(-1px,-1px);box-shadow:2px 2px 0 #000}'
-        . '#ope-navbar .ope-user-menu{position:relative}'
-        . '#ope-navbar .ope-user-name{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper);background:var(--iron-plate);border:2px solid #000;padding:7px 12px;cursor:pointer;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1}'
-        . '#ope-navbar .ope-user-name:hover{border-color:var(--ember)}'
-        . '#ope-navbar .ope-dropdown{display:none;position:absolute;right:0;top:44px;background:var(--iron-plate);border:2px solid #000;min-width:200px;z-index:100}'
-        . '#ope-navbar .ope-dropdown.open{display:block}'
-        . '#ope-navbar .ope-dropdown-item{display:block;padding:10px 14px;font-family:var(--mono);font-size:.68rem;color:var(--paper-dim);border-bottom:1px solid var(--iron-edge);text-decoration:none;transition:background .12s,color .12s}'
-        . '#ope-navbar .ope-dropdown-item:last-child{border-bottom:none}'
-        . '#ope-navbar .ope-dropdown-item:hover{background:var(--iron-hi);color:var(--paper)}'
-        . '#ope-navbar .ope-dropdown-divider{border:none;border-top:1px solid var(--iron-edge);margin:0}'
-        . '#ope-navbar .ope-btn-ghost{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:7px 13px;border:2px solid var(--rivet);background:transparent;color:var(--paper);text-decoration:none;transition:transform .12s,box-shadow .12s;line-height:1}'
-        . '#ope-navbar .ope-btn-ghost:hover{color:var(--iron);background:var(--paper);border-color:#000;transform:translate(-1px,-1px);box-shadow:2px 2px 0 #000}'
-        . '#ope-navbar .ope-nav-bell{position:relative;display:flex;align-items:center;justify-content:center;padding:6px 8px;color:var(--paper-dim);transition:color .12s}'
-        . '#ope-navbar .ope-nav-bell:hover{color:var(--ember-hi)}'
-        . '#ope-navbar .ope-nav-bell svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}'
-        . '#ope-navbar .ope-bell-badge{position:absolute;top:0;right:2px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--crack);color:#fff;font-family:var(--mono);font-size:.58rem;font-weight:700;line-height:16px;text-align:center}'
-        . '#ope-navbar .ope-theme-picker{position:relative}'
-        . '#ope-navbar .ope-theme-toggle{opacity:.86;transition:opacity .12s,transform .12s}'
-        . '#ope-navbar .ope-theme-toggle:hover{opacity:1;transform:scale(1.08);color:var(--paper-dim)}'
-        . '#ope-navbar .ope-theme-pop{display:none;position:absolute;right:0;top:44px;background:var(--iron-plate);border:2px solid #000;padding:10px;z-index:100;width:118px;flex-wrap:wrap;gap:8px}'
-        . '#ope-navbar .ope-theme-pop.open{display:flex}'
-        . '#ope-navbar .ope-theme-dot{width:22px;height:22px;flex:0 0 auto;border-radius:50%;border:2px solid #000;padding:0;cursor:pointer;transition:transform .12s,box-shadow .12s}'
-        . '#ope-navbar .ope-theme-dot:hover{transform:scale(1.15)}'
-        . '#ope-navbar .ope-theme-dot.active{box-shadow:0 0 0 2px var(--iron-plate),0 0 0 4px var(--paper)}'
-        . '@media(max-width:640px){#ope-navbar .ope-nav-links{display:none}#ope-navbar .ope-nav-logo{font-size:1.2rem}}'
-        . '</style>';
+    return '';
 }
 
 /**
@@ -1102,6 +1053,29 @@ function ope_rol_snapshot_post(&$dh)
         }
     }
 
+    // Estado de combate declarado por el jugador en la pestaña Combate,
+    // serializado en el bloque [rpgsys] del mensaje. Si está presente,
+    // sobreescribe los valores heredados/máximos.
+    $estados_json = null;
+    $stats_mod_json = null;
+    $msg = (string) ($dh->data['message'] ?? '');
+    if ($msg !== '' && stripos($msg, '[rpgsys') !== false
+        && preg_match('#\[rpgsys\]([^\[]*)\[/rpgsys\]#i', $msg, $mm)) {
+        $pl = ope_rol_parse_cbt_payload($mm[1]);
+        if ($pl['pv'] !== null) {
+            $pv_actual = (int) $pl['pv'];
+        }
+        if ($pl['en'] !== null) {
+            $en_actual = (int) $pl['en'];
+        }
+        if (!empty($pl['estados'])) {
+            $estados_json = $db->escape_string(json_encode(array_values($pl['estados']), JSON_UNESCAPED_UNICODE));
+        }
+        if (!empty($pl['mods'])) {
+            $stats_mod_json = $db->escape_string(json_encode($pl['mods'], JSON_UNESCAPED_UNICODE));
+        }
+    }
+
     $snap_data = array(
         'pid'           => $post_pid,
         'personaje_pid' => $char_pid,
@@ -1111,8 +1085,8 @@ function ope_rol_snapshot_post(&$dh)
         'pv_actual'     => $pv_actual,
         'en_actual'     => $en_actual,
         'pa_actual'     => $pa_por_turno,
-        'estados_json'  => null,
-        'stats_mod_json'=> null,
+        'estados_json'  => $estados_json,
+        'stats_mod_json'=> $stats_mod_json,
     );
 
     $db->insert_query('rol_post_snapshot', $snap_data);
@@ -1336,9 +1310,17 @@ function ope_rol_postbit_side(array $char, array $post)
         $en_max = ope_combat_calc_en($snap_stats);
         $pv_cur = isset($snap['pv_actual']) && $snap['pv_actual'] !== null ? (int) $snap['pv_actual'] : $pv_max;
         $en_cur = isset($snap['en_actual']) && $snap['en_actual'] !== null ? (int) $snap['en_actual'] : $en_max;
+        $pv_pct = $pv_max > 0 ? max(0, min(100, round(($pv_cur / $pv_max) * 100))) : 0;
+        $en_pct = $en_max > 0 ? max(0, min(100, round(($en_cur / $en_max) * 100))) : 0;
         $vitals_html = '<div class="ope-post-vitals">'
-            . '<span class="ope-post-vital ope-post-vital--pv"><b>' . $pv_cur . '</b>/' . $pv_max . ' PV</span>'
-            . '<span class="ope-post-vital ope-post-vital--en"><b>' . $en_cur . '</b>/' . $en_max . ' EN</span>'
+            . '<div class="ope-post-vital ope-post-vital--pv">'
+            . '<div class="ope-post-vital-top"><span class="ope-post-vital-k">PV</span><span class="ope-post-vital-v"><b>' . $pv_cur . '</b>/' . $pv_max . '</span></div>'
+            . '<div class="ope-post-vital-bar"><span class="ope-post-vital-fill" style="width:' . $pv_pct . '%"></span></div>'
+            . '</div>'
+            . '<div class="ope-post-vital ope-post-vital--en">'
+            . '<div class="ope-post-vital-top"><span class="ope-post-vital-k">EN</span><span class="ope-post-vital-v"><b>' . $en_cur . '</b>/' . $en_max . '</span></div>'
+            . '<div class="ope-post-vital-bar"><span class="ope-post-vital-fill" style="width:' . $en_pct . '%"></span></div>'
+            . '</div>'
             . '</div>';
     }
 
@@ -1653,6 +1635,77 @@ function ope_rol_parse_spoilers($message)
  *   [dado]2d6+FUE[/dado]         → chip de tirada (visual)
  * Se ejecuta en el hook parse_message, igual que los spoilers.
  */
+/**
+ * Parsea el contenido de un bloque [rpgsys]…[/rpgsys].
+ * Soporta dos formatos:
+ *   - Legacy: "1,2,3"  → solo IDs de carta.
+ *   - Combate: "c:1,2|pv:120|en:45|est:veneno,ardor|mod:FUE=5,AGI=-10%"
+ * Devuelve: ['cards'=>int[], 'pv'=>?int, 'en'=>?int, 'estados'=>string[], 'mods'=>[stat=>['val'=>int,'pct'=>bool]]].
+ */
+function ope_rol_parse_cbt_payload($raw)
+{
+    $out = array('cards' => array(), 'pv' => null, 'en' => null, 'estados' => array(), 'mods' => array());
+    $raw = trim((string) $raw);
+    if ($raw === '') {
+        return $out;
+    }
+
+    // Formato legacy: sin ':' → lista de IDs de carta.
+    if (strpos($raw, ':') === false) {
+        $out['cards'] = array_values(array_filter(array_map('intval', array_map('trim', explode(',', $raw)))));
+        return $out;
+    }
+
+    foreach (explode('|', $raw) as $seg) {
+        $seg = trim($seg);
+        if ($seg === '' || strpos($seg, ':') === false) {
+            continue;
+        }
+        list($k, $v) = explode(':', $seg, 2);
+        $k = trim($k);
+        $v = trim($v);
+        switch ($k) {
+            case 'c':
+                $out['cards'] = array_values(array_filter(array_map('intval', array_map('trim', explode(',', $v)))));
+                break;
+            case 'pv':
+                $out['pv'] = max(0, (int) $v);
+                break;
+            case 'en':
+                $out['en'] = max(0, (int) $v);
+                break;
+            case 'est':
+                foreach (explode(',', $v) as $e) {
+                    $e = preg_replace('/[^a-z0-9_\-]/i', '', trim($e));
+                    if ($e !== '') {
+                        $out['estados'][] = $e;
+                    }
+                }
+                break;
+            case 'mod':
+                foreach (explode(',', $v) as $m) {
+                    $m = trim($m);
+                    if ($m === '' || strpos($m, '=') === false) {
+                        continue;
+                    }
+                    list($stat, $val) = explode('=', $m, 2);
+                    $stat = preg_replace('/[^A-Z]/', '', strtoupper(trim($stat)));
+                    if ($stat === '') {
+                        continue;
+                    }
+                    $pct = (substr(trim($val), -1) === '%');
+                    $num = (int) $val;
+                    if ($num === 0) {
+                        continue;
+                    }
+                    $out['mods'][$stat] = array('val' => $num, 'pct' => $pct);
+                }
+                break;
+        }
+    }
+    return $out;
+}
+
 function ope_rol_parse_rpg($message)
 {
     if (stripos($message, '[combate') === false
@@ -1668,8 +1721,10 @@ function ope_rol_parse_rpg($message)
     // personaje renderizadas como naipes. Zona extensible (más módulos vendrán).
     if (stripos($message, '[rpgsys') !== false) {
         $message = preg_replace_callback('#\[rpgsys\]([^\[]*)\[/rpgsys\]#is', function ($m) {
-            $ids = array_filter(array_map('intval', array_map('trim', explode(',', $m[1]))));
-            $ids = array_slice(array_values(array_unique($ids)), 0, 24);
+            $pl = ope_rol_parse_cbt_payload($m[1]);
+
+            // ── Cartas ──
+            $ids = array_slice(array_values(array_unique($pl['cards'])), 0, 24);
             $cards = '';
             foreach ($ids as $cid) {
                 $carta = function_exists('ope_rol_tecnica_by_id') ? ope_rol_tecnica_by_id($cid) : null;
@@ -1677,24 +1732,90 @@ function ope_rol_parse_rpg($message)
                     $cards .= ope_rol_tecnica_card_html($carta);
                 }
             }
-            if ($cards === '') {
+            $ncards = $cards !== '' ? count($ids) : 0;
+
+            // ── Estados alterados (se aplican ANTES que las tiradas de cartas) ──
+            $estados_html = '';
+            $nest = 0;
+            if (!empty($pl['estados'])) {
+                $cat = function_exists('ope_combat_estados') ? ope_combat_estados() : array();
+                $chips = '';
+                foreach ($pl['estados'] as $ek) {
+                    $info = $cat[$ek] ?? null;
+                    $nom  = htmlspecialchars_uni((string) ($info['nombre'] ?? $ek));
+                    $tipo = htmlspecialchars_uni((string) ($info['tipo'] ?? 'negativo'));
+                    $chips .= '<span class="ope-estado ope-estado--' . $tipo . '">' . $nom . '</span>';
+                    $nest++;
+                }
+                if ($chips !== '') {
+                    $estados_html = '<div class="ope-rpgsys-sec"><div class="ope-rpgsys-sec-h">Estados alterados</div>'
+                                  . '<div class="ope-rpgsys-estados">' . $chips . '</div></div>';
+                }
+            }
+
+            // ── Modificadores de stats ──
+            $mods_html = '';
+            $nmod = 0;
+            if (!empty($pl['mods'])) {
+                $rows = '';
+                foreach ($pl['mods'] as $stat => $mv) {
+                    $val = (int) $mv['val'];
+                    $sign = $val > 0 ? '+' : '';
+                    $suf  = !empty($mv['pct']) ? '%' : '';
+                    $dir  = $val >= 0 ? 'up' : 'down';
+                    $rows .= '<span class="ope-rpgsys-mod ope-rpgsys-mod--' . $dir . '">'
+                           . '<b>' . htmlspecialchars_uni($stat) . '</b> ' . $sign . $val . $suf . '</span>';
+                    $nmod++;
+                }
+                if ($rows !== '') {
+                    $mods_html = '<div class="ope-rpgsys-sec"><div class="ope-rpgsys-sec-h">Modificadores</div>'
+                               . '<div class="ope-rpgsys-mods">' . $rows . '</div></div>';
+                }
+            }
+
+            // ── Vitales (PV/EN de este turno) ──
+            $vitals_html = '';
+            if ($pl['pv'] !== null || $pl['en'] !== null) {
+                $vparts = '';
+                if ($pl['pv'] !== null) {
+                    $vparts .= '<span class="ope-rpgsys-vital ope-rpgsys-vital--pv">PV <b>' . (int) $pl['pv'] . '</b></span>';
+                }
+                if ($pl['en'] !== null) {
+                    $vparts .= '<span class="ope-rpgsys-vital ope-rpgsys-vital--en">EN <b>' . (int) $pl['en'] . '</b></span>';
+                }
+                $vitals_html = '<div class="ope-rpgsys-vitals">' . $vparts . '</div>';
+            }
+
+            // Si no hay absolutamente nada que mostrar, no emitir bloque.
+            if ($cards === '' && $estados_html === '' && $mods_html === '' && $vitals_html === '') {
                 return '';
             }
-            $ncards = count($ids);
-            // Marcadores (sentinela) para que el hook `postbit` pueda sacar este
-            // bloque FUERA del cuerpo del post y pegarlo debajo del <article>.
-            // Colapsable y COLAPSADO por defecto (body con [hidden]).
+
+            $cards_html = $cards !== ''
+                ? '<div class="ope-rpgsys-sec"><div class="ope-rpgsys-sec-h">Cartas usadas</div><div class="ope-tk-deck">' . $cards . '</div></div>'
+                : '';
+
+            // Meta resumida.
+            $meta = array();
+            if ($nest)  $meta[] = $nest . ' estado' . ($nest === 1 ? '' : 's');
+            if ($ncards) $meta[] = $ncards . ' carta' . ($ncards === 1 ? '' : 's');
+            if ($nmod)  $meta[] = $nmod . ' mod' . ($nmod === 1 ? '' : 's');
+            $meta_txt = $meta ? implode(' &middot; ', $meta) : 'Estado de combate';
+
+            // Orden en el cuerpo: vitales → estados (antes de tiradas) → cartas → mods.
             return '<!--OPERPGSYS-->'
                  . ope_rol_tecnica_card_css()
                  . '<div class="ope-rpgsys is-collapsed">'
                  . '<button type="button" class="ope-rpgsys-h" aria-expanded="false">'
                  . '<span class="ope-rpgsys-badge">RPG System</span>'
-                 . '<span class="ope-rpgsys-meta">' . $ncards . ' carta' . ($ncards === 1 ? '' : 's') . '</span>'
+                 . '<span class="ope-rpgsys-meta">' . $meta_txt . '</span>'
                  . '<span class="ope-rpgsys-toggle" aria-hidden="true">Mostrar</span>'
                  . '</button>'
                  . '<div class="ope-rpgsys-b" hidden>'
-                 . '<div class="ope-rpgsys-sec"><div class="ope-rpgsys-sec-h">Cartas usadas</div>'
-                 . '<div class="ope-tk-deck">' . $cards . '</div></div>'
+                 . $vitals_html
+                 . $estados_html
+                 . $cards_html
+                 . $mods_html
                  . '</div></div>'
                  . '<!--/OPERPGSYS-->';
         }, $message);
@@ -2033,9 +2154,9 @@ function ope_rol_tpl_inserter_html()
         // ═══ COLUMNA IZQUIERDA ═══
         $html .= '<div class="ope-rpg-cbt-left">';
         
-        // PV
+        // PV — control unificado (escribe un delta: -30 resta, +15 suma)
         $pv_pct = $cbt_pv_max > 0 ? round(($cbt_pv / $cbt_pv_max) * 100) : 100;
-        $html .= '<div class="ope-rpg-cbt-vital ope-rpg-cbt-vital--pv">';
+        $html .= '<div class="ope-rpg-cbt-vital ope-rpg-cbt-vital--pv" data-vital="pv" data-init="' . $cbt_pv . '" data-max="' . $cbt_pv_max . '">';
         $html .= '<div class="ope-rpg-cbt-vital-head">';
         $html .= '<span class="ope-rpg-cbt-vital-label">PV</span>';
         $html .= '<span class="ope-rpg-cbt-vital-cur">' . $cbt_pv . '</span>';
@@ -2044,15 +2165,13 @@ function ope_rol_tpl_inserter_html()
         $html .= '</div>';
         $html .= '<div class="ope-rpg-cbt-vital-bar"><span class="ope-rpg-cbt-vital-fill" style="width:' . $pv_pct . '%"></span></div>';
         $html .= '<div class="ope-rpg-cbt-vital-acts">';
-        $html .= '<button type="button" class="ope-rpg-cbt-vital-btn" data-dir="-5">-5</button>';
-        $html .= '<button type="button" class="ope-rpg-cbt-vital-btn" data-dir="+5">+5</button>';
-        $html .= '<input type="text" class="ope-rpg-cbt-vital-inp ope-rpg-cbt-pvinp" value="" placeholder="+0">';
+        $html .= '<input type="text" inputmode="numeric" class="ope-rpg-cbt-vital-inp" value="" placeholder="&#177; delta (ej. -30)">';
         $html .= '<button type="button" class="ope-rpg-cbt-vital-apply">Aplicar</button>';
         $html .= '</div></div>';
-        
-        // EN
+
+        // EN — mismo control unificado que PV
         $en_pct = $cbt_en_max > 0 ? round(($cbt_en / $cbt_en_max) * 100) : 100;
-        $html .= '<div class="ope-rpg-cbt-vital ope-rpg-cbt-vital--en">';
+        $html .= '<div class="ope-rpg-cbt-vital ope-rpg-cbt-vital--en" data-vital="en" data-init="' . $cbt_en . '" data-max="' . $cbt_en_max . '">';
         $html .= '<div class="ope-rpg-cbt-vital-head">';
         $html .= '<span class="ope-rpg-cbt-vital-label">EN</span>';
         $html .= '<span class="ope-rpg-cbt-vital-cur">' . $cbt_en . '</span>';
@@ -2061,9 +2180,8 @@ function ope_rol_tpl_inserter_html()
         $html .= '</div>';
         $html .= '<div class="ope-rpg-cbt-vital-bar"><span class="ope-rpg-cbt-vital-fill" style="width:' . $en_pct . '%"></span></div>';
         $html .= '<div class="ope-rpg-cbt-vital-acts">';
-        $html .= '<button type="button" class="ope-rpg-cbt-vital-btn" data-dir="-1">-</button>';
-        $html .= '<input type="number" class="ope-rpg-cbt-vital-inp ope-rpg-cbt-eninp" value="' . $cbt_en . '" min="0" max="' . $cbt_en_max . '">';
-        $html .= '<button type="button" class="ope-rpg-cbt-vital-btn" data-dir="+1">+</button>';
+        $html .= '<input type="text" inputmode="numeric" class="ope-rpg-cbt-vital-inp" value="" placeholder="&#177; delta (ej. -10)">';
+        $html .= '<button type="button" class="ope-rpg-cbt-vital-apply">Aplicar</button>';
         $html .= '</div></div>';
         
         // PA
@@ -2135,7 +2253,15 @@ function ope_rol_tpl_inserter_html()
         . 'var info=root.querySelector(".ope-rpg-selinfo");'
         . 'function selIds(){var out=[];root.querySelectorAll(".ope-rpg-cardpick.is-sel").forEach(function(c){out.push(c.getAttribute("data-card-id"));});return out;}'
         . 'function refresh(){var n=selIds().length;if(info){info.setAttribute("data-count",n);info.textContent=n?(n+" carta"+(n>1?"s":"")+" se mostrar"+(n>1?"\u00e1n":"\u00e1")+" bajo tu post."):"Ninguna carta seleccionada.";}}'
-        // ── delegación de clicks ──
+        // ── helpers de combate ──
+        . 'function panel(){return root.querySelector(".ope-rpg-panel[data-panel=\'combate\']");}'
+        . 'function setVital(key,val){var p=panel();if(!p)return;var v=p.querySelector(".ope-rpg-cbt-vital[data-vital=\'"+key+"\']");if(!v)return;var max=parseInt(v.getAttribute("data-max"))||100;val=Math.max(0,Math.min(max,val));v.querySelector(".ope-rpg-cbt-vital-cur").textContent=val;var f=v.querySelector(".ope-rpg-cbt-vital-fill");if(f)f.style.width=Math.round((val/max)*100)+"%";}'
+        . 'function applyVital(wrap){var inp=wrap.querySelector(".ope-rpg-cbt-vital-inp");var curEl=wrap.querySelector(".ope-rpg-cbt-vital-cur");var max=parseInt(wrap.getAttribute("data-max"))||100;var val=parseInt(curEl.textContent)||0;var delta=parseInt(inp.value);if(isNaN(delta)){inp.value="";return;}var nv=Math.max(0,Math.min(max,val+delta));curEl.textContent=nv;var f=wrap.querySelector(".ope-rpg-cbt-vital-fill");if(f)f.style.width=Math.round((nv/max)*100)+"%";inp.value="";inp.focus();}'
+        . 'function addEstadoChip(ek){var p=panel();if(!p)return;var sel=p.querySelector("#ope_cbt_estados_sel");if(!sel)return;var opt=sel.querySelector("option[value=\'"+ek+"\']");if(!opt)return;var chips=p.querySelector("#ope_cbt_estados_chips");if(chips.querySelector(".ope-rpg-est-chip[data-est=\'"+ek+"\']"))return;var tipo=opt.getAttribute("data-tipo")||"negativo";var chip=document.createElement("span");chip.className="ope-rpg-est-chip ope-estado--"+tipo;chip.setAttribute("data-est",ek);chip.setAttribute("data-tipo",tipo);chip.textContent=opt.textContent;chip.title="Quitar";chip.addEventListener("click",function(){this.remove();});chips.appendChild(chip);}'
+        . 'function cbtState(){var st={cards:selIds(),pv:null,en:null,est:[],mod:[]};var p=panel();if(p){var vp=p.querySelector(".ope-rpg-cbt-vital[data-vital=\'pv\']");if(vp)st.pv={cur:parseInt(vp.querySelector(".ope-rpg-cbt-vital-cur").textContent)||0,init:parseInt(vp.getAttribute("data-init"))||0};var ve=p.querySelector(".ope-rpg-cbt-vital[data-vital=\'en\']");if(ve)st.en={cur:parseInt(ve.querySelector(".ope-rpg-cbt-vital-cur").textContent)||0,init:parseInt(ve.getAttribute("data-init"))||0};p.querySelectorAll("#ope_cbt_estados_chips .ope-rpg-est-chip[data-est]").forEach(function(c){st.est.push(c.getAttribute("data-est"));});p.querySelectorAll(".ope-rpg-cbt-modval").forEach(function(mv){var val=parseInt(mv.value)||0;if(!val)return;var stat=mv.getAttribute("data-stat");var tog=p.querySelector(".ope-rpg-cbt-toggle[data-stat=\'"+stat+"\']");var pct=tog&&tog.classList.contains("is-pct");st.mod.push(stat+"="+val+(pct?"%":""));});}return st;}'
+        . 'function cbtChanged(st){return (st.cards.length>0)||(st.est.length>0)||(st.mod.length>0)||(st.pv&&st.pv.cur!==st.pv.init)||(st.en&&st.en.cur!==st.en.init);}'
+        . 'function buildPayload(st){var seg=[];if(st.cards.length)seg.push("c:"+st.cards.join(","));if(st.pv)seg.push("pv:"+st.pv.cur);if(st.en)seg.push("en:"+st.en.cur);if(st.est.length)seg.push("est:"+st.est.join(","));if(st.mod.length)seg.push("mod:"+st.mod.join(","));return seg.join("|");}'
+        // ── delegación de clicks (un solo listener) ──
         . 'root.addEventListener("click",function(ev){'
         . 'var tab=ev.target.closest(".ope-rpg-tab");'
         . 'if(tab){var name=tab.getAttribute("data-tab");'
@@ -2143,35 +2269,40 @@ function ope_rol_tpl_inserter_html()
         . 'root.querySelectorAll(".ope-rpg-panel").forEach(function(p){p.classList.toggle("is-on",p.getAttribute("data-panel")===name);});return;}'
         . 'var card=ev.target.closest(".ope-rpg-cardpick");'
         . 'if(card&&card.hasAttribute("data-card-id")){var on=!card.classList.contains("is-sel");card.classList.toggle("is-sel",on);card.setAttribute("aria-pressed",on?"true":"false");refresh();return;}'
-        // ── Combate: botones +/- PV/EN (aplican delta directo) ──
-        . 'root.addEventListener("click",function(ev){var btn=ev.target.closest(".ope-rpg-cbt-vital-btn");if(!btn)return;var dir=parseInt(btn.getAttribute("data-dir"));var wrap=btn.closest(".ope-rpg-cbt-vital");var fill=wrap.querySelector(".ope-rpg-cbt-vital-fill");var cur=wrap.querySelector(".ope-rpg-cbt-vital-cur");var maxEl=wrap.querySelector(".ope-rpg-cbt-vital-max");var max=parseInt(maxEl.textContent)||100;var val=parseInt(cur.textContent)||0;var nv=Math.max(0,Math.min(max,val+dir));cur.textContent=nv;if(fill)fill.style.width=Math.round((nv/max)*100)+"%";});'
-        // ── Combate: botón Aplicar (aplica delta del input a PV/EN actual) ──
-        . 'root.addEventListener("click",function(ev){var app=ev.target.closest(".ope-rpg-cbt-vital-apply");if(!app)return;var wrap=app.closest(".ope-rpg-cbt-vital");var inp=wrap.querySelector(".ope-rpg-cbt-vital-inp");var fill=wrap.querySelector(".ope-rpg-cbt-vital-fill");var cur=wrap.querySelector(".ope-rpg-cbt-vital-cur");var maxEl=wrap.querySelector(".ope-rpg-cbt-vital-max");var max=parseInt(maxEl.textContent)||100;var val=parseInt(cur.textContent)||0;var delta=parseInt(inp.value)||0;var nv=Math.max(0,Math.min(max,val+delta));cur.textContent=nv;if(fill)fill.style.width=Math.round((nv/max)*100)+"%";inp.value="";});'
-        // ── Combate: Enter en input delta aplica ──
-        . 'root.addEventListener("keydown",function(ev){if(ev.key!=="Enter")return;var inp=ev.target.closest(".ope-rpg-cbt-vital-inp");if(!inp)return;var wrap=inp.closest(".ope-rpg-cbt-vital");var fill=wrap.querySelector(".ope-rpg-cbt-vital-fill");var cur=wrap.querySelector(".ope-rpg-cbt-vital-cur");var maxEl=wrap.querySelector(".ope-rpg-cbt-vital-max");var max=parseInt(maxEl.textContent)||100;var val=parseInt(cur.textContent)||0;var delta=parseInt(inp.value)||0;var nv=Math.max(0,Math.min(max,val+delta));cur.textContent=nv;if(fill)fill.style.width=Math.round((nv/max)*100)+"%";inp.value="";ev.preventDefault();});'
-        // ── Combate: select de estados → chips ──
-        . 'root.addEventListener("change",function(ev){var sel=ev.target.closest("#ope_cbt_estados_sel");if(!sel)return;var val=sel.value;if(!val){sel.value="";return;}var tipo=sel.options[sel.selectedIndex].getAttribute("data-tipo")||"negativo";var chips=root.querySelector("#ope_cbt_estados_chips");var exist=chips.querySelector("[data-est=\'"+val+"\']");if(exist){sel.value="";return;}var chip=document.createElement("span");chip.className="ope-rpg-est-chip";chip.setAttribute("data-est",val);chip.setAttribute("data-tipo",tipo);chip.setAttribute("aria-checked","true");chip.textContent=sel.options[sel.selectedIndex].textContent;chip.title="Click para quitar";chip.addEventListener("click",function(){this.remove();});chips.appendChild(chip);sel.value="";});'
-        // ── Combate: toggle bruto/porcentaje ──
-        . 'root.addEventListener("click",function(ev){var tog=ev.target.closest(".ope-rpg-cbt-toggle");if(!tog)return;var isRaw=tog.classList.contains("is-raw");tog.classList.toggle("is-raw",!isRaw);tog.classList.toggle("is-pct",isRaw);tog.setAttribute("aria-pressed",isRaw?"true":"false");});'
-        // ── template chips (insertan BBcode) ──
+        . 'var app=ev.target.closest(".ope-rpg-cbt-vital-apply");if(app){applyVital(app.closest(".ope-rpg-cbt-vital"));return;}'
+        . 'var tog=ev.target.closest(".ope-rpg-cbt-toggle");if(tog){var isRaw=tog.classList.contains("is-raw");tog.classList.toggle("is-raw",!isRaw);tog.classList.toggle("is-pct",isRaw);tog.setAttribute("aria-pressed",isRaw?"true":"false");return;}'
         . 'var chip=ev.target.closest(".ope-rpg-chip");if(!chip)return;'
         . 'if(chip.hasAttribute("data-tpl")){var b=TPL[chip.getAttribute("data-tpl")];if(b!=null)ins(b,"");return;}'
         . 'var t=chip.getAttribute("data-insert");if(t!=null)ins(t,"");});'
-        // ── preselección desde un [rpgsys] ya existente (editar post) ──
+        // ── Enter en input delta aplica ──
+        . 'root.addEventListener("keydown",function(ev){if(ev.key!=="Enter")return;var inp=ev.target.closest(".ope-rpg-cbt-vital-inp");if(!inp)return;ev.preventDefault();applyVital(inp.closest(".ope-rpg-cbt-vital"));});'
+        // ── select de estados → chip ──
+        . 'root.addEventListener("change",function(ev){var sel=ev.target.closest("#ope_cbt_estados_sel");if(!sel)return;if(sel.value){addEstadoChip(sel.value);}sel.value="";});'
+        // ── preselección desde un [rpgsys] existente (editar post) ──
         . 'function editorVal(){var ed=window.MyBBEditor;if(ed&&typeof ed.val==="function"){try{return ed.val();}catch(x){}}return ta?ta.value:"";}'
+        . 'var hadBlock=false;'
         . 'var m=editorVal().match(/\\[rpgsys\\]([^\\[]*)\\[\\/rpgsys\\]/i);'
-        . 'if(m){var ids=m[1].split(",").map(function(s){return s.trim();});'
-        . 'root.querySelectorAll(".ope-rpg-cardpick").forEach(function(c){if(ids.indexOf(c.getAttribute("data-card-id"))>-1){c.classList.add("is-sel");c.setAttribute("aria-pressed","true");}});}'
+        . 'if(m){hadBlock=true;var payload=m[1],cards=[],pv=null,en=null,est=[],mod={};'
+        . 'if(payload.indexOf(":")===-1){cards=payload.split(",").map(function(s){return s.trim();});}'
+        . 'else{payload.split("|").forEach(function(sg){var i=sg.indexOf(":");if(i<0)return;var k=sg.slice(0,i).trim(),v=sg.slice(i+1).trim();'
+        . 'if(k==="c")cards=v.split(",").map(function(s){return s.trim();});'
+        . 'else if(k==="pv")pv=parseInt(v);'
+        . 'else if(k==="en")en=parseInt(v);'
+        . 'else if(k==="est")est=v.split(",").map(function(s){return s.trim();}).filter(Boolean);'
+        . 'else if(k==="mod"){v.split(",").forEach(function(mm){var j=mm.indexOf("=");if(j<0)return;mod[mm.slice(0,j).trim()]=mm.slice(j+1).trim();});}});}'
+        . 'root.querySelectorAll(".ope-rpg-cardpick").forEach(function(c){if(cards.indexOf(c.getAttribute("data-card-id"))>-1){c.classList.add("is-sel");c.setAttribute("aria-pressed","true");}});'
+        . 'if(pv!==null&&!isNaN(pv))setVital("pv",pv);'
+        . 'if(en!==null&&!isNaN(en))setVital("en",en);'
+        . 'est.forEach(function(ek){addEstadoChip(ek);});'
+        . 'Object.keys(mod).forEach(function(s){var p=panel();if(!p)return;var inp=p.querySelector(".ope-rpg-cbt-modval[data-stat=\'"+s+"\']");if(!inp)return;var val=mod[s];inp.value=parseInt(val)||0;if(/%$/.test(val)){var tg=p.querySelector(".ope-rpg-cbt-toggle[data-stat=\'"+s+"\']");if(tg){tg.classList.remove("is-raw");tg.classList.add("is-pct");tg.setAttribute("aria-pressed","true");}}});}'
         . 'refresh();'
-        // ── al enviar: reconstruir el bloque [rpgsys] con la selección ──
+        // ── al enviar: reconstruir el bloque [rpgsys] con cartas + estado de combate ──
         . 'var form=ta?ta.form:null;'
         . 'function applyBlock(){'
-        . 'var ids=selIds();var ed=window.MyBBEditor;'
+        . 'var st=cbtState();var ed=window.MyBBEditor;'
         . 'var cur=(ed&&typeof ed.val==="function")?ed.val():(ta?ta.value:"");'
         . 'cur=cur.replace(/\\n*\\[rpgsys\\][\\s\\S]*?\\[\\/rpgsys\\]/gi,"");'
-        . 'if(ids.length){cur=cur.replace(/\\s+$/,"")+"\\n\\n[rpgsys]"+ids.join(",")+"[/rpgsys]";}'
-        // Escribe en el editor SCEditor (si existe) y SIEMPRE en el textarea real,
-        // que es el campo que se envía; así preview y publicación llevan el bloque.
+        . 'if(cbtChanged(st)||hadBlock){var pl=buildPayload(st);if(pl){cur=cur.replace(/\\s+$/,"")+"\\n\\n[rpgsys]"+pl+"[/rpgsys]";}}'
         . 'if(ed&&typeof ed.val==="function"){try{ed.val(cur);}catch(x){}}'
         . 'if(ta){ta.value=cur;}'
         . '}'

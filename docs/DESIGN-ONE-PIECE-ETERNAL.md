@@ -81,6 +81,8 @@ Una noche en el Grand Line. El mar profundo es casi negro (#0a1628). La luna pro
 
 ### 3.2 Paleta Base
 
+> **Nota sobre la paleta canónica:** La paleta que se muestra a continuación es la paleta de diseño *aspiracional/legada* del documento. La paleta **canónica implementada** es la que se encuentra en `cache/themes/theme13/ope.css`, que es la que realmente sirve el navegador. En caso de discrepancia entre ambas, prevalece la de `cache/themes/theme13/ope.css`.
+
 ```css
 :root {
   /* === SUPERFICIES === */

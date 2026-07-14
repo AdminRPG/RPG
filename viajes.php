@@ -31,7 +31,9 @@ $flash_kind = 'ok';
 
 // POST: cerrar viaje
 if ($loggedin && $mybb->request_method === 'post' && $mybb->get_input('action') === 'cerrar') {
-    verify_post_check($mybb->get_input('my_post_key'));
+    if (!verify_post_check($mybb->get_input('my_post_key'))) {
+        error_no_permission();
+    }
     $vid = (int) $mybb->get_input('viaje_id');
     $res = ope_viaje_cerrar($vid, $uid, $active_pid);
     if ($res['ok']) {

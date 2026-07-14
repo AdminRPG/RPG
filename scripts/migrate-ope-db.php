@@ -12,9 +12,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-$db = new mysqli('127.0.0.1', 'root', '', 'mybb_foro');
-if ($db->connect_error) { fwrite(STDERR, "DB error: {$db->connect_error}\n"); exit(1); }
-$db->set_charset('utf8mb4');
+require __DIR__ . '/_db-config.php';
 $P = 'mybb_';
 
 function deep_replace($data, $from, $to) {

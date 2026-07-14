@@ -2,9 +2,19 @@
 
 use Slim\Routing\RouteCollectorProxy;
 
+// Public routes — no auth required
 $app->group('/api/v1', function (RouteCollectorProxy $group) {
-    // Auth
+    // Auth (no token needed)
+    $group->post('/auth/login', 'App\Controllers\AuthController:login');
     $group->post('/auth/refresh', 'App\Controllers\AuthController:refresh');
+
+    // Public: get active character for any user (used in postbit widget)
+    $group->get('/personajes/activo/{userId}', 'App\Controllers\CuentaController:personajeActivoPublico');
+});
+
+// Auth-protected routes
+$app->group('/api/v1', function (RouteCollectorProxy $group) {
+    $group->post('/auth/logout', 'App\Controllers\AuthController:logout');
 
     // Cuenta (account-level data: slots, narrator, active character)
     $group->get('/cuenta/mi-cuenta', 'App\Controllers\CuentaController:miCuenta');
@@ -20,9 +30,6 @@ $app->group('/api/v1', function (RouteCollectorProxy $group) {
     $group->post('/personajes/{id}/aprobar', 'App\Controllers\FichaController:aprobar');
     $group->post('/personajes/{id}/rechazar', 'App\Controllers\FichaController:rechazar');
 
-    // Public: get active character for any user (used in postbit widget)
-    $group->get('/personajes/activo/{userId}', 'App\Controllers\CuentaController:personajeActivoPublico');
-
     // Post-character mapping
     $group->post('/posts/vincular', 'App\Controllers\PostController:vincularPersonaje');
     $group->get('/posts/{postId}/personaje', 'App\Controllers\PostController:obtenerPersonaje');
@@ -30,6 +37,7 @@ $app->group('/api/v1', function (RouteCollectorProxy $group) {
     // Inventario
     $group->get('/inventario/{personajeId}', 'App\Controllers\InventarioController:listar');
     $group->post('/inventario/{personajeId}/items', 'App\Controllers\InventarioController:agregarItem');
+    $group->post('/inventario/usar/{itemId}', 'App\Controllers\InventarioController:usar');
     $group->post('/inventario/transferir', 'App\Controllers\InventarioController:transferir');
 
     // Economia
@@ -39,7 +47,9 @@ $app->group('/api/v1', function (RouteCollectorProxy $group) {
 
     // Dados
     $group->post('/dados/tirar', 'App\Controllers\DadosController:tirar');
-    $group->get('/dados/historial/{hiloId}', 'App\Controllers\DadosController:historial');
+    $group->get('/dados/historial/{personajeId}', 'App\Controllers\DadosController:historial');
 })->add(new App\Middleware\AuthMiddleware())
-  ->add(new App\Middleware\RateLimitMiddleware())
-  ->add(new App\Middleware\CorsMiddleware());
+  ->add(new App\Middleware\RateLimitMiddleware());
+
+// CORS middleware must be outermost — added last (Slim 4 ->add() prepends)
+$app->add(new App\Middleware\CorsMiddleware());

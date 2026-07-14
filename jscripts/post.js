@@ -100,7 +100,7 @@ var Post = {
 
 	multiQuotedLoaded: function (request) {
 		var json = JSON.parse(request.responseText);
-		if (typeof response == 'object') {
+		if (typeof json == 'object') {
 			if (json.hasOwnProperty("errors")) {
 				$.each(json.errors, function (i, message) {
 					$.jGrowl(lang.post_fetch_error + ' ' + message, { theme: 'jgrowl_error' });

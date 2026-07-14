@@ -44,8 +44,20 @@ if ($mybb->request_method === 'post'
     if (!in_array($nuevo, $roles_validos, true)) $nuevo = '';
 
     if ($target > 0) {
-        $tq = $db->simple_select('rol_personajes', 'pid', "pid = {$target}", array('limit' => 1));
+        $tq = $db->simple_select('rol_personajes', 'pid, staff_rol', "pid = {$target}", array('limit' => 1));
         if ($db->num_rows($tq)) {
+            $target_row = $db->fetch_array($tq);
+            $era_webmaster = ((string) $target_row['staff_rol']) === 'webmaster';
+            $ahora_webmaster = $nuevo === 'webmaster';
+            if ($era_webmaster && !$ahora_webmaster) {
+                $wm_count = (int) $db->fetch_field(
+                    $db->write_query("SELECT COUNT(*) as cnt FROM " . TABLE_PREFIX . "rol_personajes WHERE staff_rol = 'webmaster' AND pid <> {$target}"),
+                    'cnt'
+                );
+                if ($wm_count < 1) {
+                    error("No puedes eliminar al unico Web Master.");
+                }
+            }
             $db->update_query('rol_personajes', array(
                 'staff_rol'      => $db->escape_string($nuevo),
                 'staff_narrador' => $narr,

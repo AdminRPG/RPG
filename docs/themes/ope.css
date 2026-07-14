@@ -3,7 +3,7 @@
    ONE PIECE ETERNAL — TEMA OFICIAL
    Paleta océano de aventura (ver :root abajo) · escala de intensidad marina.
    Tipos: Big Shoulders Display (rótulo) · Space Mono (datos) · Archivo (cuerpo)
-   Fuente única de la NAVBAR: ope_rol_navbar_css() en inc/plugins/ope_rol.php
+   Fuente de la NAVBAR: este fichero (CSS extraido de ope_rol_navbar_css())
    Diseño de referencia: docs/DESIGN-ONE-PIECE-ETERNAL.md
    ============================================================ */
 :root{
@@ -1988,6 +1988,7 @@ body.ope-pg-biblioteca.bib-npc{--bib-accent:var(--rivet);--bib-accent-hi:var(--p
 body.ope-pg-biblioteca.bib-akuma{--bib-accent:var(--fac-pirata);--bib-accent-hi:var(--fac-pirata-hi)}
 body.ope-pg-biblioteca.bib-bestiario{--bib-accent:var(--fac-cazarrecompensas);--bib-accent-hi:var(--fac-cazarrecompensas-hi)}
 body.ope-pg-biblioteca.bib-estilos{--bib-accent:var(--fac-marine);--bib-accent-hi:var(--fac-marine-hi)}
+body.ope-pg-biblioteca.bib-lore{--bib-accent:var(--ember-hi);--bib-accent-hi:var(--ember)}
 body.ope-pg-biblioteca .bib-toolbar{display:flex;flex-direction:column;gap:12px;margin-bottom:22px}
 body.ope-pg-biblioteca .bib-search-wrap{position:relative}
 body.ope-pg-biblioteca .bib-search{width:100%;padding:11px 15px;background:var(--iron);border:2px solid #000;color:var(--paper);font-family:var(--mono);font-size:.78rem;outline:none;transition:border-color .14s,box-shadow .14s}
@@ -2009,6 +2010,8 @@ body.ope-pg-biblioteca .bib-card-media img{width:100%;height:100%;object-fit:cov
 body.ope-pg-biblioteca .bib-media-ini{font-family:var(--disp);font-weight:900;font-size:3rem;color:var(--bib-accent-hi);opacity:.9}
 body.ope-pg-biblioteca .bib-media-fruit,body.ope-pg-biblioteca .bib-media-beast,body.ope-pg-biblioteca .bib-media-style{color:var(--bib-accent-hi);opacity:.85}
 body.ope-pg-biblioteca .bib-media-fruit svg,body.ope-pg-biblioteca .bib-media-beast svg,body.ope-pg-biblioteca .bib-media-style svg{width:58px;height:58px}
+body.ope-pg-biblioteca .bib-media-lore{color:var(--bib-accent-hi);opacity:.85}
+body.ope-pg-biblioteca .bib-media-lore svg{width:58px;height:58px}
 body.ope-pg-biblioteca .bib-card-badge{position:absolute;top:8px;right:8px;font-family:var(--disp);font-weight:800;font-size:.66rem;text-transform:uppercase;letter-spacing:.3px;padding:3px 9px;border:2px solid #000;line-height:1.1;z-index:1}
 body.ope-pg-biblioteca .bib-card-badge.t2{background:var(--h6);color:#160f06}
 body.ope-pg-biblioteca .bib-card-badge.t3{background:var(--h4);color:#160f06}
@@ -2020,6 +2023,42 @@ body.ope-pg-biblioteca .bib-card-badge.fac-revolucionario{background:var(--fac-r
 body.ope-pg-biblioteca .bib-card-badge.fac-gobierno{background:var(--fac-gobierno);color:var(--fac-gobierno-ink)}
 body.ope-pg-biblioteca .bib-card-badge.fac-cazarrecompensas{background:var(--fac-cazarrecompensas);color:var(--fac-cazarrecompensas-ink)}
 body.ope-pg-biblioteca .bib-card-badge.fac-civil{background:var(--fac-civil);color:var(--fac-civil-ink)}
+/* lore category badges */
+body.ope-pg-biblioteca .bib-card-badge.cat-historia{background:var(--ember-hi);color:#160f06}
+body.ope-pg-biblioteca .bib-card-badge.cat-eras{background:var(--fac-revolucionario);color:var(--fac-revolucionario-ink)}
+body.ope-pg-biblioteca .bib-card-badge.cat-personajes{background:var(--ember);color:#160f06}
+body.ope-pg-biblioteca .bib-card-badge.cat-facciones{background:var(--fac-marine);color:var(--fac-marine-ink)}
+body.ope-pg-biblioteca .bib-card-badge.cat-ubicaciones{background:var(--fac-cazarrecompensas);color:#fff}
+body.ope-pg-biblioteca .bib-card-badge.cat-sistemas{background:var(--fac-pirata);color:var(--fac-pirata-ink)}
+body.ope-pg-biblioteca .bib-card-badge.cat-cronologia{background:var(--fac-revolucionario-hi);color:#141b24}
+/* detail overlay head accent per lore category */
+.bib-d-head.cat-historia{--op-accent:var(--ember-hi)}
+.bib-d-head.cat-eras{--op-accent:var(--fac-revolucionario-hi)}
+.bib-d-head.cat-personajes{--op-accent:var(--ember)}
+.bib-d-head.cat-facciones{--op-accent:var(--fac-marine)}
+.bib-d-head.cat-ubicaciones{--op-accent:var(--fac-cazarrecompensas-hi)}
+.bib-d-head.cat-sistemas{--op-accent:var(--fac-pirata)}
+.bib-d-head.cat-cronologia{--op-accent:var(--fac-revolucionario)}
+/* lore content block */
+.bib-lore-content{font-size:.88rem;color:var(--paper-dim);line-height:1.75}
+.bib-lore-content p{margin:0 0 12px}
+.bib-lore-content h1,.bib-lore-content h2,.bib-lore-content h3{font-family:var(--disp);color:var(--paper);margin:20px 0 8px;line-height:1.15}
+.bib-lore-content h1{font-size:1.6rem;border-bottom:2px solid var(--rivet);padding-bottom:6px}
+.bib-lore-content h2{font-size:1.3rem;border-bottom:1px solid var(--iron-edge);padding-bottom:4px}
+.bib-lore-content h3{font-size:1.1rem}
+.bib-lore-content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.82rem}
+.bib-lore-content table td,.bib-lore-content table th{padding:8px 12px;border:1px solid var(--rivet);text-align:left}
+.bib-lore-content table td:first-child,.bib-lore-content table th:first-child{min-width:100px}
+.bib-lore-content table td:last-child{color:var(--paper-dim)}
+.bib-lore-content strong{color:var(--paper)}
+.bib-lore-content em{color:var(--ember-hi)}
+.bib-lore-content ul,.bib-lore-content ol{margin:10px 0;padding-left:22px}
+.bib-lore-content li{margin-bottom:6px}
+.bib-lore-content hr{border:none;height:2px;background:var(--rivet);margin:20px 0}
+.bib-lore-content blockquote{border-left:3px solid var(--ember);margin:12px 0;padding:8px 16px;background:var(--iron-edge);font-style:italic}
+.bib-lore-content code{font-family:var(--mono);font-size:.78rem;background:var(--iron);padding:1px 5px;border:1px solid var(--rivet)}
+.bib-lore-content pre{background:var(--iron);border:1px solid var(--rivet);padding:12px 16px;overflow-x:auto;font-family:var(--mono);font-size:.78rem;margin:12px 0}
+.bib-lore-content a{color:var(--ember-hi);text-decoration:underline}
 body.ope-pg-biblioteca .bib-card-rank{position:absolute;top:8px;left:8px;font-family:var(--mono);font-size:.54rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper);background:rgba(10,14,20,.72);border:1.5px solid #000;padding:3px 8px;line-height:1;z-index:1}
 body.ope-pg-biblioteca .bib-card-tag-npc{position:absolute;top:8px;right:8px;font-family:var(--disp);font-weight:800;font-size:.6rem;letter-spacing:1px;color:var(--paper);background:var(--rivet);border:2px solid #000;padding:2px 8px;z-index:1}
 body.ope-pg-biblioteca .bib-card-peligro{position:absolute;bottom:8px;left:8px;font-family:var(--mono);font-size:.5rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 7px;border:1.5px solid #000;line-height:1.2;z-index:1}
@@ -3882,25 +3921,26 @@ body.ope-pg-progresion .ope-lvl-form{margin-top:1rem}
 .ope-rpg-cbt-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .ope-rpg-cbt-left,.ope-rpg-cbt-right{min-width:0}
 
-/* --- PV / EN vital bars --- */
-.ope-rpg-cbt-vital{margin-bottom:10px;border:2px solid var(--iron-edge);background:var(--iron);padding:8px 10px}
-.ope-rpg-cbt-vital-head{display:flex;align-items:baseline;gap:4px;margin-bottom:5px}
-.ope-rpg-cbt-vital-label{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--ash);min-width:24px}
-.ope-rpg-cbt-vital-cur{font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--paper)}
-.ope-rpg-cbt-vital-sep{color:var(--ash);font-size:.65rem}
-.ope-rpg-cbt-vital-max{font-family:var(--mono);font-size:.65rem;color:var(--paper-dim)}
-.ope-rpg-cbt-vital-bar{height:5px;background:var(--iron-edge);border-radius:2px;margin-bottom:6px;overflow:hidden}
-.ope-rpg-cbt-vital-fill{display:block;height:100%;border-radius:2px;transition:width .15s}
-.ope-rpg-cbt-vital--pv .ope-rpg-cbt-vital-fill{background:var(--crack)}
-.ope-rpg-cbt-vital--en .ope-rpg-cbt-vital-fill{background:var(--patina)}
-.ope-rpg-cbt-vital-acts{display:flex;align-items:center;gap:4px}
-.ope-rpg-cbt-vital-btn{font-family:var(--mono);font-size:.6rem;font-weight:700;padding:3px 7px;background:var(--iron-hi);color:var(--paper);border:2px solid var(--iron-edge);cursor:pointer;min-width:28px;text-align:center;line-height:1}
-.ope-rpg-cbt-vital-btn:hover{background:var(--rivet)}
-.ope-rpg-cbt-vital-inp{width:52px;padding:3px 4px;background:var(--iron-edge);border:2px solid var(--iron-hi);color:var(--paper);font-family:var(--mono);font-size:.7rem;font-weight:700;text-align:center}
+/* --- PV / EN vital bars (control unificado: escribe un delta) --- */
+.ope-rpg-cbt-vital{margin-bottom:12px;border:2px solid #000;background:var(--iron);padding:11px 12px;box-shadow:2px 2px 0 rgba(0,0,0,.3)}
+.ope-rpg-cbt-vital-head{display:flex;align-items:baseline;gap:6px;margin-bottom:8px}
+.ope-rpg-cbt-vital-label{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--paper-dim);min-width:26px}
+.ope-rpg-cbt-vital-cur{font-family:var(--disp);font-size:1.6rem;font-weight:900;line-height:1;color:var(--paper)}
+.ope-rpg-cbt-vital--pv .ope-rpg-cbt-vital-cur{color:#ff9a8f}
+.ope-rpg-cbt-vital--en .ope-rpg-cbt-vital-cur{color:var(--patina-hi)}
+.ope-rpg-cbt-vital-sep{color:var(--ash);font-size:.8rem}
+.ope-rpg-cbt-vital-max{font-family:var(--mono);font-size:.75rem;color:var(--ash)}
+.ope-rpg-cbt-vital-bar{height:10px;background:var(--iron-edge);border:1px solid #000;margin-bottom:8px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}
+.ope-rpg-cbt-vital-fill{display:block;height:100%;transition:width .2s ease}
+.ope-rpg-cbt-vital--pv .ope-rpg-cbt-vital-fill{background:repeating-linear-gradient(45deg,var(--crack) 0 7px,#c8362b 7px 14px)}
+.ope-rpg-cbt-vital--en .ope-rpg-cbt-vital-fill{background:repeating-linear-gradient(45deg,var(--patina) 0 7px,var(--patina-hi) 7px 14px)}
+.ope-rpg-cbt-vital-acts{display:flex;align-items:stretch;gap:6px}
+.ope-rpg-cbt-vital-inp{flex:1;min-width:0;padding:6px 8px;background:var(--iron-edge);border:2px solid var(--iron-hi);color:var(--paper);font-family:var(--mono);font-size:.8rem;font-weight:700;text-align:center}
 .ope-rpg-cbt-vital-inp:focus{outline:none;border-color:var(--ember)}
-.ope-rpg-cbt-vital-inp::placeholder{color:var(--ash);font-weight:400;font-size:.6rem}
-.ope-rpg-cbt-vital-apply{font-family:var(--mono);font-size:.55rem;font-weight:700;padding:3px 6px;background:var(--ember);color:var(--iron);border:2px solid #000;cursor:pointer;white-space:nowrap}
-.ope-rpg-cbt-vital-apply:hover{background:var(--ember-hi)}
+.ope-rpg-cbt-vital-inp::placeholder{color:var(--ash);font-weight:400;font-size:.68rem}
+.ope-rpg-cbt-vital-apply{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 12px;background:var(--ember);color:var(--iron);border:2px solid #000;cursor:pointer;white-space:nowrap;transition:transform .1s,box-shadow .1s}
+.ope-rpg-cbt-vital-apply:hover{background:var(--ember-hi);transform:translate(-1px,-1px);box-shadow:2px 2px 0 #000}
+.ope-rpg-cbt-vital-apply:active{transform:none;box-shadow:none}
 
 /* --- PA --- */
 .ope-rpg-cbt-pa{display:flex;align-items:center;gap:6px;margin-bottom:10px;font-family:var(--mono);font-size:.65rem;color:var(--ash)}
@@ -3921,16 +3961,16 @@ body.ope-pg-progresion .ope-lvl-form{margin-top:1rem}
 .ope-rpg-est-chip:hover::after{opacity:1}
 
 /* --- Columna derecha: modificadores --- */
-.ope-rpg-cbt-section-label{display:block;font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ash);margin-bottom:8px;padding-bottom:3px;border-bottom:1px solid var(--iron-edge)}
-.ope-rpg-cbt-modgroup{margin-bottom:10px}
-.ope-rpg-cbt-modgroup-label{display:block;font-family:var(--mono);font-size:.55rem;font-weight:700;text-transform:uppercase;color:var(--ember-hi);margin-bottom:4px}
-.ope-rpg-cbt-modgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px 8px}
-.ope-rpg-cbt-modrow{display:flex;align-items:center;gap:3px}
-.ope-rpg-cbt-statkey{font-family:var(--mono);font-size:.58rem;font-weight:700;color:var(--paper-dim);min-width:28px;text-align:right}
-.ope-rpg-cbt-modval{width:38px;padding:2px 3px;background:var(--iron-edge);border:2px solid var(--iron-hi);color:var(--paper);font-family:var(--mono);font-size:.62rem;text-align:center}
+.ope-rpg-cbt-section-label{display:block;font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--iron-edge)}
+.ope-rpg-cbt-modgroup{margin-bottom:16px}
+.ope-rpg-cbt-modgroup-label{display:block;font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ember-hi);margin-bottom:8px}
+.ope-rpg-cbt-modgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.ope-rpg-cbt-modrow{display:flex;align-items:center;gap:7px}
+.ope-rpg-cbt-statkey{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--paper);min-width:34px;text-align:right}
+.ope-rpg-cbt-modval{width:52px;padding:7px 4px;background:var(--iron-edge);border:2px solid var(--iron-hi);color:var(--paper);font-family:var(--mono);font-size:.85rem;font-weight:700;text-align:center}
 .ope-rpg-cbt-modval:focus{outline:none;border-color:var(--ember)}
-.ope-rpg-cbt-toggle{display:inline-flex;border:2px solid var(--iron-hi);border-radius:2px;overflow:hidden;cursor:pointer;background:transparent;padding:0;font-family:var(--mono);font-size:.6rem;font-weight:700;line-height:1;flex-shrink:0}
-.ope-rpg-cbt-toggle span{padding:3px 6px;transition:background .12s,color .12s}
+.ope-rpg-cbt-toggle{display:inline-flex;border:2px solid var(--iron-hi);overflow:hidden;cursor:pointer;background:transparent;padding:0;font-family:var(--mono);font-size:.72rem;font-weight:700;line-height:1;flex-shrink:0}
+.ope-rpg-cbt-toggle span{padding:7px 9px;transition:background .12s,color .12s}
 .ope-rpg-cbt-toggle-raw{background:var(--iron-hi);color:var(--paper)}
 .ope-rpg-cbt-toggle-pct{background:transparent;color:var(--ash)}
 .ope-rpg-cbt-toggle.is-pct .ope-rpg-cbt-toggle-raw{background:transparent;color:var(--ash)}
@@ -3938,10 +3978,76 @@ body.ope-pg-progresion .ope-lvl-form{margin-top:1rem}
 
 .ope-rpg-cbt-note{font-family:var(--mono);font-size:.55rem;color:var(--ash);margin-top:8px;padding-top:6px;border-top:1px dashed var(--iron-edge)}
 
-/* ── PV / EN en postbit ── */
-body.ope-pg-showthread .ope-post-vitals{display:flex;gap:10px;margin-top:8px;font-family:var(--mono);font-size:.64rem}
-body.ope-pg-showthread .ope-post-vital{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border:2px solid #000;background:var(--iron);box-shadow:2px 2px 0 rgba(0,0,0,.3)}
-body.ope-pg-showthread .ope-post-vital--pv{border-left:3px solid var(--crack)}
-body.ope-pg-showthread .ope-post-vital--en{border-left:3px solid var(--patina)}
-body.ope-pg-showthread .ope-post-vital b{color:var(--paper);font-size:.74rem;font-weight:700}
-body.ope-pg-showthread .ope-post-vital span{color:var(--paper-dim)}
+/* ── PV / EN en postbit (mini-barras HUD) ── */
+.ope-post-vitals{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.ope-post-vital{border:2px solid #000;background:var(--iron);padding:6px 8px 7px;box-shadow:2px 2px 0 rgba(0,0,0,.35)}
+.ope-post-vital-top{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-bottom:5px}
+.ope-post-vital-k{font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--paper-dim)}
+.ope-post-vital-v{font-family:var(--mono);font-size:.6rem;color:var(--ash)}
+.ope-post-vital-v b{font-family:var(--disp);font-size:.95rem;font-weight:900;line-height:1}
+.ope-post-vital-bar{height:7px;background:var(--iron-edge);border:1px solid #000;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}
+.ope-post-vital-fill{display:block;height:100%;transition:width .2s ease}
+.ope-post-vital--pv .ope-post-vital-v b{color:#ff9a8f}
+.ope-post-vital--pv .ope-post-vital-fill{background:repeating-linear-gradient(45deg,var(--crack) 0 6px,#c8362b 6px 12px)}
+.ope-post-vital--en .ope-post-vital-v b{color:var(--patina-hi)}
+.ope-post-vital--en .ope-post-vital-fill{background:repeating-linear-gradient(45deg,var(--patina) 0 6px,var(--patina-hi) 6px 12px)}
+
+/* ── Bloque RPG SYSTEM: vitales / estados / modificadores bajo el post ── */
+.ope-rpgsys-vitals{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2px}
+.ope-rpgsys-vital{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border:2px solid #000;background:var(--iron);font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper-dim);box-shadow:2px 2px 0 rgba(0,0,0,.3)}
+.ope-rpgsys-vital b{font-family:var(--disp);font-size:1.05rem;font-weight:900;line-height:1}
+.ope-rpgsys-vital--pv{border-left:4px solid var(--crack)}
+.ope-rpgsys-vital--pv b{color:#ff9a8f}
+.ope-rpgsys-vital--en{border-left:4px solid var(--patina)}
+.ope-rpgsys-vital--en b{color:var(--patina-hi)}
+.ope-rpgsys-estados{display:flex;flex-wrap:wrap;gap:6px}
+.ope-rpgsys-mods{display:flex;flex-wrap:wrap;gap:6px}
+.ope-rpgsys-mod{display:inline-flex;align-items:baseline;gap:5px;padding:3px 9px;border:2px solid #000;background:var(--iron);font-family:var(--mono);font-size:.66rem;font-weight:700;color:var(--paper)}
+.ope-rpgsys-mod b{color:var(--paper-dim);font-size:.6rem;text-transform:uppercase;letter-spacing:.5px}
+.ope-rpgsys-mod--up{border-left:4px solid var(--patina)}
+.ope-rpgsys-mod--down{border-left:4px solid var(--crack)}
+
+/* ── NAVBAR (scopeado bajo #ope-navbar) ── */
+body{padding-top:52px}
+#ope-navbar{position:fixed;inset:0 0 auto 0;height:52px;z-index:1000;background:var(--iron-edge);border-bottom:2px solid #000;font-size:15px}
+#ope-navbar *{box-sizing:border-box}
+#ope-navbar button{background:none;border:none;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none}
+#ope-navbar .ope-nav{max-width:1300px;margin:0 auto;height:100%;padding:0 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+#ope-navbar .ope-nav-logo{font-family:var(--disp);font-weight:900;font-size:1.45rem;letter-spacing:1px;color:var(--paper);text-transform:uppercase;line-height:1;display:flex;align-items:center;gap:9px;text-decoration:none}
+#ope-navbar .ope-nav-logo::before{content:"";width:11px;height:11px;background:var(--ember);box-shadow:0 0 10px var(--ember);flex:0 0 auto}
+#ope-navbar .ope-nav-logo:hover{color:#fff}
+#ope-navbar .ope-nav-links{display:flex;gap:2px}
+#ope-navbar .ope-nav-link{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--paper-dim);text-transform:uppercase;letter-spacing:1px;padding:7px 11px;border:1px solid transparent;text-decoration:none;line-height:1}
+#ope-navbar .ope-nav-link:hover,#ope-navbar .ope-nav-link.on{color:var(--iron);background:var(--ember);border-color:#000}
+#ope-navbar .ope-nav-dd{position:relative;display:flex}
+#ope-navbar .ope-nav-dd-btn{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+#ope-navbar .ope-dd-caret{font-size:.6rem;line-height:1;transition:transform .12s}
+#ope-navbar .ope-nav-dd-menu{left:0;right:auto;top:40px}
+#ope-navbar .ope-nav-right{display:flex;align-items:center;gap:10px}
+#ope-navbar .ope-nav-cta{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--iron);background:var(--paper);padding:7px 12px;border:2px solid #000;text-decoration:none;transition:transform .12s,box-shadow .12s;line-height:1}
+#ope-navbar .ope-nav-cta:hover{transform:translate(-1px,-1px);box-shadow:2px 2px 0 #000}
+#ope-navbar .ope-user-menu{position:relative}
+#ope-navbar .ope-user-name{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--paper);background:var(--iron-plate);border:2px solid #000;padding:7px 12px;cursor:pointer;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1}
+#ope-navbar .ope-user-name:hover{border-color:var(--ember)}
+#ope-navbar .ope-dropdown{display:none;position:absolute;right:0;top:44px;background:var(--iron-plate);border:2px solid #000;min-width:200px;z-index:100}
+#ope-navbar .ope-dropdown.open{display:block}
+#ope-navbar .ope-dropdown-item{display:block;padding:10px 14px;font-family:var(--mono);font-size:.68rem;color:var(--paper-dim);border-bottom:1px solid var(--iron-edge);text-decoration:none;transition:background .12s,color .12s}
+#ope-navbar .ope-dropdown-item:last-child{border-bottom:none}
+#ope-navbar .ope-dropdown-item:hover{background:var(--iron-hi);color:var(--paper)}
+#ope-navbar .ope-dropdown-divider{border:none;border-top:1px solid var(--iron-edge);margin:0}
+#ope-navbar .ope-btn-ghost{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:7px 13px;border:2px solid var(--rivet);background:transparent;color:var(--paper);text-decoration:none;transition:transform .12s,box-shadow .12s;line-height:1}
+#ope-navbar .ope-btn-ghost:hover{color:var(--iron);background:var(--paper);border-color:#000;transform:translate(-1px,-1px);box-shadow:2px 2px 0 #000}
+#ope-navbar .ope-nav-bell{position:relative;display:flex;align-items:center;justify-content:center;padding:6px 8px;color:var(--paper-dim);transition:color .12s}
+#ope-navbar .ope-nav-bell:hover{color:var(--ember-hi)}
+#ope-navbar .ope-nav-bell svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#ope-navbar .ope-bell-badge{position:absolute;top:0;right:2px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--crack);color:#fff;font-family:var(--mono);font-size:.58rem;font-weight:700;line-height:16px;text-align:center}
+#ope-navbar .ope-theme-picker{position:relative}
+#ope-navbar .ope-theme-toggle{opacity:.86;transition:opacity .12s,transform .12s}
+#ope-navbar .ope-theme-toggle:hover{opacity:1;transform:scale(1.08);color:var(--paper-dim)}
+#ope-navbar .ope-theme-pop{display:none;position:absolute;right:0;top:44px;background:var(--iron-plate);border:2px solid #000;padding:10px;z-index:100;width:118px;flex-wrap:wrap;gap:8px}
+#ope-navbar .ope-theme-pop.open{display:flex}
+#ope-navbar .ope-theme-dot{width:22px;height:22px;flex:0 0 auto;border-radius:50%;border:2px solid #000;padding:0;cursor:pointer;transition:transform .12s,box-shadow .12s}
+#ope-navbar .ope-theme-dot:hover{transform:scale(1.15)}
+#ope-navbar .ope-theme-dot.active{box-shadow:0 0 0 2px var(--iron-plate),0 0 0 4px var(--paper)}
+@media(max-width:640px){#ope-navbar .ope-nav-links{display:none}#ope-navbar .ope-nav-logo{font-size:1.2rem}}
+.rol-char-selector{margin-bottom:12px}

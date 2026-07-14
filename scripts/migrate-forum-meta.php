@@ -16,26 +16,13 @@
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-$db = new mysqli('127.0.0.1', 'root', '', 'mybb_foro');
-if ($db->connect_error) {
-    fwrite(STDERR, "DB connection error: " . $db->connect_error . "\n");
-    exit(1);
-}
-$db->set_charset('utf8mb4');
+require __DIR__ . '/_db-config.php';
+require __DIR__ . '/_migrate-lib.php';
 
 $PREFIX = 'mybb_';
 
-function run(mysqli $db, string $label, string $sql): void
-{
-    if ($db->query($sql) === false) {
-        fwrite(STDERR, "  [ERROR] $label: " . $db->error . "\n");
-        exit(1);
-    }
-    echo "  [ok] $label\n";
-}
-
 echo "=== Migrando {$PREFIX}rol_forum_meta ===\n";
-run($db, 'CREATE TABLE rol_forum_meta', "
+$sql = "
     CREATE TABLE IF NOT EXISTS {$PREFIX}rol_forum_meta (
         fid SMALLINT UNSIGNED NOT NULL PRIMARY KEY,
         dueno VARCHAR(180) NULL,
@@ -44,7 +31,11 @@ run($db, 'CREATE TABLE rol_forum_meta', "
         anotaciones TEXT NULL,
         dateline INT UNSIGNED NOT NULL DEFAULT 0,
         lastedit INT UNSIGNED NOT NULL DEFAULT 0
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-");
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+if ($db->query($sql) === false) {
+    fwrite(STDERR, "  [ERROR] rol_forum_meta: " . $db->error . "\n");
+    exit(1);
+}
+echo "  [OK] rol_forum_meta\n";
 
 echo "\n=== DONE ===\n";

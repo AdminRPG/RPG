@@ -81,7 +81,30 @@ if ($puede_gestionar && $mybb->request_method === 'post'
     && verify_post_check($mybb->get_input('my_post_key'), true)
     && $mybb->get_input('gaccion') === 'perfil') {
 
-    $valid_url = static function ($u) { return $u === '' || (bool) preg_match('~^https?://~i', $u); };
+    $valid_url = static function ($u) {
+        if ($u === '') return true;
+        $parsed = parse_url($u);
+        if (!is_array($parsed) || empty($parsed['host']) || empty($parsed['scheme'])) return false;
+        $scheme = strtolower($parsed['scheme']);
+        $host   = strtolower($parsed['host']);
+        if (!in_array($scheme, array('http', 'https'), true)) return false;
+        if ($host === 'localhost' || $host === '0.0.0.0') return false;
+        if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $ip = ip2long($host);
+            if ($ip === false) return false;
+            if ($ip === ip2long('127.0.0.1')) return false;
+            $long = sprintf('%u', $ip);
+            if ($long >= ip2long('10.0.0.0') && $long <= ip2long('10.255.255.255')) return false;
+            if ($long >= ip2long('172.16.0.0') && $long <= ip2long('172.31.255.255')) return false;
+            if ($long >= ip2long('192.168.0.0') && $long <= ip2long('192.168.255.255')) return false;
+        }
+        if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $ipv6 = inet_pton($host);
+            if ($ipv6 === false) return false;
+            if ($ipv6 === inet_pton('::1')) return false;
+        }
+        return true;
+    };
 
     $n_avatar = trim((string) $mybb->get_input('avatar'));
     $n_icono  = trim((string) $mybb->get_input('icono'));

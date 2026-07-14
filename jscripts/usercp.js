@@ -5,7 +5,7 @@ var UserCP = {
 		{
 			$(document).on('keydown', function(e)
 			{ 
-				if (e.keyCode == 27 && $('#buddyselect_container').is(':visible'))
+				if ((e.key === 'Escape' || e.keyCode === 27) && $('#buddyselect_container').is(':visible'))
 				{ 
 					$('#buddyselect_container').hide();
 				}

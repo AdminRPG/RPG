@@ -19,35 +19,17 @@ $loggedin  = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid       = (int) ($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
+require_once MYBB_ROOT . 'inc/ope_user_init.php';
+
 // ── Nivel de staff (lo expone el plugin ope_rol; con respaldo directo) ──
-$staff_level = 0;
-if ($loggedin) {
-    if (isset($mybb->user['ope_staff_level'])) {
-        $staff_level = (int) $mybb->user['ope_staff_level'];
-    } elseif ($db->table_exists('rol_cuentas')) {
-        $cq = $db->simple_select('rol_cuentas', 'staff_level', "uid = {$uid}", array('limit' => 1));
-        if ($db->num_rows($cq)) {
-            $staff_level = (int) $db->fetch_field($cq, 'staff_level');
-        }
-    }
-}
+$staff_level = ope_get_staff_level($uid);
 
 // Iniciales para el botón de usuario
-$initials = '';
-if ($loggedin) {
-    $parts = preg_split('/\s+/', trim((string) $mybb->user['username']));
-    foreach ($parts as $p) {
-        if ($p !== '') {
-            $initials .= function_exists('mb_substr') ? mb_substr($p, 0, 1, 'UTF-8') : substr($p, 0, 1);
-        }
-    }
-    $initials = function_exists('mb_substr') ? mb_substr($initials, 0, 2, 'UTF-8') : substr($initials, 0, 2);
-    $initials = function_exists('mb_strtoupper') ? mb_strtoupper($initials, 'UTF-8') : strtoupper($initials);
-}
+$initials   = ope_get_initials($mybb->user['username'] ?? '');
 $initials_e = htmlspecialchars_uni($initials);
 
 // Nombre a mostrar en la navbar: personaje activo o, en su defecto, la cuenta.
-$display_name   = (string) ($mybb->user['ope_display_name'] ?? ($mybb->user['username'] ?? ''));
+$display_name   = ope_get_display_name();
 $display_name_e = htmlspecialchars_uni($display_name);
 
 // ── Mapa de rango → variable de calor ──
@@ -175,17 +157,25 @@ $tiene_personajes = count($personajes) > 0;
 $tiene_npcs = count($npcs) > 0;
 
 $personajes_moderados = array();
+$unread_map = array();
 if ($loggedin && $db->table_exists('rol_mensajes')) {
+    $pids = array_column($personajes, 'pid');
+    if ($pids) {
+        $pid_list = implode(',', array_map('intval', $pids));
+        $msgs = $db->query("
+            SELECT destino_pid, COUNT(*) as cnt FROM " . TABLE_PREFIX . "rol_mensajes
+            WHERE destino_pid IN ({$pid_list}) AND leido = 0
+            AND asunto LIKE 'Moderación:%'
+            GROUP BY destino_pid
+        ");
+        while ($row = $db->fetch_array($msgs)) {
+            $unread_map[(int)$row['destino_pid']] = (int)$row['cnt'];
+        }
+    }
     foreach ($personajes as $pj) {
         if ($pj['estado'] === 'revision') {
-            $pid_i = (int)$pj['pid'];
-            $mc = $db->query("
-                SELECT COUNT(*) as cnt FROM " . TABLE_PREFIX . "rol_mensajes
-                WHERE destino_pid = {$pid_i} AND leido = 0
-                AND asunto LIKE 'Moderación:%'
-            ");
-            if ((int)$db->fetch_field($mc, 'cnt') > 0) {
-                $personajes_moderados[$pid_i] = true;
+            if (($unread_map[(int)$pj['pid']] ?? 0) > 0) {
+                $personajes_moderados[(int)$pj['pid']] = true;
             }
         }
     }

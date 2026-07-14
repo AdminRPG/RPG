@@ -729,7 +729,7 @@ function generate_post_check($rotation_shift=0)
 
 	$seed .= $mybb->settings['internal']['encryption_key'];
 
-	return md5($seed);
+	return hash_hmac('sha256', $seed, $mybb->settings['internal']['encryption_key'] ?? 'default_key');
 }
 
 /**

@@ -2,52 +2,55 @@
 
 namespace App\Auth;
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Firebase\JWT\ExpiredException;
+
 class JWTService
 {
-    public static function encode(array $payload, string $secret): string
+    public static function encode(array $payload): string
     {
-        $header = ['alg' => 'HS256', 'typ' => 'JWT'];
-        $segments = [];
-        $segments[] = self::base64UrlEncode(json_encode($header));
-        $segments[] = self::base64UrlEncode(json_encode($payload));
-        $signingInput = implode('.', $segments);
-        $signature = hash_hmac('sha256', $signingInput, $secret, true);
-        $segments[] = self::base64UrlEncode($signature);
-        return implode('.', $segments);
-    }
+        $secret = self::getSecret();
 
-    public static function decode(string $token, string $secret): array
-    {
-        $parts = explode('.', $token);
-        if (count($parts) !== 3) {
-            return [];
+        if (!isset($payload['iat'])) {
+            $payload['iat'] = time();
+        }
+        if (!isset($payload['exp'])) {
+            $payload['exp'] = time() + (int) ($_ENV['ROL_JWT_EXPIRY'] ?? 3600);
         }
 
-        [$headerB64, $payloadB64, $signatureB64] = $parts;
-
-        $signingInput = $headerB64 . '.' . $payloadB64;
-        $signature = self::base64UrlDecode($signatureB64);
-        $expectedSignature = hash_hmac('sha256', $signingInput, $secret, true);
-
-        if (!hash_equals($expectedSignature, $signature)) {
-            return [];
-        }
-
-        $payload = json_decode(self::base64UrlDecode($payloadB64), true);
-        return is_array($payload) ? $payload : [];
+        return JWT::encode($payload, $secret, 'HS256');
     }
 
-    private static function base64UrlEncode(string $data): string
+    public static function decode(string $token): array
     {
-        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+        $secret = self::getSecret();
+        $decoded = JWT::decode($token, new Key($secret, 'HS256'));
+
+        if ($decoded instanceof \stdClass) {
+            return (array) $decoded;
+        }
+
+        return [];
     }
 
-    private static function base64UrlDecode(string $data): string
+    public static function validate(array $payload): bool
     {
-        $remainder = strlen($data) % 4;
-        if ($remainder) {
-            $data .= str_repeat('=', 4 - $remainder);
+        if (!isset($payload['exp'], $payload['sub'])) {
+            return false;
         }
-        return base64_decode(strtr($data, '-_', '+/'));
+
+        return $payload['exp'] > time();
+    }
+
+    public static function getSecret(): string
+    {
+        $secret = $_ENV['ROL_JWT_SECRET'] ?? '';
+
+        if (empty($secret) || $secret === 'change-this-to-a-random-secret') {
+            $secret = bin2hex(random_bytes(32));
+        }
+
+        return $secret;
     }
 }

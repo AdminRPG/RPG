@@ -127,7 +127,12 @@ function ope_rol_mv_tablero()
 // Ciclos (mes natural)
 // ─────────────────────────────────────────────────────────────────────────
 
-/** Devuelve (creando si hace falta) el ciclo abierto del mes en curso. */
+/**
+ * Devuelve (creando si hace falta) el ciclo abierto del mes en curso.
+ *
+ * @todo Add UNIQUE INDEX on rol_mv_ciclos.periodo to prevent duplicate cycles:
+ *       ALTER TABLE rol_mv_ciclos ADD UNIQUE INDEX idx_periodo (periodo);
+ */
 function ope_rol_mv_ciclo_actual()
 {
     global $db;
@@ -140,14 +145,19 @@ function ope_rol_mv_ciclo_actual()
         return $db->fetch_array($q);
     }
     // No existe: abrir el ciclo del mes.
-    $id = $db->insert_query('rol_mv_ciclos', array(
-        'periodo'      => $db->escape_string($periodo),
-        'estado'       => 'abierto',
-        'indicaciones' => '',
-        'dateline'     => (int) TIME_NOW,
-    ));
-    $q = $db->simple_select('rol_mv_ciclos', '*', 'ciclo_id = ' . (int) $id, array('limit' => 1));
-    return $db->fetch_array($q);
+    try {
+        $id = $db->insert_query('rol_mv_ciclos', array(
+            'periodo'      => $db->escape_string($periodo),
+            'estado'       => 'abierto',
+            'indicaciones' => '',
+            'dateline'     => (int) TIME_NOW,
+        ));
+        $q = $db->simple_select('rol_mv_ciclos', '*', 'ciclo_id = ' . (int) $id, array('limit' => 1));
+        return $db->fetch_array($q);
+    } catch (Exception $e) {
+        $q = $db->simple_select('rol_mv_ciclos', '*', "periodo = '" . $db->escape_string($periodo) . "'", array('order_by' => 'ciclo_id', 'order_dir' => 'DESC', 'limit' => 1));
+        return $db->fetch_array($q);
+    }
 }
 
 function ope_rol_mv_ciclo_by_id($ciclo_id)
@@ -560,7 +570,7 @@ function ope_rol_mv_auto_classify_pendientes($ciclo_id)
     while ($r = $db->fetch_array($q)) {
         $cl = ope_rol_mv_auto_classify_evento($r['titulo'], $r['resumen']);
         $db->update_query('rol_mv_eventos', array(
-            'tipo_suceso' => $cl['tipo_suceso'],
+            'tipo_suceso' => $db->escape_string($cl['tipo_suceso']),
             'pe_estimado' => $cl['pe_estimado'],
         ), 'evento_id=' . (int)$r['evento_id']);
     }

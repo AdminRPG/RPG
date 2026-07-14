@@ -108,6 +108,24 @@ $CATALOGOS = array(
             'orden'       => array('t' => 'number', 'l' => 'Orden'),
         ),
     ),
+    'lore' => array(
+        'table' => 'rol_lore', 'label' => 'Lore', 'sing' => 'artículo',
+        'sub' => array('categoria', 'subcategoria'),
+        'fields' => array(
+            'nombre'        => array('t' => 'text', 'l' => 'Título', 'req' => true, 'w' => 2),
+            'slug'          => array('t' => 'text', 'l' => 'Slug', 'w' => 2),
+            'categoria'     => array('t' => 'select', 'l' => 'Categoría', 'opts' => array(
+                'historia' => 'Historia', 'eras' => 'Eras', 'personajes' => 'Personajes',
+                'facciones' => 'Facciones', 'ubicaciones' => 'Ubicaciones',
+                'sistemas' => 'Sistemas', 'cronologia' => 'Cronología',
+            )),
+            'subcategoria' => array('t' => 'text', 'l' => 'Subcategoría', 'w' => 2),
+            'resumen'       => array('t' => 'textarea', 'l' => 'Resumen (tarjeta)', 'w' => 2),
+            'contenido'     => array('t' => 'textarea', 'l' => 'Contenido (HTML)', 'w' => 2),
+            'imagen'        => array('t' => 'text', 'l' => 'URL de imagen', 'w' => 2),
+            'orden'         => array('t' => 'number', 'l' => 'Orden'),
+        ),
+    ),
 );
 
 $cat = $mybb->get_input('cat');

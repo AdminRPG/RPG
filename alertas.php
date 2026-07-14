@@ -57,12 +57,9 @@ if ($loggedin && $activePid > 0 && $db->table_exists('rol_alertas')) {
     while ($row = $db->fetch_array($aq)) $alertas[] = $row;
 }
 
-$initials = '';
-if ($loggedin) {
-    $parts = preg_split('/\s+/', trim((string)$mybb->user['username']));
-    foreach ($parts as $p) { if ($p !== '') $initials .= mb_strtoupper(mb_substr($p, 0, 1, 'UTF-8'), 'UTF-8'); }
-    $initials = mb_substr($initials, 0, 2, 'UTF-8');
-}
+require_once MYBB_ROOT . 'inc/ope_user_init.php';
+
+$initials   = ope_get_initials($mybb->user['username'] ?? '');
 $initials_e = htmlspecialchars_uni($initials);
 
 $tipo_iconos = [

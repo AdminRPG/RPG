@@ -15,30 +15,12 @@ $loggedin  = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid       = (int)($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
-// Nivel de staff (plugin ope_rol, con respaldo directo)
-$staff_level = 0;
-if ($loggedin) {
-    if (isset($mybb->user['ope_staff_level'])) {
-        $staff_level = (int)$mybb->user['ope_staff_level'];
-    } elseif ($db->table_exists('rol_cuentas')) {
-        $cq = $db->simple_select('rol_cuentas', 'staff_level', "uid = {$uid}", array('limit' => 1));
-        if ($db->num_rows($cq)) {
-            $staff_level = (int)$db->fetch_field($cq, 'staff_level');
-        }
-    }
-}
+require_once MYBB_ROOT . 'inc/ope_user_init.php';
 
-$initials = '';
-if ($loggedin) {
-    $parts = preg_split('/\s+/', trim((string)$mybb->user['username']));
-    foreach ($parts as $p) {
-        if ($p !== '') {
-            $initials .= function_exists('mb_substr') ? mb_substr($p, 0, 1, 'UTF-8') : substr($p, 0, 1);
-        }
-    }
-    $initials = function_exists('mb_substr') ? mb_substr($initials, 0, 2, 'UTF-8') : substr($initials, 0, 2);
-    $initials = function_exists('mb_strtoupper') ? mb_strtoupper($initials, 'UTF-8') : strtoupper($initials);
-}
+// Nivel de staff (plugin ope_rol, con respaldo directo)
+$staff_level = ope_get_staff_level($uid);
+
+$initials   = ope_get_initials($mybb->user['username'] ?? '');
 $initials_e = htmlspecialchars_uni($initials);
 
 // ── Catálogo de trámites (data-driven; los filtros se generan a partir de esto) ──

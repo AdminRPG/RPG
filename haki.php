@@ -10,20 +10,11 @@ $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int)($mybb->user['uid'] ?? 0);
 
-$initials = '';
-if ($loggedin) {
-    $parts = preg_split('/\s+/', trim((string)$mybb->user['username']));
-    foreach ($parts as $p) {
-        if ($p !== '') {
-            $initials .= function_exists('mb_substr') ? mb_substr($p, 0, 1, 'UTF-8') : substr($p, 0, 1);
-        }
-    }
-    $initials = function_exists('mb_substr') ? mb_substr($initials, 0, 2, 'UTF-8') : substr($initials, 0, 2);
-    $initials = function_exists('mb_strtoupper') ? mb_strtoupper($initials, 'UTF-8') : strtoupper($initials);
-}
-$initials_e = htmlspecialchars_uni($initials);
+require_once MYBB_ROOT . 'inc/ope_user_init.php';
 
-$display_name = (string)($mybb->user['ope_display_name'] ?? ($mybb->user['username'] ?? ''));
+$initials       = ope_get_initials($mybb->user['username'] ?? '');
+$initials_e     = htmlspecialchars_uni($initials);
+$display_name   = ope_get_display_name();
 $display_name_e = htmlspecialchars_uni($display_name);
 
 $active_pid = 0;
@@ -34,14 +25,7 @@ if ($loggedin && isset($mybb->user['ope_active_pid']) && (int)$mybb->user['ope_a
     if ($db->num_rows($cq)) $active_pid = (int)$db->fetch_field($cq, 'personaje_activo');
 }
 
-$staff_level = 0;
-if ($loggedin && $active_pid > 0 && $db->table_exists('rol_personajes')) {
-    $staff_level = (int)($mybb->user['ope_staff_level'] ?? 0);
-    if ($staff_level < 1) {
-        $sq = $db->simple_select('rol_cuentas', 'staff_level', "uid = {$uid}", array('limit' => 1));
-        if ($db->num_rows($sq)) $staff_level = (int)$db->fetch_field($sq, 'staff_level');
-    }
-}
+$staff_level = ope_get_staff_level($uid, $active_pid);
 
 $flash = '';
 $flash_kind = 'ok';

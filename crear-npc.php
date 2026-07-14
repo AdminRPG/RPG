@@ -107,54 +107,59 @@ if ($mybb->request_method === 'post') {
             $sub_opcion = '';
         }
 
-        // ---- Stats ----
-        $stats_base = array_fill_keys($STAT_KEYS, 1);
-        $stats_raciales = $stats_base;
-        if (isset($RAZAS[$raza1])) {
-            foreach ($RAZAS[$raza1]['mod'] as $k => $v) {
-                $stats_raciales[$k] = ($stats_raciales[$k] ?? 1) + $v;
-            }
-            if (!$hibrido) {
-                $mod_sec = (!empty($sub_opciones_disp) && isset($sub_opciones_disp[$sub_opcion]))
-                    ? $sub_opciones_disp[$sub_opcion]['mod']
-                    : $RAZAS[$raza1]['mod_secundaria'];
-                foreach ($mod_sec as $k => $v) {
-                    $stats_raciales[$k] = ($stats_raciales[$k] ?? 1) + $v;
-                }
-            } elseif (isset($RAZAS[$raza2])) {
-                foreach ($RAZAS[$raza2]['mod'] as $k => $v) {
-                    $stats_raciales[$k] = ($stats_raciales[$k] ?? 1) + $v;
-                }
+        // ---- Stats v2: reparto numerico de PS (5-100+) ----
+        $stats_base = ope_rol_stats_base(); // Todos en 5
+        $raza_data = isset($RAZAS[$raza1]) ? $RAZAS[$raza1] : array();
+        $ps_disponibles = ope_rol_ps_iniciales($raza1);
+
+        // Recoger valores repartidos por el staff (vienen como array numerico)
+        $ps_asignados_raw = $mybb->get_input('ps_stats', MyBB::INPUT_ARRAY);
+        $ps_asignados = array();
+        $ps_total_usado = 0;
+        if (is_array($ps_asignados_raw)) {
+            foreach ($STAT_KEYS as $sk) {
+                $v = isset($ps_asignados_raw[$sk]) ? (int)$ps_asignados_raw[$sk] : 0;
+                $v = max(0, $v);
+                $ps_asignados[$sk] = $v;
+                $ps_total_usado += $v;
             }
         }
 
-        $max_bumps = 1;
-        if (isset($RAZAS[$raza1]) && !empty($RAZAS[$raza1]['extra_stat_bump'])) {
-            $max_bumps = 2;
+        if ($ps_total_usado <= 0) {
+            $errores[] = 'Reparte al menos 1 Punto de Stat (PS).';
         }
-        if ($hibrido && isset($RAZAS[$raza2]) && !empty($RAZAS[$raza2]['extra_stat_bump'])) {
-            $max_bumps = 2;
-        }
-
-        $bumps = $mybb->get_input('stat_bump', MyBB::INPUT_ARRAY);
-        if (!is_array($bumps)) {
-            $bumps = array();
-        }
-        $bumps = array_values(array_unique(array_intersect($bumps, $STAT_KEYS)));
-        if (count($bumps) < 1) {
-            $errores[] = 'Sube al menos una estadística en la creación.';
-        }
-        if (count($bumps) > $max_bumps) {
-            $errores[] = 'Tu raza solo permite subir ' . $max_bumps . ' estadística(s) en la creación.';
+        if ($ps_total_usado > $ps_disponibles) {
+            $errores[] = "Has repartido {$ps_total_usado} PS, pero solo dispones de {$ps_disponibles}.";
         }
 
-        $stats_efectivas = $stats_raciales;
-        foreach ($bumps as $b) {
-            $stats_efectivas[$b] = ($stats_efectivas[$b] ?? 1) + 1;
+        // Aplicar PS a stats base
+        $stats_sin_pasivas = $stats_base;
+        foreach ($ps_asignados as $sk => $v) {
+            $stats_sin_pasivas[$sk] = ($stats_sin_pasivas[$sk] ?? 5) + $v;
         }
-        $suma = array_sum($stats_efectivas);
-        $nivel = ope_rol_nivel_from_sum($suma);
-        $nivel_label = ope_rol_nivel_label($nivel);
+
+        // Validar cap de creacion: ningun stat > 20
+        foreach ($stats_sin_pasivas as $sk => $sv) {
+            if ($sv > 20) {
+                $errores[] = "{$sk} no puede superar 20 en la creacion (tiene {$sv}).";
+            }
+        }
+
+        // Aplicar pasivas raciales (multiplicadores %)
+        $stats_efectivas = ope_rol_aplicar_pasivas($stats_sin_pasivas, $raza_data);
+        if ($hibrido && isset($RAZAS[$raza2])) {
+            $stats_efectivas = ope_rol_aplicar_pasivas($stats_efectivas, $RAZAS[$raza2]);
+        } elseif (!$hibrido) {
+            $mults_sec = isset($raza_data['multiplicadores_secundaria']) ? $raza_data['multiplicadores_secundaria'] : array();
+            foreach ($mults_sec as $stat => $factor) {
+                if (isset($stats_efectivas[$stat])) {
+                    $stats_efectivas[$stat] = (int) round($stats_efectivas[$stat] * $factor);
+                }
+            }
+        }
+
+        $suma = ope_rol_stat_sum($stats_efectivas);
+        $nivel = 1;
 
         // ---- Virtudes y Defectos ----
         $virtudes_in = $mybb->get_input('virtudes', MyBB::INPUT_ARRAY);
@@ -229,6 +234,11 @@ if ($mybb->request_method === 'post') {
             $slug = my_strtolower(preg_replace('/[^a-z0-9]+/i', '-', $nombre));
             $slug = trim($slug, '-');
 
+            $stats_json_data = array();
+            foreach ($STAT_KEYS as $sk) {
+                $stats_json_data[$sk] = $stats_efectivas[$sk] ?? 5;
+            }
+
             $datos = array(
                 'raza_principal' => $raza1,
                 'raza_secundaria' => $hibrido ? $raza2 : null,
@@ -237,11 +247,11 @@ if ($mybb->request_method === 'post') {
                 'apodo' => $apodo,
                 'edad' => $edad,
                 'genero' => $genero,
-                'stats_base' => $stats_base,
-                'stats_raciales' => $stats_raciales,
+                'stats_base' => $stats_sin_pasivas,
                 'stats_efectivas' => $stats_efectivas,
-                'stat_bumps' => $bumps,
-                'rango_suma' => $suma,
+                'ps_asignados' => $ps_asignados,
+                'ps_disponibles' => $ps_disponibles,
+                'ps_total_usado' => $ps_total_usado,
                 'virtudes' => $virtudes_sel,
                 'defectos' => $defectos_sel,
                 'pc_gastado' => $pc_gastado,
@@ -267,9 +277,11 @@ if ($mybb->request_method === 'post') {
                 'estado' => 'aprobado',
                 'es_npc' => 1,
                 'activo' => 0,
-                'rango' => $nivel_label,
-                'nivel' => $nivel,
+                'nivel' => 1,
                 'avatar' => '',
+                'stats_json' => $db->escape_string(json_encode($stats_json_data, JSON_UNESCAPED_UNICODE)),
+                'ps_gastados' => $ps_total_usado,
+                'stats_ganados' => 0,
                 'datos' => $db->escape_string(json_encode($datos, JSON_UNESCAPED_UNICODE)),
                 'inventario' => $db->escape_string(json_encode($inventario, JSON_UNESCAPED_UNICODE)),
                 'economia' => $db->escape_string(json_encode($economia, JSON_UNESCAPED_UNICODE)),
@@ -356,12 +368,15 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="plate-b">
           <div class="race-grid" id="raceGrid">
 <?php foreach ($RAZAS as $rid => $r):
-    $mod = json_encode($r['mod'], JSON_UNESCAPED_UNICODE);
-    $modsec = json_encode($r['mod_secundaria'], JSON_UNESCAPED_UNICODE);
+    $mod = json_encode($r['mod'] ?? array(), JSON_UNESCAPED_UNICODE);
+    $modsec = json_encode($r['mod_secundaria'] ?? array(), JSON_UNESCAPED_UNICODE);
     $subop = json_encode($r['sub_opciones'] ?? array(), JSON_UNESCAPED_UNICODE);
+    $mults = json_encode($r['multiplicadores'] ?? array(), JSON_UNESCAPED_UNICODE);
+    $multssec = json_encode($r['multiplicadores_secundaria'] ?? array(), JSON_UNESCAPED_UNICODE);
+    $psbonus = (int)($r['ps_bonus'] ?? 0);
 ?>
             <label class="race-card">
-              <input type="radio" name="raza_principal" value="<?php echo $rid; ?>" data-mod='<?php echo htmlspecialchars_uni($mod); ?>' data-modsec='<?php echo htmlspecialchars_uni($modsec); ?>' data-subop='<?php echo htmlspecialchars_uni($subop); ?>' data-extra-bump="<?php echo !empty($r['extra_stat_bump']) ? '1' : '0'; ?>" data-nombre="<?php echo htmlspecialchars_uni($r['nombre']); ?>" required<?php echo isset($old['raza_principal']) && $old['raza_principal'] === $rid ? ' checked' : ''; ?>>
+              <input type="radio" name="raza_principal" value="<?php echo $rid; ?>" data-mod='<?php echo htmlspecialchars_uni($mod); ?>' data-modsec='<?php echo htmlspecialchars_uni($modsec); ?>' data-subop='<?php echo htmlspecialchars_uni($subop); ?>' data-mults='<?php echo htmlspecialchars_uni($mults); ?>' data-multssec='<?php echo htmlspecialchars_uni($multssec); ?>' data-ps-bonus="<?php echo $psbonus; ?>" data-nombre="<?php echo htmlspecialchars_uni($r['nombre']); ?>" required<?php echo isset($old['raza_principal']) && $old['raza_principal'] === $rid ? ' checked' : ''; ?>>
               <div class="rc-body">
                 <div class="rc-name"><?php echo htmlspecialchars_uni($r['nombre']); ?></div>
                 <div class="rc-resumen"><?php echo htmlspecialchars_uni($r['resumen']); ?></div>
@@ -380,9 +395,11 @@ header('Content-Type: text/html; charset=utf-8');
             <select name="raza_secundaria" id="razaSecundaria">
               <option value="">— elige —</option>
 <?php foreach ($RAZAS as $rid => $r):
-    $mod = json_encode($r['mod'], JSON_UNESCAPED_UNICODE);
+    $mod2 = json_encode($r['mod'] ?? array(), JSON_UNESCAPED_UNICODE);
+    $mults2 = json_encode($r['multiplicadores'] ?? array(), JSON_UNESCAPED_UNICODE);
+    $psbonus2 = (int)($r['ps_bonus'] ?? 0);
 ?>
-              <option value="<?php echo $rid; ?>" data-mod='<?php echo htmlspecialchars_uni($mod); ?>' data-extra-bump="<?php echo !empty($r['extra_stat_bump']) ? '1' : '0'; ?>"<?php echo isset($old['raza_secundaria']) && $old['raza_secundaria'] === $rid ? ' selected' : ''; ?>><?php echo htmlspecialchars_uni($r['nombre']); ?></option>
+              <option value="<?php echo $rid; ?>" data-mod='<?php echo htmlspecialchars_uni($mod2); ?>' data-mults='<?php echo htmlspecialchars_uni($mults2); ?>' data-ps-bonus="<?php echo $psbonus2; ?>"<?php echo isset($old['raza_secundaria']) && $old['raza_secundaria'] === $rid ? ' selected' : ''; ?>><?php echo htmlspecialchars_uni($r['nombre']); ?></option>
 <?php endforeach; ?>
             </select>
           </div>
@@ -415,11 +432,11 @@ header('Content-Type: text/html; charset=utf-8');
     <!-- PASO 3: STATS -->
     <div class="wiz-step" data-step="3">
       <div class="plate">
-        <div class="plate-h"><span class="t">3. Estadísticas</span><span class="c">// F(1) a M+(10)</span></div>
+        <div class="plate-h"><span class="t">3. Estadísticas</span><span class="c">// 5 a 20+</span></div>
         <div class="plate-b">
-          <p class="mono fs-72 c-dim mb-10">Todas empiezan en <b class="c-paper">F</b>. Las pasivas raciales ya modifican el valor efectivo. Después puedes subir <b id="maxBumpsLabel" class="c-h6">1 estadística</b> un rango más.</p>
+          <p class="stats-hint">Todas empiezan en <b class="c-paper">5</b>. Reparte tus <b class="c-ember" id="psDisponiblesLabel">30 PS</b> como quieras (max 15 PS por stat; 20 antes de pasivas).</p>
           <div id="statsContainer"></div>
-          <div class="wiz-sum-bar"><span>Suma total: <b id="statSum">0</b></span><span>Rango del personaje: <b id="statRank">F</b></span></div>
+          <div class="wiz-sum-bar"><span>Suma efectiva: <b id="statSum">0</b></span><span>Nivel inicial: <b id="statLevel">1 (todos empiezan a nivel 1)</b></span></div>
         </div>
       </div>
     </div>
@@ -574,7 +591,10 @@ header('Content-Type: text/html; charset=utf-8');
 <script>
 (function(){
   var STAT_LABELS = <?php echo json_encode($STATS, JSON_UNESCAPED_UNICODE); ?>;
-  var RANK_BREAKS = [[66,'M+'],[56,'M'],[47,'SS'],[39,'S'],[32,'A'],[26,'B'],[21,'C'],[17,'D'],[14,'E'],[0,'F']];
+  var PS_BASE = 30;
+  var PS_HUMANO = 40;
+  var STAT_BASE = 5;
+  var STAT_CAP = 20;
   var STEP_NAMES = ['Raza','Concepto','Stats','Virtudes','Facción','Equipo','Historia','Resumen'];
   var steps = Array.prototype.slice.call(document.querySelectorAll('.wiz-step'));
   var cur = 1;
@@ -626,8 +646,9 @@ header('Content-Type: text/html; charset=utf-8');
       if (!concepto) return 'Describe el concepto del NPC.';
     }
     if (n === 3){
-      var bumps = form.querySelectorAll('input[name="stat_bump[]"]:checked');
-      if (bumps.length < 1) return 'Sube al menos una estadística.';
+      var totalPs = 0;
+      form.querySelectorAll('.ps-input').forEach(function(inp){ totalPs += parseInt(inp.value, 10) || 0; });
+      if (totalPs <= 0) return 'Reparte al menos 1 Punto de Stat (PS).';
     }
     if (n === 4){
       var bar = document.getElementById('pcBar');
@@ -703,33 +724,36 @@ header('Content-Type: text/html; charset=utf-8');
     var r1 = document.querySelector('input[name=raza_principal]:checked');
     var hib = hibChk.checked;
     var r2opt = hib ? document.getElementById('razaSecundaria').selectedOptions[0] : null;
-    var mod1 = r1 ? JSON.parse(r1.dataset.mod || '{}') : {};
-    var modsec1 = {};
+    var mults1 = r1 ? JSON.parse(r1.dataset.mults || '{}') : {};
+    var multssec1 = {};
     if (r1 && !hib){
       var subChk = subOpcionGrid.querySelector('input[name=sub_opcion]:checked');
       if (subChk){
         var subop = JSON.parse(r1.dataset.subop || '{}');
-        modsec1 = (subop[subChk.value] && subop[subChk.value].mod) || {};
+        multssec1 = (subop[subChk.value] && subop[subChk.value].mod) ? {} : JSON.parse(r1.dataset.multssec || '{}');
       } else {
-        modsec1 = JSON.parse(r1.dataset.modsec || '{}');
+        multssec1 = JSON.parse(r1.dataset.multssec || '{}');
       }
     }
-    var mod2 = (r2opt && r2opt.value) ? JSON.parse(r2opt.dataset.mod || '{}') : {};
-    var extraBump = (r1 && r1.dataset.extraBump === '1') || (r2opt && r2opt.value && r2opt.dataset.extraBump === '1');
-    return {mod1: mod1, modsec1: modsec1, mod2: mod2, extraBump: extraBump};
+    var mults2 = (r2opt && r2opt.value) ? JSON.parse(r2opt.dataset.mults || '{}') : {};
+    var psR1 = r1 ? parseInt(r1.dataset.psBonus, 10) || 0 : 0;
+    var psR2 = (r2opt && r2opt.value) ? parseInt(r2opt.dataset.psBonus, 10) || 0 : 0;
+    var psDisponibles = PS_BASE + psR1 + psR2;
+    return {mults1: mults1, multssec1: multssec1, mults2: mults2, psDisponibles: psDisponibles};
   }
 
   function renderStats(){
     var container = document.getElementById('statsContainer');
     var rd = getRazaData();
-    var maxBumps = rd.extraBump ? 2 : 1;
-    document.getElementById('maxBumpsLabel').textContent = maxBumps + ' estadística' + (maxBumps > 1 ? 's' : '');
+    var psDisponibles = rd.psDisponibles;
+    document.getElementById('psDisponiblesLabel').textContent = psDisponibles + ' PS';
 
-    var prevBumps = {};
-    container.querySelectorAll('input[name="stat_bump[]"]:checked').forEach(function(c){ prevBumps[c.value] = true; });
+    var prevPs = {};
+    container.querySelectorAll('input.ps-input').forEach(function(inp){
+      prevPs[inp.dataset.stat] = parseInt(inp.value, 10) || 0;
+    });
 
     container.innerHTML = '';
-    var totalSum = 0;
     Object.keys(STAT_LABELS).forEach(function(pk){
       var pillar = STAT_LABELS[pk];
       var pdiv = document.createElement('div');
@@ -740,43 +764,55 @@ header('Content-Type: text/html; charset=utf-8');
       pdiv.appendChild(h);
 
       Object.keys(pillar.stats).forEach(function(sig){
-        var base = 1;
-        var racial = base + (rd.mod1[sig]||0) + (rd.modsec1[sig]||0) + (rd.mod2[sig]||0);
+        var prev = prevPs[sig] || 0;
+        var maxPs = STAT_CAP - STAT_BASE;
         var row = document.createElement('div');
         row.className = 'stat-row';
-        var delta = racial - base;
-        var deltaTxt = delta === 0 ? '=' : (delta > 0 ? '+' + delta : String(delta));
-        var deltaCls = delta > 0 ? 'pos' : (delta < 0 ? 'neg' : '');
         row.innerHTML =
           '<span class="stat-name">' + pillar.stats[sig] + ' <span class="sig">' + sig + '</span></span>' +
-          '<span class="stat-val ' + deltaCls + '">' + deltaTxt + '</span>' +
-          '<span class="stat-eff" data-eff="' + sig + '">' + racial + '</span>' +
-          '<label class="stat-bump"><input type="checkbox" name="stat_bump[]" value="' + sig + '"' + (prevBumps[sig] ? ' checked' : '') + '> +1</label>';
+          '<span class="stat-base">Base: ' + STAT_BASE + '</span>' +
+          '<input type="number" name="ps_stats[' + sig + ']" class="ps-input" data-stat="' + sig + '" value="' + prev + '" min="0" max="' + maxPs + '" step="1">' +
+          '<span class="stat-eff" data-eff="' + sig + '">' + STAT_BASE + '</span>';
         pdiv.appendChild(row);
       });
       container.appendChild(pdiv);
     });
 
-    // Enforce max bumps + recompute effective values & sum
-    var bumpBoxes = container.querySelectorAll('input[name="stat_bump[]"]');
+    var psInputs = container.querySelectorAll('.ps-input');
+    function aplicarMults(sinPasivas, sig){
+      var v = sinPasivas;
+      if (rd.mults1[sig]) v = Math.round(v * rd.mults1[sig]);
+      if (rd.multssec1[sig]) v = Math.round(v * rd.multssec1[sig]);
+      if (rd.mults2[sig]) v = Math.round(v * rd.mults2[sig]);
+      return v;
+    }
+
     function recompute(){
-      var checked = container.querySelectorAll('input[name="stat_bump[]"]:checked');
-      bumpBoxes.forEach(function(b){ b.disabled = (checked.length >= maxBumps && !b.checked); });
+      var totalUsado = 0;
       var sum = 0;
-      container.querySelectorAll('[data-eff]').forEach(function(el){
-        var sig = el.dataset.eff;
-        var box = container.querySelector('input[name="stat_bump[]"][value="' + sig + '"]');
-        var raw = 1 + (rd.mod1[sig]||0) + (rd.modsec1[sig]||0) + (rd.mod2[sig]||0);
-        var withBump = raw + (box && box.checked ? 1 : 0);
-        el.textContent = withBump;
-        sum += withBump;
+      psInputs.forEach(function(inp){
+        var sig = inp.dataset.stat;
+        var ps = Math.max(0, parseInt(inp.value, 10) || 0);
+        var maxPs = STAT_CAP - STAT_BASE;
+        if (ps > maxPs){ ps = maxPs; inp.value = maxPs; }
+        totalUsado += ps;
+      });
+      var restante = psDisponibles - totalUsado;
+      psInputs.forEach(function(inp){
+        var sig = inp.dataset.stat;
+        var ps = parseInt(inp.value, 10) || 0;
+        var maxPosible = ps + Math.max(0, restante);
+        inp.max = Math.min(STAT_CAP - STAT_BASE, maxPosible);
+        var sinPasivas = STAT_BASE + ps;
+        var eff = aplicarMults(sinPasivas, sig);
+        inp.closest('.stat-row').querySelector('.stat-eff').textContent = eff;
+        sum += eff;
       });
       document.getElementById('statSum').textContent = sum;
-      var rank = 'F';
-      for (var i=0;i<RANK_BREAKS.length;i++){ if (sum >= RANK_BREAKS[i][0]){ rank = RANK_BREAKS[i][1]; break; } }
-      document.getElementById('statRank').textContent = rank;
+      document.getElementById('statLevel').textContent = '1 (todos empiezan a nivel 1)';
     }
-    bumpBoxes.forEach(function(b){ b.addEventListener('change', recompute); });
+
+    psInputs.forEach(function(inp){ inp.addEventListener('input', recompute); });
     recompute();
   }
 
@@ -874,7 +910,8 @@ header('Content-Type: text/html; charset=utf-8');
       '<div class="line"><b>Raza</b>' + razaTxt + '</div>' +
       '<div class="line"><b>Facción</b>' + faccionTxt + '</div></div>' +
       '<div class="sum-block"><h4>Estadísticas</h4>' +
-      '<div class="line"><b>Suma total</b>' + document.getElementById('statSum').textContent + ' — Rango ' + document.getElementById('statRank').textContent + '</div></div>' +
+      '<div class="line"><b>Suma total</b>' + document.getElementById('statSum').textContent + '</div>' +
+      '<div class="line"><b>Nivel inicial</b>1 (el nivel se gana jugando)</div></div>' +
       '<div class="sum-block"><h4>Virtudes (' + virtudesNames.length + ')</h4><div class="line">' + (virtudesNames.join(', ') || 'Ninguna') + '</div></div>' +
       '<div class="sum-block"><h4>Defectos (' + defectosNames.length + ')</h4><div class="line">' + (defectosNames.join(', ') || 'Ninguno') + '</div></div>' +
       '<div class="sum-block"><h4>Equipo</h4><div class="line"><b>Pack</b>' + packTxt + '</div><div class="line"><b>Berries</b>' + document.getElementById('berriesOut').textContent + '</div></div>';

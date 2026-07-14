@@ -99,10 +99,10 @@ class Personaje extends Model
     public function calcularPA(): int
     {
         $stats = $this->stats->keyBy('stat_key');
-        $agi = $stats->get('agilidad')?->valor ?? 1;
-        $int = $stats->get('intelecto')?->valor ?? 1;
-        $ing = $stats->get('ingenio')?->valor ?? 1;
-        $car = $stats->get('carisma')?->valor ?? 1;
+        $agi = $stats->get('AGI')?->valor ?? 5;
+        $int = $stats->get('INT')?->valor ?? 5;
+        $ing = $stats->get('ING')?->valor ?? 5;
+        $car = $stats->get('CAR')?->valor ?? 5;
         return $agi + max($int, $ing, $car);
     }
 }

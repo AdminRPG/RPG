@@ -6,9 +6,7 @@
  *   php scripts/fix-theme-stylesheets.php
  */
 error_reporting(E_ALL); ini_set('display_errors', '1');
-$db = new mysqli('127.0.0.1', 'root', '', 'mybb_foro');
-if ($db->connect_error) { fwrite(STDERR, $db->connect_error); exit(1); }
-$db->set_charset('utf8mb4');
+require __DIR__ . '/_db-config.php';
 
 function deep_replace($d, $f, $t) {
     if (is_array($d)) { $o = []; foreach ($d as $k => $v) { $nk = is_string($k) ? str_replace($f, $t, $k) : $k; $o[$nk] = deep_replace($v, $f, $t); } return $o; }

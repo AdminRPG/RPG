@@ -16,37 +16,12 @@
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-$db = new mysqli('127.0.0.1', 'root', '', 'mybb_foro');
-if ($db->connect_error) {
-    fwrite(STDERR, "DB connection error: " . $db->connect_error . "\n");
-    exit(1);
-}
-$db->set_charset('utf8mb4');
+require __DIR__ . '/_db-config.php';
+require __DIR__ . '/_migrate-lib.php';
 
 $PREFIX = 'mybb_';
 
-function col_exists(mysqli $db, string $table, string $col): bool
-{
-    $t = $db->real_escape_string($table);
-    $c = $db->real_escape_string($col);
-    $res = $db->query("SHOW COLUMNS FROM `{$t}` LIKE '{$c}'");
-    return $res && $res->num_rows > 0;
-}
-
-function add_col(mysqli $db, string $table, string $col, string $definition): void
-{
-    if (col_exists($db, $table, $col)) {
-        echo "  [skip] {$table}.{$col} ya existe\n";
-        return;
-    }
-    if ($db->query("ALTER TABLE `{$table}` ADD COLUMN `{$col}` {$definition}") === false) {
-        fwrite(STDERR, "  [ERROR] {$table}.{$col}: " . $db->error . "\n");
-        exit(1);
-    }
-    echo "  [OK] {$table}.{$col} añadida\n";
-}
-
-function run(mysqli $db, string $sql, string $label): void
+function oleada2_run(mysqli $db, string $sql, string $label): void
 {
     if ($db->query($sql) === false) {
         fwrite(STDERR, "  [ERROR] {$label}: " . $db->error . "\n");
@@ -74,7 +49,7 @@ add_col($db, "{$PREFIX}rol_personajes", 'pa_por_turno',
 
 echo "\n=== 2. TABLA DE ESTADOS ===\n";
 
-run($db, "
+oleada2_run($db, "
     CREATE TABLE IF NOT EXISTS `{$PREFIX}rol_estados` (
         `estado_key`   VARCHAR(30) NOT NULL,
         `nombre`       VARCHAR(60) NOT NULL DEFAULT '',

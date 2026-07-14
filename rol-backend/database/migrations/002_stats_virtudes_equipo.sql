@@ -11,25 +11,63 @@
 -- =========================================================
 
 -- Extensión de columnas en rol_personajes (datos de identidad)
-ALTER TABLE rol_personajes
-  ADD COLUMN IF NOT EXISTS alias VARCHAR(100) AFTER nombre,
-  ADD COLUMN IF NOT EXISTS concept VARCHAR(255) AFTER alias,
-  ADD COLUMN IF NOT EXISTS apariencia TEXT AFTER historia,
-  ADD COLUMN IF NOT EXISTS personalidad TEXT after apariencia,
-  ADD COLUMN IF NOT EXISTS voz JSON after personalidad,
-  ADD COLUMN IF NOT EXISTS motivaciones JSON AFTER voz,
-  ADD COLUMN IF NOT EXISTS arco_narrativo JSON AFTER motivaciones,
-  ADD COLUMN IF NOT EXISTS pv_restantes INT NOT NULL DEFAULT 6 AFTER historia;
+-- MySQL compatible column additions using INFORMATION_SCHEMA check
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'rol_personajes' AND COLUMN_NAME = 'alias');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE rol_personajes ADD COLUMN alias VARCHAR(100) AFTER nombre', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'rol_personajes' AND COLUMN_NAME = 'concept');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE rol_personajes ADD COLUMN concept VARCHAR(255) AFTER alias', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'rol_personajes' AND COLUMN_NAME = 'apariencia');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE rol_personajes ADD COLUMN apariencia TEXT AFTER historia', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'rol_personajes' AND COLUMN_NAME = 'personalidad');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE rol_personajes ADD COLUMN personalidad TEXT AFTER apariencia', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'rol_personajes' AND COLUMN_NAME = 'voz');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE rol_personajes ADD COLUMN voz JSON AFTER personalidad', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'rol_personajes' AND COLUMN_NAME = 'motivaciones');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE rol_personajes ADD COLUMN motivaciones JSON AFTER voz', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'rol_personajes' AND COLUMN_NAME = 'arco_narrativo');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE rol_personajes ADD COLUMN arco_narrativo JSON AFTER motivaciones', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'rol_personajes' AND COLUMN_NAME = 'pv_restantes');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE rol_personajes ADD COLUMN pv_restantes INT NOT NULL DEFAULT 6 AFTER historia', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- Stats (12 filas por personaje, una por stat)
+-- Sistema numerico: escala 5-100+. Siglas de 3 letras (FUE, DES, ...).
 CREATE TABLE IF NOT EXISTS rol_stats (
     id INT PRIMARY KEY AUTO_INCREMENT,
     personaje_id INT NOT NULL,
     pilar ENUM('cuerpo', 'mente', 'espiritu') NOT NULL,
-    stat_key VARCHAR(20) NOT NULL,
-    rango CHAR(3) NOT NULL DEFAULT 'F',
-    valor TINYINT NOT NULL DEFAULT 1,
-    es_mejorada BOOLEAN NOT NULL DEFAULT FALSE,
+    stat_key VARCHAR(3) NOT NULL,
+    valor INT NOT NULL DEFAULT 5,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (personaje_id) REFERENCES rol_personajes(id) ON DELETE CASCADE,
@@ -89,23 +127,21 @@ CREATE TABLE IF NOT EXISTS rol_relaciones (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================================
--- Datos de referencia: catálogo de rangos de stats
+-- Catalogo de referencia de labels para valores numericos
+-- (compartido con el fontend: ope_rol_stat_label en inc/ope_rol_data.php)
 -- =========================================================
-CREATE TABLE IF NOT EXISTS ref_rangos_stats (
-    rango CHAR(3) PRIMARY KEY,
-    valor TINYINT NOT NULL UNIQUE,
+CREATE TABLE IF NOT EXISTS ref_stat_labels (
+    min_val INT NOT NULL,
     label VARCHAR(20) NOT NULL,
-    descripcion VARCHAR(100) NOT NULL
+    PRIMARY KEY (min_val)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO ref_rangos_stats (rango, valor, label, descripcion) VALUES
-    ('F',   1,  'Pésimo',        'Significativamente por debajo del promedio'),
-    ('E',   2,  'Malo',          'Por debajo del promedio'),
-    ('D',   3,  'Mediocre',      'Ligeramente por debajo del promedio'),
-    ('C',   4,  'Promedio',      'Humano adulto normal'),
-    ('B',   5,  'Bueno',         'Entrenado / por encima del promedio'),
-    ('A',   6,  'Notable',       'Experto / Élite'),
-    ('S',   7,  'Sobresaliente', 'Maestro / Mejor en su campo'),
-    ('SS',  8,  'Legendario',    'Cúspide humana'),
-    ('SSS', 9,  'Mítico',        'Trasciende lo humano'),
-    ('M+',  10, 'Trascendental', 'Sobrenatural / Divino');
+INSERT INTO ref_stat_labels (min_val, label) VALUES
+    (100, 'Trascendente'),
+    (80,  'Legendario'),
+    (60,  'Excepcional'),
+    (40,  'Notable'),
+    (25,  'Bueno'),
+    (15,  'Normal'),
+    (10,  'Bajo'),
+    (5,   'Minimo');

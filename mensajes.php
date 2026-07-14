@@ -40,7 +40,7 @@ if ($loggedin && $activePid > 0 && $mybb->request_method === 'post' && $db->tabl
         if ($destino_pid <= 0 || $cuerpo === '') {
             $flash = 'Faltan campos obligatorios.'; $flash_kind = 'warn';
         } else {
-            if ($thread_id <= 0) $thread_id = TIME_NOW;
+            if ($thread_id <= 0) $thread_id = (int)(microtime(true) * 10000);
             $db->insert_query('rol_mensajes', array(
                 'thread_id' => $thread_id,
                 'origen_pid' => $activePid,

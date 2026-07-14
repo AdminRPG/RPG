@@ -16,10 +16,9 @@ $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int) ($mybb->user['uid'] ?? 0);
 
-$staff = $loggedin
-    ? ope_rol_active_staff($uid)
-    : array('rank' => 0, 'is_staff' => false, 'nombre' => '');
-$rank = (int) $staff['rank'];
+require_once MYBB_ROOT . 'inc/ope_user_init.php';
+
+$rank = ope_get_staff_level($uid);
 
 if (!$loggedin || $rank < 3) {
     header('Location: ' . $bburl . '/index.php');
@@ -144,7 +143,7 @@ if ($pid > 0 && $mybb->request_method === 'post'
                     }
                     foreach ($STAT_KEYS as $sk) {
                         if (isset($stats_in[$sk])) {
-                            $datos['stats_efectivas'][$sk] = max(0, min(10, (int) $stats_in[$sk]));
+                            $datos['stats_efectivas'][$sk] = max(5, (int) $stats_in[$sk]);
                         }
                     }
                     $datos['rango_suma'] = ope_rol_stat_sum($datos['stats_efectivas']);
@@ -555,10 +554,10 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
 
     <div class="gp-section">
-      <div class="gp-section-h">Stats efectivas (0&ndash;10)</div>
+      <div class="gp-section-h">Stats efectivas</div>
       <div class="gp-grid gp-stats">
 <?php foreach ($STAT_KEYS as $sk): ?>
-        <label class="gp-field"><span><?php echo $sk; ?></span><input type="number" name="stats_efectivas[<?php echo $sk; ?>]" min="0" max="10" value="<?php echo (int)($stats_ef[$sk] ?? 0); ?>"></label>
+        <label class="gp-field"><span><?php echo $sk; ?></span><input type="number" name="stats_efectivas[<?php echo $sk; ?>]" min="5" value="<?php echo (int)($stats_ef[$sk] ?? 5); ?>"></label>
 <?php endforeach; ?>
       </div>
     </div>

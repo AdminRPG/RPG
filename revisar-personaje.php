@@ -16,10 +16,11 @@ $uid       = (int)($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 $pid       = (int)($mybb->get_input('pid', MyBB::INPUT_INT));
 
+require_once MYBB_ROOT . 'inc/ope_user_init.php';
+
 // Staff del PERSONAJE ACTIVO. Aprobar/moderar/rechazar expedientes requiere
 // rol >= Colaborador (rank 1). El staff va por personaje, no por cuenta.
-$staff       = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0);
-$staff_level = (int) $staff['rank'];
+$staff_level = ope_get_staff_level($uid);
 
 // Acceso: Colaborador o superior (con el personaje activo).
 if (!$loggedin || $staff_level < 1) {

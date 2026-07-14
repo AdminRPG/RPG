@@ -477,6 +477,53 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
         return array('ok' => true, 'msg' => 'Trámite aprobado.');
     }
 
+if (!function_exists('ope_rol_cat_lore')) {
+    /** Biblioteca de Lore: devuelve todos los artículos activos de rol_lore. */
+    function ope_rol_cat_lore($solo_activos = true)
+    {
+        global $db;
+        $out = array();
+        if (!$db->table_exists('rol_lore')) {
+            return $out;
+        }
+        $where = $solo_activos ? 'activo = 1' : '';
+        $q = $db->simple_select('rol_lore', '*', $where, array('order_by' => 'orden, id', 'order_dir' => 'ASC'));
+        while ($r = $db->fetch_array($q)) {
+            $out[] = $r;
+        }
+        return $out;
+    }
+
+    /** Etiquetas legibles para categorías de lore. */
+    function ope_rol_cat_lore_categoria_labels()
+    {
+        return array(
+            'historia'   => 'Historia',
+            'eras'        => 'Eras',
+            'personajes'  => 'Personajes',
+            'facciones'   => 'Facciones',
+            'ubicaciones' => 'Ubicaciones',
+            'sistemas'    => 'Sistemas',
+            'cronologia'  => 'Cronología',
+        );
+    }
+
+    /** Slug de categoría de lore a color de acento (CSS var). */
+    function ope_rol_cat_lore_categoria_color($cat)
+    {
+        $map = array(
+            'historia'   => 'var(--ember-hi)',
+            'eras'        => 'var(--fac-revolucionario-hi)',
+            'personajes'  => 'var(--ember)',
+            'facciones'   => 'var(--fac-marine)',
+            'ubicaciones' => 'var(--fac-cazarrecompensas-hi)',
+            'sistemas'    => 'var(--fac-pirata)',
+            'cronologia'  => 'var(--fac-revolucionario)',
+        );
+        return $map[$cat] ?? 'var(--ember)';
+    }
+}
+
     /** Rechaza un trámite de tripulación. */
     function ope_rol_cat_tripulacion_rechazar_tramite($tid)
     {
