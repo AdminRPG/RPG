@@ -65,16 +65,24 @@ Y cada stat individual tiene su propia etiqueta según `ope_rol_stat_label()`:
 
 | Columna BD | Tipo | Para qué sirve | ¿El wizard la rellena? |
 |---|---|---|---|
-| `datos_publicos` | TEXT (JSON) | Lo que el mundo ve: títulos, descripción extensa, historia, relaciones, recompensa, lema | ❌ Se queda en NULL |
-| `datos_internos` | TEXT (JSON) | Solo staff+IA: personalidad (6 ejes 0-100), metas, tracking por ciclo, notas staff | ❌ Se queda en NULL |
-| `mundo_zona` | VARCHAR | Slug de la zona actual (ej. `paraiso`, `new-world`) | ❌ Se queda vacío |
-| `mundo_ubic` | VARCHAR | Ubicación específica (ej. `Marineford — Celda de máxima seguridad`) | ❌ Se queda vacío |
-| `mundo_accion` | VARCHAR | Qué está haciendo ahora mismo | ❌ Se queda vacío |
-| `mundo_estado_np` | VARCHAR | Estado narrativo corto (`Activo`, `Capturada`, `Herido`...) | ❌ Se queda vacío |
-| `avatar` / `icono` | VARCHAR | Imagen del NPC | ❌ Se queda vacío |
+| `datos_publicos` | TEXT (JSON) | Prompt IA: títulos, descripción extensa, historia, relaciones, recompensa, lema | ❌ NULL |
+| `datos_internos` | TEXT (JSON) | Prompt IA: personalidad (6 ejes 0-100), metas, tracking, notas staff, triggers | ❌ NULL |
+| `desc_fisica` | TEXT | **Visible en ficha.php**: descripción física detallada del personaje | ❌ NULL |
+| `from_fisico` | VARCHAR | **Visible en ficha.php**: referencia del físico (ej. "One Piece, Eiichiro Oda") | ❌ NULL |
+| `personalidad` | TEXT | **Visible en ficha.php**: perfil de personalidad público del personaje | ❌ NULL |
+| `bio` | TEXT (JSON) | **Visible en ficha.php**: concepto, pasado, motivación y relaciones del personaje | ❌ Vacío |
+| `mundo_zona` | VARCHAR | Slug de la zona actual (ej. `paraiso`, `new-world`) | ❌ Vacío |
+| `mundo_ubic` | VARCHAR | Ubicación específica (ej. `Marineford — Celda de máxima seguridad`) | ❌ Vacío |
+| `mundo_accion` | VARCHAR | Qué está haciendo ahora mismo | ❌ Vacío |
+| `mundo_estado_np` | VARCHAR | Estado narrativo corto (`Activo`, `Capturada`, `Herido`...) | ❌ Vacío |
+| `avatar` / `icono` | VARCHAR | Imagen del NPC | ❌ Vacío |
 
 > [!CAUTION]
-> **Sin estos campos, el NPC es un fantasma.** La función `ope_rol_mv_npc_mayores()` lee *todos* los NPCs con `es_npc=1`, pero si no tienen `datos_publicos`/`datos_internos` rellenos, el prompt de la IA los lista como `zona: ? | ubicación: ? | estado: ? | acción:` — la IA no tiene con qué trabajar y los ignora narrativamente.
+> **Sin `desc_fisica`, `personalidad` y `bio`, la ficha del NPC se ve vacía.** `datos_publicos` alimenta el prompt de la IA pero NO se muestra en `ficha.php`. La ficha lee las columnas `desc_fisica`, `from_fisico`, `personalidad`, y el JSON `bio` (concepto, pasado, motivacion). Si solo rellenas `datos_publicos`, la IA sabrá quién es el NPC pero los jugadores verán una ficha casi en blanco.
+>
+> **Sin `datos_publicos`/`datos_internos`, el NPC es un fantasma para la IA.** La función `ope_rol_mv_npc_mayores()` lee *todos* los NPCs con `es_npc=1`, pero si no tienen estos JSONs rellenos, el prompt de la IA los lista como `zona: ? | ubicación: ? | estado: ? | acción:` — la IA no tiene con qué trabajar y los ignora narrativamente.
+>
+> **Hay que rellenar AMBOS grupos**: los campos de ficha (`desc_fisica`, `personalidad`, `bio`) para los jugadores, y los JSONs (`datos_publicos`, `datos_internos`) para la IA.
 
 ### Cómo consume el prompt de la IA los datos del NPC
 
@@ -322,7 +330,48 @@ Estas columnas cambian cada ciclo (las actualiza la IA vía `npc_tracking`):
 
 ---
 
-## 6. Paso 5 — Insertar/actualizar en BD
+## 6. Paso 4b — Campos visibles en ficha.php (lo que ven los jugadores)
+
+> [!IMPORTANT]
+> `datos_publicos` alimenta a la IA. `desc_fisica`, `personalidad` y `bio` alimentan la ficha que ven los jugadores. **Son independientes: hay que rellenar ambos.**
+
+`ficha.php` muestra estos campos en la pestaña "Crónica":
+
+| Columna BD | Sección en ficha | Ejemplo | Mínimo recomendado |
+|---|---|---|---|
+| `desc_fisica` | Descripción física | Texto libre con apariencia, cicatrices, ropa, armas | 800+ caracteres |
+| `from_fisico` | "From:" bajo el retrato | Referencia de la imagen/diseño (ej. "One Piece, Eiichiro Oda") | 1 línea |
+| `personalidad` | Personalidad | Texto libre con carácter, tono, manías, código moral | 800+ caracteres |
+| `bio.concepto` | Otros datos > Concepto | Resumen de quién es y su situación actual | 2-3 párrafos |
+| `bio.pasado` | Otros datos > Pasado | Historia completa, cronología, eventos clave | 4-5 párrafos |
+| `bio.motivacion` | Otros datos > Motivación | Qué quiere, por qué, qué hará para conseguirlo | 2-3 párrafos |
+
+### Ejemplo: Isabella D. Vega
+
+**`desc_fisica`** (2,126 chars): Describe TODO el aspecto físico del personaje como si lo narrara Oda: estatura, complexión, cada cicatriz y su origen, rostro y rasgos distintivos (ojos carmesí), pelo y cómo lo lleva, ropa (capa, camisa, pantalones, botas), y arma insignia con detalle.
+
+**`personalidad`** (2,119 chars): Perfil completo del carácter: actitud general (temeraria, libre), relación con la autoridad y los Tenryubitos, comportamiento en combate, lealtad y su talón de Aquiles (la traición de Balgor), tono de voz, manías (reír en momentos inapropiados, llamar "idiota" por afecto), y responsabilidad hacia los oprimidos.
+
+**`bio`** (JSON con 3 claves):
+- `concepto`: 3-4 párrafos resumiendo quién es y su relevancia en el mundo AHORA.
+- `pasado`: 5+ párrafos con infancia, ascenso, conquista de Grand Line, Última Isla, traición, captura. Cada etapa con fechas, nombres y consecuencias.
+- `motivacion`: 2-3 párrafos sobre su sueño, por qué no puede rendirse, y qué significa su captura para el mundo.
+
+> [!TIP]
+> **No copies y pegues `datos_publicos.descripcion` en `desc_fisica`.** Son textos diferentes: `desc_fisica` es SOLO apariencia física (lo que un personaje vería al mirarlo). `datos_publicos.descripcion` es un perfil enciclopédico completo (apariencia + historia + situación). Para `personalidad`, puedes adaptar `datos_publicos.personalidad_publica` pero enfocándolo mas al tono de Oda: frases célebres, manías, forma de hablar, cómo reacciona en distintas situaciones.
+
+### Checklist de campos de ficha
+
+- [ ] `desc_fisica` ≥ 800 chars (describe TODO el aspecto físico, cicatrices con su origen, ropa, arma)
+- [ ] `from_fisico` no vacío (referencia del diseño visual)
+- [ ] `personalidad` ≥ 800 chars (carácter, tono, manías, código moral, relaciones)
+- [ ] `bio.concepto` ≥ 300 chars (quién es AHORA, no solo quién fue)
+- [ ] `bio.pasado` ≥ 1000 chars (historia cronológica completa, no un resumen)
+- [ ] `bio.motivacion` ≥ 400 chars (sueño, razones, consecuencias si fracasa)
+
+---
+
+## 7. Paso 5 — Insertar/actualizar en BD
 
 ### SQL completo para Isabella D. Vega
 
@@ -335,11 +384,17 @@ SET
   stats_ganados = 790,
   nivel = 85,
 
-  -- Datos públicos (completos, extensos)
+  -- Datos públicos (completos, extensos) → para la IA
   datos_publicos = '<PEGAR EL JSON DE datos_publicos DE LA SECCIÓN 3>',
 
-  -- Datos internos (completos, extensos)
+  -- Datos internos (completos, extensos) → para la IA
   datos_internos = '<PEGAR EL JSON DE datos_internos DE LA SECCIÓN 4>',
+
+  -- Campos visibles en ficha.php → para los jugadores
+  desc_fisica = '<PEGAR TEXTO DE desc_fisica>',
+  from_fisico = '<PEGAR REFERENCIA>',
+  personalidad = '<PEGAR TEXTO DE personalidad>',
+  bio = '<PEGAR JSON DE bio (concepto, pasado, motivacion)>',
 
   -- Ubicación en vivo
   mundo_zona = 'paraiso',
@@ -377,17 +432,23 @@ SELECT
   nivel,
   IF(datos_publicos IS NOT NULL AND datos_publicos != '' AND datos_publicos != 'null', '✅', '❌') AS pub,
   IF(datos_internos IS NOT NULL AND datos_internos != '' AND datos_internos != 'null', '✅', '❌') AS inter,
+  IF(desc_fisica IS NOT NULL AND desc_fisica != '', '✅', '❌') AS fisica,
+  IF(personalidad IS NOT NULL AND personalidad != '', '✅', '❌') AS perso,
+  IF(bio IS NOT NULL AND bio != '' AND bio != 'null', '✅', '❌') AS bio_ok,
   IF(mundo_zona != '', '✅', '❌') AS zona,
   IF(mundo_accion != '', '✅', '❌') AS accion,
   IF(mundo_estado_np != '', '✅', '❌') AS estado,
   CHAR_LENGTH(datos_publicos) AS pub_chars,
-  CHAR_LENGTH(datos_internos) AS inter_chars
+  CHAR_LENGTH(datos_internos) AS inter_chars,
+  CHAR_LENGTH(desc_fisica) AS fisica_chars,
+  CHAR_LENGTH(personalidad) AS perso_chars,
+  CHAR_LENGTH(bio) AS bio_chars
 FROM mybb_rol_personajes
 WHERE es_npc = 1
 ORDER BY nombre;
 ```
 
-Si `pub_chars` es menor a 500, la descripción pública es demasiado corta para el prompt. Si `inter_chars` es menor a 300, los datos internos son demasiado escuetos.
+Si `pub_chars` es menor a 500, la descripción pública es demasiado corta para el prompt. Si `inter_chars` es menor a 300, los datos internos son demasiado escuetos. Si `fisica_chars` o `perso_chars` es menor a 800, la ficha se ve pobre para los jugadores.
 
 ---
 
@@ -536,7 +597,16 @@ Si `pub_chars` es menor a 500, la descripción pública es demasiado corta para 
 - [ ] `nivel` = sum(stats) / 10 (redondeado abajo)
 - [ ] `avatar` o `icono` con URL de imagen
 
-### BD — Campos de NPC Mayor
+### BD — Campos visibles en ficha.php (jugadores)
+- [ ] `desc_fisica` — 800+ caracteres (apariencia, cicatrices, ropa, arma)
+- [ ] `from_fisico` — referencia del diseño visual (ej. "One Piece, Eiichiro Oda")
+- [ ] `personalidad` — 800+ caracteres (carácter, tono, manías, código moral)
+- [ ] `bio` JSON con:
+  - [ ] `concepto` — 2-3 párrafos (quién es AHORA)
+  - [ ] `pasado` — 4-5 párrafos (historia cronológica completa)
+  - [ ] `motivacion` — 2-3 párrafos (sueño, razones, consecuencias)
+
+### BD — Campos de NPC Mayor (IA)
 - [ ] `datos_publicos` JSON con:
   - [ ] `titulo` (SINGULAR) — string con títulos separados por ` · `
   - [ ] `descripcion` — 4-5 párrafos mínimo (800+ palabras)
