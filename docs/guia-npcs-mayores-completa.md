@@ -103,6 +103,51 @@ Puntos críticos:
 
 ---
 
+## 0b. Las 7 reglas de Oda para NPCs (OBLIGATORIO)
+
+Si Oda no lo escribiría, no va en el NPC. Todo personaje de One Piece tiene:
+
+### 1. Risa distintiva (OBLIGATORIO)
+Cada NPC necesita una risa fonética única. No puede haber dos iguales. La risa DEBE aparecer en `desc_fisica`, `personalidad`, y en al menos un párrafo de `bio`.
+
+| Tipo de personaje | Estilo de risa | Ejemplos |
+|---|---|---|
+| Guerrero/a imponente | Grave, explosiva | "Gahahahaha!", "Muhahaha!", "Wahahaha!" |
+| Misterioso/elegante | Suave, contenida | "Fufufu...", "Kukuku...", "Hohoho..." |
+| Brutal/mecánico | Metálica, repetitiva | "GOROGOROGORO!", "KARAKARAKARA!", "JIKIJIKI!" |
+| Acuático/serio | Fluida, cortante | "Shurururu...", "Naminami...", "Zazaza..." |
+| Arrogante/noble | Corta, nasal | "Oho!", "Mmm...", "Hmph!" |
+| Alegre/despreocupado | Musical, cantarina | "Yohohoho!", "Dereshishishi!", "Nishishishi!" |
+
+### 2. Sueño declarado (OBLIGATORIO)
+TODO personaje de One Piece tiene un sueño que declara en voz alta. Debe aparecer explícitamente en el `lema`, en la `personalidad`, y en la `motivacion`. No basta con "quiere poder" o "quiere dinero" — el sueño debe ser **concreto, personal, y ligeramente imposible**.
+
+| Mal (genérico) | Bien (Oda) |
+|---|---|
+| "Quiere dominar el mundo" | "Será el Rey de los Piratas aunque tenga que partir el cielo en dos" |
+| "Quiere ser fuerte" | "Se convertirá en el espadachín más fuerte del mundo para que ninguna lágrima vuelva a caer en su isla" |
+| "Quiere venganza" | "Hará que cada Tenryubito se arrodille ante los esclavos que despreciaron" |
+
+### 3. Tragedia personal (OBLIGATORIO)
+Nadie es fuerte porque sí. Cada NPC tiene una herida en el pasado que EXPLICA quién es ahora. Debe aparecer en `bio.pasado` en al menos un párrafo completo y emotivo. La tragedia debe ser **específica**: un nombre, una fecha, un lugar, una pérdida concreta.
+
+### 4. Tic o manía (OBLIGATORIO)
+Un detalle físico o verbal recurrente que lo hace reconocible: jugar con una moneda, rascarse la cabeza, decir "idiota" por afecto, ajustarse los guantes antes de pelear, oler una flor, roncar en momentos inapropiados. Debe aparecer en `desc_fisica` y `personalidad`.
+
+### 5. Mundo interconectado
+Cada NPC conoce o ha oído hablar de al menos 2-3 de los otros NPCs. Las `relaciones_publicas` deben incluir conexiones creíbles con el roster existente. No existen en el vacío.
+
+### 6. Poder con precio
+Toda Fruta del Diablo, Haki, o habilidad especial tiene un coste o limitación clara. Si el NPC es absurdamente fuerte, debe tener una debilidad igual de específica (no "es orgulloso" — algo concreto como "no puede usar su Haki del Conquistador bajo techo" o "su brazo derecho se paraliza después de 3 minutos de combate").
+
+### 7. Humor en la oscuridad
+Incluso el NPC más trágico tiene momentos de humanidad, ironía o humor absurdo. Oda nunca escribe personajes 100% serios. Encuentra el gag: Isabella se ríe a carcajadas cuando la van a ejecutar. Flint se duerme en reuniones de Almirantes. Aurelian insulta a sus pacientes mientras los cura.
+
+> [!CAUTION]
+> **Si un NPC no tiene risa, sueño, tragedia Y tic, no está terminado.** No lo subas a BD hasta que los tenga.
+
+---
+
 ## 1. Auditoría del lore (qué tienes, qué te falta)
 
 Antes de tocar la BD, audita el archivo del personaje en `one-piece-eternal-lore/characters/`.
