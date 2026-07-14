@@ -428,6 +428,21 @@ function ope_heat_val(int $v): string
     if ($v > 9) $v = 9;
     return '--h' . $v;
 }
+/** Convierte texto con \n\n en párrafos <p> HTML, escapando y respetando saltos simples. */
+function ope_nl2p(string $text): string
+{
+    $text = trim($text);
+    if ($text === '') return '';
+    $paras = preg_split('/\n\s*\n/', $text);
+    $out = '';
+    foreach ($paras as $p) {
+        $p = trim($p);
+        if ($p !== '') {
+            $out .= '<p>' . nl2br(htmlspecialchars_uni($p)) . '</p>';
+        }
+    }
+    return $out;
+}
 /** Formato corto para cifras grandes de berries (4.850.000 → "4.9M"). */
 function ope_short_money(int $n): string
 {
@@ -940,7 +955,7 @@ header('Content-Type: text/html; charset=utf-8');
               <p class="ope-from-line"><span class="l">From:</span> <?php echo htmlspecialchars_uni($from_fisico); ?></p>
 <?php endif; ?>
 <?php if ($desc_fisica !== ''): ?>
-              <p><?php echo nl2br(htmlspecialchars_uni($desc_fisica)); ?></p>
+              <?php echo ope_nl2p($desc_fisica); ?>
 <?php else: ?>
               <p class="mono c-dim">Sin descripci&oacute;n f&iacute;sica todav&iacute;a.<?php echo $puede_gestionar ? ' Edítala desde Gesti&oacute;n.' : ''; ?></p>
 <?php endif; ?>
@@ -952,7 +967,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div class="plate-h"><span class="t">Personalidad</span></div>
             <div class="plate-b prose">
 <?php if ($personalidad !== ''): ?>
-              <p><?php echo nl2br(htmlspecialchars_uni($personalidad)); ?></p>
+              <?php echo ope_nl2p($personalidad); ?>
 <?php else: ?>
               <p class="mono c-dim">Sin personalidad registrada todav&iacute;a.<?php echo $puede_gestionar ? ' Edítala desde Gesti&oacute;n.' : ''; ?></p>
 <?php endif; ?>
@@ -979,7 +994,7 @@ header('Content-Type: text/html; charset=utf-8');
                 if ($otxt === '') continue;
 ?>
               <p class="lead"><?php echo $ol; ?></p>
-              <p class="mb-14"><?php echo nl2br(htmlspecialchars_uni($otxt)); ?></p>
+              <?php echo ope_nl2p($otxt); ?>
 <?php endforeach; endif; ?>
             </div>
           </div>
