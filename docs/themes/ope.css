@@ -1268,19 +1268,14 @@ body.ope-pg-ficha .pgroup-h{display:flex;align-items:center;gap:9px;margin-botto
 body.ope-pg-ficha .pgroup-h .n{font-family:var(--disp);font-weight:800;font-size:1.05rem;text-transform:uppercase;letter-spacing:.5px}
 body.ope-pg-ficha .pgroup-h .bar{flex:1;height:2px;background:var(--rivet)}
 body.ope-pg-ficha .pgroup-h .avg{font-family:var(--mono);font-size:.6rem;color:var(--paper-dim)}
-/* Atributos: SOLO nombre + barra segmentada (sin número ni letra dentro) */
-body.ope-pg-ficha .stat{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:5px 0}
+/* Atributos: nombre + sigla + barra porcentual + valor + etiqueta */
+body.ope-pg-ficha .stat{display:grid;grid-template-columns:32px 110px 1fr 52px auto;gap:8px;align-items:center;padding:5px 0}
 body.ope-pg-ficha .stat .nm{font-family:var(--body);font-size:.82rem;font-weight:600;color:var(--paper)}
-/* Clave de la escala F..M+ sobre las barras (alineada con los 10 segmentos) */
-body.ope-pg-ficha .ope-scalekey{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;margin:2px 0 8px}
-body.ope-pg-ficha .ope-scalekey .k{font-family:var(--mono);font-size:.54rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--fac-hi)}
-body.ope-pg-ficha .ope-scalekey .segs{display:grid;grid-template-columns:repeat(10,1fr);gap:2px}
-body.ope-pg-ficha .ope-scalekey .segs span{font-family:var(--mono);font-size:.52rem;font-weight:700;color:var(--paper-dim);text-align:center}
-/* Barra dividida en 10 segmentos (F E D C B A S SS M M+) */
-body.ope-pg-ficha .segbar{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;height:20px}
-/* Vacíos = superficie oscura de facción (nunca azul si la facción es otra) */
-body.ope-pg-ficha .segbar .seg{background:var(--fac-surface2,var(--iron-edge));border:2px solid #000;transition:background .25s}
-body.ope-pg-ficha .segbar .seg.on{background:var(--fac)}
+body.ope-pg-ficha .stat .sig{font-family:var(--mono);font-size:.6rem;font-weight:700;color:var(--paper-dim);text-transform:uppercase}
+body.ope-pg-ficha .stat .stat-num{font-family:var(--disp);font-weight:900;font-size:1rem;text-align:right}
+body.ope-pg-ficha .stat .stat-lbl{font-size:.62rem}
+body.ope-pg-ficha .stat-bar-wrap{height:14px;background:var(--fac-surface2,var(--iron-edge));border:2px solid #000}
+body.ope-pg-ficha .stat-bar-wrap .stat-bar{height:100%;min-width:4px;transition:width .35s}
 /* Chip de PC sin repartir en la cabecera de Atributos */
 body.ope-pg-ficha .ope-pc-chip{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--fac-ink);background:var(--fac);border:2px solid #000;padding:3px 9px;white-space:nowrap}
 body.ope-pg-ficha .ope-pc-chip b{font-family:var(--disp);font-size:.9rem;margin-left:4px}

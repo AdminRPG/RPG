@@ -323,8 +323,7 @@ if ($puede_gestionar && $mybb->request_method === 'post'
         foreach (ope_rol_stat_keys() as $k) {
             if (!array_key_exists($k, $in)) continue;
             $v = (int) $in[$k];
-            if ($v < 1) $v = 1;
-            if ($v > 10) $v = 10;
+            if ($v < 5) $v = 5;
             $stats[$k] = $v;
         }
     }
@@ -598,7 +597,7 @@ header('Content-Type: text/html; charset=utf-8');
     foreach ($STAT_GROUPS as $gkey => $grupo) {
         $vals = array();
         foreach ($grupo['stats'] as $ab => $nm) {
-            $vals[] = (int) ($stats_ef[$ab] ?? 1);
+            $vals[] = (int) ($stats_ef[$ab] ?? 5);
         }
         $group_calc[$gkey] = array(
             'avg' => count($vals) ? array_sum($vals) / count($vals) : 1,
@@ -896,16 +895,9 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h">
           <span class="t">Atributos</span>
+          <span class="c">// Suma <?php echo (int) $suma; ?> &middot; Nivel <?php echo (int) $nivel; ?></span>
         </div>
         <div class="plate-b">
-          <div class="ope-scalekey" aria-hidden="true">
-            <span class="k">Escala</span>
-            <div class="segs">
-<?php foreach (array('1','2','3','4','5','6','7','8','9','10') as $sl): ?>
-              <span><?php echo htmlspecialchars_uni($sl); ?></span>
-<?php endforeach; ?>
-            </div>
-          </div>
 <?php foreach ($STAT_GROUPS as $gkey => $grupo):
             $rows = $grupo['stats'];
             $gc   = $group_calc[$gkey];
@@ -917,16 +909,18 @@ header('Content-Type: text/html; charset=utf-8');
             </div>
 <?php foreach ($rows as $ab => $nm):
               $v = ope_rol_stat_num($stats_ef, $ab);
-              if ($v > 10) $v = 10;
-              $rank_lbl = ope_rol_stat_label($v);
+              $label = ope_rol_stat_label($v);
+              $pct = min(100, max(0, (int) round(($v / 100) * 100)));
+              $heat = $v >= 80 ? '--h9' : ($v >= 60 ? '--h8' : ($v >= 40 ? '--h6' : ($v >= 25 ? '--h4' : '--h2')));
 ?>
             <div class="stat">
-              <span class="nm"><?php echo htmlspecialchars_uni($nm); ?></span>
-              <div class="segbar" role="img" aria-label="<?php echo htmlspecialchars_uni($nm . ': ' . $rank_lbl); ?>">
-<?php for ($i = 1; $i <= 10; $i++): ?>
-                <span class="seg<?php echo $i <= $v ? ' on' : ''; ?>"></span>
-<?php endfor; ?>
+              <span class="nm" title="<?php echo htmlspecialchars_uni($ab); ?>"><?php echo htmlspecialchars_uni($nm); ?></span>
+              <span class="sig"><?php echo htmlspecialchars_uni($ab); ?></span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" style="width:<?php echo $pct; ?>%; background:var(<?php echo $heat; ?>)"></div>
               </div>
+              <span class="stat-num" style="color:var(<?php echo $heat; ?>)"><?php echo (int) $v; ?></span>
+              <span class="stat-lbl mono fs-62 c-dim"><?php echo htmlspecialchars_uni($label); ?></span>
             </div>
 <?php endforeach; ?>
           </div>
@@ -1486,7 +1480,7 @@ header('Content-Type: text/html; charset=utf-8');
                 <label class="ope-attr-cell">
                   <span class="ope-attr-ab"><?php echo htmlspecialchars_uni($ab); ?></span>
                   <span class="ope-attr-nm"><?php echo htmlspecialchars_uni($nm); ?></span>
-                  <input type="number" name="attr[<?php echo $ab; ?>]" min="1" max="10" step="1" value="<?php echo $cur; ?>">
+                  <input type="number" name="attr[<?php echo $ab; ?>]" min="5" step="1" value="<?php echo $cur; ?>">
                 </label>
 <?php endforeach; ?>
               </div>

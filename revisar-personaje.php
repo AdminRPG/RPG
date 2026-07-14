@@ -368,15 +368,13 @@ header('Content-Type: text/html; charset=utf-8');
                 foreach ($pilares as $pilarName => $keys): ?>
                   <div class="rp-pilar-label fs-58 fw-700 ttu c-ash"><?php echo $pilarName; ?></div>
                   <?php foreach ($keys as $k):
-                    $v = (int)($stats[$k] ?? 0);
-                    $rangos = ['F','E','D','C','B','A','S','SS','M','M+'];
-                    $rl = $rangos[max(0, min(9, $v))] ?? '?';
-                    $hv = ope_heat_var($rl);
+                    $v = (int)($stats[$k] ?? 5);
+                    $lbl = ope_rol_stat_label($v);
                   ?>
                     <div class="stat-row">
                       <span class="sn"><?php echo $k; ?></span>
                       <span class="sl"><?php echo $labels[$k] ?? $k; ?></span>
-                      <span class="sv" style="color:var(<?php echo $hv; ?>)"><?php echo $rl; ?></span>
+                      <span class="sv"><?php echo (int) $v; ?> <span class="c-dim fs-62"><?php echo htmlspecialchars_uni($lbl); ?></span></span>
                     </div>
                   <?php endforeach;
                 endforeach;
