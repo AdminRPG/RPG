@@ -1,0 +1,26 @@
+{
+    "personalidad": {"agr": 75, "val": 85, "hon": 10, "lea": 15, "amb": 95, "int": 85},
+    "personalidad_detallada": "Balgor tiene una agresividad alta pero controlada (75): no ataca por impulso, sino por calculo. Cada acto de violencia esta planificado para maximizar beneficios y minimizar riesgos. Su valentia es notable (85): ha vivido rodeado de enemigos que lo odian y jamas ha mostrado miedo. Pero su valentia no es heroica: es practica — mostrar debilidad equivale a sentencia de muerte. Su honor es practicamente inexistente (10): no tiene codigo moral, no respeta tratados, no cree en la palabra dada. La moralidad es una herramienta, util cuando conviene y descartable cuando estorba.\n\nSu lealtad es casi nula (15): no es leal a nada excepto a su propia supervivencia. Incluso sus subordinados mas cercanos tienen sistemas de autodestruccion remotos implantados en sus aumentos ciberneticos. Su ambicion es maxima (95): quiere dominar el mundo, no conquistarlo, sino controlarlo. Su vision es un mundo industrializado bajo su mando, donde el, como unico proveedor de tecnologia belica, sea el rey indiscutible. Su inteligencia es alta (85): genio de la ingenieria y la estrategia belica. Diseña sus propias armas y comprende la logistica de la guerra mejor que cualquier almirante.",
+    "metas": [
+        "Completar el Mecha-Coloso y demostrar al mundo que la era de los guerreros ha terminado: maquina de guerra del tamano de una isla que incorpora toda la tecnologia acumulada durante decadas.",
+        "Expandir su imperio industrial devorando los restos de las flotas debilitadas tras la ejecucion de Isabella: cuando las flotas se hundan y los ejercitos se debiliten, el estara alli para recoger los pedazos.",
+        "Eliminar a Jack el Inmortal antes de que Jack lo elimine a el: su ex-compañero viene a matarlo. No lo teme pero lo respeta como amenaza. La Fortaleza es una trampa mortal diseñada para Jack."
+    ],
+    "meta_actual": "Completar el Mecha-Coloso y expandir su imperio industrial",
+    "tracking": {
+        "ubicacion_zona": "new-world",
+        "salud": 95,
+        "moral": 90,
+        "plan_activo": "Balgor supervisa los trabajos del Nucleo del Mecha-Coloso en el corazon de la Fortaleza (78% completado). Sus fabricas producen armamento sin parar abasteciendo reinos beligerantes. Ha desplegado Mecha-constructos de vigilancia alrededor de Marineford para recopilar datos de combate. Su red de espionaje monitorea a los otros Yonko, especialmente a Shura y Ezekiel. Negocia en secreto con cientificos de la Marina para obtener tecnologia de Pacifistas y mejorarla.",
+        "thread_id": null,
+        "ultimo_ciclo": 0
+    },
+    "notas_staff": "Balgor es el villano pragmatico. Su rol es crear dilemas morales para PJs. REGLAS: (1) La Fortaleza crece 3% por semana sin ataques. Al 100%, Mecha-Coloso completado — punto de inflexion narrativo. (2) Balgor ofrece alianzas con letra pequeña a PJs de valor estrategico. (3) Puede detonar remotamente a sus subordinados ciberneticos. (4) Conoce planos de Pacifistas y desarrolla version mejorada — informacion clasificada que PJs pueden descubrir.",
+    "triggers_especiales": [
+        "Si Isabella es ejecutada sin intervencion: Balgor celebra en privado. Moral a 100. Crecimiento de Fortaleza acelera a 5% por semana.",
+        "Si Jack el Inmortal ataca la Fortaleza: Protocolo Cazador activado. 40 torretas configuradas contra su estilo. Si Jack sobrevive, combate epico de titanes.",
+        "Si un Yonko rival ataca la Fortaleza: Balgor activa Asimilacion Total — fusion con la Fortaleza entera controlando cada torreta como extension de su cuerpo.",
+        "Si alguien ofrece tecnologia avanzada: Balgor reconsidera cualquier hostilidad previa. Su ambicion tecnologica supera su instinto de autopreservacion.",
+        "Si el Mecha-Coloso llega al 100%: evento mundial. Balgor exige reconocimiento como Primer Emperador de la Era Tecnologica. Todos los Yonko y la Marina deben responder."
+    ]
+}

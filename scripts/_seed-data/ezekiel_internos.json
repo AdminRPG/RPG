@@ -1,0 +1,25 @@
+{
+    "personalidad": {"agr": 35, "val": 80, "hon": 50, "lea": 30, "amb": 60, "int": 90},
+    "personalidad_detallada": "Ezekiel tiene una agresividad controlada (35): no busca conflicto pero no lo evita si es necesario. Su enfoque es quirurgico — elimina amenazas especificas con precision milimetrica. Prefiere observar y esperar. Su valentia es silenciosa pero firme (80): sin alardes, pero nunca ha mostrado miedo ante ninguna amenaza. Su honor es ambiguo (50): sigue su propio sentido de justicia, a menudo incomprensible para otros. Puede salvar a un enemigo un dia y ejecutarlo al siguiente sin explicacion.\n\nSu lealtad es minima (30): no es leal a naciones, facciones ni personas. Su unica lealtad es a una mision secreta que solo el conoce. Cualquier alianza sera temporal e instrumental. Su ambicion es enigmatica (60): quiere algo, pero nadie sabe que. Observa el mundo desde las alturas como quien espera que algo ocurra o se prepara para algo. Su inteligencia es excepcional (90): procesa informacion a velocidad sobrehumana, analiza patrones, predice movimientos. Su Haki de Observacion lee intenciones y emociones a distancia.",
+    "metas": [
+        "Vigilar el Santuario Flotante de Ark y proteger su secreto: Ark no es solo una fortaleza — es un observatorio, un archivo, quizas un arma. Ezekiel dedica cada hora a proteger lo que sea que Ark contiene. Solo el ha entrado en la Camara Central.",
+        "Observar la ejecucion de Isabella como espectador o participante: recopila informacion, analiza variables, calcula probabilidades. Si la ejecucion desencadena lo que ha estado esperando, actuara. Si no, permanecera en el cielo.",
+        "Eliminar a Balgor si confirma sus peores sospechas: vigila al Titan hace meses. Sospecha que su traicion a Isabella fue solo el primer paso de un plan mayor. Si lo confirma, no habra juicio — solo un disparo desde las nubes."
+    ],
+    "meta_actual": "Observar y analizar la situacion global antes de actuar",
+    "tracking": {
+        "ubicacion_zona": "new-world",
+        "salud": 100,
+        "moral": 80,
+        "plan_activo": "Ezekiel monitorea el mundo desde la plataforma de observacion de Ark. Su red de Dials de vigilancia le permite escuchar conversaciones, ver movimientos de flotas, y seguir personas de interes. Tiene agentes infiltrados en Marineford, Onigashima, Zou y la Fortaleza de Chatarra. Sabe mas sobre los movimientos de los otros Yonko que ellos mismos. No ha tomado decision sobre la ejecucion — espera una señal que confirme o descarte sus hipotesis.",
+        "thread_id": null,
+        "ultimo_ciclo": 0
+    },
+    "notas_staff": "Ezekiel es el Yonko con mas informacion. REGLAS: (1) Nunca revela toda la informacion que tiene. (2) Puede ser fuente de informacion clasificada para PJs que logren encontrarlo. (3) Ark NO puede ser encontrado sin ayuda de Ezekiel o alguien que ya haya estado alli. (4) Tiene un trasfondo secreto relacionado con una profecia Skypiean — mantener oculto hasta el momento narrativo adecuado. (5) En combate nunca se acerca a menos de 500 metros de su objetivo. Estilo 100% a distancia.",
+    "triggers_especiales": [
+        "Si alguien descubre la ubicacion de Ark: Ezekiel se vuelve hostil inmediatamente. Elimina la amenaza sin preguntar. Si el intruso sobrevive al primer disparo, lo considera 'digno' y ofrece audiencia.",
+        "Si la ejecucion revela informacion sobre la Ultima Isla o el Siglo Vacio: Ezekiel abandona la observacion y entra en accion directa. Los eventos que esperaba estan ocurriendo.",
+        "Si Balgor activa su forma Mecha completa: Ezekiel lo considera amenaza apocaliptica y actua para detenerlo. Sus disparos pueden penetrar el blindaje del Mecha.",
+        "Si un PJ llega a Ark: Ezekiel no ataca. Lo observa 24 horas. Si lo considera digno, concede audiencia y responde UNA pregunta con total sinceridad."
+    ]
+}

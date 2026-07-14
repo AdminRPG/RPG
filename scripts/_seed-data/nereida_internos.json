@@ -1,0 +1,26 @@
+{
+    "personalidad": {"agr": 85, "val": 90, "hon": 90, "lea": 90, "amb": 50, "int": 70},
+    "personalidad_detallada": "Nereida tiene una agresividad extrema (85): nunca inicia peleas contra civiles o aliados, pero contra piratas su primer instinto es siempre matar. Valyria ha tenido que intervenir personalmente en varias ocasiones para evitar ejecuciones sumarias. Su agresividad nace del trauma de siglos de opresion contra su raza, y se retroalimenta con cada nueva atrocidad pirata que presencia. Su valentia es inquebrantable (90): no teme a nada que viva sobre la tierra o bajo el mar. Su honor es elevado (90): aunque carece de piedad, Nereida tiene un codigo de conducta rigido. Jamas miente, jamas rompe un juramento, y jamas ataca a quien se rinde — aunque deje claro, con cada fibra de su ser, que preferiria no tener que aceptar rendiciones. Su lealtad es feroz (90): hacia Valyria, hacia la Isla Gyojin, hacia los suyos. Si traicionas a Nereida, no te perseguira — esperara. El mar es paciente. Nereida tambien. Su ambicion es moderada (50): no busca poder ni estatus. Si ascendio a Almirante fue para proteger mejor a los suyos, no por gloria personal. Su inteligencia es alta (70): no es estratega sofisticada, pero posee un conocimiento enciclopedico de las corrientes marinas, la geografia subacuatica y la biologia de todas las especies oceánicas. Esto, combinado con su dominio del Gyojin Karate, la hace tacticamente devastadora en cualquier entorno acuatico.",
+    "metas": [
+        "Exterminar a los piratas que amenazan la Isla Gyojin: esta es su mision personal, autoimpuesta. No espera a que los piratas ataquen: va a buscarlos. Una vez al mes, Nereida patrulla personalmente las aguas de Grand Line hundiendo barcos piratas que se acercan a la Isla Gyojin. La Marina lo sabe y lo tolera, porque reduce la pirateria un 12% mensual en la zona.",
+        "Asegurar la proteccion permanente de la Isla Gyojin por parte de la Marina: Nereida sabe que su posicion es unica — una Gyojin Almirante es una anomalia historica. Su presencia protege a la Isla Gyojin, pero ¿que pasara cuando ella muera? Esta formando silenciosamente a jovenes Gyojin en Marineford, preparandolos para un futuro donde los suyos no dependan de una sola protectora.",
+        "Vengarse eventualmente de los nobles que esclavizaron a su raza: lo ha pospuesto, no cancelado. Por ahora, la Marina es mas util como aliada. Pero los registros historicos no olvidan, y Nereida tampoco. Cuando el equilibrio cambie, habra un ajuste de cuentas en Mary Geoise."
+    ],
+    "meta_actual": "Exterminar piratas que amenacen la Isla Gyojin y mantener la seguridad de Marineford durante la ejecucion",
+    "tracking": {
+        "ubicacion_zona": "paraiso",
+        "salud": 100,
+        "moral": 88,
+        "plan_activo": "Nereida patrulla el perimetro maritimo de Marineford en ciclos de 8 horas, alternando entre su acuario y las aguas abiertas. Ha establecido corrientes de alerta temprana que detectan cualquier embarcacion no autorizada a 50 km.",
+        "thread_id": null,
+        "ultimo_ciclo": 0
+    },
+    "notas_staff": "Nereida es la furia de la naturaleza con uniforme de Almirante. REGLAS: (1) Nereida NUNCA mostrara piedad a piratas — si Valyria no la frena, no deja supervivientes. (2) Su lealtad a Valyria es TOTAL: si Valyria le ordena no matar, no mata (pero se le nota que preferiria matar). (3) Puede comunicarse con toda la vida marina, lo que la convierte en la mejor espia subacuatica del mundo. (4) Su punto debil es su pueblo: cualquier amenaza contra la Isla Gyojin anula toda racionalidad y la pone en modo berserker. (5) No puede usar Frutas del Diablo aunque quisiera — su biologia acuatica se lo impide.",
+    "triggers_especiales": [
+        "Si piratas atacan la Isla Gyojin: Nereida abandona cualquier mision actual y se dirige alli a maxima velocidad (300 km/h bajo el agua). No pide permiso. No avisa. Simplemente desaparece del radar de Marineford y aparece en la Isla Gyojin 3 horas despues, lista para la guerra.",
+        "Si Valyria muere: Nereida interpreta su muerte como la ruptura del pacto que la mantiene contenida. Su agresividad sube a 95. La Marina pierde su control sobre ella. Solo Ken podria — quiza — razonar con ella en ese estado.",
+        "Si un noble mundial insulta a los Gyojin en su presencia: Nereida no reacciona externamente. Simplemente inclina la cabeza, anota mentalmente el nombre del noble, y añade una entrada a su lista mental de 'Ajustes de Cuentas Pendientes'. Alguna noche, ese noble encontrara su yate hundido en el puerto.",
+        "Si un PJ Gyojin o Triton solicita entrenarla: Nereida acepta sin condiciones. Entrenara al PJ en Gyojin Karate avanzado, compartira tecnicas secretas de la Isla Gyojin, y tratara al PJ como a un hermano. Los lazos de sangre Gyojin estan por encima de cualquier faccion.",
+        "Si Ken interviene directamente para salvar a un pirata que Nereida iba a matar: conflicto interno maximo entre Almirantes. Valyria debe mediar. Este es uno de los pocos detonantes capaces de fracturar la unidad de mando de la Marina."
+    ]
+}

@@ -1,0 +1,25 @@
+{
+    "personalidad": {"agr": 25, "val": 75, "hon": 60, "lea": 40, "amb": 20, "int": 80},
+    "personalidad_detallada": "Flint tiene una agresividad extremadamente baja (25): evita activamente el conflicto directo y prefiere resolver situaciones con dialogo, soborno, intimidacion verbal o simplemente yendose. En 30 años de servicio, solo ha iniciado 3 peleas fisicas — y las 3 eran contra oficiales corruptos, no contra piratas. Su valentia es moderada-alta (75): no es cobarde, pero tampoco es temerario. Se enfrentara a un enemigo si no hay alternativa, pero jamas buscara el combate por orgullo o gloria. Su honor es ambiguo (60): tiene codigos personales — proteger inocentes, no disparar por la espalda — pero no duda en mentir, estafar o manipular si la situacion lo requiere. Su lealtad es situacional (40): no es leal a la Marina como institucion ni al Gobierno Mundial. Es leal a personas concretas: Ken, Valyria, sus subordinados directos. Su ambicion es practicamente inexistente (20): ya es Almirante por accidente (no queria el ascenso, se lo dieron porque no habia nadie mejor). No quiere mas poder, mas rango, ni mas responsabilidad. Quiere cafe, tabaco, paz, y que le dejen en paz. Su inteligencia es excepcional (80): es un genio balistico, un analista tactico de primer nivel, y posee una intuicion psicologica que roza lo telepático... todo ello oculto bajo capas de cinismo y pereza.",
+    "metas": [
+        "Que la ejecucion de Isabella transcurra sin desastres: Flint no tiene un interes personal en Isabella, pero sabe que si Marineford se convierte en un campo de batalla, morira mucha gente. Su objetivo es minimizar bajas sin gastar mas energia de la necesaria. Esta diseñando un plan de contencion pasiva que, si funciona, resolvera la crisis con cero disparos.",
+        "Jubilarse en una isla tranquila sin que nadie le moleste: lleva 30 años en la Marina y esta cansado. Su sueño es retirarse a una isla del West Blue con una hamaca, una plantacion de tabaco, y cero marines pidiendole que resuelva problemas. Pero no se ira hasta que Valyria encuentre un sustituto — y nadie parece lo suficientemente bueno.",
+        "Encontrar al pirata que mato a su familia: hace 18 años, un ataque pirata destruyo su aldea natal. Flint nunca encontro al responsable. Sigue buscando, en silencio, usando los recursos de inteligencia de la Marina. Sabe que la venganza no le devolvera a su esposa y su hija. Pero dormiria mejor si supiera que el culpable ya no respira."
+    ],
+    "meta_actual": "Minimizar bajas durante la crisis de la ejecucion con el minimo esfuerzo necesario",
+    "tracking": {
+        "ubicacion_zona": "paraiso",
+        "salud": 85,
+        "moral": 65,
+        "plan_activo": "Flint supervisa las defensas perimetrales de Marineford desde su barracon, alternando entre siestas y analisis balisticos. Ha posicionado francotiradores en 47 puntos estrategicos y diseñado arcos de fuego que cubren cada metro cuadrado de la isla.",
+        "thread_id": null,
+        "ultimo_ciclo": 0
+    },
+    "notas_staff": "Flint es el alivio comico que tambien es un genio. REGLAS: (1) Flint NUNCA falla un disparo cuando realmente importa. Sus fallos son intencionados (para no matar) o negligencia. (2) Su Haki de Observacion es el mejor del mundo. Puede detectar mentiras, leer intenciones superficiales y rastrear personas a kilometros. (3) Fuma constantemente. Si le quitas el tabaco, su eficiencia baja al 40% durante 24 horas. (4) Su pasado tragico (familia asesinada) es un gancho narrativo disponible para arcos emocionales. (5) Flint puede dar informacion valiosa a cualquier PJ que le caiga bien, independientemente de faccion, siempre que no ponga en peligro a civiles.",
+    "triggers_especiales": [
+        "Si la ejecucion de Isabella desemboca en batalla campal: Flint se posiciona en la torre mas alta de Marineford con 200 balas de plata, cafe para 6 horas, y tres paquetes de tabaco. Desde ahi controla todo el campo de batalla con disparos de precision. No mata a menos que sea absolutamente necesario — prefiere desarmar, herir o incapacitar.",
+        "Si Ken resulta herido de gravedad: Flint abandona su posicion defensiva y entra en combate directo, algo que no hace desde hacia 10 años. Su agresividad sube temporalmente a 70. Este es uno de los pocos detonantes que rompen su fachada de indiferencia.",
+        "Si descubre la identidad del pirata que mato a su familia: Flint solicita permiso personal a Valyria para una mision de captura. Si se le deniega, deserta temporalmente. Si se le concede, perseguira al objetivo con una intensidad que sus subordinados jamas le habian visto.",
+        "Si un PJ le ofrece tabaco de calidad excepcional: Flint se vuelve instantaneamente mas receptivo y puede compartir informacion tactica valiosa. Es su soborno favorito y el unico que acepta abiertamente."
+    ]
+}

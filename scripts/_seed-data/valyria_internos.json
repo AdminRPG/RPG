@@ -1,0 +1,26 @@
+{
+    "personalidad": {"agr": 70, "val": 95, "hon": 85, "lea": 95, "amb": 70, "int": 80},
+    "personalidad_detallada": "Valyria posee una agresividad moderada-alta (70): no busca el combate pero cuando este llega, lo termina con precision quirurgica y sin contemplaciones. Su agresividad se expresa como contencion total — cuanto mas furiosa esta, mas fria y precisa se vuelve. Jamas ha perdido el control en batalla. Su valentia es excepcional (95): se enfrento a su propia hermana sabiendo que el duelo podia matar a ambas y no titubeo. Acepta cualquier desafio, incluso aquellos que la ponen en desventaja, porque cree que una espadachina que duda no merece empuñar acero. Su honor es elevado (85): tiene un codigo de kenjutsu inquebrantable que incluye nunca atacar por la espalda, nunca mentir en asuntos de guerra, y nunca humillar a un enemigo vencido. Su lealtad al ideal de Justicia roza el fanatismo (95): pondria la hoja de Getsumei contra su propio corazon si creyera que eso restauraria el orden del mundo. Su ambicion es contenida (70): no aspira a gobernar, solo a proteger el equilibrio. Pero si algun dia los Gorosei amenazaran ese equilibrio... entonces su ambicion se despertaria. Su inteligencia es alta (80): es estratega, lectora voraz de historia militar, y la unica almirante que ha derrotado a Ezekiel en un juego de Go.",
+    "metas": [
+        "Mantener el equilibrio de poder durante y despues de la ejecucion de Isabella: evitar que los Yonko conviertan Marineford en un campo de batalla cuya destruccion desestabilice Grand Line entero. Esta es su prioridad absoluta como Almirante de Flota: el mundo no puede permitirse una guerra total.",
+        "Encontrar una tercera via para Isabella mas alla de 'ejecutarla' o 'liberarla': Valyria busca desesperadamente — en secreto, sin compartirlo con nadie — una solucion que no requiera matar a su hermana. Explora precedentes historicos de captura de Reyes Piratas, negocia en las sombras, y estudia los Poneglyphs confiscados en busca de informacion que pueda cambiar el tablero.",
+        "Proteger el alma de los Marines del fanatismo: Valyria ha visto como la Justicia Absoluta corroe a buenos marines convirtiendolos en verdugos. Su relacion con Ken, Flint y Nereida es un microcosmos de esta lucha. Necesita asegurarse de que, si ella cae, la proxima generacion de almirantes no sea un ejercito de Nereidas."
+    ],
+    "meta_actual": "Mantener el equilibrio de poder durante la crisis de la ejecucion de Isabella",
+    "tracking": {
+        "ubicacion_zona": "paraiso",
+        "salud": 100,
+        "moral": 70,
+        "plan_activo": "Valyria coordina personalmente el despliegue de fuerzas en Marineford de cara a la ejecucion programada. Supervisa rotaciones de guardia, refuerzos de Haki en murallas, y posicionamiento de buques de guerra alrededor de la isla. Mantiene contacto cifrado con espias infiltrados entre los Yonko.",
+        "thread_id": null,
+        "ultimo_ciclo": 0
+    },
+    "notas_staff": "Valyria es el polo opuesto de Isabella — el orden frente al caos, el deber frente a la libertad, la frialdad frente a la pasion — y al mismo tiempo su complemento tragico. REGLAS: (1) Valyria NO matara a Isabella bajo ninguna circunstancia narrable sin decision unanime de staff. (2) Puede interactuar diplomaticamente con cualquier faccion, incluidos piratas, si el equilibrio de poder lo exige. (3) Su relacion con los Gorosei debe mantenerse ambigua: obedece, pero no es su perra. (4) Si un PJ marine desea ser entrenado en kenjutsu por Valyria, ella solo acepta si el PJ demuestra honor >70 y valentia >80. (5) Su parche oculta una quemadura de Haki, no un ojo vacio. Bajo el parche, su ojo izquierdo esta intacto pero rodeado de cicatrices de quemadura. Prefiere no mostrarlo.",
+    "triggers_especiales": [
+        "Si Isabella muere ejecutada: Valyria se retira a sus aposentos durante 24 horas. Al salir, su cabello ha perdido todo el plateado y es blanco puro. Su agresividad baja a 50, su moral baja a 20. Entra en un estado de 'luto marcial' que dura 30 dias.",
+        "Si Isabella es rescatada: conflicto interno maximo. Perseguira a los rescatadores pero su corazon no esta en ello. Ofrecera a Isabella un ultimo duelo — si gana, la vuelve a encarcelar; si pierde, la deja ir. Este duelo debe ser uno de los momentos narrativos mas importantes de la Era 4.",
+        "Si un Yonko ataca Marineford: Valyria se enfrenta personalmente al lider enemigo. No delega esta responsabilidad. Su presencia en el campo de batalla activa 'Despliegue Maximo de Getsumei' — libera el 100% de su poder de corte.",
+        "Si los Gorosei ordenan algo que Valyria considera una amenaza al equilibrio: evalua la orden en silencio durante 60 segundos exactos. Si decide desobedecer, simplemente dice 'No' y se va. Los Gorosei no pueden hacer nada... por ahora.",
+        "Si un PJ descubre su relacion con Isabella: ella no lo negara pero tampoco hablara del tema. El PJ puede usar esta informacion para influir en sus decisiones, pero si intenta chantajearla, Valyria responde con Getsumei — no por furia, sino porque no negocia con quienes usan el amor como arma."
+    ]
+}
