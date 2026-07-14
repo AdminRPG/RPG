@@ -128,38 +128,38 @@ Para Isabella (ex-Reina Pirata, nivel Emperador), las stats efectivas reflejan s
 
 ```json
 {
-  "FUE": 80, "DES": 60, "VIG": 80, "AGI": 70,
-  "INT": 70, "ING": 40, "CON": 50, "PER": 70,
-  "CAR": 90, "CTR": 30, "VOL": 100, "SEN": 80
+  "FUE": 83, "DES": 62, "VIG": 83, "AGI": 73,
+  "INT": 72, "ING": 42, "CON": 52, "PER": 73,
+  "CAR": 93, "CTR": 32, "VOL": 100, "SEN": 85
 }
 ```
 
-**Suma: 820** → Nivel 82 → Etiqueta "Emperador"
+**Suma: 850** → Nivel 85 → Etiqueta "Emperador"
 
 **Justificación detallada de cada stat:**
 
 | Stat | Valor | Etiqueta | Por qué |
 |---|---|---|---|
 | **VOL 100** | Máximo | Trascendente | Isabella es portadora de la Voluntad de la D. y tiene el Haoshoku Haki más poderoso de su generación. Su voluntad fue capaz de someter a millones en el Nuevo Mundo. Incluso encadenada y derrotada, su espíritu no se ha quebrado. Es literalmente la persona con la voluntad más fuerte del mundo conocido. |
-| **CAR 90** | Casi máximo | Legendario | Su carisma es legendario. Formó una tripulación desde cero siendo una niña huérfana sin nombre, y la llevó hasta conquistar el Grand Line completo. Incluso sus enemigos la respetan. Los marines que la custodian le temen no porque pueda escapar, sino porque saben que sus palabras podrían convencer a cualquiera de liberarla. Su risa «¡Gahahahaha!» es reconocida en todos los mares. |
-| **FUE 80** | Muy alto | Legendario | Guerrera física pura. No posee Fruta del Diablo y nunca la ha necesitado. Su fuerza bruta, amplificada por Haki de Armadura avanzado (destrucción interna), le permitió enfrentarse cuerpo a cuerpo a los monstruos más poderosos del mundo. Puede romper Kairoseki con sus manos desnudas cuando está al 100%. |
-| **VIG 80** | Muy alto | Legendario | Ha sobrevivido a heridas que habrían matado a cualquier otro ser humano. Su resistencia física es legendaria: luchó 3 días seguidos contra un ejército entero antes de ser capturada. Su cuerpo está cubierto de cicatrices de «mil batallas» según su propia descripción. |
-| **SEN 80** | Muy alto | Legendario | Isabella tiene una sensibilidad emocional extrema que la conecta con las personas y el mundo a un nivel profundo. Es lo que le permite inspirar devoción ciega en su tripulación y sentir compasión sincera por los esclavos y oprimidos. Esta sensibilidad es también su debilidad: confía demasiado en los suyos (defecto de lore), y la traición de Balgor la devastó emocionalmente. |
-| **AGI 70** | Alto | Excepcional | Rápida y ágil, con reflejos afilados por décadas de combate naval. Su manejo de la cadena de Kairoseki requiere una coordinación corporal extraordinaria. Sin embargo, no es una especialista en velocidad pura — prefiere el combate directo y contundente. |
-| **PER 70** | Alto | Excepcional | Haki de Observación de nivel alto, capaz de predecir movimientos a corto plazo. Su percepción del campo de batalla es instintiva, no analítica. Navegó el Grand Line completo, lo que requiere una agudeza sensorial excepcional para leer el clima, las corrientes y los peligros del mar. |
-| **INT 70** | Alto | Excepcional | Estratega instintiva, no genio táctico calculador. Su inteligencia brilla en la improvisación y la lectura de personas, no en la planificación meticulosa. Descubrió la verdad del Siglo Vacío, lo que demuestra una mente capaz de comprender verdades complejas. |
-| **DES 60** | Moderado-alto | Excepcional | Hábil con su cadena de Kairoseki y competente en combate armado, pero no es una artesana ni una técnica de precisión milimétrica. Su estilo es más de fuerza bruta que de finura. |
-| **CON 50** | Moderado | Notable | Isabella creció en la pobreza extrema y nunca tuvo educación formal. Su conocimiento del mundo es empírico, aprendido por experiencia directa. Sabe de navegación, supervivencia y combate, pero no de ciencia, historia académica ni teoría. Lo que sabe del Siglo Vacío lo descubrió, no lo estudió. |
-| **ING 40** | Bajo-moderado | Notable | No es inventora, ingeniera ni creadora de artefactos. Su tripulación tenía especialistas para eso. Isabella lidera y lucha; no diseña ni construye. |
-| **CTR 30** | Bajo | Bueno | Isabella es lo opuesto a sutil. No se infiltra, no manipula, no engaña. Actúa de frente, dice lo que piensa, ríe cuando no debería y desafía a sus enemigos mirándolos a los ojos. Su control emocional es mínimo — es apasionada, explosiva y transparente. Esto es una fortaleza (autenticidad) y una debilidad (predecible). |
+| **CAR 93** | Casi maximo | Legendario | Su carisma es legendario. Formó una tripulación desde cero siendo una niña huérfana sin nombre, y la llevó hasta conquistar el Grand Line completo. Incluso sus enemigos la respetan. Los marines que la custodian le temen no porque pueda escapar, sino porque saben que sus palabras podrían convencer a cualquiera de liberarla. Su risa «¡Gahahahaha!» es reconocida en todos los mares. |
+| **FUE 83** | Muy alto | Legendario | Guerrera física pura. No posee Fruta del Diablo y nunca la ha necesitado. Su fuerza bruta, amplificada por Haki de Armadura avanzado (destrucción interna), le permitió enfrentarse cuerpo a cuerpo a los monstruos más poderosos del mundo. Puede romper Kairoseki con sus manos desnudas cuando está al 100%. |
+| **VIG 83** | Muy alto | Legendario | Ha sobrevivido a heridas que habrían matado a cualquier otro ser humano. Su resistencia física es legendaria: luchó 3 días seguidos contra un ejército entero antes de ser capturada. Su cuerpo está cubierto de cicatrices de «mil batallas» según su propia descripción. |
+| **SEN 85** | Muy alto | Legendario | Isabella tiene una sensibilidad emocional extrema que la conecta con las personas y el mundo a un nivel profundo. Es lo que le permite inspirar devoción ciega en su tripulación y sentir compasión sincera por los esclavos y oprimidos. Esta sensibilidad es también su debilidad: confía demasiado en los suyos (defecto de lore), y la traición de Balgor la devastó emocionalmente. |
+| **AGI 73** | Alto | Excepcional | Rápida y ágil, con reflejos afilados por décadas de combate naval. Su manejo de la cadena de Kairoseki requiere una coordinación corporal extraordinaria. Sin embargo, no es una especialista en velocidad pura — prefiere el combate directo y contundente. |
+| **PER 73** | Alto | Excepcional | Haki de Observación de nivel alto, capaz de predecir movimientos a corto plazo. Su percepción del campo de batalla es instintiva, no analítica. Navegó el Grand Line completo, lo que requiere una agudeza sensorial excepcional para leer el clima, las corrientes y los peligros del mar. |
+| **INT 72** | Alto | Excepcional | Estratega instintiva, no genio táctico calculador. Su inteligencia brilla en la improvisación y la lectura de personas, no en la planificación meticulosa. Descubrió la verdad del Siglo Vacío, lo que demuestra una mente capaz de comprender verdades complejas. |
+| **DES 62** | Moderado-alto | Excepcional | Hábil con su cadena de Kairoseki y competente en combate armado, pero no es una artesana ni una técnica de precisión milimétrica. Su estilo es más de fuerza bruta que de finura. |
+| **CON 52** | Moderado | Notable | Isabella creció en la pobreza extrema y nunca tuvo educación formal. Su conocimiento del mundo es empírico, aprendido por experiencia directa. Sabe de navegación, supervivencia y combate, pero no de ciencia, historia académica ni teoría. Lo que sabe del Siglo Vacío lo descubrió, no lo estudió. |
+| **ING 42** | Bajo-moderado | Notable | No es inventora, ingeniera ni creadora de artefactos. Su tripulación tenía especialistas para eso. Isabella lidera y lucha; no diseña ni construye. |
+| **CTR 32** | Bajo | Bueno | Isabella es lo opuesto a sutil. No se infiltra, no manipula, no engaña. Actúa de frente, dice lo que piensa, ríe cuando no debería y desafía a sus enemigos mirándolos a los ojos. Su control emocional es mínimo — es apasionada, explosiva y transparente. Esto es una fortaleza (autenticidad) y una debilidad (predecible). |
 
 ```sql
 UPDATE mybb_rol_personajes
 SET
-  stats_json = '{"FUE":80,"DES":60,"VIG":80,"AGI":70,"INT":70,"ING":40,"CON":50,"PER":70,"CAR":90,"CTR":30,"VOL":100,"SEN":80}',
-  ps_gastados = 760,
-  stats_ganados = 760,
-  nivel = 82
+  stats_json = '{"FUE":83,"DES":62,"VIG":83,"AGI":73,"INT":72,"ING":42,"CON":52,"PER":73,"CAR":93,"CTR":32,"VOL":100,"SEN":85}',
+  ps_gastados = 790,
+  stats_ganados = 790,
+  nivel = 85
 WHERE nombre = 'Isabella D. Vega' AND es_npc = 1;
 ```
 
@@ -329,11 +329,11 @@ Estas columnas cambian cada ciclo (las actualiza la IA vía `npc_tracking`):
 ```sql
 UPDATE mybb_rol_personajes
 SET
-  -- Stats ajustadas (escala 5-100+)
-  stats_json = '{"FUE":80,"DES":60,"VIG":80,"AGI":70,"INT":70,"ING":40,"CON":50,"PER":70,"CAR":90,"CTR":30,"VOL":100,"SEN":80}',
-  ps_gastados = 760,
-  stats_ganados = 760,
-  nivel = 82,
+  -- Stats ajustadas (escala 5-100+, nivel 85 Emperador)
+  stats_json = '{"FUE":83,"DES":62,"VIG":83,"AGI":73,"INT":72,"ING":42,"CON":52,"PER":73,"CAR":93,"CTR":32,"VOL":100,"SEN":85}',
+  ps_gastados = 790,
+  stats_ganados = 790,
+  nivel = 85,
 
   -- Datos públicos (completos, extensos)
   datos_publicos = '<PEGAR EL JSON DE datos_publicos DE LA SECCIÓN 3>',
