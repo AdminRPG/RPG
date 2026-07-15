@@ -76,7 +76,7 @@ function ope_oraculo_post_html(array $viaje, array $oraculo)
 
     $html  = '<div class="ope-viaje-oraculo">';
     $html .= '<header class="ope-vo-head">';
-    $html .= '<div class="ope-vo-kicker">Oráculo de Viaje · OP-Eternal</div>';
+    $html .= '<div class="ope-vo-kicker">Oráculo de Viaje &middot; Lyria</div>';
     $html .= '<h2 class="ope-vo-titulo">Travesía: ' . $origen . ' → ' . $destino . '</h2>';
     $html .= '<div class="ope-vo-meta">';
     $html .= '<span>⛵ ' . $barco . '</span>';
@@ -96,7 +96,7 @@ function ope_oraculo_post_html(array $viaje, array $oraculo)
     $html .= '<li>Posts sugeridos: <strong>' . $posts . '</strong> (mínimo 1 por jugador activo)</li>';
     $html .= '<li>Plazo orientativo: <strong>' . $plazo . ' días</strong> off-rol</li>';
     $html .= '<li>Rolean la travesía en este hilo. Cuando quieran llegar, el <strong>capitán</strong> solicita el cierre desde el panel del viaje.</li>';
-    $html .= '<li>OP-Eternal publicará la llegada a <strong>' . $destino . '</strong> al confirmar.</li>';
+    $html .= '<li>Lyria publicará la llegada a <strong>' . $destino . '</strong> al confirmar.</li>';
     $html .= '</ul></div>';
     $html .= '<div class="ope-vo-oficios"><h4>Modificadores activos</h4><div class="ope-vo-oficios-grid">' . $oficios_html . '</div></div>';
     $html .= '</footer></div>';
@@ -113,7 +113,7 @@ function ope_oraculo_cierre_post_html(array $viaje, string $capitan_nombre)
 
     return '<div class="ope-viaje-oraculo ope-vo-cierre">'
          . '<header class="ope-vo-head ope-vo-head--cierre">'
-         . '<div class="ope-vo-kicker">Llegada confirmada · OP-Eternal</div>'
+         . '<div class="ope-vo-kicker">Llegada confirmada &middot; Lyria</div>'
          . '<h2 class="ope-vo-titulo">⚓ ' . $destino . '</h2>'
          . '<p class="ope-vo-cierre-lead">A solicitud del capitán <strong>' . $cap . '</strong>, '
          . 'la tripulación completa la travesía desde <em>' . $origen . '</em> y amarra en '

@@ -104,11 +104,15 @@ $islas_json = json_encode($islas, JSON_UNESCAPED_UNICODE);
 
 $hero_image_url = '';
 foreach (array('webp', 'avif', 'jpg', 'jpeg', 'png') as $hero_ext) {
-    $hero_path = MYBB_ROOT . 'images/ope/oraculo-viaje.' . $hero_ext;
+    $hero_path = MYBB_ROOT . 'images/gbe/oraculo-viaje.' . $hero_ext;
     if (is_file($hero_path)) {
-        $hero_image_url = rtrim((string) $mybb->settings['bburl'], '/') . '/images/ope/oraculo-viaje.' . $hero_ext;
+        $hero_image_url = rtrim((string) $mybb->settings['bburl'], '/') . '/images/gbe/oraculo-viaje.' . $hero_ext;
         break;
     }
+}
+// fallback: usar hero-mundo como placeholder si no hay oraculo especifico
+if ($hero_image_url === '' && is_file(MYBB_ROOT . 'images/gbe/hero-mundo.jpg')) {
+    $hero_image_url = rtrim((string) $mybb->settings['bburl'], '/') . '/images/gbe/hero-mundo.jpg';
 }
 
 header('Content-Type: text/html; charset=utf-8');
@@ -144,7 +148,7 @@ header('Content-Type: text/html; charset=utf-8');
       <span class="code">// navegación · 4 mesas D100</span>
       <span class="rule"></span>
     </div>
-    <p class="ope-vj-lead">Traza una travesía entre islas y deja que <strong>OP-Eternal</strong> lea el mar: clima, encuentros, hallazgos y peligros formarán el hilo de <em>Alta Mar</em>. La tripulación decide cuánto dura la historia: <strong>el viaje solo termina cuando solicitas la llegada</strong>.</p>
+    <p class="ope-vj-lead">Traza una travesía entre islas y deja que <strong>Lyria</strong> lea el cielo: clima, encuentros, hallazgos y peligros formarán el hilo de <em>Alta Mar</em>. La tripulación decide cuánto dura la historia: <strong>el viaje solo termina cuando solicitas la llegada</strong>.</p>
     <div class="ope-vj-facts" aria-label="Características del viaje">
       <span><i class="ph ph-dice-five" aria-hidden="true"></i><b>4 mesas</b>D100 por tramo</span>
       <span><i class="ph ph-map-trifold" aria-hidden="true"></i><b>1–5 tramos</b>según la ruta</span>
@@ -181,7 +185,7 @@ header('Content-Type: text/html; charset=utf-8');
       <?php else: ?>
       <div class="ope-vj-aside-placeholder" aria-hidden="true">
         <i class="ph ph-compass-rose"></i>
-        <span>images/ope/oraculo-viaje.webp</span>
+        <span>images/gbe/oraculo-viaje.webp</span>
       </div>
       <?php endif; ?>
       <figcaption><span>Bitácora de navegación</span>El horizonte nunca promete un mar en calma.</figcaption>
@@ -304,10 +308,10 @@ header('Content-Type: text/html; charset=utf-8');
     <div class="ope-vj-panel" data-panel="4" role="tabpanel" hidden>
       <div class="ope-vj-panel-head">
         <h2>Revisa la bitácora</h2>
-        <p>Comprueba la ruta y el barco. Al zarpar, OP-Eternal abrirá el hilo y revelará las tiradas.</p>
+        <p>Comprueba la ruta y el barco. Al zarpar, Lyria abrir&aacute; el hilo y revelar&aacute; las tiradas.</p>
       </div>
       <div class="ope-vj-summary" id="ope-vj-summary"></div>
-      <p class="ope-vj-warn">Al confirmar, OP-Eternal creará el hilo con el Oráculo resuelto. Podréis rolear hasta que <strong>tú</strong> solicites la llegada.</p>
+      <p class="ope-vj-warn">Al confirmar, Lyria crear&aacute; el hilo con el Or&aacute;culo resuelto. Podr&eacute;is rolear hasta que <strong>t&uacute;</strong> solicites la llegada.</p>
       <div class="ope-vj-nav-row">
         <button type="button" class="ope-btn ope-btn-ghost ope-vj-prev" data-prev="3">Atrás</button>
         <button type="submit" class="ope-btn ope-btn-hot ope-vj-submit">Invocar Oráculo y zarpar</button>

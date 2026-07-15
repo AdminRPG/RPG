@@ -1,18 +1,20 @@
 ---
-description: Esqueleto obligatorio de páginas PHP autónomas y reglas CSS (DESIGN §7.8)
+description: Esqueleto obligatorio de páginas PHP autónomas y reglas CSS (DESIGN §5)
 globs: **/*.php,docs/themes/ope.css
 alwaysApply: false
 ---
 
 # Páginas autónomas · scaffold y CSS
 
-Fuente de verdad: **`docs/DESIGN-ONE-PIECE-ETERNAL.md` §7.8** (y también en `AGENTS.md`). Léela antes de crear o rediseñar una página `.php` del RPG. Lo de abajo es el resumen operativo.
+Fuente de verdad: **`docs/DESIGN-GRANBLUE-ETERNAL.md` §5** y **`docs/AGENTES-Y-HERRAMIENTAS.md`** (portado visual). Léelos antes de crear o rediseñar una página `.php` del RPG.
+
+> **Portada MyBB** no usa este scaffold — usa `body.gbe-index` (DESIGN §6). Ver `.cursor/rules/visual-port-gbe.mdc`.
 
 ## Obligatorio en cada página nueva
 
 1. `ope_rol_head_base()` + `ope_rol_navbar_html()` — sin `<style>` inline.
 2. `<body class="ope-pg-<pagina> [variante]">` — scope para CSS exclusivo.
-3. Breadcrumb con markup estándar (ya estilizado **globalmente**):
+3. Breadcrumb con markup estándar (global):
 
 ```html
 <div class="breadcrumb">
@@ -25,55 +27,51 @@ Fuente de verdad: **`docs/DESIGN-ONE-PIECE-ETERNAL.md` §7.8** (y también en `A
 ```
 
 4. Contenedor `.wrap` + `.shead` + `.reveal` según el patrón del proyecto.
-5. Datos desde BD/helpers (`inc/ope_rol_catalogos.php`, etc.) — **sin mockups** en el PHP.
+5. Datos desde BD/helpers — **sin mockups** en el PHP.
 
-## ⚠️ GOTCHA CRÍTICO — las clases base son POR-SCOPE, no globales
+## ⚠️ GOTCHA nº1 — clases NO globales
 
-Esta es la causa nº1 de "la página se ve rota" (incidente `haki.php`, jul-2026).
+**`.shead` · `.plate` · `.plate-h` · `.plate-b` · `.reveal` · `.flash` · `.pj-empty`** no existen globalmente. Sin scaffolding scopeado → texto plano (incidente `haki.php`).
 
-Las clases estructurales **`.shead` · `.plate` · `.plate-h` · `.plate-b` · `.reveal` · `.flash` · `.pj-empty`** **NO existen de forma global**. Cada página las **re-declara** bajo su propio scope (`body.ope-pg-personajes .plate`, `body.ope-pg-ficha .plate`, …). Si creas `<body class="ope-pg-nueva">` y usas `.plate`/`.shead` **sin añadir el scaffolding para ese scope**, salen SIN borde/fondo/sombra → texto plano flotando.
+**Globales:** `.wrap`, `.breadcrumb`, `.btn*`, `.ope-prog-*`.
 
-**Sí son globales** (no re-declarar): `.wrap`, `.breadcrumb`/`.breadcrumb-in`, `.btn`/`.btn-hot`/`.btn-ghost`, `.ope-prog-ppbar*`, `.ope-prog-hero-bar*`.
+## Scaffolding GBF (nueva página — usar esto, no OP brutalista)
 
-### Scaffolding OBLIGATORIO al estrenar un scope `ope-pg-<pagina>`
-
-Pega esto al final de `ope.css` (adaptando el nombre) ANTES de tus reglas propias:
+Pega en `ope.css` adaptando `<pagina>`. Fuente canónica: **DESIGN §5.4** (tokens `--line`, `border-radius`, sin `border:2px solid #000`):
 
 ```css
 body.ope-pg-<pagina> .shead{display:flex;align-items:baseline;gap:14px;margin:8px 0 14px}
-body.ope-pg-<pagina> .shead h1,body.ope-pg-<pagina> .shead h2{font-family:var(--disp);font-weight:800;font-size:2rem;text-transform:uppercase;color:var(--paper);line-height:1}
+body.ope-pg-<pagina> .shead h1,body.ope-pg-<pagina> .shead h2{font-family:var(--disp);font-weight:700;font-size:2rem;color:var(--paper);line-height:1}
 body.ope-pg-<pagina> .shead .code{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ember-hi);letter-spacing:1px}
-body.ope-pg-<pagina> .shead .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--rivet) 0 6px,transparent 6px 12px)}
-body.ope-pg-<pagina> .plate{border:2px solid #000;background:var(--iron-plate);margin-bottom:12px;box-shadow:3px 3px 0 rgba(0,0,0,.25)}
-body.ope-pg-<pagina> .plate-h{background:var(--iron-edge);padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:2px solid #000}
-body.ope-pg-<pagina> .plate-h .t{font-family:var(--disp);font-weight:800;font-size:1.1rem;text-transform:uppercase;color:var(--paper);letter-spacing:.5px}
-body.ope-pg-<pagina> .plate-h .c{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--paper-dim)}
-body.ope-pg-<pagina> .plate-b{padding:13px}
-body.ope-pg-<pagina> .flash{border:2px solid #000;padding:11px 14px;margin-bottom:16px;font-family:var(--mono);font-size:.74rem;font-weight:700}
-body.ope-pg-<pagina> .flash.ok{background:var(--patina);color:var(--iron)}
+body.ope-pg-<pagina> .shead .rule{flex:1;height:2px;background:linear-gradient(90deg,var(--gold),transparent)}
+body.ope-pg-<pagina> .plate{border:1px solid var(--line);background:var(--iron-plate);margin-bottom:12px;box-shadow:var(--shadow-sm);border-radius:14px;overflow:hidden}
+body.ope-pg-<pagina> .plate-h{background:linear-gradient(120deg,var(--concrete),var(--iron-plate));padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line-soft)}
+body.ope-pg-<pagina> .plate-h .t{font-family:var(--disp);font-weight:700;font-size:1rem;color:var(--gold-deep)}
+body.ope-pg-<pagina> .plate-h .c{font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;color:var(--ash)}
+body.ope-pg-<pagina> .plate-b{padding:16px}
+body.ope-pg-<pagina> .flash{border:1px solid var(--line);padding:11px 14px;margin-bottom:16px;font-family:var(--mono);font-size:.74rem;font-weight:700;border-radius:8px}
+body.ope-pg-<pagina> .flash.ok{background:color-mix(in srgb,var(--patina) 20%,transparent);color:var(--paper)}
 body.ope-pg-<pagina> .flash.error{background:var(--crack);color:#fff}
-body.ope-pg-<pagina> .pj-empty{border:2px dashed var(--rivet);background:var(--iron-plate);padding:40px 22px;text-align:center;font-family:var(--mono);font-size:.8rem;color:var(--paper-dim)}
+body.ope-pg-<pagina> .pj-empty{border:1px dashed var(--rivet);background:var(--iron-plate);padding:40px 22px;text-align:center;font-family:var(--mono);font-size:.8rem;color:var(--paper-dim);border-radius:12px}
 body.ope-pg-<pagina> .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
 body.ope-pg-<pagina> .reveal.vis{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){body.ope-pg-<pagina> .reveal{opacity:1;transform:none}}
 ```
 
-> Atajo: si tu página es visualmente idéntica a otra, reutiliza su scope en el `<body>` (p.ej. `class="ope-pg-tramites ope-pg-nueva"`) y solo añade tus diferencias.
+> Atajo: reutiliza scope de página hermana GBF (`ficha.php` → `ope-pg-ficha`).
 
 ## CSS — qué NO hacer
 
-- **No** inline styles estáticos: `style="margin-top:1rem"` → clase CSS. Solo se permite `style` con valor **dinámico de PHP** (`width:<?=$pct?>%`).
-- **No** duplicar `body.ope-pg-* .breadcrumb` — el breadcrumb es global.
-- **No** añadir clases en HTML/JS sin su regla en `docs/themes/ope.css`.
-- Estilos exclusivos de página → `body.ope-pg-<pagina> .clase` al final de `ope.css`.
-- **No** inventar variables CSS: usa las de `:root` (`--ember`, `--paper`, `--iron-plate`, `--crack`…). No existen `--plate-bg`, `--ink-dim`, etc.
-- Tras editar CSS: `php scripts/sync-theme.php import` y luego `verify` (el navegador sirve `cache/themes/theme13/ope.css`, NO el fuente — sin `import` no ves cambios).
+- No inline styles estáticos.
+- No duplicar breadcrumb por página.
+- No clases en HTML sin regla en `ope.css`.
+- No inventar variables — usa `:root` (`--line`, `--paper`, `--gold-deep`, …).
+- Tras editar: `php scripts/sync-theme.php import` + `verify` (navegador = `cache/themes/theme13/ope.css`).
 
-## Checklist OBLIGATORIO antes de dar por hecha una página
+## Checklist antes de dar por hecha
 
-- [ ] **Toda clase del HTML resuelve** globalmente o bajo `body.ope-pg-<pagina>` (revisa una por una; en scope nuevo pega el scaffolding de arriba).
-- [ ] `php scripts/check-inline-styles.php` → **limpio**.
-- [ ] `php scripts/sync-theme.php import` ejecutado y `verify` → `OK CSS: in sync`.
-- [ ] Verificación visual real en navegador (comparar con una página hermana ya correcta).
-- [ ] Breadcrumb con `.sep`, sin CSS duplicado por página.
-- [ ] Modales con `hidden`, `.in`, `*-no-scroll`, Escape y clic en backdrop.
+- [ ] Scaffolding GBF pegado si scope nuevo
+- [ ] `check-inline-styles.php` limpio
+- [ ] `sync-theme verify` → `OK CSS: in sync`
+- [ ] Comparación visual con `ficha.php` u otra página GBF ya correcta
+- [ ] Si es portado desde prototipo: checklist `docs/AGENTES-Y-HERRAMIENTAS.md` §2

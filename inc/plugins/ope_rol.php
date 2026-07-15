@@ -359,12 +359,13 @@ function ope_rol_navbar_html()
              . '<a href="' . $bburl . '/estado-mundo.php" class="ope-dropdown-item">Estado del mundo</a>'
              . '</div></div>';
     $links  .= '<a href="' . $bburl . '/guias.php" class="ope-nav-link' . $isOn(array('guias.php')) . '">Gu&iacute;as</a>';
-    $bibOn = $isOn(array('biblioteca-personajes.php','biblioteca-akuma.php','biblioteca-npc.php','biblioteca-estilos.php','biblioteca-bestiario.php'));
+    $bibOn = $isOn(array('biblioteca-personajes.php','biblioteca-akuma.php','biblioteca-npc.php','biblioteca-estilos.php','biblioteca-bestiario.php','biblioteca-lore.php'));
     $links  .= '<div class="ope-nav-dd">'
              . '<button type="button" class="ope-nav-link ope-nav-dd-btn' . $bibOn . '" onclick="this.nextElementSibling.classList.toggle(\'open\')" aria-expanded="false">Bibliotecas<span class="ope-dd-caret" aria-hidden="true">&#9662;</span></button>'
              . '<div class="ope-dropdown ope-nav-dd-menu">'
+             . '<a href="' . $bburl . '/biblioteca-lore.php" class="ope-dropdown-item">Biblioteca de Lore</a>'
              . '<a href="' . $bburl . '/biblioteca-personajes.php" class="ope-dropdown-item">Biblioteca personajes</a>'
-             . '<a href="' . $bburl . '/biblioteca-akuma.php" class="ope-dropdown-item">Biblioteca akuma no mi</a>'
+             . '<a href="' . $bburl . '/biblioteca-akuma.php" class="ope-dropdown-item">Biblioteca de Pactos</a>'
              . '<a href="' . $bburl . '/biblioteca-npc.php" class="ope-dropdown-item">Biblioteca NPC</a>'
              . '<a href="' . $bburl . '/biblioteca-estilos.php" class="ope-dropdown-item">Biblioteca estilos</a>'
              . '<a href="' . $bburl . '/biblioteca-bestiario.php" class="ope-dropdown-item">Biblioteca bestiario</a>'
@@ -408,67 +409,33 @@ function ope_rol_navbar_html()
         $right .= '<a href="' . $bburl . '/member.php?action=login" class="ope-btn-ghost ope-btn-sm">Acceder</a>';
     }
 
-    // Selector de tema visual global: icono + popover de 7 puntos de color.
-    // Preferencia de NAVEGADOR (cookie), visible igual logueado o invitado, y
-    // por eso vive fuera del if/else de arriba. Se lee la cookie aquí también
-    // (no solo en ope_rol_inject_navbar) porque páginas propias como ficha.php
-    // llaman a esta función directamente, sin pasar por el hook.
-    $ope_theme_labels = array(
-        'eternal' => array('Eternal', '#FFCB93', '#41A4E0'),
-        'rojo'    => array('Rojo',    '#FFB3A3', '#E0645A'),
-        'azul'    => array('Azul',    '#9FD8FF', '#2F8FD1'),
-        'verde'   => array('Verde',   '#9FEACB', '#2F9E6B'),
-        'morado'  => array('Morado',  '#D8C2FF', '#8B5FBF'),
-        'mostaza' => array('Mostaza', '#FFDD8A', '#C9962E'),
-        'gris'    => array('Gris',    '#D6DEE6', '#7C8A99'),
-    );
-    $ope_theme_cookie  = isset($_COOKIE['ope_theme']) ? (string) $_COOKIE['ope_theme'] : '';
-    $ope_theme_current = array_key_exists($ope_theme_cookie, $ope_theme_labels) ? $ope_theme_cookie : 'eternal';
+    // Toggle de tema cielo/noche global: botón único que alterna entre temas.
+    // Cookie de navegador (sin sesión ni BD), visible igual logueado o invitado.
+    $gbe_theme_cookie = isset($_COOKIE['gbe_theme']) ? (string) $_COOKIE['gbe_theme'] : '';
+    $gbe_theme_current = ($gbe_theme_cookie === 'noche') ? 'noche' : 'cielo';
+    $themeToggleLabel = ($gbe_theme_current === 'noche') ? 'Cielo' : 'Noche';
 
-    $themeDots = '';
-    foreach ($ope_theme_labels as $slug => $info) {
-        list($label, $swatchA, $swatchB) = $info;
-        $activeCls = ($slug === $ope_theme_current) ? ' active' : '';
-        $themeDots .= '<button type="button" class="ope-theme-dot' . $activeCls . '" data-theme="' . $slug . '"'
-                    . ' title="' . htmlspecialchars_uni($label) . '" aria-label="' . htmlspecialchars_uni($label) . '"'
-                    . ' style="background:linear-gradient(135deg,' . $swatchA . ' 50%,' . $swatchB . ' 50%)"></button>';
-    }
+    $themeToggle  = '<button type="button" class="ope-theme-toggle-btn" id="ope-theme-toggle" title="Cambiar tema"'
+                  . ' data-theme="' . $gbe_theme_current . '"'
+                  . ' aria-label="Cambiar a modo ' . ($gbe_theme_current === 'noche' ? 'cielo' : 'noche') . '">'
+                  . $themeToggleLabel
+                  . '</button>';
 
-    $themePicker  = '<div class="ope-theme-picker">';
-    $themePicker .= '<button type="button" class="ope-nav-bell ope-theme-toggle" title="Tema visual" aria-expanded="false" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle(\'open\')">';
-    // Rueda de color con 4 gajos de tinta real (no monocromo): así se lee de
-    // un vistazo como "selector de tema" y no como un círculo blanco suelto.
-    $themePicker .= '<svg viewBox="0 0 24 24" width="20" height="20" stroke="none">'
-                  . '<path d="M12 2A10 10 0 0 0 3.6 6.6L12 12Z" fill="#e0645a"/>'
-                  . '<path d="M3.6 6.6A10 10 0 0 0 3.6 17.4L12 12Z" fill="#2f8fd1"/>'
-                  . '<path d="M3.6 17.4A10 10 0 0 0 12 22L12 12Z" fill="#e3a836"/>'
-                  . '<path d="M12 22A10 10 0 0 0 20.4 17.4L12 12Z" fill="#2f9e6b"/>'
-                  . '<path d="M20.4 17.4A10 10 0 0 0 20.4 6.6L12 12Z" fill="#8b5fbf"/>'
-                  . '<path d="M20.4 6.6A10 10 0 0 0 12 2L12 12Z" fill="#e0592f"/>'
-                  . '<circle cx="12" cy="12" r="3.4" fill="var(--iron-edge)"/>'
-                  . '</svg>';
-    $themePicker .= '</button>';
-    $themePicker .= '<div class="ope-theme-pop">' . $themeDots . '</div>';
-    $themePicker .= '</div>';
+    $right = $themeToggle . $right;
 
-    $right = $themePicker . $right;
-
-    // Red de seguridad anti-flash: páginas propias en PHP puro (ficha.php y
-    // similares) echan esta navbar directamente tras <body>, sin pasar por el
-    // hook pre_output_page (que es quien pone data-site-theme server-side en
-    // el pipeline estándar de MyBB). Este script, al ser lo primero que se
-    // parsea dentro de <body>, aplica el atributo antes de que se pinte nada,
-    // así que no hay flash visible aunque sea un fallback JS. En páginas del
-    // pipeline es inofensivo: re-aplica el mismo valor que ya puso el server.
-    $html  = '<script>document.body.setAttribute("data-site-theme",(function(){'
-           . 'var m=document.cookie.match(/(?:^|; )ope_theme=([^;]+)/);'
+    // Anti-flash: aplica data-theme al <html> antes de que se pinte nada.
+    // En páginas del pipeline, ope_rol_inject_navbar() ya lo pone server-side;
+    // este fallback JS cubre páginas propias en PHP puro (ficha.php, etc.).
+    $html  = '<script>document.documentElement.setAttribute("data-theme",(function(){'
+           . 'var m=document.cookie.match(/(?:^|; )gbe_theme=([^;]+)/);'
            . 'var t=m?decodeURIComponent(m[1]):"";'
-           . 'return /^(eternal|rojo|azul|verde|morado|mostaza|gris)$/.test(t)?t:"eternal";'
+           . 'return t==="noche"?"noche":"cielo";'
            . '})());</script>' . "\n";
     $html .= '<!-- ===== NAVBAR (fixed, iron-edge) · fuente única ===== -->' . "\n";
     $html .= ope_rol_navbar_css();
     $html .= '<nav id="ope-navbar"><div class="ope-nav">';
-    $html .= '<a href="' . $bburl . '/index.php" class="ope-nav-logo">One Piece Eternal</a>';
+    $crest = $bburl . '/images/gbe/crest-eternal.png';
+    $html .= '<a href="' . $bburl . '/index.php" class="ope-nav-logo"><img class="ope-nav-crest" src="' . $crest . '" alt="" width="28" height="28" loading="eager">Granblue Fantasy: <b>Eternal</b></a>';
     $html .= '<div class="ope-nav-links">' . $links . '</div>';
     $html .= '<div class="ope-nav-right">' . $right . '</div>';
     $html .= '</div></nav>';
@@ -542,7 +509,7 @@ function ope_rol_head_base()
 
     $html  = '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
     $html .= '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
-    $html .= '<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,700;1,400&amp;family=Big+Shoulders+Display:wght@600;700;800;900&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">' . "\n";
+    $html .= '<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&amp;family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=Spectral:ital,wght@0,400;0,500;0,600;1,400&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">' . "\n";
     $html .= '<link rel="stylesheet" href="' . htmlspecialchars_uni($href) . '">' . "\n";
 
     return $html;
@@ -639,24 +606,27 @@ function ope_rol_inject_navbar($contents)
     if (defined('IN_ADMINCP') || !is_string($contents) || $contents === '') {
         return $contents;
     }
+    if (stripos($contents, '<html') === false) {
+        return $contents;
+    }
+
+    // Tema cielo/noche global (cookie del navegador; sin sesión ni BD).
+    // Se inyecta SIEMPRE (incluso si la navbar ya está presente en templates
+    // como ope-index.xml), para que el CSS aplique tokens sin flash.
+    if (stripos($contents, 'data-theme=') === false) {
+        $gbe_theme_cookie  = isset($_COOKIE['gbe_theme']) ? (string) $_COOKIE['gbe_theme'] : '';
+        $gbe_theme_current = ($gbe_theme_cookie === 'noche') ? 'noche' : 'cielo';
+        $contents_themed   = preg_replace('/<html([^>]*)>/i', '<html$1 data-theme="' . $gbe_theme_current . '">', $contents, 1);
+        if ($contents_themed !== null) {
+            $contents = $contents_themed;
+        }
+    }
+
     if (stripos($contents, 'id="ope-navbar"') !== false) {
         return $contents;
     }
     if (stripos($contents, '<body') === false) {
         return $contents;
-    }
-
-    // Tema visual global (cookie del navegador; sin sesión ni BD). Se resuelve
-    // ANTES de las dos ramas de abajo para que ambas hereden el atributo, y así
-    // el CSS puede aplicar el acento correcto ya en el primer render (sin flash).
-    if (stripos($contents, 'data-site-theme=') === false) {
-        $ope_theme_whitelist = array('eternal', 'rojo', 'azul', 'verde', 'morado', 'mostaza', 'gris');
-        $ope_theme_cookie    = isset($_COOKIE['ope_theme']) ? (string) $_COOKIE['ope_theme'] : '';
-        $ope_theme_current   = in_array($ope_theme_cookie, $ope_theme_whitelist, true) ? $ope_theme_cookie : 'eternal';
-        $contents_themed     = preg_replace('/<body([^>]*)>/i', '<body$1 data-site-theme="' . $ope_theme_current . '">', $contents, 1);
-        if ($contents_themed !== null) {
-            $contents = $contents_themed;
-        }
     }
 
     // ope_rol_navbar_html() ya lleva pegado su propio <script id="ope-theme-js">
@@ -671,8 +641,13 @@ function ope_rol_inject_navbar($contents)
     // contenedor de páginas de fábrica (lo estrecharía y dejaría hueco bajo el
     // footer). Sólo se inyecta la navbar.
     $custom_layout = in_array($script, array('index.php', 'forumdisplay.php', 'showthread.php'), true);
+    $pageSlug = str_replace('.php', '', $script);
     if ($custom_layout) {
-        $new = preg_replace('/(<body[^>]*>)/i', '$1' . "\n" . $navbar, $contents, 1);
+        if (stripos($contents, 'data-ope-page=') === false) {
+            $new = preg_replace('/(<body)([^>]*)>/i', '$1$2 data-ope-page="' . $pageSlug . '">' . "\n" . $navbar, $contents, 1);
+        } else {
+            $new = preg_replace('/(<body[^>]*>)/i', '$0' . "\n" . $navbar, $contents, 1);
+        }
         return $new !== null ? $new : $contents;
     }
 
@@ -1186,7 +1161,7 @@ function ope_rol_render_firma($firma_raw)
         'nl2br'          => 1,
     ));
     return '<div class="ope-post-sig ope-sig-char">'
-         . '<div class="ope-sig-sep" aria-hidden="true"><span>One Piece Eternal</span></div>'
+         . '<div class="ope-sig-sep" aria-hidden="true"><span>Granblue Fantasy: Eternal</span></div>'
          . '<div class="ope-sig-body">' . $parsed . '</div>'
          . '</div>';
 }
@@ -1644,7 +1619,7 @@ function ope_rol_parse_spoilers($message)
  */
 function ope_rol_parse_cbt_payload($raw)
 {
-    $out = array('cards' => array(), 'pv' => null, 'en' => null, 'estados' => array(), 'mods' => array());
+    $out = array('cards' => array(), 'pv' => null, 'en' => null, 'estados' => array(), 'mods' => array(), 'ons' => null);
     $raw = trim((string) $raw);
     if ($raw === '') {
         return $out;
@@ -1701,6 +1676,15 @@ function ope_rol_parse_cbt_payload($raw)
                     $out['mods'][$stat] = array('val' => $num, 'pct' => $pct);
                 }
                 break;
+            case 'ons':
+                $parts = array_map('trim', explode(',', $v, 2));
+                if (count($parts) >= 2) {
+                    $out['ons'] = array(
+                        'npc_id'  => (int) $parts[0],
+                        'tec_idx' => (int) $parts[1],
+                    );
+                }
+                break;
         }
     }
     return $out;
@@ -1733,6 +1717,17 @@ function ope_rol_parse_rpg($message)
                 }
             }
             $ncards = $cards !== '' ? count($ids) : 0;
+
+            // ── Acompañante NPC (técnica usada) ──
+            $nons = 0;
+            if (!empty($pl['ons']) && is_array($pl['ons'])) {
+                $ons_npc = function_exists('ope_rol_npc_sec_by_id') ? ope_rol_npc_sec_by_id((int) ($pl['ons']['npc_id'] ?? 0)) : null;
+                if ($ons_npc) {
+                    $tec_idx = (int) ($pl['ons']['tec_idx'] ?? -1);
+                    $cards .= ope_rol_npc_sec_used_html($ons_npc, $tec_idx);
+                    $nons = 1;
+                }
+            }
 
             // ── Estados alterados (se aplican ANTES que las tiradas de cartas) ──
             $estados_html = '';
@@ -1791,20 +1786,24 @@ function ope_rol_parse_rpg($message)
                 return '';
             }
 
+            $sec_title = ($ncards && $nons) ? 'Cartas y acompañante'
+                : ($nons ? 'Acompañante' : 'Cartas usadas');
             $cards_html = $cards !== ''
-                ? '<div class="ope-rpgsys-sec"><div class="ope-rpgsys-sec-h">Cartas usadas</div><div class="ope-tk-deck">' . $cards . '</div></div>'
+                ? '<div class="ope-rpgsys-sec"><div class="ope-rpgsys-sec-h">' . $sec_title . '</div><div class="ope-tk-deck ope-tk-deck--mix">' . $cards . '</div></div>'
                 : '';
 
             // Meta resumida.
             $meta = array();
             if ($nest)  $meta[] = $nest . ' estado' . ($nest === 1 ? '' : 's');
             if ($ncards) $meta[] = $ncards . ' carta' . ($ncards === 1 ? '' : 's');
+            if ($nons)  $meta[] = '1 acompañante';
             if ($nmod)  $meta[] = $nmod . ' mod' . ($nmod === 1 ? '' : 's');
             $meta_txt = $meta ? implode(' &middot; ', $meta) : 'Estado de combate';
 
             // Orden en el cuerpo: vitales → estados (antes de tiradas) → cartas → mods.
             return '<!--OPERPGSYS-->'
                  . ope_rol_tecnica_card_css()
+                 . ope_rol_npc_sec_card_css()
                  . '<div class="ope-rpgsys is-collapsed">'
                  . '<button type="button" class="ope-rpgsys-h" aria-expanded="false">'
                  . '<span class="ope-rpgsys-badge">RPG System</span>'
@@ -1979,20 +1978,18 @@ function ope_rol_theme_js()
         . "if(open){b.removeAttribute('hidden');box.classList.remove('is-collapsed');h.setAttribute('aria-expanded','true');if(t)t.textContent='Ocultar';}"
         . "else{b.setAttribute('hidden','');box.classList.add('is-collapsed');h.setAttribute('aria-expanded','false');if(t)t.textContent='Mostrar';}});})();\n"
         . "(function(){"
+        . "var btn=document.getElementById('ope-theme-toggle');"
+        . "if(btn){btn.addEventListener('click',function(e){e.stopPropagation();"
+        . "var cur=btn.getAttribute('data-theme')||'cielo';"
+        . "var next=cur==='noche'?'cielo':'noche';"
+        . "btn.setAttribute('data-theme',next);"
+        . "btn.textContent=next==='noche'?'Cielo':'Noche';"
+        . "document.documentElement.setAttribute('data-theme',next);"
+        . "document.cookie='gbe_theme='+next+'; path=/; max-age=31536000; SameSite=Lax';"
+        . "});}"
+        . "})();\n"
+        . "(function(){"
         . "document.addEventListener('click',function(e){"
-        . "var dot=e.target.closest&&e.target.closest('.ope-theme-dot');"
-        . "if(dot){"
-        . "var slug=dot.getAttribute('data-theme');if(!slug)return;"
-        . "document.body.setAttribute('data-site-theme',slug);"
-        . "document.cookie='ope_theme='+slug+'; path=/; max-age=31536000; SameSite=Lax';"
-        . "var pop=dot.closest('.ope-theme-pop');"
-        . "if(pop){var dots=pop.querySelectorAll('.ope-theme-dot');"
-        . "for(var i=0;i<dots.length;i++){dots[i].classList.remove('active');}"
-        . "dot.classList.add('active');pop.classList.remove('open');}"
-        . "return;"
-        . "}"
-        . "var openPop=document.querySelector('#ope-navbar .ope-theme-pop.open');"
-        . "if(openPop&&!openPop.contains(e.target)&&!(e.target.closest&&e.target.closest('.ope-theme-toggle'))){openPop.classList.remove('open');}"
         . "var openDrops=document.querySelectorAll('#ope-navbar .ope-dropdown.open');"
         . "for(var k=0;k<openDrops.length;k++){var od=openDrops[k];"
         . "if(!od.contains(e.target)&&!(e.target.closest&&e.target.closest('.ope-user-name'))&&!(e.target.closest&&e.target.closest('.ope-nav-dd-btn'))){od.classList.remove('open');}}"
@@ -2083,6 +2080,44 @@ function ope_rol_tpl_inserter_html()
         $card_tiles = '<span class="ope-rpg-empty">Este personaje a&uacute;n no tiene cartas de t&eacute;cnica.</span>';
     }
 
+    // ── Acompañantes NPC (máx. 2) ──
+    $ons_css = '';
+    $ons_tiles = '';
+    $has_ons = false;
+    if ($pid > 0 && function_exists('ope_rol_char_acompanantes')) {
+        $acomps = ope_rol_char_acompanantes($pid);
+        if ($acomps) {
+            $has_ons = true;
+            $ons_css = ope_rol_npc_sec_card_css();
+            foreach ($acomps as $ac) {
+                $npc = $ac['npc'] ?? null;
+                if (!$npc) continue;
+                $nid = (int) ($npc['id'] ?? 0);
+                $nnom = (string) ($npc['nombre'] ?? 'NPC');
+                $tecnicas = ope_rol_npc_sec_norm_tecnicas($npc['tecnicas'] ?? null);
+                if ($nid < 1) continue;
+                $ons_tiles .= '<div class="ope-rpg-ons" data-npc-id="' . $nid . '">';
+                $ons_tiles .= '<div class="ope-rpg-ons-head">' . htmlspecialchars_uni($nnom) . ' <small>slot ' . (int) $ac['slot'] . '</small></div>';
+                if (empty($tecnicas)) {
+                    $ons_tiles .= '<span class="ope-rpg-empty">Sin t&eacute;cnicas definidas.</span>';
+                } else {
+                    $ons_tiles .= '<div class="ope-rpg-ons-tecs">';
+                    foreach ($tecnicas as $ti => $t) {
+                        $lbl = (string) ($t['n'] ?? 'Técnica');
+                        $ons_tiles .= '<button type="button" class="ope-rpg-ons-tec" data-npc-id="' . $nid . '" data-tec-idx="' . (int) $ti . '" aria-pressed="false">'
+                                   . htmlspecialchars_uni($lbl) . '</button>';
+                    }
+                    $ons_tiles .= '</div>';
+                    $ons_tiles .= '<div class="ope-rpg-ons-preview">' . ope_rol_npc_sec_card_html($npc) . '</div>';
+                }
+                $ons_tiles .= '</div>';
+            }
+        }
+    }
+    if ($ons_tiles === '') {
+        $ons_tiles = '<span class="ope-rpg-empty">No tienes acompa&ntilde;antes. Solic&iacute;talos en <b>Tr&aacute;mites &rsaquo; Acompa&ntilde;ante</b>.</span>';
+    }
+
     // ── Ensamblado ──
     $html  = '<div class="ope-rpg" id="ope-rpg">';
     $html .= '<div class="ope-rpg-head"><span class="ope-rpg-badge">RPG System</span>'
@@ -2090,6 +2125,7 @@ function ope_rol_tpl_inserter_html()
     $html .= '<div class="ope-rpg-tabs" role="tablist">'
            . '<button type="button" class="ope-rpg-tab is-on" data-tab="plantillas">Plantillas</button>'
            . '<button type="button" class="ope-rpg-tab" data-tab="cartas">Cartas</button>'
+           . ($has_ons ? '<button type="button" class="ope-rpg-tab" data-tab="acompanante">Acompa&ntilde;ante</button>' : '')
            . ($pid > 0 ? '<button type="button" class="ope-rpg-tab" data-tab="combate">Combate</button>' : '')
            . '</div>';
 
@@ -2104,6 +2140,14 @@ function ope_rol_tpl_inserter_html()
     $html .= '<p class="ope-rpg-note">Haz clic para adjuntar una carta; pasa el cursor por encima para verla completa. Al publicar aparecer&aacute;n en un bloque <b>RPG SYSTEM</b> pegado debajo de tu post.</p>';
     $html .= '<div class="ope-rpg-cards">' . $card_tiles . '</div>';
     $html .= '<div class="ope-rpg-selinfo" data-count="0">Ninguna carta seleccionada.</div>';
+    $html .= '</div>';
+
+    // Panel Acompañante
+    $html .= '<div class="ope-rpg-panel" data-panel="acompanante">';
+    $html .= $ons_css;
+    $html .= '<p class="ope-rpg-note">Elige <b>una t&eacute;cnica</b> de tus acompa&ntilde;antes. Al publicar, su carta aparecer&aacute; en el bloque <b>RPG SYSTEM</b> junto a las cartas de t&eacute;cnica.</p>';
+    $html .= '<div class="ope-rpg-ons-list">' . $ons_tiles . '</div>';
+    $html .= '<div class="ope-rpg-ons-selinfo">Ning&uacute;n acompa&ntilde;ante seleccionado.</div>';
     $html .= '</div>';
 
     // ── Panel Combate (AV-01) ──
@@ -2252,15 +2296,17 @@ function ope_rol_tpl_inserter_html()
         // ── selección de cartas ──
         . 'var info=root.querySelector(".ope-rpg-selinfo");'
         . 'function selIds(){var out=[];root.querySelectorAll(".ope-rpg-cardpick.is-sel").forEach(function(c){out.push(c.getAttribute("data-card-id"));});return out;}'
+        . 'function selOns(){var b=root.querySelector(".ope-rpg-ons-tec.is-sel");return b?{npc:b.getAttribute("data-npc-id"),tec:b.getAttribute("data-tec-idx")}:null;}'
+        . 'function refreshOns(){var o=selOns(),info=root.querySelector(".ope-rpg-ons-selinfo");if(!info)return;if(!o){info.textContent="Ning\\u00fan acompa\\u00f1ante seleccionado.";return;}var lbl=root.querySelector(".ope-rpg-ons-tec.is-sel");info.textContent="Acompa\\u00f1ante: "+(lbl?lbl.textContent.trim():"t\\u00e9cnica")+" (se mostrar\\u00e1 bajo tu post).";}'
         . 'function refresh(){var n=selIds().length;if(info){info.setAttribute("data-count",n);info.textContent=n?(n+" carta"+(n>1?"s":"")+" se mostrar"+(n>1?"\u00e1n":"\u00e1")+" bajo tu post."):"Ninguna carta seleccionada.";}}'
         // ── helpers de combate ──
         . 'function panel(){return root.querySelector(".ope-rpg-panel[data-panel=\'combate\']");}'
         . 'function setVital(key,val){var p=panel();if(!p)return;var v=p.querySelector(".ope-rpg-cbt-vital[data-vital=\'"+key+"\']");if(!v)return;var max=parseInt(v.getAttribute("data-max"))||100;val=Math.max(0,Math.min(max,val));v.querySelector(".ope-rpg-cbt-vital-cur").textContent=val;var f=v.querySelector(".ope-rpg-cbt-vital-fill");if(f)f.style.width=Math.round((val/max)*100)+"%";}'
         . 'function applyVital(wrap){var inp=wrap.querySelector(".ope-rpg-cbt-vital-inp");var curEl=wrap.querySelector(".ope-rpg-cbt-vital-cur");var max=parseInt(wrap.getAttribute("data-max"))||100;var val=parseInt(curEl.textContent)||0;var delta=parseInt(inp.value);if(isNaN(delta)){inp.value="";return;}var nv=Math.max(0,Math.min(max,val+delta));curEl.textContent=nv;var f=wrap.querySelector(".ope-rpg-cbt-vital-fill");if(f)f.style.width=Math.round((nv/max)*100)+"%";inp.value="";inp.focus();}'
         . 'function addEstadoChip(ek){var p=panel();if(!p)return;var sel=p.querySelector("#ope_cbt_estados_sel");if(!sel)return;var opt=sel.querySelector("option[value=\'"+ek+"\']");if(!opt)return;var chips=p.querySelector("#ope_cbt_estados_chips");if(chips.querySelector(".ope-rpg-est-chip[data-est=\'"+ek+"\']"))return;var tipo=opt.getAttribute("data-tipo")||"negativo";var chip=document.createElement("span");chip.className="ope-rpg-est-chip ope-estado--"+tipo;chip.setAttribute("data-est",ek);chip.setAttribute("data-tipo",tipo);chip.textContent=opt.textContent;chip.title="Quitar";chip.addEventListener("click",function(){this.remove();});chips.appendChild(chip);}'
-        . 'function cbtState(){var st={cards:selIds(),pv:null,en:null,est:[],mod:[]};var p=panel();if(p){var vp=p.querySelector(".ope-rpg-cbt-vital[data-vital=\'pv\']");if(vp)st.pv={cur:parseInt(vp.querySelector(".ope-rpg-cbt-vital-cur").textContent)||0,init:parseInt(vp.getAttribute("data-init"))||0};var ve=p.querySelector(".ope-rpg-cbt-vital[data-vital=\'en\']");if(ve)st.en={cur:parseInt(ve.querySelector(".ope-rpg-cbt-vital-cur").textContent)||0,init:parseInt(ve.getAttribute("data-init"))||0};p.querySelectorAll("#ope_cbt_estados_chips .ope-rpg-est-chip[data-est]").forEach(function(c){st.est.push(c.getAttribute("data-est"));});p.querySelectorAll(".ope-rpg-cbt-modval").forEach(function(mv){var val=parseInt(mv.value)||0;if(!val)return;var stat=mv.getAttribute("data-stat");var tog=p.querySelector(".ope-rpg-cbt-toggle[data-stat=\'"+stat+"\']");var pct=tog&&tog.classList.contains("is-pct");st.mod.push(stat+"="+val+(pct?"%":""));});}return st;}'
-        . 'function cbtChanged(st){return (st.cards.length>0)||(st.est.length>0)||(st.mod.length>0)||(st.pv&&st.pv.cur!==st.pv.init)||(st.en&&st.en.cur!==st.en.init);}'
-        . 'function buildPayload(st){var seg=[];if(st.cards.length)seg.push("c:"+st.cards.join(","));if(st.pv)seg.push("pv:"+st.pv.cur);if(st.en)seg.push("en:"+st.en.cur);if(st.est.length)seg.push("est:"+st.est.join(","));if(st.mod.length)seg.push("mod:"+st.mod.join(","));return seg.join("|");}'
+        . 'function cbtState(){var st={cards:selIds(),pv:null,en:null,est:[],mod:[],ons:selOns()};var p=panel();if(p){var vp=p.querySelector(".ope-rpg-cbt-vital[data-vital=\'pv\']");if(vp)st.pv={cur:parseInt(vp.querySelector(".ope-rpg-cbt-vital-cur").textContent)||0,init:parseInt(vp.getAttribute("data-init"))||0};var ve=p.querySelector(".ope-rpg-cbt-vital[data-vital=\'en\']");if(ve)st.en={cur:parseInt(ve.querySelector(".ope-rpg-cbt-vital-cur").textContent)||0,init:parseInt(ve.getAttribute("data-init"))||0};p.querySelectorAll("#ope_cbt_estados_chips .ope-rpg-est-chip[data-est]").forEach(function(c){st.est.push(c.getAttribute("data-est"));});p.querySelectorAll(".ope-rpg-cbt-modval").forEach(function(mv){var val=parseInt(mv.value)||0;if(!val)return;var stat=mv.getAttribute("data-stat");var tog=p.querySelector(".ope-rpg-cbt-toggle[data-stat=\'"+stat+"\']");var pct=tog&&tog.classList.contains("is-pct");st.mod.push(stat+"="+val+(pct?"%":""));});}return st;}'
+        . 'function cbtChanged(st){return (st.cards.length>0)||(st.est.length>0)||(st.mod.length>0)||(st.ons&&st.ons.npc)||(st.pv&&st.pv.cur!==st.pv.init)||(st.en&&st.en.cur!==st.en.init);}'
+        . 'function buildPayload(st){var seg=[];if(st.cards.length)seg.push("c:"+st.cards.join(","));if(st.pv)seg.push("pv:"+st.pv.cur);if(st.en)seg.push("en:"+st.en.cur);if(st.est.length)seg.push("est:"+st.est.join(","));if(st.mod.length)seg.push("mod:"+st.mod.join(","));if(st.ons&&st.ons.npc!=null&&st.ons.tec!=null)seg.push("ons:"+st.ons.npc+","+st.ons.tec);return seg.join("|");}'
         // ── delegación de clicks (un solo listener) ──
         . 'root.addEventListener("click",function(ev){'
         . 'var tab=ev.target.closest(".ope-rpg-tab");'
@@ -2269,6 +2315,8 @@ function ope_rol_tpl_inserter_html()
         . 'root.querySelectorAll(".ope-rpg-panel").forEach(function(p){p.classList.toggle("is-on",p.getAttribute("data-panel")===name);});return;}'
         . 'var card=ev.target.closest(".ope-rpg-cardpick");'
         . 'if(card&&card.hasAttribute("data-card-id")){var on=!card.classList.contains("is-sel");card.classList.toggle("is-sel",on);card.setAttribute("aria-pressed",on?"true":"false");refresh();return;}'
+        . 'var onst=ev.target.closest(".ope-rpg-ons-tec");'
+        . 'if(onst){var was=onst.classList.contains("is-sel");root.querySelectorAll(".ope-rpg-ons-tec").forEach(function(b){b.classList.remove("is-sel");b.setAttribute("aria-pressed","false");});if(!was){onst.classList.add("is-sel");onst.setAttribute("aria-pressed","true");}refreshOns();return;}'
         . 'var app=ev.target.closest(".ope-rpg-cbt-vital-apply");if(app){applyVital(app.closest(".ope-rpg-cbt-vital"));return;}'
         . 'var tog=ev.target.closest(".ope-rpg-cbt-toggle");if(tog){var isRaw=tog.classList.contains("is-raw");tog.classList.toggle("is-raw",!isRaw);tog.classList.toggle("is-pct",isRaw);tog.setAttribute("aria-pressed",isRaw?"true":"false");return;}'
         . 'var chip=ev.target.closest(".ope-rpg-chip");if(!chip)return;'
@@ -2282,15 +2330,17 @@ function ope_rol_tpl_inserter_html()
         . 'function editorVal(){var ed=window.MyBBEditor;if(ed&&typeof ed.val==="function"){try{return ed.val();}catch(x){}}return ta?ta.value:"";}'
         . 'var hadBlock=false;'
         . 'var m=editorVal().match(/\\[rpgsys\\]([^\\[]*)\\[\\/rpgsys\\]/i);'
-        . 'if(m){hadBlock=true;var payload=m[1],cards=[],pv=null,en=null,est=[],mod={};'
+        . 'if(m){hadBlock=true;var payload=m[1],cards=[],pv=null,en=null,est=[],mod={},ons=null;'
         . 'if(payload.indexOf(":")===-1){cards=payload.split(",").map(function(s){return s.trim();});}'
         . 'else{payload.split("|").forEach(function(sg){var i=sg.indexOf(":");if(i<0)return;var k=sg.slice(0,i).trim(),v=sg.slice(i+1).trim();'
         . 'if(k==="c")cards=v.split(",").map(function(s){return s.trim();});'
         . 'else if(k==="pv")pv=parseInt(v);'
         . 'else if(k==="en")en=parseInt(v);'
         . 'else if(k==="est")est=v.split(",").map(function(s){return s.trim();}).filter(Boolean);'
+        . 'else if(k==="ons"){var p=v.split(",");if(p.length>=2)ons={npc:p[0].trim(),tec:p[1].trim()};}'
         . 'else if(k==="mod"){v.split(",").forEach(function(mm){var j=mm.indexOf("=");if(j<0)return;mod[mm.slice(0,j).trim()]=mm.slice(j+1).trim();});}});}'
         . 'root.querySelectorAll(".ope-rpg-cardpick").forEach(function(c){if(cards.indexOf(c.getAttribute("data-card-id"))>-1){c.classList.add("is-sel");c.setAttribute("aria-pressed","true");}});'
+        . 'if(ons){root.querySelectorAll(".ope-rpg-ons-tec").forEach(function(b){if(b.getAttribute("data-npc-id")===ons.npc&&b.getAttribute("data-tec-idx")===ons.tec){b.classList.add("is-sel");b.setAttribute("aria-pressed","true");}});refreshOns();}'
         . 'if(pv!==null&&!isNaN(pv))setVital("pv",pv);'
         . 'if(en!==null&&!isNaN(en))setVital("en",en);'
         . 'est.forEach(function(ek){addEstadoChip(ek);});'
@@ -2403,7 +2453,11 @@ function ope_rol_tecnica_card_html(array $carta)
                 . htmlspecialchars_uni($f['texto']) . '</span>';
     }
 
-    $html  = '<article class="ope-tk ope-tk-t' . $tier . ($insignia ? ' is-insignia' : '') . '">';
+    $html  = '<article class="ope-tk ope-tk-t' . $tier . ($insignia ? ' is-insignia' : '') . '"'
+           . ' data-name="' . $nombre . '"'
+           . ' data-desc="' . htmlspecialchars_uni(mb_substr($desc, 0, 200)) . '"'
+           . ' data-tags="' . htmlspecialchars_uni(implode(',', is_array($carta['tags'] ?? null) ? $carta['tags'] : array())) . '"'
+           . '>';
     $html .= '<div class="ope-tk-h">';
     $html .= '<span class="ope-tk-tier" title="Tier ' . $romano . '">' . $romano . '</span>';
     $html .= '<div class="ope-tk-tt"><h4 class="ope-tk-name">' . $nombre . '</h4>';
@@ -2838,6 +2892,567 @@ function ope_rol_tecnica_forge_css()
         . $s . '.gc-libgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px}'
         . $s . '.gc-assigned{outline:3px solid var(--patina);outline-offset:-3px}'
         . '</style>';
+}
+
+/**
+ * HTML de una carta de NPC secundario (formato apaisado: imagen ¾ a la
+ * izquierda, nombre + descripción + técnicas a la derecha).
+ * $npc['tecnicas'] debe venir ya como array (o null).
+ */
+/**
+ * Normaliza el JSON de técnicas de un NPC secundario a [{n,d,e}, ...].
+ */
+function ope_rol_npc_sec_norm_tecnicas($raw)
+{
+    $tecnicas = is_array($raw) ? $raw : array();
+    if (!is_array($raw) && is_string($raw) && $raw !== '') {
+        $decoded = json_decode($raw, true);
+        $tecnicas = is_array($decoded) ? $decoded : array();
+    }
+    $out = array();
+    foreach ($tecnicas as $t) {
+        if (is_string($t)) {
+            $out[] = array('n' => $t, 'd' => '', 'e' => '');
+        } elseif (is_array($t) && isset($t['n'])) {
+            $out[] = array(
+                'n' => (string) ($t['n'] ?? ''),
+                'd' => (string) ($t['d'] ?? ''),
+                'e' => (string) ($t['e'] ?? ''),
+            );
+        } elseif (is_array($t) && isset($t['nombre'])) {
+            $out[] = array(
+                'n' => (string) ($t['nombre'] ?? ''),
+                'd' => (string) ($t['dados'] ?? $t['d'] ?? ''),
+                'e' => (string) ($t['descripcion'] ?? $t['e'] ?? ''),
+            );
+        }
+    }
+    return $out;
+}
+
+function ope_rol_npc_sec_card_html(array $npc, $highlight_tec = -1)
+{
+    $nombre    = htmlspecialchars_uni((string) ($npc['nombre'] ?? 'Sin nombre'));
+    $desc      = trim((string) ($npc['descripcion'] ?? ''));
+    $imagen    = trim((string) ($npc['imagen'] ?? ''));
+    $tecnicas_norm = ope_rol_npc_sec_norm_tecnicas($npc['tecnicas'] ?? null);
+    $highlight_tec = (int) $highlight_tec;
+
+    $html  = '<article class="ons-card">';
+
+    $html .= '<div class="ons-img-box">';
+    if ($imagen !== '') {
+        $html .= '<div class="ons-img"><img src="' . htmlspecialchars_uni($imagen) . '" alt="' . $nombre . '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'on-empty\');"></div>';
+    } else {
+        $html .= '<div class="ons-img on-empty"></div>';
+    }
+    $html .= '</div>';
+
+    $html .= '<div class="ons-body">';
+    $html .= '<h4 class="ons-name">' . $nombre . '</h4>';
+
+    if ($desc !== '') {
+        $html .= '<p class="ons-desc">' . nl2br(htmlspecialchars_uni($desc)) . '</p>';
+    }
+
+    if (!empty($tecnicas_norm)) {
+        $html .= '<div class="ons-tec">';
+        $html .= '<span class="ons-tec-lbl">T&eacute;cnicas</span>';
+        $html .= '<div class="ons-tec-list">';
+        foreach ($tecnicas_norm as $ti => $t) {
+            $used_cls = ($highlight_tec >= 0 && $ti === $highlight_tec) ? ' is-used' : '';
+            $html .= '<div class="ons-tec-item' . $used_cls . '">';
+            $html .= '<span class="ons-tec-iname">' . htmlspecialchars_uni($t['n']) . '</span>';
+            if ($t['d'] !== '' && $t['d'] !== '—') {
+                $html .= '<span class="ons-tec-idice">' . htmlspecialchars_uni($t['d']) . '</span>';
+            }
+            if ($t['e'] !== '') {
+                $html .= '<span class="ons-tec-ief">' . htmlspecialchars_uni($t['e']) . '</span>';
+            }
+            $html .= '</div>';
+        }
+        $html .= '</div></div>';
+    }
+
+    $html .= '</div>';
+    $html .= '</article>';
+    return $html;
+}
+
+/**
+ * CSS de la carta de NPC secundario (formato "ons-card": apaisado con imagen).
+ * Se emite una sola vez por página.
+ */
+function ope_rol_npc_sec_card_css()
+{
+    static $done = false;
+    if ($done) return '';
+    $done = true;
+
+    return '<style id="ope-ons-card-css">'
+        . '.ons-deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}'
+        . '.ons-card{display:flex;gap:0;border:2px solid #000;background:var(--iron-plate);box-shadow:4px 4px 0 #000;min-height:200px;overflow:hidden}'
+        . '.ons-img-box{flex:0 0 38%;position:relative;background:var(--iron);border-right:2px solid #000;min-height:200px;display:flex;align-items:center;justify-content:center;overflow:hidden}'
+        . '.ons-img{width:100%;height:100%;position:absolute;inset:0}'
+        . '.ons-img img{width:100%;height:100%;object-fit:cover;display:block}'
+        . '.ons-img.on-empty{position:relative;display:flex;align-items:center;justify-content:center;background:var(--iron-edge)}'
+        . '.ons-img.on-empty svg{stroke:var(--rivet);fill:none;stroke-width:1.5;opacity:.5}'
+        . '.ons-img.on-empty::after{content:"";width:40px;height:40px;background:currentColor;mask-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\'%3E%3Ccircle cx=\'12\' cy=\'8\' r=\'4\'/%3E%3Cpath d=\'M4 20v-1a6 6 0 0 1 6-6h4\'/%3E%3C/svg%3E");-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\'%3E%3Ccircle cx=\'12\' cy=\'8\' r=\'4\'/%3E%3Cpath d=\'M4 20v-1a6 6 0 0 1 6-6h4\'/%3E%3C/svg%3E");opacity:.35}'
+        . '.ons-body{flex:1;display:flex;flex-direction:column;gap:10px;padding:14px 16px;min-width:0}'
+        . '.ons-name{margin:0;font-family:var(--disp);font-weight:800;font-size:1.2rem;text-transform:uppercase;letter-spacing:.4px;color:var(--paper);line-height:1.1;word-break:break-word}'
+        . '.ons-desc{margin:0;font-family:var(--body,inherit);font-size:.8rem;line-height:1.5;color:var(--paper-dim)}'
+        . '.ons-tec{display:flex;flex-direction:column;gap:5px;margin-top:auto}'
+        . '.ons-tec-lbl{font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ember-hi);padding-bottom:2px;border-bottom:1px solid var(--iron-edge)}'
+        . '.ons-tec-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}'
+        . '.ons-tec-item{display:flex;flex-direction:column;gap:1px;background:var(--iron);border:1px solid #000;border-left:3px solid var(--ember);padding:5px 7px}'
+        . '.ons-tec-item.is-used{background:var(--iron-edge);border-color:var(--ember);box-shadow:0 0 0 1px var(--ember) inset}'
+        . '.ons-tec-item.is-used .ons-tec-iname{color:var(--ember-hi)}'
+        . '.ons-card.is-post-used{outline:2px solid var(--ember);outline-offset:-2px}'
+        . '.ons-tec-iname{font-family:var(--disp);font-weight:700;font-size:.7rem;color:var(--paper);text-transform:uppercase;letter-spacing:.3px;line-height:1.2}'
+        . '.ons-tec-idice{font-family:var(--mono);font-size:.57rem;font-weight:700;color:var(--ember-hi);padding-left:2px}'
+        . '.ons-tec-ief{font-family:var(--body,inherit);font-size:.64rem;color:var(--paper-dim);line-height:1.3;padding-left:2px}'
+        . '</style>';
+}
+
+/**
+ * CSS del forjador/creador de NPCs secundarios (formulario + preview).
+ * Scopeado a body.ope-pg-crear-npc-sec para reutilizarlo.
+ * Se emite una sola vez.
+ */
+function ope_rol_npc_sec_forge_css()
+{
+    static $done = false;
+    if ($done) return '';
+    $done = true;
+    $s = 'body.ope-pg-crear-npc-sec';
+
+    return '<style id="ope-ons-forge-css">'
+        . $s . ' .ons-layout{display:grid;grid-template-columns:1fr;gap:16px}'
+        . '@media(min-width:1080px){' . $s . ' .ons-layout{grid-template-columns:minmax(0,1fr) minmax(380px,.65fr);align-items:start}}'
+        . $s . ' .ons-preview-col{position:sticky;top:66px}'
+        . $s . ' .ons-preview-lbl{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--paper-dim);margin:0 0 10px}'
+        . $s . ' .ons-deck-single .ons-card{max-width:100%;min-height:200px}'
+        . $s . ' .ons-tec-inline{display:flex;flex-direction:column;gap:8px;margin-top:4px}'
+        . $s . ' .ons-tec-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--iron);border:1px solid #000;padding:6px 9px}'
+        . $s . ' .ons-tec-row input{background:var(--iron-plate);color:var(--paper);border:1px solid var(--rivet);padding:5px 8px;font-family:var(--mono);font-size:.64rem}'
+        . $s . ' .ons-tec-row input:focus{border-color:var(--ember);outline:none}'
+        . $s . ' .ons-tec-row .ons-tec-rname{flex:1 1 160px}'
+        . $s . ' .ons-tec-row .ons-tec-rdice{flex:0 0 110px;color:var(--ember-hi)}'
+        . $s . ' .ons-tec-row .ons-tec-refect{flex:1 1 200px}'
+        . $s . ' .ons-tec-row button{background:none;border:none;color:var(--crack);font-size:1rem;font-weight:700;cursor:pointer;padding:0 4px;line-height:1;flex:0 0 auto}'
+        . $s . ' .ons-tec-row button:hover{color:#fff}'
+        . $s . ' .ons-tec-add{display:flex;gap:7px;flex-wrap:wrap;border:1px dashed var(--rivet);padding:8px 9px}'
+        . $s . ' .ons-tec-add input{flex:1 1 160px;min-width:90px;background:var(--iron);color:var(--paper);border:1px solid var(--rivet);padding:5px 8px;font-family:var(--mono);font-size:.64rem}'
+        . $s . ' .ons-tec-add input:focus{border-color:var(--ember);outline:none}'
+        . $s . ' .ons-tec-add input::placeholder{color:var(--ash);font-style:italic}'
+        . $s . ' .ons-tec-add button{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;background:var(--ember);color:var(--iron);border:2px solid #000;padding:5px 13px;cursor:pointer;white-space:nowrap;flex:0 0 auto}'
+        . $s . ' .ons-tec-add button:hover{background:var(--ember-hi);transform:translate(-1px,-1px);box-shadow:2px 2px 0 #000}'
+        . $s . ' .ons-lib-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}'
+        . $s . ' .ons-lib-header .zs-search{margin-bottom:0}'
+        . $s . ' .ons-lib-search{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}'
+        . $s . ' .ons-lib-search input[type=text]{flex:1;min-width:150px;background:var(--iron);color:var(--paper);border:2px solid #000;padding:7px 10px;font-family:var(--mono);font-size:.68rem}'
+        . $s . ' .ons-lib-search input[type=text]:focus{border-color:var(--ember);outline:none}'
+        . $s . ' .ons-lib-search input[type=text]::placeholder{color:var(--ash);font-style:italic}'
+        . $s . ' .ons-deck-item{position:relative}'
+        . $s . ' .ons-deck-tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}'
+        . $s . ' .ons-deck-tools form{margin:0}'
+        . '</style>';
+}
+
+/**
+ * Biblioteca de NPCs secundarios de mybb_rol_npcs_secundarios.
+ * Devuelve filas con `tecnicas` ya decodificado y normalizado.
+ * Busca por nombre del NPC y/o por nombre de tecnica (en el JSON).
+ */
+function ope_rol_npc_sec_lib($buscar = '', $tec_buscar = '')
+{
+    global $db;
+    $out = array();
+    if (!$db->table_exists('rol_npcs_secundarios')) return $out;
+    $where = '1=1';
+    $buscar = trim((string) $buscar);
+    $tec_buscar = trim((string) $tec_buscar);
+    if ($buscar !== '') {
+        $where .= " AND nombre LIKE '%" . $db->escape_string_like($buscar) . "%'";
+    }
+    if ($tec_buscar !== '') {
+        $where .= " AND tecnicas LIKE '%" . $db->escape_string_like($tec_buscar) . "%'";
+    }
+    $q = $db->simple_select('rol_npcs_secundarios', '*', $where, array('order_by' => 'nombre ASC', 'limit' => 500));
+    while ($r = $db->fetch_array($q)) {
+        $r['tecnicas'] = ope_rol_npc_sec_norm_tecnicas($r['tecnicas'] ?? '');
+        $out[] = $r;
+    }
+    return $out;
+}
+
+/**
+ * Un NPC secundario por id, con técnicas normalizadas.
+ */
+function ope_rol_npc_sec_by_id($npc_id)
+{
+    global $db;
+    $npc_id = (int) $npc_id;
+    if ($npc_id < 1 || !$db->table_exists('rol_npcs_secundarios')) {
+        return null;
+    }
+    $q = $db->simple_select('rol_npcs_secundarios', '*', "id = {$npc_id}", array('limit' => 1));
+    if (!$db->num_rows($q)) {
+        return null;
+    }
+    $r = $db->fetch_array($q);
+    $r['tecnicas'] = ope_rol_npc_sec_norm_tecnicas($r['tecnicas'] ?? '');
+    return $r;
+}
+
+/** Máximo de acompañantes NPC por personaje. */
+function ope_rol_acompanantes_max()
+{
+    return 2;
+}
+
+/**
+ * Acompañantes asignados a un personaje (slots 1–2), con datos del NPC.
+ */
+function ope_rol_char_acompanantes($pid)
+{
+    global $db;
+    $pid = (int) $pid;
+    $out = array();
+    if ($pid < 1 || !$db->table_exists('rol_acompanantes') || !$db->table_exists('rol_npcs_secundarios')) {
+        return $out;
+    }
+    $q = $db->simple_select('rol_acompanantes', '*', "pid = {$pid}", array('order_by' => 'slot ASC'));
+    while ($row = $db->fetch_array($q)) {
+        $npc = ope_rol_npc_sec_by_id((int) $row['npc_id']);
+        if (!$npc) {
+            continue;
+        }
+        $row['npc'] = $npc;
+        $out[] = $row;
+    }
+    return $out;
+}
+
+/**
+ * Asigna un NPC secundario a un slot del personaje (1 o 2).
+ * Devuelve ['ok'=>bool, 'msg'=>string].
+ */
+function ope_rol_acompanante_asignar($pid, $npc_id, $slot)
+{
+    global $db;
+    $pid = (int) $pid;
+    $npc_id = (int) $npc_id;
+    $slot = (int) $slot;
+    $max = ope_rol_acompanantes_max();
+
+    if ($pid < 1 || $npc_id < 1) {
+        return array('ok' => false, 'msg' => 'Datos incompletos.');
+    }
+    if ($slot < 1 || $slot > $max) {
+        return array('ok' => false, 'msg' => 'El slot debe ser 1 o 2.');
+    }
+    if (!$db->table_exists('rol_acompanantes') || !$db->table_exists('rol_npcs_secundarios')) {
+        return array('ok' => false, 'msg' => 'Falta la tabla de acompañantes. Ejecuta scripts/migrate-acompanantes.php');
+    }
+    if (!$db->num_rows($db->simple_select('rol_npcs_secundarios', 'id', "id = {$npc_id}", array('limit' => 1)))) {
+        return array('ok' => false, 'msg' => 'Ese NPC no existe en la biblioteca.');
+    }
+
+    // Mismo NPC en otro slot → mover.
+    $dup = $db->simple_select('rol_acompanantes', 'id, slot', "pid = {$pid} AND npc_id = {$npc_id}", array('limit' => 1));
+    if ($db->num_rows($dup)) {
+        $ex = $db->fetch_array($dup);
+        if ((int) $ex['slot'] === $slot) {
+            return array('ok' => true, 'msg' => 'Ese acompañante ya está en ese slot.');
+        }
+        $db->delete_query('rol_acompanantes', 'id = ' . (int) $ex['id']);
+    }
+
+    // Slot ocupado por otro NPC → reemplazar.
+    $occ = $db->simple_select('rol_acompanantes', 'id', "pid = {$pid} AND slot = {$slot}", array('limit' => 1));
+    if ($db->num_rows($occ)) {
+        $db->delete_query('rol_acompanantes', 'id = ' . (int) $db->fetch_field($occ, 'id'));
+    }
+
+    $db->insert_query('rol_acompanantes', array(
+        'pid'      => $pid,
+        'npc_id'   => $npc_id,
+        'slot'     => $slot,
+        'dateline' => TIME_NOW,
+    ));
+
+    return array('ok' => true, 'msg' => 'Acompañante asignado al slot ' . $slot . '.');
+}
+
+/**
+ * Quita el acompañante de un slot (o por npc_id si slot = 0).
+ */
+function ope_rol_acompanante_quitar($pid, $slot = 0, $npc_id = 0)
+{
+    global $db;
+    $pid = (int) $pid;
+    $slot = (int) $slot;
+    $npc_id = (int) $npc_id;
+    if ($pid < 1 || !$db->table_exists('rol_acompanantes')) {
+        return array('ok' => false, 'msg' => 'No se pudo quitar el acompañante.');
+    }
+    if ($slot > 0) {
+        $db->delete_query('rol_acompanantes', "pid = {$pid} AND slot = {$slot}");
+    } elseif ($npc_id > 0) {
+        $db->delete_query('rol_acompanantes', "pid = {$pid} AND npc_id = {$npc_id}");
+    } else {
+        return array('ok' => false, 'msg' => 'Indica slot o NPC.');
+    }
+    return array('ok' => true, 'msg' => 'Acompañante retirado.');
+}
+
+/**
+ * Primer slot libre (1..max) del personaje, o 0 si están todos ocupados.
+ */
+function ope_rol_acompanante_slot_libre($pid)
+{
+    global $db;
+    $pid = (int) $pid;
+    $max = ope_rol_acompanantes_max();
+    if ($pid < 1 || !$db->table_exists('rol_acompanantes')) {
+        return 1;
+    }
+    $ocupados = array();
+    $q = $db->simple_select('rol_acompanantes', 'slot', "pid = {$pid}");
+    while ($r = $db->fetch_array($q)) {
+        $ocupados[(int) $r['slot']] = true;
+    }
+    for ($s = 1; $s <= $max; $s++) {
+        if (empty($ocupados[$s])) {
+            return $s;
+        }
+    }
+    return 0;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Solicitudes de acompañante (jugador pide → staff aprueba/rechaza).
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * El jugador solicita un acompañante NPC para su personaje. Crea una solicitud
+ * pendiente que el staff resuelve. Devuelve ['ok'=>bool, 'msg'=>string].
+ */
+function ope_rol_acompanante_solicitar($pid, $uid, $npc_id, $motivo = '')
+{
+    global $db;
+    $pid = (int) $pid;
+    $uid = (int) $uid;
+    $npc_id = (int) $npc_id;
+    $motivo = trim((string) $motivo);
+    $max = ope_rol_acompanantes_max();
+
+    if ($pid < 1 || $npc_id < 1) {
+        return array('ok' => false, 'msg' => 'Elige un NPC de la biblioteca.');
+    }
+    if (!$db->table_exists('rol_acompanante_solicitudes') || !$db->table_exists('rol_npcs_secundarios')) {
+        return array('ok' => false, 'msg' => 'Falta la tabla de solicitudes. Ejecuta scripts/migrate-acompanantes.php');
+    }
+    if (!$db->num_rows($db->simple_select('rol_npcs_secundarios', 'id', "id = {$npc_id}", array('limit' => 1)))) {
+        return array('ok' => false, 'msg' => 'Ese NPC no existe en la biblioteca.');
+    }
+    // ¿Ya lo tiene asignado?
+    if ($db->table_exists('rol_acompanantes')
+        && $db->num_rows($db->simple_select('rol_acompanantes', 'id', "pid = {$pid} AND npc_id = {$npc_id}", array('limit' => 1)))) {
+        return array('ok' => false, 'msg' => 'Ya tienes ese acompañante asignado.');
+    }
+    // ¿Slots llenos?
+    $asignados = $db->table_exists('rol_acompanantes')
+        ? (int) $db->fetch_field($db->simple_select('rol_acompanantes', 'COUNT(*) c', "pid = {$pid}"), 'c')
+        : 0;
+    // Solicitudes pendientes de este personaje.
+    $pend = (int) $db->fetch_field(
+        $db->simple_select('rol_acompanante_solicitudes', 'COUNT(*) c', "pid = {$pid} AND estado = 'pendiente'"),
+        'c'
+    );
+    if ($asignados + $pend >= $max) {
+        return array('ok' => false, 'msg' => 'Has alcanzado el máximo de acompañantes (contando solicitudes pendientes). Retira uno o espera la resolución.');
+    }
+    // ¿Ya hay una solicitud pendiente para el mismo NPC?
+    if ($db->num_rows($db->simple_select('rol_acompanante_solicitudes', 'id', "pid = {$pid} AND npc_id = {$npc_id} AND estado = 'pendiente'", array('limit' => 1)))) {
+        return array('ok' => false, 'msg' => 'Ya tienes una solicitud pendiente para ese NPC.');
+    }
+
+    $db->insert_query('rol_acompanante_solicitudes', array(
+        'pid'      => $pid,
+        'uid'      => $uid,
+        'npc_id'   => $npc_id,
+        'motivo'   => $db->escape_string(mb_substr($motivo, 0, 1000)),
+        'estado'   => 'pendiente',
+        'dateline' => TIME_NOW,
+    ));
+
+    return array('ok' => true, 'msg' => 'Solicitud enviada. El staff la revisará pronto.');
+}
+
+/**
+ * Cancela una solicitud pendiente propia (por el jugador).
+ */
+function ope_rol_acompanante_solicitud_cancelar($sid, $pid)
+{
+    global $db;
+    $sid = (int) $sid;
+    $pid = (int) $pid;
+    if ($sid < 1 || $pid < 1 || !$db->table_exists('rol_acompanante_solicitudes')) {
+        return array('ok' => false, 'msg' => 'No se pudo cancelar.');
+    }
+    $db->delete_query('rol_acompanante_solicitudes', "id = {$sid} AND pid = {$pid} AND estado = 'pendiente'");
+    return array('ok' => true, 'msg' => 'Solicitud cancelada.');
+}
+
+/**
+ * Solicitudes de un personaje (todas, más recientes primero), con nombre NPC.
+ */
+function ope_rol_char_solicitudes_acompanante($pid)
+{
+    global $db;
+    $pid = (int) $pid;
+    $out = array();
+    if ($pid < 1 || !$db->table_exists('rol_acompanante_solicitudes')) {
+        return $out;
+    }
+    $q = $db->simple_select('rol_acompanante_solicitudes', '*', "pid = {$pid}", array('order_by' => 'dateline', 'order_dir' => 'DESC', 'limit' => 50));
+    while ($r = $db->fetch_array($q)) {
+        $npc = ope_rol_npc_sec_by_id((int) $r['npc_id']);
+        $r['npc_nombre'] = $npc ? (string) ($npc['nombre'] ?? '') : 'NPC eliminado';
+        $out[] = $r;
+    }
+    return $out;
+}
+
+/**
+ * Solicitudes de acompañante pendientes (cola de staff), con datos del NPC y jugador.
+ */
+function ope_rol_acompanante_solicitudes_pendientes()
+{
+    global $db;
+    $out = array();
+    if (!$db->table_exists('rol_acompanante_solicitudes')) {
+        return $out;
+    }
+    $q = $db->simple_select('rol_acompanante_solicitudes', '*', "estado = 'pendiente'", array('order_by' => 'dateline', 'order_dir' => 'ASC'));
+    while ($r = $db->fetch_array($q)) {
+        $r['npc'] = ope_rol_npc_sec_by_id((int) $r['npc_id']);
+        $r['pj_nombre'] = function_exists('ope_rol_cat_nombre_pid')
+            ? ope_rol_cat_nombre_pid((int) $r['pid'])
+            : '';
+        $r['owner'] = '';
+        if ((int) $r['uid'] > 0) {
+            $uq = $db->simple_select('users', 'username', 'uid = ' . (int) $r['uid'], array('limit' => 1));
+            if ($db->num_rows($uq)) {
+                $r['owner'] = (string) $db->fetch_field($uq, 'username');
+            }
+        }
+        $r['asignados'] = $db->table_exists('rol_acompanantes')
+            ? (int) $db->fetch_field($db->simple_select('rol_acompanantes', 'COUNT(*) c', 'pid = ' . (int) $r['pid']), 'c')
+            : 0;
+        $out[] = $r;
+    }
+    return $out;
+}
+
+/** Nº de solicitudes de acompañante pendientes (para badges). */
+function ope_rol_acompanante_solicitudes_pend_count()
+{
+    global $db;
+    if (!$db->table_exists('rol_acompanante_solicitudes')) {
+        return 0;
+    }
+    return (int) $db->fetch_field(
+        $db->simple_select('rol_acompanante_solicitudes', 'COUNT(*) c', "estado = 'pendiente'"),
+        'c'
+    );
+}
+
+/**
+ * Aprueba una solicitud: asigna el NPC al primer slot libre del personaje.
+ */
+function ope_rol_acompanante_solicitud_aprobar($sid, $staff_uid, $nota = '')
+{
+    global $db;
+    $sid = (int) $sid;
+    $staff_uid = (int) $staff_uid;
+    $nota = trim((string) $nota);
+    if ($sid < 1 || !$db->table_exists('rol_acompanante_solicitudes')) {
+        return array('ok' => false, 'msg' => 'Solicitud no encontrada.');
+    }
+    $q = $db->simple_select('rol_acompanante_solicitudes', '*', "id = {$sid}", array('limit' => 1));
+    if (!$db->num_rows($q)) {
+        return array('ok' => false, 'msg' => 'Solicitud no encontrada.');
+    }
+    $sol = $db->fetch_array($q);
+    if ((string) $sol['estado'] !== 'pendiente') {
+        return array('ok' => false, 'msg' => 'Esa solicitud ya está resuelta.');
+    }
+    $pid = (int) $sol['pid'];
+    $npc_id = (int) $sol['npc_id'];
+
+    $slot = ope_rol_acompanante_slot_libre($pid);
+    if ($slot < 1) {
+        return array('ok' => false, 'msg' => 'El personaje ya tiene los slots llenos. No se puede aprobar hasta que libere uno.');
+    }
+    $res = ope_rol_acompanante_asignar($pid, $npc_id, $slot);
+    if (!$res['ok']) {
+        return $res;
+    }
+    $db->update_query('rol_acompanante_solicitudes', array(
+        'estado'     => 'aprobada',
+        'slot'       => $slot,
+        'staff_uid'  => $staff_uid,
+        'staff_nota' => $db->escape_string(mb_substr($nota, 0, 500)),
+        'resolved'   => TIME_NOW,
+    ), "id = {$sid}");
+
+    return array('ok' => true, 'msg' => 'Solicitud aprobada: acompañante asignado al slot ' . $slot . '.');
+}
+
+/**
+ * Rechaza una solicitud con nota opcional del staff.
+ */
+function ope_rol_acompanante_solicitud_rechazar($sid, $staff_uid, $nota = '')
+{
+    global $db;
+    $sid = (int) $sid;
+    $staff_uid = (int) $staff_uid;
+    $nota = trim((string) $nota);
+    if ($sid < 1 || !$db->table_exists('rol_acompanante_solicitudes')) {
+        return array('ok' => false, 'msg' => 'Solicitud no encontrada.');
+    }
+    $q = $db->simple_select('rol_acompanante_solicitudes', 'estado', "id = {$sid}", array('limit' => 1));
+    if (!$db->num_rows($q)) {
+        return array('ok' => false, 'msg' => 'Solicitud no encontrada.');
+    }
+    if ((string) $db->fetch_field($q, 'estado') !== 'pendiente') {
+        return array('ok' => false, 'msg' => 'Esa solicitud ya está resuelta.');
+    }
+    $db->update_query('rol_acompanante_solicitudes', array(
+        'estado'     => 'rechazada',
+        'staff_uid'  => $staff_uid,
+        'staff_nota' => $db->escape_string(mb_substr($nota, 0, 500)),
+        'resolved'   => TIME_NOW,
+    ), "id = {$sid}");
+
+    return array('ok' => true, 'msg' => 'Solicitud rechazada.');
+}
+
+/**
+ * HTML de carta de NPC usado en un post (técnica resaltada).
+ */
+function ope_rol_npc_sec_used_html(array $npc, $tec_idx)
+{
+    $tec_idx = (int) $tec_idx;
+    $tecnicas = ope_rol_npc_sec_norm_tecnicas($npc['tecnicas'] ?? null);
+    if ($tec_idx < 0 || $tec_idx >= count($tecnicas)) {
+        $tec_idx = -1;
+    }
+    $card = ope_rol_npc_sec_card_html($npc, $tec_idx);
+    return str_replace('class="ons-card"', 'class="ons-card is-post-used"', $card);
 }
 
 /** CSS del "naipe" de carta de técnica (una sola vez por página). */

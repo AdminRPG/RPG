@@ -561,8 +561,8 @@ if (!is_array($ope_home) || empty($ope_home)) {
             'Cada historia deja huella en el mundo. Ninguna aventura pasa sin dejar marca.',
         ],
         'lore' => [
-            'titulo' => 'La aventura continúa',
-            'texto'  => 'One Piece Eternal abre sus puertas a una nueva generación de aventureros. El mundo, sus reglas y su historia se escriben aquí, historia a historia. Crea tu personaje y zárpate a descubrir el mundo.',
+            'titulo' => 'La Grieta de Éter se ensancha',
+            'texto'  => 'Granblue Fantasy: Eternal abre el registro de skyfarers. Islas flotantes, aeronaves y Bestias Primarias te esperan. Crea tu personaje y zarpa hacia Estalucia.',
         ],
         // Instante OOC en el que arranca el día 1 · Primavera · Año I del calendario on-rol.
         'rol_epoch' => mktime(0, 0, 0, 1, 1, 2026),
@@ -577,14 +577,10 @@ if (!isset($ope_home['hermanos'])) { $ope_home['hermanos'] = []; }
 $ope_hermanos = is_array($ope_home['hermanos']) ? $ope_home['hermanos'] : [];
 $ope_afiliados = is_array($ope_home['afiliados']) ? $ope_home['afiliados'] : [];
 
-// I-Forge: banner del hero — resuelve cualquier imagen images/ope/banner.* (jpg/png/webp…)
-$ope_hero_banner = '';
-$heroDir = MYBB_ROOT . 'images/ope/';
-$heroCandidates = glob($heroDir . 'banner.{jpg,jpeg,png,webp,gif,avif}', GLOB_BRACE);
-if (!empty($heroCandidates)) {
-    // Prioriza el más reciente para que un archivo recién subido gane.
-    usort($heroCandidates, static function ($a, $b) { return filemtime($b) <=> filemtime($a); });
-    $ope_hero_banner = $mybb->settings['bburl'] . '/images/ope/' . basename($heroCandidates[0]);
+// GBE: banner del hero — images/gbe/hero-mundo.jpg
+$ope_hero_banner = $mybb->settings['bburl'] . '/images/gbe/hero-mundo.jpg';
+if (!is_file(MYBB_ROOT . 'images/gbe/hero-mundo.jpg')) {
+    $ope_hero_banner = '';
 }
 
 // Construye los botones de afiliados/hermanos (HTML) para el template.
@@ -723,18 +719,24 @@ $staffQuery = $db->query("
 ");
 while ($staff = $db->fetch_array($staffQuery)) {
     if ((int)$staff['cancp'] === 1) {
-        $role = 'Administración'; $ring = 'var(--ember)';
+        $role = 'Administración'; $ring = 'var(--gbe-gold)';
     } elseif ((int)$staff['issupermod'] === 1) {
-        $role = 'Moderación'; $ring = 'var(--h6)';
+        $role = 'Moderación'; $ring = 'var(--gbe-eter)';
     } else {
-        $role = $staff['grouptitle'] !== '' ? $staff['grouptitle'] : 'Narración'; $ring = 'var(--patina-hi)';
+        $role = $staff['grouptitle'] !== '' ? $staff['grouptitle'] : 'Narración'; $ring = 'var(--gbe-sky)';
     }
     $uname = htmlspecialchars_uni($staff['username']);
-    $initial = htmlspecialchars_uni(my_strtoupper(my_substr($staff['username'], 0, 1)));
+    $displayName = $uname;
+    $roleOut = $role;
+    if (strcasecmp($staff['username'], 'OP-Eternal') === 0) {
+        $displayName = 'Lyria';
+        $roleOut = 'Cronista &middot; Bot';
+    }
+    $initial = htmlspecialchars_uni(my_strtoupper(my_substr($displayName, 0, 1)));
     $ope_staff_list .= '
-    <a href="'.$mybb->settings['bburl'].'/member.php?action=profile&amp;uid='.$staff['uid'].'" class="ope-staff-p" title="'.htmlspecialchars_uni($role).'">
+    <a href="'.$mybb->settings['bburl'].'/member.php?action=profile&amp;uid='.$staff['uid'].'" class="ope-staff-p" title="'.htmlspecialchars_uni(strip_tags($roleOut)).'">
         <span class="ope-staff-av" style="--ring:'.$ring.'">'.$initial.'</span>
-        <span class="ope-staff-meta"><span class="ope-staff-n">'.$uname.'</span><span class="ope-staff-r">'.htmlspecialchars_uni($role).'</span></span>
+        <span class="ope-staff-meta"><span class="ope-staff-n">'.$displayName.'</span><span class="ope-staff-r">'.$roleOut.'</span></span>
     </a>';
 }
 
@@ -778,17 +780,31 @@ while ($cat = $db->fetch_array($catQuery)) {
     }
     if (empty($catForums)) { continue; }
 
-    $isWorld = (mb_stripos($cat['name'], 'mundo') !== false) || $catHasIslas;
+    $isWorld = (mb_stripos($cat['name'], 'mundo') !== false)
+        || (mb_stripos($cat['name'], 'cielo') !== false)
+        || $catHasIslas;
+    $bentoClass = (mb_stripos($cat['name'], 'cielo') !== false) ? 'gbe-world-bento' : 'ope-world-bento';
 
     if ($isWorld) {
-        // ---- Estilo REGIÓN: tarjetas grandes con foto que llevan a las islas ----
-        $catDesc = trim($cat['description']) !== '' ? htmlspecialchars_uni($cat['description']) : 'regiones &middot; navega para ver las islas';
+        $catDesc = trim($cat['description']) !== '' ? htmlspecialchars_uni($cat['description']) : 'skydoms &middot; navega para ver las islas';
+        $wm = (mb_stripos($cat['name'], 'cielo') !== false) ? 'Skydoms' : $catName;
+        $eyebrow = (mb_stripos($cat['name'], 'cielo') !== false) ? 'El Cielo &middot; navega por regi&oacute;n' : $catDesc;
+        $stitle = (mb_stripos($cat['name'], 'cielo') !== false) ? 'Carta Celeste' : $catName;
         $cards = ope_render_region_cards($cat['fid'], $forumpermissions);
+        $slug = 'cat_'.$cat['fid'];
+        if (mb_stripos($cat['name'], 'cielo') !== false) {
+            $slug = 'cat_el-cielo';
+        }
         $ope_categories .= '
-        <section class="ope-block-cat" id="cat_'.$cat['fid'].'">
-            <div class="ope-shead"><h2>'.$catName.'</h2><span class="ope-shead-code">// '.$catDesc.'</span><span class="ope-shead-rule"></span></div>
-            <div class="ope-regions ope-world-bento">
-                '.$cards.'
+        <section class="gbe-section gbe-cat" id="'.$slug.'">
+            <span class="gbe-wm" aria-hidden="true">'.htmlspecialchars_uni($wm).'</span>
+            <div class="gbe-wrap">
+                <span class="gbe-eyebrow">'.$eyebrow.'</span>
+                <h2 class="gbe-stitle">'.$stitle.'</h2>
+                <div class="gbe-gold-rule"></div>
+                <div class="ope-regions '.$bentoClass.'">
+                    '.$cards.'
+                </div>
             </div>
         </section>';
     } else {
@@ -822,10 +838,15 @@ while ($cat = $db->fetch_array($catQuery)) {
             </a>';
         }
         $ope_categories .= '
-        <section class="ope-block-cat" id="cat_'.$cat['fid'].'">
-            <div class="ope-shead"><h2>'.$catName.'</h2><span class="ope-shead-code">// '.$catDesc.'</span><span class="ope-shead-rule"></span></div>
-            <div class="ope-slab">
-                '.$rows.'
+        <section class="gbe-section gbe-cat gbe-cat-ot" id="cat_'.$cat['fid'].'">
+            <span class="gbe-wm" aria-hidden="true">Off Topic</span>
+            <div class="gbe-wrap">
+                <span class="gbe-eyebrow">'.$catDesc.'</span>
+                <h2 class="gbe-stitle">'.$catName.'</h2>
+                <div class="gbe-gold-rule"></div>
+                <div class="ope-slab gbe-slab">
+                    '.$rows.'
+                </div>
             </div>
         </section>';
     }

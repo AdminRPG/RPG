@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="cielo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vael el Errante — Carta de Skyfarer · Granblue Fantasy: Eternal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Ficha v4 — banner 16:9 arriba · identidad compacta · pestañas del foro real adaptadas a GBF */
+:root{
+  --bg:#eef4f8; --bg-2:#f6f3ea; --wash:#dCE8F2; --card:#ffffff; --card-2:#f7f9fb;
+  --ink:#2f4256; --ink-soft:#5b6f83; --ink-dim:#8ba0b3;
+  --gold:#b7924e; --gold-hi:#d8b76b; --gold-deep:#8f6f34;
+  --sky:#5ba3d0; --sky-deep:#2f6fa0; --eter:#3bb3ab;
+  --line:rgba(183,146,78,.35); --line-soft:rgba(90,111,131,.16);
+  --shadow:0 18px 46px rgba(47,66,86,.12); --shadow-sm:0 8px 22px rgba(47,66,86,.10);
+  --disp:'Cinzel',Georgia,serif; --mark:'Cormorant Garamond',Georgia,serif;
+  --body:'Spectral',Georgia,serif; --mono:'Space Mono',Menlo,Consolas,monospace;
+  --h1:#9fb0c0;--h2:#77a4c6;--h3:#5ba3d0;--h4:#3f8fc0;--h5:#3bb3ab;--h6:#c9a24e;--h7:#b7924e;--h8:#a8843f;--h9:#8f6f34;
+  --el-fuego:#d9503a;--el-agua:#2f8fce;--el-tierra:#b3862f;--el-viento:#3fa76a;--el-luz:#d9b23a;--el-oscuridad:#7d5bc0;
+}
+html[data-theme="noche"]{
+  --bg:#0e1730; --bg-2:#0b1226; --wash:#16244a; --card:rgba(22,33,62,.72); --card-2:rgba(14,22,44,.7);
+  --ink:#eaf1fb; --ink-soft:#b9c6dd; --ink-dim:#7f90ad;
+  --gold:#e2bd6b; --gold-hi:#ffd98a; --gold-deep:#b48f3f;
+  --sky:#5aa9ff; --sky-deep:#2f74b5; --eter:#63e6dd;
+  --line:rgba(226,189,107,.32); --line-soft:rgba(185,198,221,.14);
+  --shadow:0 18px 46px rgba(0,0,0,.4); --shadow-sm:0 8px 22px rgba(0,0,0,.34);
+  --h1:#7f90ad;--h2:#5a86b5;--h3:#5aa9ff;--h4:#63b8ea;--h5:#63e6dd;--h6:#e2bd6b;--h7:#ffd98a;--h8:#ffe9a3;--h9:#fff6d8;
+}
+body[data-element="viento"]{--aura:var(--el-viento)}
+body[data-element="fuego"]{--aura:var(--el-fuego)}
+body[data-element="agua"]{--aura:var(--el-agua)}
+body[data-element="tierra"]{--aura:var(--el-tierra)}
+body[data-element="luz"]{--aura:var(--el-luz)}
+body[data-element="oscuridad"]{--aura:var(--el-oscuridad)}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:radial-gradient(120% 60% at 50% -8%, color-mix(in srgb,var(--wash) 70%,transparent), transparent 60%), var(--bg);
+  color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;min-height:100vh}
+a{color:var(--gold-deep);text-decoration:none;transition:color .2s}a:hover{color:var(--gold)}
+html[data-theme="noche"] a{color:var(--gold-hi)}
+img,svg{display:block;max-width:100%}::selection{background:var(--gold-hi);color:#2b2213}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* NAV */
+.nav{position:fixed;inset:0 0 auto 0;height:66px;z-index:1000;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line-soft)}
+.nav-in{max-width:1180px;margin:0 auto;height:100%;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-family:var(--disp);font-weight:700;font-size:1.18rem;letter-spacing:1px;color:var(--ink);display:flex;align-items:center;gap:11px}
+.brand .crest{width:28px;height:28px;object-fit:contain}
+.brand b{color:var(--gold-deep);font-weight:900}html[data-theme="noche"] .brand b{color:var(--gold-hi)}
+.nav-links{display:flex;gap:6px}
+.nav-a{font-family:var(--mark);font-size:1.06rem;color:var(--ink-soft);padding:8px 14px;position:relative}
+.nav-a::after{content:"";position:absolute;left:14px;right:14px;bottom:6px;height:1px;background:var(--gold);transform:scaleX(0);transition:transform .28s}
+.nav-a:hover,.nav-a.on{color:var(--ink)}.nav-a:hover::after,.nav-a.on::after{transform:scaleX(1)}
+.theme-btn{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink-soft);background:transparent;border:1px solid var(--line);border-radius:20px;padding:7px 14px;cursor:pointer}
+.theme-btn:hover{border-color:var(--gold);color:var(--gold-deep)}
+
+.bc{padding-top:66px}
+.bc-in{max-width:1180px;margin:0 auto;padding:14px 20px;font-family:var(--mono);font-size:.64rem;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-dim)}
+.bc-in a{color:var(--ink-dim)}.bc-in .sep{color:var(--line);padding:0 6px}.bc-in b{color:var(--ink)}
+
+/* BANNER 16:9 (como ficha.php real: datos.banner) */
+.char-banner{position:relative;width:100%;aspect-ratio:16/9;max-height:420px;overflow:hidden;border-bottom:1px solid var(--line-soft);
+  box-shadow:inset 0 -80px 80px -40px color-mix(in srgb,var(--aura) 25%,transparent)}
+.char-banner img{width:100%;height:100%;object-fit:cover}
+.char-banner-ph{background:linear-gradient(135deg,color-mix(in srgb,var(--aura) 30%,var(--sky)),var(--sky-deep))}
+.char-banner-veil{position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,color-mix(in srgb,var(--bg) 75%,transparent))}
+.char-banner-edge{position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--aura),var(--gold),var(--aura))}
+
+/* Identidad bajo el banner */
+.char-id{position:relative;margin-top:-48px;padding-bottom:24px}
+.char-id-in{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow);display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center}
+@media(max-width:820px){.char-id-in{grid-template-columns:auto 1fr;grid-template-rows:auto auto}}
+.avatar{width:72px;height:72px;border-radius:12px;border:2px solid var(--aura);background:var(--card-2);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:900;font-size:2rem;color:color-mix(in srgb,var(--aura) 70%,var(--ink));flex:0 0 auto;box-shadow:0 0 16px color-mix(in srgb,var(--aura) 30%,transparent)}
+.id-eye{font-family:var(--mono);font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--sky-deep)}
+.id-name{font-family:var(--disp);font-weight:900;font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.05;color:var(--ink);margin:4px 0}
+.id-alias{font-family:var(--mark);font-style:italic;font-size:1.1rem;color:var(--ink-soft)}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.chip{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:4px 10px;border-radius:20px;border:1px solid var(--line);color:var(--ink);background:var(--card-2)}
+.chip.el{border-color:var(--aura);color:color-mix(in srgb,var(--aura) 78%,var(--ink));background:color-mix(in srgb,var(--aura) 10%,transparent)}
+.chip.ok{border-color:var(--eter);color:var(--sky-deep)}
+.chip.crew{background:color-mix(in srgb,var(--sky) 14%,transparent);border-color:var(--sky)}
+.id-side{text-align:right}
+@media(max-width:820px){.id-side{grid-column:1/-1;text-align:left;display:flex;gap:20px;flex-wrap:wrap}}
+.reno .v{font-family:var(--disp);font-weight:900;font-size:1.8rem;color:var(--gold-deep);line-height:1}html[data-theme="noche"] .reno .v{color:var(--gold-hi)}
+.reno .l,.reno .rank{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-dim)}
+.reno .rank{font-family:var(--mark);font-size:.95rem;color:var(--sky-deep);text-transform:none;margin-top:2px}
+.vitals{display:flex;gap:12px;margin-top:10px}
+.vital{min-width:96px}
+.vital .top{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.58rem;color:var(--ink-soft);margin-bottom:3px}
+.vital .bar{height:6px;border-radius:4px;background:var(--line-soft);overflow:hidden}
+.vital .bar i{display:block;height:100%;width:0;border-radius:4px;transition:width 1s cubic-bezier(.2,.7,.2,1)}
+.vital.pv .bar i{background:linear-gradient(90deg,#d9503a,#ff7a5a)}
+.vital.en .bar i{background:linear-gradient(90deg,var(--eter),var(--sky))}
+.vital.pa .bar i{background:linear-gradient(90deg,var(--gold),var(--gold-hi))}
+.char-acts{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+.btn{font-family:var(--mark);font-size:1rem;padding:10px 22px;border-radius:24px;cursor:pointer;border:1px solid transparent;transition:transform .15s,box-shadow .15s;display:inline-flex}
+.btn-hot{background:linear-gradient(135deg,var(--gold-hi),var(--gold-deep));color:#fff;box-shadow:0 8px 20px rgba(183,146,78,.3)}
+.btn-hot:hover{transform:translateY(-2px);color:#fff}
+.btn-ghost{background:var(--card-2);color:var(--ink);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-deep)}
+
+/* TABS */
+.tabs-wrap{position:sticky;top:66px;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-soft);margin:0 -20px;padding:0 20px}
+.tabs{display:flex;gap:4px;overflow-x:auto}
+.tab{font-family:var(--mark);font-size:1.06rem;color:var(--ink-soft);background:none;border:none;padding:14px 16px;cursor:pointer;position:relative;white-space:nowrap}
+.tab::after{content:"";position:absolute;left:16px;right:16px;bottom:0;height:2px;background:var(--gold);transform:scaleX(0);transition:transform .25s}
+.tab.on{color:var(--gold-deep)}html[data-theme="noche"] .tab.on{color:var(--gold-hi)}.tab.on::after{transform:scaleX(1)}
+.panes{padding:28px 0 48px}
+.pane{display:none}.pane.on{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.dgrid{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.panel-h{padding:12px 16px;border-bottom:1px solid var(--line-soft);display:flex;justify-content:space-between;background:linear-gradient(120deg,var(--wash),var(--card))}
+.panel-h .t{font-family:var(--disp);font-weight:700;font-size:1rem;color:var(--gold-deep)}html[data-theme="noche"] .panel-h .t{color:var(--gold-hi)}
+.panel-h .c{font-family:var(--mono);font-size:.58rem;color:var(--ink-dim);text-transform:uppercase}
+.panel-b{padding:16px}.prose{color:var(--ink-soft);font-size:.96rem;line-height:1.7}
+
+.pillar{margin-bottom:16px}
+.pillar-h{font-family:var(--mono);font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--sky-deep);margin-bottom:8px}
+.stat{display:grid;grid-template-columns:100px 1fr 38px;gap:8px;align-items:center;margin-bottom:8px}
+.stat .n{font-family:var(--mark);font-size:1rem;color:var(--ink)}
+.stat .track{height:9px;border-radius:5px;background:var(--line-soft);overflow:hidden}
+.stat .track i{display:block;height:100%;width:0;border-radius:5px;transition:width 1s ease}
+.stat .v{font-family:var(--mono);font-weight:700;text-align:right;font-size:.85rem}
+
+.tec{border:1px solid var(--line);border-radius:10px;padding:11px;margin-bottom:9px;background:var(--card-2)}
+.tec-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.tec-n{font-family:var(--mark);color:var(--ink);font-size:1.05rem}
+.tec-tier{font-family:var(--mono);font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--aura);color:#fff}
+.tec-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.tag{font-family:var(--mono);font-size:.56rem;text-transform:uppercase;padding:2px 7px;border-radius:10px;border:1px solid var(--line);color:var(--ink-soft)}
+.tag.el{border-color:var(--aura);color:color-mix(in srgb,var(--aura) 78%,var(--ink))}
+
+.pact{border:1px solid var(--aura);border-radius:12px;padding:14px;background:color-mix(in srgb,var(--aura) 8%,transparent);display:flex;gap:12px;align-items:flex-start}
+.pact.none{border-style:dashed;border-color:var(--line);background:var(--card-2)}
+.pact .seal{width:48px;height:48px;flex:0 0 auto;border-radius:50%;border:2px solid var(--aura);display:flex;align-items:center;justify-content:center;color:var(--aura)}
+.pact.none .seal{border-color:var(--line);color:var(--ink-dim)}
+.pact .pt{font-family:var(--mark);color:var(--ink);font-size:1.08rem}
+.pact .pd{font-size:.84rem;color:var(--ink-soft)}
+
+.inv{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:9px}
+.slot{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--card-2);font-size:.82rem}
+.slot b{font-family:var(--mark);color:var(--ink);display:block;font-size:.98rem}
+.slot span{font-family:var(--mono);font-size:.58rem;color:var(--ink-dim)}
+
+.rel{display:flex;gap:11px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:9px;background:var(--card-2)}
+.rel-av{width:40px;height:40px;border-radius:50%;flex:0 0 auto;background:linear-gradient(150deg,var(--sky),var(--sky-deep));border:2px solid var(--relc,var(--gold))}
+.rel-n{font-family:var(--mark);color:var(--ink);font-size:1.05rem}
+.rel-k{font-family:var(--mono);font-size:.6rem;color:var(--relc,var(--sky-deep));text-transform:uppercase}
+.rel-d{font-size:.8rem;color:var(--ink-soft)}
+
+.foot{background:color-mix(in srgb,var(--bg-2) 60%,transparent);border-top:1px solid var(--line-soft);margin-top:16px}
+.foot-in{max-width:1180px;margin:0 auto;padding:24px 20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.foot-b{font-family:var(--disp);font-weight:700;color:var(--ink)}
+.foot-links a{font-family:var(--mono);font-size:.68rem;color:var(--ink-soft);margin-left:14px}
+.note{max-width:1180px;margin:0 auto;padding:12px 20px 36px;font-family:var(--mono);font-size:.6rem;color:var(--ink-dim)}
+</style>
+</head>
+<body data-element="viento">
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="index.html"><img class="crest" src="../../../images/gbe/crest-eternal.png" alt="">Granblue Fantasy: <b>Eternal</b></a>
+  <div class="nav-links"><a class="nav-a" href="index.html">Inicio</a><a class="nav-a" href="#">El Cielo</a><a class="nav-a" href="#">Gremio</a><a class="nav-a on" href="#">Skyfarers</a><a class="nav-a" href="#">Gaceta</a></div>
+  <button class="theme-btn" onclick="toggleTheme()" id="tbtn">Noche</button>
+</div></nav>
+
+<div class="bc"><div class="bc-in"><a href="index.html">Inicio</a><span class="sep">›</span><a href="#">Skyfarers</a><span class="sep">›</span><b>Vael el Errante</b></div></div>
+
+<!-- BANNER 16:9 -->
+<div class="char-banner char-banner-ph">
+  <!-- Sustituir por skyfarer-vael-banner.jpg cuando exista -->
+  <img src="../../../images/gbe/hero-pueblos.jpg" alt="Banner de Vael el Errante">
+  <div class="char-banner-veil"></div>
+  <div class="char-banner-edge"></div>
+</div>
+
+<div class="wrap">
+  <div class="char-id">
+    <div class="char-id-in">
+      <div class="avatar">V</div>
+      <div>
+        <span class="id-eye">Expediente · Nº 00042</span>
+        <h1 class="id-name">Vael el Errante</h1>
+        <p class="id-alias">«El que persigue el viento del alba» · Erune · 22 años</p>
+        <div class="chips">
+          <span class="chip el">◈ Viento</span>
+          <span class="chip">Sable del Viento</span>
+          <span class="chip">Arma · Sable</span>
+          <span class="chip crew">Crew «Alba»</span>
+          <span class="chip ok">Aprobado</span>
+          <span class="chip">Nivel 14 · Rango C</span>
+        </div>
+        <div class="char-acts">
+          <a class="btn btn-hot" href="#">Progresión</a>
+          <button class="btn btn-ghost" type="button">Gestión</button>
+        </div>
+      </div>
+      <div class="id-side">
+        <div class="reno"><div class="v" data-count="4200">0</div><div class="l">Renombre</div><div class="rank">Buscavientos</div></div>
+        <div class="vitals">
+          <div class="vital pv"><div class="top"><span>PV</span><span>86</span></div><div class="bar"><i data-fill="100"></i></div></div>
+          <div class="vital en"><div class="top"><span>Éter</span><span>54/60</span></div><div class="bar"><i data-fill="90"></i></div></div>
+          <div class="vital pa"><div class="top"><span>PA</span><span>7/8</span></div><div class="bar"><i data-fill="88"></i></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs-wrap"><div class="tabs">
+    <button class="tab on" data-tab="atributos">Atributos</button>
+    <button class="tab" data-tab="cronica">Crónica</button>
+    <button class="tab" data-tab="combate">Combate</button>
+    <button class="tab" data-tab="equipo">Equipo</button>
+    <button class="tab" data-tab="relaciones">Relaciones</button>
+  </div></div>
+
+  <div class="panes">
+    <section class="pane on" data-pane="atributos">
+      <div class="dgrid">
+        <div class="panel">
+          <div class="panel-h"><span class="t">Atributos</span><span class="c">// 12 stats · nivel 14</span></div>
+          <div class="panel-b">
+            <div class="pillar"><div class="pillar-h">Cuerpo</div>
+              <div class="stat"><span class="n">Fuerza</span><span class="track"><i data-fill="60" style="background:var(--h4)"></i></span><span class="v" style="color:var(--h4)">60</span></div>
+              <div class="stat"><span class="n">Agilidad</span><span class="track"><i data-fill="82" style="background:var(--h7)"></i></span><span class="v" style="color:var(--h7)">82</span></div>
+              <div class="stat"><span class="n">Vigor</span><span class="track"><i data-fill="55" style="background:var(--h3)"></i></span><span class="v" style="color:var(--h3)">55</span></div>
+              <div class="stat"><span class="n">Destreza</span><span class="track"><i data-fill="74" style="background:var(--h6)"></i></span><span class="v" style="color:var(--h6)">74</span></div>
+            </div>
+            <div class="pillar"><div class="pillar-h">Mente</div>
+              <div class="stat"><span class="n">Ingenio</span><span class="track"><i data-fill="68" style="background:var(--h5)"></i></span><span class="v" style="color:var(--h5)">68</span></div>
+              <div class="stat"><span class="n">Percepción</span><span class="track"><i data-fill="88" style="background:var(--h8)"></i></span><span class="v" style="color:var(--h8)">88</span></div>
+              <div class="stat"><span class="n">Voluntad</span><span class="track"><i data-fill="70" style="background:var(--h6)"></i></span><span class="v" style="color:var(--h6)">70</span></div>
+              <div class="stat"><span class="n">Carisma</span><span class="track"><i data-fill="63" style="background:var(--h4)"></i></span><span class="v" style="color:var(--h4)">63</span></div>
+            </div>
+            <div class="pillar"><div class="pillar-h">Espíritu</div>
+              <div class="stat"><span class="n">Afinidad</span><span class="track"><i data-fill="90" style="background:var(--h8)"></i></span><span class="v" style="color:var(--h8)">90</span></div>
+              <div class="stat"><span class="n">Control</span><span class="track"><i data-fill="77" style="background:var(--h7)"></i></span><span class="v" style="color:var(--h7)">77</span></div>
+              <div class="stat"><span class="n">Resonancia</span><span class="track"><i data-fill="66" style="background:var(--h5)"></i></span><span class="v" style="color:var(--h5)">66</span></div>
+              <div class="stat"><span class="n">Fortuna</span><span class="track"><i data-fill="48" style="background:var(--h2)"></i></span><span class="v" style="color:var(--h2)">48</span></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="panel" style="margin-bottom:16px">
+            <div class="panel-h"><span class="t">Afinidad elemental</span><span class="c">// fijo</span></div>
+            <div class="panel-b prose"><b style="color:var(--aura)">Viento</b> · ventaja sobre Tierra, debilidad frente a Fuego. Define técnicas, aura y ventajas de combate.</div>
+          </div>
+          <div class="panel" style="margin-bottom:16px">
+            <div class="panel-h"><span class="t">Virtudes y defectos</span><span class="c">// personalidad mecánica</span></div>
+            <div class="panel-b prose"><b>Ligero</b> (+iniciativa en cielo abierto) · <b>Oído del Erune</b> (+percepción) · <b>Inquieto</b> (defecto: penalización si repite puerto)</div>
+          </div>
+          <div class="panel">
+            <div class="panel-h"><span class="t">Pacto Primal</span><span class="c">// opcional</span></div>
+            <div class="panel-b"><div class="pact none"><span class="seal">∅</span><div><div class="pt">Sin pacto</div><div class="pd">La mayoría de skyfarers no tienen vínculo con una Bestia Primaria. Se obtiene solo en trama, con aprobación del staff.</div></div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pane" data-pane="cronica">
+      <div class="dgrid">
+        <div class="panel"><div class="panel-h"><span class="t">Descripción física</span></div><div class="panel-b prose">Delgado y de movimientos precisos, con las largas orejas de los Erune siempre atentas al viento. Abrigo de vuelo desgastado y sable curvo de acero celeste.</div></div>
+        <div class="panel"><div class="panel-h"><span class="t">Personalidad</span></div><div class="panel-b prose">Inquieto, incapaz de quedarse dos estaciones en el mismo puerto. Leal a su crew hasta el final.</div></div>
+        <div class="panel" style="grid-column:1/-1"><div class="panel-h"><span class="t">Línea de tiempo</span><span class="c">// crónica on-rol</span></div><div class="panel-b prose">
+          <p><b style="color:var(--gold-deep)">Año 511</b> — Zarpa de Puerto Ancla.</p>
+          <p><b style="color:var(--gold-deep)">Año 512</b> — Se une a la crew «Alba». Sobrevive a la Corona de Tormenta.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section class="pane" data-pane="combate">
+      <div class="dgrid">
+        <div class="panel"><div class="panel-h"><span class="t">Técnicas</span><span class="c">// deck de cartas</span></div><div class="panel-b">
+          <div class="tec"><div class="tec-top"><span class="tec-n">Corte del Alba</span><span class="tec-tier">Tier A</span></div><div class="prose" style="font-size:.86rem">Tajo veloz cargado de viento; escala con Agilidad.</div><div class="tec-tags"><span class="tag el">Viento</span><span class="tag">Sable</span></div></div>
+          <div class="tec"><div class="tec-top"><span class="tec-n">Paso de Nube</span><span class="tec-tier">Tier B</span></div><div class="prose" style="font-size:.86rem">Reposiciona esquivando; consume Éter.</div><div class="tec-tags"><span class="tag el">Viento</span><span class="tag">Movilidad</span></div></div>
+        </div></div>
+        <div class="panel"><div class="panel-h"><span class="t">Vitales de combate</span><span class="c">// AV-01</span></div><div class="panel-b prose">
+          <p><b>PV</b> 86 · <b>Éter</b> 60 · <b>PA</b> 8/turno.</p>
+          <p style="margin-top:8px">Sistema de heridas localizadas y estados alterados (heredado del motor OP, reskinned).</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section class="pane" data-pane="equipo">
+      <div class="panel" style="margin-bottom:16px"><div class="panel-h"><span class="t">Arma equipada</span><span class="c">// define técnicas</span></div><div class="panel-b prose"><b>Sable de acero celeste</b> — filo ligero. Habilita técnicas de tipo Sable.</div></div>
+      <div class="panel"><div class="panel-h"><span class="t">Mochila</span><span class="c">// 4/12 slots</span></div><div class="panel-b"><div class="inv">
+        <div class="slot"><b>Poción de Éter</b><span>×3</span></div>
+        <div class="slot"><b>Log Pose celeste</b><span>navegación</span></div>
+        <div class="slot"><b>Capa de vuelo</b><span>vestible</span></div>
+        <div class="slot"><b>Rupies</b><span>2.450 R</span></div>
+      </div></div></div>
+    </section>
+
+    <section class="pane" data-pane="relaciones">
+      <div class="rel" style="--relc:var(--el-viento)"><div class="rel-av"></div><div><div class="rel-n">Sena de Latón</div><div class="rel-k">Tripulación · Crew Alba</div><div class="rel-d">Ingeniera Harvin de la aeronave.</div></div></div>
+      <div class="rel" style="--relc:var(--el-fuego)"><div class="rel-av"></div><div><div class="rel-n">Rurik Cornalta</div><div class="rel-k">Rival</div><div class="rel-d">Draph que disputa el mismo contrato del Gremio.</div></div></div>
+    </section>
+  </div>
+</div>
+
+<footer class="foot"><div class="foot-in"><span class="foot-b">Granblue Fantasy: Eternal</span><div class="foot-links"><a href="index.html">Inicio</a><a href="#">Reglas</a></div></div></footer>
+<p class="note">PROTOTIPO ficha v4 · Banner 16:9 custom por PJ (datos.banner) · avatar + icono propios · placeholder demo con hero-pueblos.jpg.</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+var REDUCED=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function toggleTheme(){var h=document.documentElement,b=document.getElementById('tbtn');var n=h.getAttribute('data-theme')==='noche';h.setAttribute('data-theme',n?'cielo':'noche');b.textContent=n?'Noche':'Cielo';}
+
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on')});
+    document.querySelectorAll('.pane').forEach(function(x){x.classList.remove('on')});
+    t.classList.add('on');
+    var p=document.querySelector('.pane[data-pane="'+t.dataset.tab+'"]');
+    if(p){p.classList.add('on');fillBars(p);}
+  });
+});
+function fillBars(scope){
+  (scope||document).querySelectorAll('[data-fill]').forEach(function(i){
+    if(i.dataset.done)return;i.dataset.done=1;
+    var v=i.getAttribute('data-fill')+'%';
+    if(REDUCED){i.style.width=v;return;}
+    setTimeout(function(){i.style.width=v;},80);
+  });
+}
+window.addEventListener('load',function(){
+  fillBars(document.querySelector('.char-id'));
+  fillBars(document.querySelector('.pane.on'));
+  if(window.gsap&&window.ScrollTrigger){
+    gsap.registerPlugin(ScrollTrigger);
+    document.querySelectorAll('[data-count]').forEach(function(el){
+      var end=+el.getAttribute('data-count'),o={v:0};
+      if(REDUCED){el.textContent=end.toLocaleString('es');return;}
+      gsap.to(o,{v:end,duration:1.4,ease:'power2.out',scrollTrigger:{trigger:el,start:'top 92%'},onUpdate:function(){el.textContent=Math.floor(o.v).toLocaleString('es');}});
+    });
+  }
+});
+</script>
+</body>
+</html>

@@ -12,6 +12,7 @@ define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'progresion.php');
 require_once './global.php';
 require_once MYBB_ROOT . 'inc/ope_rol_data.php';
+require_once MYBB_ROOT . 'inc/ope_rol_haki.php';
 
 $bburl     = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname    = htmlspecialchars_uni($mybb->settings['bbname']);
@@ -100,7 +101,8 @@ if ($loggedin && $active_pid > 0 && $pj && $mybb->request_method === 'post'
     $stats_ganados_check = (int)($pj['stats_ganados'] ?? 0);
     $nivel_check = (int)($pj['nivel'] ?? 1);
     if (!function_exists('ope_rol_puede_subir_stats')) {
-        require_once MYBB_ROOT . 'inc/ope_rol_data.php';
+require_once MYBB_ROOT . 'inc/ope_rol_data.php';
+require_once MYBB_ROOT . 'inc/ope_rol_haki.php';
     }
     if (!ope_rol_puede_subir_stats($nivel_check, $stats_ganados_check)) {
         $flash = '¡Has alcanzado el límite de tu nivel! Sube de nivel para poder seguir mejorando tus stats.';
@@ -153,6 +155,22 @@ if ($loggedin && $active_pid > 0 && $pj && $mybb->request_method === 'post'
     } // fin else (bloqueo nivel)
 }
 
+// ── Procesar subida de Haki ──
+if ($loggedin && $active_pid > 0 && $mybb->request_method === 'post'
+    && verify_post_check($mybb->get_input('my_post_key'), true)
+    && $mybb->get_input('haki_tipo')) {
+    $tipo = $mybb->get_input('haki_tipo');
+    $resultado = function_exists('ope_haki_subir') ? ope_haki_subir($active_pid, $tipo) : 'Sistema Haki no disponible.';
+    if ($resultado === '') {
+        $flash = '¡Haki mejorado!';
+        $flash_kind = 'ok';
+    } else {
+        $flash = $resultado;
+        $flash_kind = 'error';
+    }
+    $pp_data = function_exists('ope_pp_saldo') ? ope_pp_saldo($active_pid) : $pp_data;
+}
+
 // Refrescar personaje tras POST redirect o recalc lazy
 if ($active_pid > 0 && $db->table_exists('rol_personajes')) {
     $pq = $db->simple_select('rol_personajes', '*', "pid = {$active_pid} AND uid = {$uid}", array('limit' => 1));
@@ -174,6 +192,11 @@ if ($active_pid > 0 && $db->table_exists('rol_pp_log')) {
         $pp_log[] = $lr;
     }
 }
+
+// ── Haki ──
+$haki = function_exists('ope_haki_get') ? ope_haki_get($active_pid) : array();
+$haki_tipos = function_exists('ope_haki_tipos') ? ope_haki_tipos() : array();
+$haki_niveles = function_exists('ope_haki_niveles') ? ope_haki_niveles() : array();
 
 // ── Función local para formatear stats ──
 // Ya no se usa RANK_LABELS; se usará ope_rol_stat_label() donde se necesite
@@ -260,7 +283,7 @@ header('Content-Type: text/html; charset=utf-8');
           <span><b><?php echo (int) $faltan; ?></b> pts &rarr; Nivel <?php echo (int)($nivel_actual + 1); ?></span>
         </div>
         <div class="ope-prog-hero-bar"><span style="width:<?php echo (int) $prog_pct; ?>%"></span></div>
-        <p class="ope-prog-hero-note">Gasta <b>PP</b> en tus atributos. El coste aumenta por tramos: 1 PP/pto (5-20), 2 PP/pto (21-40), 3 PP/pto (41-60), 5 PP/pto (61-80), 8 PP/pto (81-100), 12 PP/pto (101+).</p>
+        <p class="ope-prog-hero-note">Gasta <b>PP</b> en tus atributos para hacerlos crecer. El coste sube por tramos &mdash; consulta la tabla de <b>costes</b> más abajo.</p>
       </div>
       <div class="ope-prog-hero-pp">
         <span class="ope-prog-hero-pp-val"><?php echo (int) $pp_data['pp_disponible']; ?></span>
@@ -293,14 +316,14 @@ header('Content-Type: text/html; charset=utf-8');
   </section>
   <?php elseif (!$puede_subir_stats): ?>
   <section class="reveal">
-    <div class="plate" style="border-color: var(--ember);">
+    <div class="plate ope-lvl-plate ope-lvl-plate--warn">
       <div class="plate-h">
         <span class="t">¡Límite de nivel alcanzado!</span>
         <span class="c">// Nivel <?php echo $nivel_actual; ?></span>
       </div>
       <div class="plate-b">
         <p>Has llegado al máximo de puntos de stat para tu nivel actual (<b><?php echo $pts_necesarios; ?> pts</b>). Sube de nivel para seguir mejorando.</p>
-        <p style="color:var(--ink-dim);">Puntos acumulados: <b><?php echo $stats_ganados; ?></b> / <?php echo $pts_necesarios; ?></p>
+        <p class="ope-prog-muted">Puntos acumulados: <b><?php echo $stats_ganados; ?></b> / <?php echo $pts_necesarios; ?></p>
         <form method="post" action="progresion.php" class="ope-lvl-form">
           <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
           <input type="hidden" name="subir_nivel" value="1">
@@ -355,58 +378,9 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
   </section>
 
-  <!-- ── Barra de PP ── -->
+  <!-- ═══ ATRIBUTOS (acción principal) ═══ -->
   <section class="reveal">
-    <div class="ope-prog-ppbar">
-      <div class="ope-prog-ppbar-total">
-        <span class="ope-prog-ppbar-val"><?php echo $pp_data['pp_disponible']; ?></span>
-        <span class="ope-prog-ppbar-label">PP disponibles</span>
-      </div>
-      <div class="ope-prog-ppbar-detail">
-        <div class="ope-prog-ppbar-stat">
-          <span class="ope-prog-ppbar-num"><?php echo $pp_data['pp_total']; ?></span>
-          <span class="ope-prog-ppbar-lbl">Total ganados</span>
-        </div>
-        <div class="ope-prog-ppbar-stat">
-          <span class="ope-prog-ppbar-num"><?php echo $pp_data['pp_gastado']; ?></span>
-          <span class="ope-prog-ppbar-lbl">Gastados</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Racha diaria ── -->
-  <?php
-  if (function_exists('ope_racha_get')) {
-      require_once MYBB_ROOT . 'inc/ope_rol_rachas.php';
-  }
-  $racha_data = function_exists('ope_racha_get') ? ope_racha_get($active_pid) : array('racha_dias' => 0);
-  $racha_dias = (int)($racha_data['racha_dias'] ?? 0);
-  $racha_hitos = array(7, 14, 21, 30);
-  ?>
-  <section class="reveal">
-    <div class="shead shead-sec"><h2>Racha diaria</h2><span class="code">// <?php echo $racha_dias; ?> días</span><span class="rule"></span></div>
-    <div class="plate"><div class="plate-b">
-      <div class="ope-racha-bar">
-        <?php foreach ($racha_hitos as $hito):
-          $alcanzado = $racha_dias >= $hito;
-          $flag = "recompensa_dia{$hito}";
-          $cobrado = $racha_data[$flag] ?? 0;
-          $cls = $cobrado ? 'ope-racha-dot--cobrado' : ($alcanzado ? 'ope-racha-dot--on' : '');
-        ?>
-        <div class="ope-racha-dot <?php echo $cls; ?>">
-          <span class="ope-racha-dot-dia">Día <?php echo $hito; ?></span>
-          <span class="ope-racha-dot-estado"><?php echo $cobrado ? '✓ Cobrado' : ($alcanzado ? 'Disponible' : ''); ?></span>
-        </div>
-        <?php endforeach; ?>
-      </div>
-      <p class="ope-racha-note">Postea al menos una vez cada 48h para mantener la racha. Si fallas, vuelve a 0.</p>
-    </div></div>
-  </section>
-
-  <!-- ── Stats y costes ── -->
-  <section class="reveal">
-    <div class="shead shead-sec"><h2>Atributos</h2><span class="code">// stats</span><span class="rule"></span></div>
+    <div class="shead shead-sec"><h2>Atributos</h2><span class="code">// gasta PP para mejorar</span><span class="rule"></span></div>
 
     <?php
     $stats_catalogo = ope_rol_stats();
@@ -441,7 +415,7 @@ header('Content-Type: text/html; charset=utf-8');
                 <span class="ope-prog-stat-next">→ <?php echo (int)($val + 1); ?></span>
                 <span class="ope-prog-stat-pp"><?php echo (int) $coste; ?> PP</span>
                 <?php if ($bloqueado_nivel): ?>
-                <span class="ope-prog-stat-nopp" style="color:var(--ember);">¡Necesitas subir de nivel!</span>
+                <span class="ope-prog-stat-nopp ope-prog-stat-nopp--lvl">¡Necesitas subir de nivel!</span>
                 <?php elseif ($puede_subir): ?>
                 <form method="post" action="progresion.php" class="ope-prog-form-inline">
                   <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
@@ -462,65 +436,173 @@ header('Content-Type: text/html; charset=utf-8');
     <?php endforeach; ?>
   </section>
 
-  <!-- ── Historial de PP ── -->
-  <?php if (!empty($pp_log)): ?>
+  <!-- ═══ COLUMNAS: HAKI | (RACHA + PP) ═══ -->
+  <?php
+  if (function_exists('ope_racha_get')) {
+      require_once MYBB_ROOT . 'inc/ope_rol_rachas.php';
+  }
+  $racha_data = function_exists('ope_racha_get') ? ope_racha_get($active_pid) : array('racha_dias' => 0);
+  $racha_dias = (int)($racha_data['racha_dias'] ?? 0);
+  $racha_hitos = array(7, 14, 21, 30);
+  ?>
   <section class="reveal">
-    <div class="shead shead-sec"><h2>Historial</h2><span class="code">// últ. movimientos</span><span class="rule"></span></div>
-    <div class="plate">
-      <div class="plate-b ope-prog-plate-nopad">
-        <table class="ope-prog-log">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Tipo</th>
-              <th>PP</th>
-              <th>Detalle</th>
-            </tr>
-          </thead>
-          <tbody>
-          <?php foreach ($pp_log as $log):
-            $cambio = (int) $log['pp_cambio'];
-            $tipo_label = array(
-              'post' => 'Post', 'mision' => 'Misión', 'arco' => 'Arco',
-              'evento' => 'Evento', 'staff' => 'Staff',
-              'gasto_stat' => 'Subir stat', 'gasto_carta' => 'Carta', 'gasto_haki' => 'Haki',
-            );
-            $tipo_str = $tipo_label[$log['tipo']] ?? $log['tipo'];
-            $palabras_str = $log['palabras'] > 0 ? " ({$log['palabras']} palabras)" : '';
-          ?>
-            <tr class="<?php echo $cambio > 0 ? 'ope-prog-log-gan' : 'ope-prog-log-gas'; ?>">
-              <td><?php echo date('d/m/Y', (int) $log['dateline']); ?></td>
-              <td><?php echo htmlspecialchars_uni($tipo_str); ?></td>
-              <td class="ope-prog-log-pp"><?php echo $cambio > 0 ? '+' . $cambio : $cambio; ?></td>
-              <td><?php echo htmlspecialchars_uni($log['notas'] . $palabras_str); ?></td>
-            </tr>
-          <?php endforeach; ?>
-          </tbody>
-        </table>
+    <div class="ope-prog-cols">
+
+      <!-- Haki -->
+      <div class="ope-prog-col">
+        <div class="shead shead-sec"><h2>Haki</h2><span class="code">// voluntad</span><span class="rule"></span></div>
+        <?php if (!empty($haki_tipos)): ?>
+        <?php foreach ($haki_tipos as $tipo_key => $tipo_info):
+          $nivel = (int)($haki[$tipo_key]['nivel'] ?? 0);
+          $siguiente = $nivel + 1;
+          $puede_subir = ($nivel < 4) && ($tipo_key !== 'haoshoku' || $nivel === 0);
+          $info_nivel = isset($haki_niveles[$siguiente]) ? $haki_niveles[$siguiente] : null;
+          $coste = $info_nivel ? (int)$info_nivel['coste_pp'] : 0;
+          $requiere = $info_nivel ? (int)$info_nivel['requiere_nivel'] : 0;
+          $bloqueado = $info_nivel && $nivel_actual < $requiere;
+          $sin_pp = $pp_data['pp_disponible'] < $coste;
+        ?>
+        <div class="plate">
+          <div class="plate-h">
+            <span class="t"><?php echo htmlspecialchars_uni($tipo_info['nombre']); ?></span>
+            <span class="c">// Nivel <?php echo $nivel; ?>/4</span>
+          </div>
+          <div class="plate-b">
+            <p class="mb-8"><?php echo htmlspecialchars_uni($tipo_info['desc']); ?></p>
+            <div class="ope-haki-bar">
+              <?php for ($i = 1; $i <= 4; $i++): ?>
+              <span class="ope-haki-dot<?php echo $i <= $nivel ? ' ope-haki-dot--on' : ''; ?>">Nv.<?php echo $i; ?></span>
+              <?php endfor; ?>
+            </div>
+            <?php if ($nivel >= 4): ?>
+              <p class="ope-haki-max">&#9733; Nivel Supremo alcanzado</p>
+            <?php elseif ($tipo_key === 'haoshoku' && $nivel >= 1): ?>
+              <p class="ope-haki-pl">Haoshoku se mejora con Puntos de Leyenda (PL), no con PP.</p>
+            <?php elseif ($bloqueado): ?>
+              <p class="ope-haki-locked">Requiere nivel <?php echo $requiere; ?> (tienes <?php echo $nivel_actual; ?>)</p>
+            <?php elseif ($sin_pp): ?>
+              <p class="ope-haki-locked">Necesitas <?php echo $coste; ?> PP (tienes <?php echo (int)$pp_data['pp_disponible']; ?>)</p>
+            <?php else: ?>
+              <form method="post" action="progresion.php">
+                <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
+                <input type="hidden" name="haki_tipo" value="<?php echo $tipo_key; ?>">
+                <p>Subir a nivel <?php echo $siguiente; ?> (<?php echo htmlspecialchars_uni($info_nivel['nombre']); ?>): <b><?php echo $coste; ?> PP</b></p>
+                <button type="submit" class="btn btn-hot">Subir Haki</button>
+              </form>
+            <?php endif; ?>
+          </div>
+        </div>
+        <?php endforeach; ?>
+        <?php else: ?>
+        <div class="plate"><div class="plate-b"><p class="ope-prog-muted">El sistema de Haki no está disponible.</p></div></div>
+        <?php endif; ?>
       </div>
+
+      <!-- Racha diaria + Puntos de Progreso -->
+      <div class="ope-prog-col">
+        <div class="shead shead-sec"><h2>Racha diaria</h2><span class="code">// <?php echo $racha_dias; ?> días</span><span class="rule"></span></div>
+        <div class="plate"><div class="plate-b">
+          <div class="ope-racha-bar">
+            <?php foreach ($racha_hitos as $hito):
+              $alcanzado = $racha_dias >= $hito;
+              $flag = "recompensa_dia{$hito}";
+              $cobrado = $racha_data[$flag] ?? 0;
+              $cls = $cobrado ? 'ope-racha-dot--cobrado' : ($alcanzado ? 'ope-racha-dot--on' : '');
+            ?>
+            <div class="ope-racha-dot <?php echo $cls; ?>">
+              <span class="ope-racha-dot-dia">Día <?php echo $hito; ?></span>
+              <span class="ope-racha-dot-estado"><?php echo $cobrado ? '✓ Cobrado' : ($alcanzado ? 'Disponible' : ''); ?></span>
+            </div>
+            <?php endforeach; ?>
+          </div>
+          <p class="ope-racha-note">Postea al menos una vez cada 48h para mantener la racha. Si fallas, vuelve a 0.</p>
+        </div></div>
+
+        <div class="shead shead-sec"><h2>Puntos de Progreso</h2><span class="code">// desglose</span><span class="rule"></span></div>
+        <div class="ope-prog-ppbar ope-prog-ppbar--stack">
+          <div class="ope-prog-ppbar-total">
+            <span class="ope-prog-ppbar-val"><?php echo $pp_data['pp_disponible']; ?></span>
+            <span class="ope-prog-ppbar-label">PP disponibles</span>
+          </div>
+          <div class="ope-prog-ppbar-detail">
+            <div class="ope-prog-ppbar-stat">
+              <span class="ope-prog-ppbar-num"><?php echo $pp_data['pp_total']; ?></span>
+              <span class="ope-prog-ppbar-lbl">Total ganados</span>
+            </div>
+            <div class="ope-prog-ppbar-stat">
+              <span class="ope-prog-ppbar-num"><?php echo $pp_data['pp_gastado']; ?></span>
+              <span class="ope-prog-ppbar-lbl">Gastados</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
-  <?php endif; ?>
 
-  <!-- ── Tabla de referencia de costes ── -->
+  <!-- ═══ COLUMNAS: HISTORIAL | COSTES ═══ -->
   <section class="reveal">
-    <div class="shead shead-sec"><h2>Costes de Stats</h2><span class="code">// referencia INI-04</span><span class="rule"></span></div>
-    <div class="plate">
-      <div class="plate-b ope-prog-plate-nopad">
-        <table class="ope-prog-log">
-          <thead>
-            <tr><th>Tramo</th><th>Coste por punto</th><th>Ejemplo</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>5 – 20</td><td class="ope-prog-log-pp">1 PP</td><td>Subir de 12 a 13 cuesta 1 PP</td></tr>
-            <tr><td>21 – 40</td><td class="ope-prog-log-pp">2 PP</td><td>Subir de 25 a 26 cuesta 2 PP</td></tr>
-            <tr><td>41 – 60</td><td class="ope-prog-log-pp">3 PP</td><td>Subir de 50 a 51 cuesta 3 PP</td></tr>
-            <tr><td>61 – 80</td><td class="ope-prog-log-pp">5 PP</td><td>Subir de 70 a 71 cuesta 5 PP</td></tr>
-            <tr><td>81 – 100</td><td class="ope-prog-log-pp">8 PP</td><td>Subir de 90 a 91 cuesta 8 PP</td></tr>
-            <tr><td>101+</td><td class="ope-prog-log-pp">12 PP</td><td>Subir de 105 a 106 cuesta 12 PP</td></tr>
-          </tbody>
-        </table>
+    <div class="ope-prog-cols">
+
+      <!-- Historial -->
+      <div class="ope-prog-col">
+        <div class="shead shead-sec"><h2>Historial</h2><span class="code">// últ. movimientos</span><span class="rule"></span></div>
+        <?php if (!empty($pp_log)): ?>
+        <div class="plate">
+          <div class="plate-b ope-prog-plate-nopad">
+            <table class="ope-prog-log">
+              <thead>
+                <tr><th>Fecha</th><th>Tipo</th><th>PP</th><th>Detalle</th></tr>
+              </thead>
+              <tbody>
+              <?php foreach ($pp_log as $log):
+                $cambio = (int) $log['pp_cambio'];
+                $tipo_label = array(
+                  'post' => 'Post', 'mision' => 'Misión', 'arco' => 'Arco',
+                  'evento' => 'Evento', 'staff' => 'Staff',
+                  'gasto_stat' => 'Subir stat', 'gasto_carta' => 'Carta', 'gasto_haki' => 'Haki',
+                );
+                $tipo_str = $tipo_label[$log['tipo']] ?? $log['tipo'];
+                $palabras_str = $log['palabras'] > 0 ? " ({$log['palabras']} palabras)" : '';
+              ?>
+                <tr class="<?php echo $cambio > 0 ? 'ope-prog-log-gan' : 'ope-prog-log-gas'; ?>">
+                  <td><?php echo date('d/m/Y', (int) $log['dateline']); ?></td>
+                  <td><?php echo htmlspecialchars_uni($tipo_str); ?></td>
+                  <td class="ope-prog-log-pp"><?php echo $cambio > 0 ? '+' . $cambio : $cambio; ?></td>
+                  <td><?php echo htmlspecialchars_uni($log['notas'] . $palabras_str); ?></td>
+                </tr>
+              <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <?php else: ?>
+        <div class="plate"><div class="plate-b"><p class="ope-prog-muted">Aún no hay movimientos de PP registrados.</p></div></div>
+        <?php endif; ?>
       </div>
+
+      <!-- Costes de Stats -->
+      <div class="ope-prog-col">
+        <div class="shead shead-sec"><h2>Costes de Stats</h2><span class="code">// referencia INI-04</span><span class="rule"></span></div>
+        <div class="plate">
+          <div class="plate-b ope-prog-plate-nopad">
+            <table class="ope-prog-log">
+              <thead>
+                <tr><th>Tramo</th><th>Coste por punto</th><th>Ejemplo</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>5 – 20</td><td class="ope-prog-log-pp">1 PP</td><td>Subir de 12 a 13 cuesta 1 PP</td></tr>
+                <tr><td>21 – 40</td><td class="ope-prog-log-pp">2 PP</td><td>Subir de 25 a 26 cuesta 2 PP</td></tr>
+                <tr><td>41 – 60</td><td class="ope-prog-log-pp">3 PP</td><td>Subir de 50 a 51 cuesta 3 PP</td></tr>
+                <tr><td>61 – 80</td><td class="ope-prog-log-pp">5 PP</td><td>Subir de 70 a 71 cuesta 5 PP</td></tr>
+                <tr><td>81 – 100</td><td class="ope-prog-log-pp">8 PP</td><td>Subir de 90 a 91 cuesta 8 PP</td></tr>
+                <tr><td>101+</td><td class="ope-prog-log-pp">12 PP</td><td>Subir de 105 a 106 cuesta 12 PP</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 

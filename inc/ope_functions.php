@@ -60,21 +60,22 @@ if (!function_exists('ope_forum_image')) {
 }
 
 if (!function_exists('ope_sector_art')) {
-    /** Arte SVG procedural determinista por fid (fallback cuando no hay foto). */
+    /** Arte SVG procedural determinista por fid (fallback cuando no hay foto).
+     *  Estética GBF: cielo, nubes, éter, islas flotantes. */
     function ope_sector_art($fid) {
         static $art = [
-            // 0 · fundición / ciudad
-            '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><rect width="200" height="168" fill="#2a2d33"/><polygon points="0,168 46,64 92,120 128,50 176,120 200,72 200,168" fill="#1b1d22"/><rect x="150" y="30" width="16" height="14" fill="#e0641f"/><rect x="120" y="40" width="10" height="24" fill="#31353d"/></svg>',
-            // 1 · bosque
-            '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><rect width="200" height="168" fill="#20281e"/><polygon points="0,168 24,96 52,138 78,70 104,130 132,58 164,138 190,92 200,168" fill="#141a12"/></svg>',
-            // 2 · sierra
-            '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><rect width="200" height="168" fill="#3a3e46"/><polygon points="0,168 44,52 74,100 104,26 134,94 166,46 200,110 200,168" fill="#24272e"/><polygon points="104,26 118,52 90,52" fill="#c9c4b4"/></svg>',
-            // 3 · costa
-            '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><rect width="200" height="168" fill="#1a2a33"/><path d="M0 112 Q50 96 100 112 T200 112 V168 H0Z" fill="#22414d"/><path d="M0 136 Q50 122 100 136 T200 136 V168 H0Z" fill="#2f5866"/></svg>',
-            // 4 · prohibido
-            '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><rect width="200" height="168" fill="#0f1013"/><polygon points="0,168 30,92 60,146 90,64 120,138 150,84 200,168" fill="#171922"/><circle cx="100" cy="52" r="3" fill="#e0641f"/><circle cx="140" cy="36" r="2" fill="#f4b02f"/></svg>',
-            // 5 · refugio
-            '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><rect width="200" height="168" fill="#42382a"/><polygon points="0,168 200,168 200,124 150,134 100,104 50,134 0,124" fill="#2e281d"/><rect x="84" y="52" width="34" height="80" fill="#5a4a35"/><polygon points="74,52 128,52 100,26" fill="#3a3020"/></svg>',
+            // 0 · Phantagrande — puerto verde con brisa
+            '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9bbed8"/><stop offset="1" stop-color="#e7f0f7"/></linearGradient></defs><rect width="200" height="168" fill="url(#g0)"/><path d="M0 110 Q50 96 100 110 T200 110 V168 H0Z" fill="#3a6b56"/><path d="M0 124 Q60 114 120 124 T200 124 V168 H0Z" fill="#2d5642"/><circle cx="160" cy="36" r="14" fill="#fff" opacity=".7"/><circle cx="180" cy="48" r="10" fill="#fff" opacity=".55"/></svg>',
+            // 1 · Nalhegrande — niebla dorada entre montañas
+            '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9a86b"/><stop offset="1" stop-color="#e8d3a5"/></linearGradient></defs><rect width="200" height="168" fill="url(#g1)"/><polygon points="0,168 36,90 70,128 102,68 134,118 168,80 200,138 200,168" fill="#7a5837" opacity=".7"/><path d="M0 130 Q60 118 120 130 T200 130 V168 H0Z" fill="#d8be7e" opacity=".55"/></svg>',
+            // 2 · Zeephone — hielo azul
+            '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7eb8d8"/><stop offset="1" stop-color="#cee8f1"/></linearGradient></defs><rect width="200" height="168" fill="url(#g2)"/><polygon points="20,60 36,32 50,58" fill="#fff" opacity=".9"/><polygon points="100,40 122,12 142,38" fill="#fff" opacity=".9"/><polygon points="170,72 186,46 200,70" fill="#fff" opacity=".9"/><path d="M0 124 Q60 116 120 124 T200 124 V168 H0Z" fill="#5a9fc4" opacity=".5"/></svg>',
+            // 3 · Auguste — volcán
+            '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d99a5a"/><stop offset="1" stop-color="#f4c987"/></linearGradient></defs><rect width="200" height="168" fill="url(#g3)"/><polygon points="60,168 100,52 140,168" fill="#8b3a25"/><polygon points="100,52 92,68 108,68" fill="#1a0a06"/><path d="M0 132 Q60 120 120 132 T200 132 V168 H0Z" fill="#7a2a18" opacity=".6"/></svg>',
+            // 4 · Estalucia — isla legendaria dorada
+            '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d4c4a8"/><stop offset="1" stop-color="#f3e5c4"/></linearGradient></defs><rect width="200" height="168" fill="url(#g4)"/><polygon points="40,120 100,30 160,120" fill="#8f7a5a" opacity=".7"/><polygon points="100,30 88,52 112,52" fill="#4a3a26"/><circle cx="100" cy="58" r="4" fill="#b7924e"/><path d="M0 124 Q60 116 120 124 T200 124 V168 H0Z" fill="#a08a64" opacity=".6"/></svg>',
+            // 5 · Reserva — altamar
+            '<svg viewBox="0 0 200 168" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5ba3d0"/><stop offset="1" stop-color="#a8d4e8"/></linearGradient></defs><rect width="200" height="168" fill="url(#g5)"/><path d="M0 100 Q50 84 100 100 T200 100 V168 H0Z" fill="#2f6fa0"/><path d="M0 124 Q50 110 100 124 T200 124 V168 H0Z" fill="#3f8fc0" opacity=".7"/></svg>',
         ];
         return $art[(int)$fid % count($art)];
     }

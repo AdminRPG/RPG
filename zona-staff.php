@@ -102,6 +102,15 @@ if ($db->table_exists('rol_mv_noticias')) {
     $mv_noticias_activas = (int) $db->fetch_field($db->simple_select('rol_mv_noticias', 'COUNT(*) c', 'activa = 1'), 'c');
 }
 
+$npc_sec_count = 0;
+if ($db->table_exists('rol_npcs_secundarios')) {
+    $npc_sec_count = (int) $db->fetch_field($db->simple_select('rol_npcs_secundarios', 'COUNT(*) c'), 'c');
+}
+
+$acomp_sol_pend = function_exists('ope_rol_acompanante_solicitudes_pend_count')
+    ? ope_rol_acompanante_solicitudes_pend_count()
+    : 0;
+
 $trip_tramites_pend = 0;
 if ($db->table_exists('rol_tramites')) {
     $trip_tramites_pend = (int) $db->fetch_field(
@@ -157,6 +166,16 @@ $zonas = array(
         'body'  => 'Asocia cartas ya creadas al deck de cualquier personaje. Al asignar se copia la carta al deck (con su insignia propia). Gestiona el deck: retirar cartas o marcar la T&eacute;cnica Insignia.',
         'meta'  => $cartas_asignadas . ' asignada(s)', 'cta' => 'Asignar', 'badge' => 0, 'href' => $bburl . '/asignar-cartas.php',
         'icon'  => '<path d="M9 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"/><rect x="9" y="2" width="10" height="20" rx="2"/><path d="M13 7h2"/><path d="M13 11h2"/>'),
+    array('grp' => 'administrador', 'code' => 'STF-14',
+        'title' => 'NPCs Secundarios',
+        'body'  => 'Crea fichas simplificadas de NPCs secundarios con nombre, imagen, descripci&oacute;n y t&eacute;cnicas representativas. Cada carta muestra el dise&ntilde;o en vivo mientras la editas, con imagen a la izquierda y datos a la derecha.',
+        'meta'  => $npc_sec_count . ' en biblioteca', 'cta' => 'Crear NPC', 'badge' => 0, 'href' => $bburl . '/crear-npc-secundario.php',
+        'icon'  => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
+    array('grp' => 'colaborador', 'code' => 'STF-15',
+        'title' => 'Solicitudes de acompa&ntilde;ante',
+        'body'  => 'Aprueba o rechaza las solicitudes de los jugadores para asociar un <b>NPC secundario</b> como acompa&ntilde;ante. Al aprobar, el NPC se asigna a un slot libre del personaje (m&aacute;x. 2).',
+        'meta'  => $acomp_sol_pend . ' pendiente(s)', 'cta' => 'Revisar', 'badge' => $acomp_sol_pend, 'href' => $bburl . '/gestionar-acompanantes.php',
+        'icon'  => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
     array('grp' => 'webmaster', 'code' => 'STF-08',
         'title' => 'Mundo Vivo',
         'body'  => 'Centro de la Balanza: eventos notificados, misiones del mes, tablero de zonas/facciones/tensi&oacute;n, NPCs y sus ubicaciones. Genera el super-prompt para la IA, ingiere el resultado y publica el nuevo estado del mundo y el peri&oacute;dico <b>Eternal News</b>.',

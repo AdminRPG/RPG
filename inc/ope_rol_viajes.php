@@ -264,7 +264,7 @@ function ope_viaje_solicitar(array $data)
     // Mensaje corto: el HTML del oráculo se renderiza vía [viaje=ID] en parse_message.
     $tid = ope_system_create_thread($fid_alta, $subject, '[viaje=0]', 'Viaje');
     if ($tid < 1) {
-        return array('ok' => false, 'msg' => 'OP-Eternal no pudo crear el hilo. ¿Está activo el bot?');
+        return array('ok' => false, 'msg' => 'Lyria no pudo crear el hilo. ¿Está activo el bot?');
     }
 
     $db->insert_query('rol_viajes', array(
@@ -305,7 +305,7 @@ function ope_viaje_solicitar(array $data)
     $bburl = rtrim((string) $mybb->settings['bburl'], '/');
     return array(
         'ok'       => true,
-        'msg'      => 'Viaje iniciado. OP-Eternal ha publicado el Oráculo.',
+        'msg'      => 'Viaje iniciado. Lyria ha publicado el Oráculo.',
         'tid'      => $tid,
         'viaje_id' => $viaje_id,
         'url'      => $bburl . '/showthread.php?tid=' . $tid,
@@ -368,7 +368,7 @@ function ope_viaje_cerrar($viaje_id, $uid, $active_pid)
     $bburl = rtrim((string) $GLOBALS['mybb']->settings['bburl'], '/');
     return array(
         'ok'  => true,
-        'msg' => 'Llegada confirmada. OP-Eternal ha publicado el cierre.',
+        'msg' => 'Llegada confirmada. Lyria ha publicado el cierre.',
         'url' => $bburl . '/showthread.php?tid=' . (int) $viaje['tid'],
     );
 }
@@ -426,7 +426,7 @@ function ope_viaje_panel_showthread($tid, $uid, $active_pid)
         $html .= '<input type="hidden" name="my_post_key" value="' . htmlspecialchars_uni($mybb->post_code) . '">';
         $html .= '<input type="hidden" name="action" value="cerrar">';
         $html .= '<input type="hidden" name="viaje_id" value="' . (int) $viaje['viaje_id'] . '">';
-        $html .= '<p class="ope-viaje-panel-note">Cuando la tripulación haya roteado lo suficiente, solicita la <strong>llegada a ' . $dest . '</strong>. OP-Eternal publicará el cierre.</p>';
+        $html .= '<p class="ope-viaje-panel-note">Cuando la tripulación haya roteado lo suficiente, solicita la <strong>llegada a ' . $dest . '</strong>. Lyria publicará el cierre.</p>';
         $html .= '<button type="submit" class="ope-btn ope-btn-hot">Solicitar llegada</button>';
         $html .= '</form>';
     } elseif ($estado === 'cerrado') {

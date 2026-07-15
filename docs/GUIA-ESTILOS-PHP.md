@@ -1,10 +1,18 @@
 # Guía de Estilos para Nuevas Páginas PHP
 
-> **Fuente de verdad: `docs/DESIGN-ONE-PIECE-ETERNAL.md` §7.8** (resumida también en `AGENTS.md`).
-> Este documento es el how-to práctico; ante cualquier duda o conflicto, manda §7.8.
+> **Fuente de verdad: `docs/DESIGN-GRANBLUE-ETERNAL.md` §5** (resumida en `AGENTS.md` y `docs/AGENTES-Y-HERRAMIENTAS.md`).
 >
-> Regla de oro: **CERO `<style>` y CERO `style=""` estáticos en PHP.**
-> Todo el CSS va en `docs/themes/ope.css` bajo `body.ope-pg-<pagina>`.
+> **Portada MyBB:** no uses esta guía — usa `body.gbe-index` y DESIGN §6.
+>
+> Regla de oro: **CERO `<style>` y CERO `style=""` estáticos en PHP.** Todo el CSS va en `docs/themes/ope.css`.
+
+---
+
+## Antes de portar UI (cualquier herramienta: Cursor / OpenCode / Antigravity)
+
+1. Lee `docs/AGENTES-Y-HERRAMIENTAS.md` §2 — **no portes a medias**.
+2. Si viene de prototipo HTML, implementa las **5 capas** (estructura, tokens, overrides OP, fuentes, datos).
+3. Compara visualmente con `docs/Prototypes/Granblue/` antes de cerrar la tarea.
 
 ---
 
@@ -84,8 +92,7 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:red
 </html>
 ```
 
-> ⚠️ **LEE ESTO ANTES DE USAR LOS COMPONENTES DE ABAJO** (causa nº1 de páginas rotas — incidente `haki.php`):
-> Las clases base **`.shead .plate .plate-h .plate-b .reveal .flash .pj-empty` NO son globales**. Cada página las **re-declara** bajo su scope (`body.ope-pg-personajes .plate`, `body.ope-pg-ficha .plate`, …). Si usas estos componentes en un `<body class="ope-pg-nueva">` **sin añadir su CSS scopeado** (§4), salen sin estilo (texto plano). SÍ son globales: `.wrap .breadcrumb .btn* .ope-prog-*`.
+> ⚠️ **GOTCHA nº1** (causa de páginas rotas): las clases base **`.shead .plate .plate-h .plate-b .reveal .flash .pj-empty` NO son globales**. Cada página las **re-declara** bajo su scope. Scaffolding canónico GBF: **DESIGN §5.4** (no el brutalismo OP con `border:2px solid #000`). SÍ son globales: `.wrap .breadcrumb .btn* .ope-prog-*`.
 
 ### 3. Componentes disponibles (CLASES CSS, no inventes nuevas)
 
@@ -103,7 +110,7 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:red
 
 ### 4. Reglas CSS en ope.css
 
-**PASO 1 (OBLIGATORIO en scope nuevo)** — pega el scaffolding base para que `.shead/.plate/.reveal/.flash/.pj-empty` funcionen. Ver bloque completo en `.cursor/rules/page-scaffold.mdc` → "Scaffolding OBLIGATORIO". Sin esto, los componentes de §3 salen SIN estilo.
+**PASO 1 (OBLIGATORIO en scope nuevo)** — pega el scaffolding GBF de `DESIGN-GRANBLUE-ETERNAL.md` §5.4 (o `.cursor/rules/page-scaffold.mdc`). Sin esto, los componentes de §3 salen SIN estilo.
 
 **PASO 2** — tus reglas propias, **SIEMPRE** scopeadas bajo `body.ope-pg-mi-pagina`:
 

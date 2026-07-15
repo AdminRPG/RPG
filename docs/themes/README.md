@@ -1,9 +1,11 @@
-# One Piece Eternal theme — fuente de verdad y sincronización
+# Granblue Fantasy: Eternal — tema MyBB (fuente de verdad y sincronización)
+
+> **Agentes (Cursor / OpenCode / Antigravity):** antes de editar estos archivos, lee `docs/AGENTES-Y-HERRAMIENTAS.md` §2 y `.cursor/rules/visual-port-gbe.mdc`.
 
 El tema **no** vive en un único XML monolítico. Está repartido en archivos con
 roles claros para que un import no pise otro. Todo el CSS vive en **una sola
 hoja** (`ope.css`); ninguna página PHP lleva `<style>` inline. Ver la convención
-completa en `docs/DESIGN.md` (§0 y §1).
+completa en `docs/DESIGN-GRANBLUE-ETERNAL.md` (§5).
 
 ## Archivos canónicos (edita estos)
 
@@ -20,21 +22,15 @@ completa en `docs/DESIGN.md` (§0 y §1).
 > desde `inc/plugins/ope_rol.php` (`ope_rol_navbar_html()`, `ope_rol_navbar_css()`,
 > `ope_rol_head_base()`). No dupliques esas reglas en `ope.css` ni en PHP.
 
+## Portada (`index.php`)
+
+La portada **no** usa `body.ope-pg-*`. Usa `body.gbe-index` (plantilla `ope-index.xml`) con componentes `.gbe-section`, `.gbe-bento`, `.gbe-hero`. Las categorías las genera `index.php`. Ver `DESIGN-GRANBLUE-ETERNAL.md` §6, §6.7 y `docs/AGENTES-Y-HERRAMIENTAS.md` §2.5.
+
+**No declarar portada terminada** sin overrides `body.gbe-index` en `ope.css` y comparación con `docs/Prototypes/Granblue/index.html`.
+
 ## Color por facción
 
-Las 6 facciones (definidas en `inc/ope_rol_data.php` → `ope_rol_facciones()`) tienen
-un color propio. Los colores son **tokens en `:root` de `ope.css`** (fuente única);
-no hardcodees colores de facción sueltos. Cada facción define `--fac-<slug>`,
-`--fac-<slug>-hi` (borde/realce) y `--fac-<slug>-ink` (texto legible encima).
-
-| Slug (`datos.faccion`) | Etiqueta visible | Color | Token base |
-|------------------------|------------------|-------|------------|
-| `pirata` | Pirata | Rojo | `--fac-pirata` |
-| `marine` | Marine | Azul | `--fac-marine` |
-| `revolucionario` | Revolucionario | Amarillo | `--fac-revolucionario` |
-| `gobierno` | Gobierno | Negro | `--fac-gobierno` |
-| `cazarrecompensas` | **Cazadores** | Verde | `--fac-cazarrecompensas` |
-| `civil` | Civil | Morado | `--fac-civil` |
+> **Pendiente F3:** las facciones en código siguen siendo las de One Piece (`ope_rol_facciones()`). Los tokens `--fac-*` en `ope.css` se renombrarán cuando existan facciones GBF (Gremio, Erste, etc.). Hasta entonces, no añadir facciones OP nuevas en copy GBF.
 
 - Resolución del slug: `ope_rol_faccion_slug($faccion)` en `inc/plugins/ope_rol.php`
   (normaliza acentos y alias). `ope_rol_char()` ya devuelve `faccion` y `faccion_slug`.

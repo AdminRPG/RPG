@@ -1,4 +1,4 @@
-# Product
+# Product — Granblue Fantasy: Eternal
 
 ## Register
 
@@ -6,38 +6,62 @@ product
 
 ## Users
 
-Roleplayers hispanos 18+, comunidad adulta que busca un universo oscuro de fantasía con lore original. Vienen a contar historias colaborativas por escrito (play-by-post), gestionar personajes, y participar en un sistema de juego con estadísticas, inventario, economía y dados. Buscan una experiencia inmersiva, artesanal y misteriosa.
+Roleplayers hispanos 18+, comunidad adulta que busca un foro de rol play-by-post con ambientación de fantasía aérea (Skydoms, skyfarers, Bestias Primarias) y lore original. Vienen a crear personajes, unirse a crews, narrar historias colaborativas y usar mecánicas de combate, progresión, misiones e inventario. Buscan una experiencia pulida, inmersiva y visualmente coherente — referencia de nivel: [Granblue Fantasy Relink](https://relink.granbluefantasy.jp/) (claridad acuarela, oro/bronce, serif elegante).
 
 ## Product Purpose
 
-I-Forge es un foro de rol play-by-post con ambientación oscura y lore original. Combina MyBB (foro, autenticación, narrativa) con un backend propio de mecánicas de juego (fichas de personaje, inventario, economía, tiradas de dados). El objetivo es ofrecer una experiencia de rol pulida, inmersiva y visualmente cohesiva que compita al nivel de referentes como One Piece Gaiden.
+**Granblue Fantasy: Eternal** es un foro de rol play-by-post ambientado en un cielo de islas flotantes inspirado en Granblue Fantasy, con historia y personajes propios. Combina MyBB (foro, autenticación, narrativa) con un backend propio de mecánicas RPG (fichas, inventario, economía en rupies, técnicas, combate por turnos, crews, misiones).
+
+El objetivo es ofrecer la profundidad mecánica que tenía One Piece Eternal (combate, tripulación/crew, progresión, mundo vivo) con una identidad visual y narrativa nueva: cielo, éter, Gremio, Skydoms.
 
 ## Brand Personality
 
-Oscuro, artesanal, misterioso. Nunca infantil, corporativo o genérico.
+Luminoso, épico, acuarela-sobre-nubes. Nunca infantil saturado ni corporativo genérico.
 
-- Voz: narrativa, envolvente, con un toque de crudeza y misterio. El foro "habla" como un cronista de un mundo oscuro.
-- Tono: serio pero no solemne. Permite momentos de calidez entre los jugadores, pero el envolvente general es de peligro y descubrimiento.
-- Copy: verbos activos, nada de "Submit" o "Success". Los errores explican qué pasó sin disculparse. Estados vacíos invitan a la acción en tono narrativo.
+- **Voz:** cronista del Gremio — elegante, evocadora, con urgencia de aventura. El foro habla como quien narra rutas entre islas.
+- **Tono:** serio pero esperanzador. Peligro en el horizonte, pero el cielo sigue abierto.
+- **Copy:** verbos de navegación (zarpar, explorar, sellar, reclamar). Errores claros sin disculparse. Estados vacíos invitan a crear el primer skyfarer.
 
 ## Anti-references
 
-- No glassmorphism, no azules brillantes tipo Bootstrap, no fondos blancos
-- No parecer un foro genérico sin identidad (Default MyBB)
-- No estética infantil ni colorida-saturada
-- No copiar directamente la identidad visual de One Piece Gaiden (es el referente de nivel de pulido, no de estilo)
+- No neobrutalismo OP (bordes negros 2px, sombras duras, Big Shoulders Display)
+- No glassmorphism genérico ni Bootstrap azul
+- **No botones pill/cápsula** (`border-radius` > 12px en CTAs) — usar rectangulares 8px (§4.4 DESIGN)
+- No copiar personajes canónicos de Granblue Fantasy (solo Skydoms/universo reconocible + historia propia)
+- No parecer plantilla MyBB sin identidad
 
 ## Design Principles
 
-1. **Neobrutalismo con propósito**: el estilo neobrutalista (bordes gruesos, sombras sólidas, paleta pergamino + verde bosque + tinta dorada) no es un capricho estético — cada elección de contraste, acento y espaciado debe sentirse intencional, no heredada de una plantilla. — cada elección de contraste, acento y espaciado debe sentirse intencional, no heredada de una plantilla.
-2. **Cohesión artesanal**: cada página debe sentirse parte del mismo mundo. Nada de estilos improvisados o inconsistentes entre secciones.
-3. **Densidad informativa sin caos**: las fichas de personaje son densas en datos igual que un dashboard, pero con jerarquía visual clara y elementos que guían la mirada.
-4. **El elemento firma es el rey**: un único elemento de protagonismo visual por pantalla; el resto del diseño se mantiene disciplinado a su alrededor.
-5. **Degradación elegante**: si la API falla, el foro no se rompe. Las features de juego son un añadido, no un requisito para navegar.
+1. **Relink, no plantilla:** paleta cielo claro + oro + acuarela; tipografía Cinzel / Cormorant / Spectral (ver `DESIGN-GRANBLUE-ETERNAL.md`).
+2. **Un elemento firma por pantalla:** hero carrusel en portada, banner 16:9 en ficha, bento de Skydoms en índice.
+3. **Tríada visual del personaje:** avatar + banner 16:9 + icono por skyfarer (no reutilizar `hero-*.jpg` del sitio como banner de PJ).
+4. **Cohesión por scope CSS:** cada página PHP usa `body.ope-pg-<slug>`; portada usa `body.gbe-index`.
+5. **Botones rectangulares:** sin pills/cápsulas — `border-radius: 8px` en CTAs (DESIGN §4.4).
+6. **Degradación elegante:** si falla una API de juego, el foro sigue legible.
+
+## Themes
+
+| Tema | Uso |
+|---|---|
+| **cielo** (default) | Fondo claro, acuarela, día en el puerto |
+| **noche** | Oscuro índigo, faros de éter, UI nocturna |
+
+Selector visual en navbar (migración pendiente de `eternal/rojo/...` OP a `cielo/noche`).
 
 ## Accessibility & Inclusion
 
-- Contraste mínimo AA en texto sobre fondo
+- Contraste mínimo AA en texto sobre fondo claro
 - Foco visible por teclado
 - `prefers-reduced-motion` respetado
 - Navegación funcional sin JavaScript (lectura de posts)
+
+## Documentación relacionada
+
+| Doc | Contenido |
+|---|---|
+| `docs/AGENTES-Y-HERRAMIENTAS.md` | Protocolo anti-portado parcial (Cursor, OpenCode, Antigravity) |
+| `docs/ANTIGRAVITY.md` | Prompt de arranque para Gemini IDE |
+| `docs/DESIGN-GRANBLUE-ETERNAL.md` | Fuente de verdad visual + §5 scaffolding PHP |
+| `docs/PLAN-MAESTRO-GRANBLUE-ETERNAL.md` | Visión, fases, mecánicas |
+| `docs/Prototypes/Granblue/index.html` | Referencia visual portada aprobada |
+| `docs/references/relink.granbluefantasy.jp/` | Capturas oficiales Relink |

@@ -107,18 +107,14 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             $errores[] = 'Elige una raza secundaria distinta para el híbrido.';
         }
 
-        // ---- Concepto ----
+        // ---- Nombre ----
         $nombre = ope_rol_clean($mybb->get_input('nombre'), 120);
         $apodo = ope_rol_clean($mybb->get_input('apodo'), 60);
         $edad = ope_rol_clean($mybb->get_input('edad'), 20);
         $genero = ope_rol_clean($mybb->get_input('genero'), 40);
-        $concepto = ope_rol_clean($mybb->get_input('concepto'), 600);
 
         if ($nombre === '' || function_exists('mb_strlen') ? mb_strlen($nombre, 'UTF-8') < 3 : strlen($nombre) < 3) {
             $errores[] = 'El nombre del personaje debe tener al menos 3 caracteres.';
-        }
-        if ($concepto === '') {
-            $errores[] = 'Describe brevemente el concepto de tu personaje.';
         }
         if ($nombre !== '' && $db->table_exists('rol_personajes')) {
             $dupe = $db->simple_select('rol_personajes', 'pid', "nombre = '" . $db->escape_string($nombre) . "'", array('limit' => 1));
@@ -302,7 +298,6 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             );
             $economia = array('berries' => $berries);
             $bio = array(
-                'concepto' => $concepto,
                 'pasado' => $historia_pasado,
                 'motivacion' => $historia_motivacion,
                 'relaciones' => $historia_relaciones,
@@ -500,7 +495,7 @@ header('Content-Type: text/html; charset=utf-8');
     <!-- PASO 2: CONCEPTO -->
     <div class="wiz-step" data-step="2">
       <div class="plate">
-        <div class="plate-h"><span class="t">2. Nombre y concepto</span><span class="c">// quién es</span></div>
+        <div class="plate-h"><span class="t">2. Nombre</span><span class="c">// quién es</span></div>
         <div class="plate-b">
           <div class="grid2">
             <div class="field"><label class="flabel">Nombre del personaje *</label><input type="text" name="nombre" maxlength="120" required value="<?php echo htmlspecialchars_uni($old['nombre'] ?? ''); ?>"></div>
@@ -508,7 +503,6 @@ header('Content-Type: text/html; charset=utf-8');
             <div class="field"><label class="flabel">Edad</label><input type="text" name="edad" maxlength="20" value="<?php echo htmlspecialchars_uni($old['edad'] ?? ''); ?>"></div>
             <div class="field"><label class="flabel">Género</label><input type="text" name="genero" maxlength="40" value="<?php echo htmlspecialchars_uni($old['genero'] ?? ''); ?>"></div>
           </div>
-          <div class="field"><label class="flabel">Concepto / aspecto *</label><textarea name="concepto" required maxlength="600" placeholder="Quién es, qué aspecto tiene, qué lo mueve..."><?php echo htmlspecialchars_uni($old['concepto'] ?? ''); ?></textarea></div>
           <p class="hint">¿Quieres que tu personaje tenga una "D." en su nombre? Elige la virtud <b class="c-paper">Voluntad de D.</b> en el siguiente paso (Virtudes y Defectos).</p>
         </div>
       </div>
@@ -730,9 +724,7 @@ header('Content-Type: text/html; charset=utf-8');
     }
     if (n === 2){
       var nombre = form.querySelector('[name=nombre]').value.trim();
-      var concepto = form.querySelector('[name=concepto]').value.trim();
       if (nombre.length < 3) return 'Escribe un nombre de al menos 3 caracteres.';
-      if (!concepto) return 'Describe el concepto de tu personaje.';
     }
     if (n === 3){
       var totalPs = 0;
