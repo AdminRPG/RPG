@@ -1137,7 +1137,7 @@ body.ope-pg-personajes .pj-toggle-btn.active .pj-toggle-n{background:var(--iron)
 
 
 /* BOTONES */
-body.ope-pg-ficha .btn{font-family:var(--mono);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 20px;border:2px solid #000;cursor:pointer;transition:transform .12s,box-shadow .12s;display:inline-block}
+body.ope-pg-ficha .btn{font-family:var(--gbe-mark);font-size:.84rem;font-weight:500;text-transform:none;letter-spacing:0;padding:10px 20px;border:1px solid var(--gbe-line);border-radius:8px;cursor:pointer;transition:all .18s;display:inline-block;box-shadow:var(--gbe-shadow-sm)}
 body.ope-pg-ficha .btn-hot{background:var(--ember);color:var(--iron)}
 body.ope-pg-ficha .btn-hot:hover{background:var(--ember-hi);color:var(--iron);transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000}
 body.ope-pg-ficha .btn-ghost{background:transparent;color:var(--paper);border-color:var(--rivet)}
@@ -1165,7 +1165,7 @@ body.ope-pg-ficha .forge{display:grid;grid-template-columns:320px 1fr;gap:22px;a
 @media(max-width:960px){body.ope-pg-ficha .forge{grid-template-columns:1fr;gap:14px}}
 body.ope-pg-ficha .pcol{position:sticky;top:var(--gbe-nav-h)}
 @media(max-width:960px){body.ope-pg-ficha .pcol{position:static}}
-body.ope-pg-ficha .forge-portrait{position:relative;border:3px solid #000;background:var(--iron-edge);overflow:hidden}
+body.ope-pg-ficha .forge-portrait{position:relative;border:1px solid var(--gbe-line);background:var(--gbe-card-2);overflow:hidden;border-radius:14px 14px 0 0}
 body.ope-pg-ficha .fp-frame{position:relative;aspect-ratio:280/450;overflow:hidden;display:flex;align-items:center;justify-content:center}
 body.ope-pg-ficha .fp-glow{position:absolute;inset:0;background:radial-gradient(85% 60% at 50% 34%,rgba(255,203,147,.42),rgba(255,203,147,.12) 45%,transparent 70%)}
 body.ope-pg-ficha .fp-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center}
@@ -1173,24 +1173,24 @@ body.ope-pg-ficha .fp-shade{position:absolute;inset:0;z-index:2;pointer-events:n
 body.ope-pg-ficha .fp-initial{position:relative;font-family:var(--disp);font-weight:900;font-size:7rem;color:var(--iron-hi);text-shadow:0 3px 0 #000;z-index:2}
 body.ope-pg-ficha .fp-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:22px 22px;pointer-events:none}
 body.ope-pg-ficha .fp-temper{position:absolute;left:0;top:0;bottom:0;width:9px;background:linear-gradient(to top,var(--h1),var(--h3),var(--h5),var(--h7),var(--h9));border-right:2px solid #000;z-index:3}
-body.ope-pg-ficha .fp-rank{position:absolute;top:0;right:0;z-index:4;font-family:var(--disp);font-weight:900;font-size:1.5rem;color:var(--iron);padding:4px 12px;border-left:2px solid #000;border-bottom:2px solid #000}
-body.ope-pg-ficha .fp-lv{position:absolute;z-index:4;left:9px;top:0;font-family:var(--mono);font-size:.58rem;font-weight:700;color:var(--iron);background:var(--h6);padding:3px 8px;border-right:2px solid #000;border-bottom:2px solid #000}
+body.ope-pg-ficha .fp-rank{position:absolute;top:0;right:0;z-index:4;font-family:var(--gbe-disp);font-weight:700;font-size:1.3rem;color:var(--gbe-ink);padding:4px 12px;background:var(--gbe-card);border-left:1px solid var(--gbe-line-soft);border-bottom:1px solid var(--gbe-line-soft);border-radius:0 0 0 8px}
+body.ope-pg-ficha .fp-lv{position:absolute;z-index:4;left:9px;top:0;font-family:var(--mono);font-size:.58rem;font-weight:700;color:#fff;background:var(--gbe-gold);padding:3px 8px;border-right:1px solid var(--gbe-line-soft);border-bottom:1px solid var(--gbe-line-soft);border-radius:0 0 6px 0}
 body.ope-pg-ficha .fp-nameplate{position:absolute;left:0;right:0;bottom:0;z-index:4;background:linear-gradient(to top,var(--iron-edge),rgba(13,14,17,.86) 70%,transparent);padding:26px 12px 12px}
 body.ope-pg-ficha .fp-nameplate b{display:block;font-family:var(--disp);font-weight:900;font-size:1.9rem;line-height:.9;text-transform:uppercase;color:var(--paper);text-shadow:0 2px 0 #000}
 body.ope-pg-ficha .fp-nameplate span{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.5px;color:var(--h6)}
-body.ope-pg-ficha .pcol .under{border:2px solid #000;border-top:none;background:var(--iron-plate);padding:12px}
+body.ope-pg-ficha .pcol .under{border:1px solid var(--gbe-line);border-top:none;background:var(--gbe-card);padding:12px;border-radius:0 0 14px 14px}
 body.ope-pg-ficha .pcol .acts{display:flex;gap:7px}
 body.ope-pg-ficha .pcol .acts .btn{flex:1;text-align:center;padding:9px 6px;font-size:.66rem}
-body.ope-pg-ficha .estado-chip{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:4px 9px;border:2px solid #000;color:var(--iron);display:inline-block;margin-bottom:10px}
+body.ope-pg-ficha .estado-chip{font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:4px 10px;border:1px solid var(--gbe-line);border-radius:6px;color:var(--gbe-gold-deep);background:var(--gbe-card-2);display:inline-block;margin-bottom:10px}
 
 /* IDENTIDAD */
 body.ope-pg-ficha .idbanner{margin-bottom:14px}
 body.ope-pg-ficha .eyebrow{font-family:var(--mono);font-size:.66rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ember-hi);display:flex;flex-wrap:wrap;gap:6px 12px;margin-bottom:8px}
 body.ope-pg-ficha .eyebrow .sep{color:var(--rivet)}
-body.ope-pg-ficha .idbanner h1{font-family:var(--disp);font-weight:900;font-size:clamp(2.6rem,7vw,4.6rem);line-height:.85;letter-spacing:-1px;text-transform:uppercase;color:var(--paper);text-shadow:0 2px 0 #000}
+body.ope-pg-ficha .idbanner h1{font-family:var(--gbe-disp);font-weight:700;font-size:clamp(2.2rem,6vw,3.8rem);line-height:.9;letter-spacing:-.5px;text-transform:none;color:var(--gbe-ink);text-shadow:none}
 body.ope-pg-ficha .idbanner .desig{font-size:.92rem;color:var(--paper-dim);margin-top:10px}
 body.ope-pg-ficha .idtags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
-body.ope-pg-ficha .tag{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:4px 10px;border:2px solid #000}
+body.ope-pg-ficha .tag{font-family:var(--mono);font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:4px 10px;border:1px solid var(--gbe-line-soft);border-radius:8px;background:var(--gbe-card)}
 body.ope-pg-ficha .tag.rank{background:var(--ember);color:var(--iron)}
 body.ope-pg-ficha .tag.line{background:var(--fac);color:var(--fac-ink);border-color:#000}
 body.ope-pg-ficha .tag.act{background:var(--patina);color:var(--iron)}
@@ -1218,58 +1218,68 @@ body.ope-pg-ficha::after{content:"";position:fixed;inset:0;z-index:-1;pointer-ev
 body.ope-pg-ficha .idbanner{border-left:4px solid var(--fac);padding-left:15px}
 body.ope-pg-ficha .fp-nameplate{border-top:3px solid var(--fac)}
 body.ope-pg-ficha .fp-nameplate span{color:var(--fac-hi)}
-body.ope-pg-ficha .forge-portrait{box-shadow:0 0 0 3px var(--fac),5px 5px 0 #000}
-body.ope-pg-ficha .idbanner .eyebrow{color:var(--fac-hi)}
+body.ope-pg-ficha .forge-portrait{box-shadow:var(--gbe-shadow-sm)}
+body.ope-pg-ficha .idbanner .eyebrow{color:var(--gbe-gold-deep)}
 
-/* ═══ REPINTE TOTAL POR FACCIÓN ═══
-   Todo el esquema (superficies + acentos) cambia con la facción, no solo los
-   bordes. Superficies oscuras tintadas (--fac-surface/2) + acentos brillantes
-   (--fac/--fac-hi). Texto claro (--paper) legible en las 6 facciones. */
-/* Placas / paneles: superficie y cabecera tintadas, filo de facción */
-body.ope-pg-ficha .plate{background:var(--fac-surface);background-image:none;border-color:#000}
-body.ope-pg-ficha .plate-h{background:var(--fac-surface2);background-image:none;border-bottom:2px solid var(--fac)}
-body.ope-pg-ficha .plate-h .t{color:var(--paper)}
-body.ope-pg-ficha .plate-h .c{color:var(--fac-hi)}
-/* Pestañas: inactivas en superficie de facción, activa en color pleno */
-body.ope-pg-ficha .tabs{display:flex;flex-wrap:wrap;gap:2px;border-bottom:2px solid var(--fac);margin:18px 0 14px}
-body.ope-pg-ficha .tab{font-family:var(--mono);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:9px 16px;background:var(--fac-surface);color:var(--paper-dim);border:2px solid #000;border-bottom:none;cursor:pointer;position:relative;top:2px}
-body.ope-pg-ficha .tab:hover{color:var(--paper)}
-body.ope-pg-ficha .tab[aria-selected="true"]{background:var(--fac);color:var(--fac-ink);top:0}
+/* ═══ SCAFFOLDING GBF: ETERNAL — Chrome GBE (no facción en superficies base) ═══
+   Las superficies estructurales (placas, tabs, slots) usan tokens GBE neutros
+   que respetan el tema claro/noche del usuario, sin teñirse por facción. Solo
+   los acentos puntuales (border de tab activa, dot de coin, nodo TL) usan --fac. */
+
+/* PLACAS / PANELES */
+body.ope-pg-ficha .plate{background:var(--gbe-card);border:1px solid var(--gbe-line);border-radius:14px;box-shadow:var(--gbe-shadow-sm);margin-bottom:14px;overflow:hidden}
+body.ope-pg-ficha .plate-h{background:linear-gradient(120deg,var(--gbe-wash),var(--gbe-card));border-bottom:1px solid var(--gbe-line-soft);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+body.ope-pg-ficha .plate-h .t{font-family:var(--gbe-disp);font-weight:700;font-size:1rem;text-transform:none;color:var(--gbe-gold-deep);letter-spacing:.3px}
+body.ope-pg-ficha .plate-h .c{font-family:var(--mono);font-size:.6rem;color:var(--gbe-ink-dim);text-transform:uppercase;letter-spacing:.5px}
+body.ope-pg-ficha .plate-b{padding:14px;color:var(--gbe-ink-soft);font-family:var(--gbe-body)}
+
+/* PESTAÑAS */
+body.ope-pg-ficha .tabs{display:flex;flex-wrap:wrap;gap:0;border-bottom:2px solid var(--gbe-line-soft);margin:18px 0 16px}
+body.ope-pg-ficha .tab{font-family:var(--gbe-mark);font-size:.82rem;font-weight:600;text-transform:none;letter-spacing:.2px;padding:10px 18px;background:transparent;color:var(--gbe-ink-dim);border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:color .18s,border-color .18s;position:relative;top:0}
+body.ope-pg-ficha .tab:hover{color:var(--gbe-ink-soft);border-bottom-color:var(--gbe-line)}
+body.ope-pg-ficha .tab[aria-selected="true"]{color:var(--gbe-gold-deep);border-bottom-color:var(--gbe-gold);background:transparent}
 body.ope-pg-ficha .panel{display:none}
 body.ope-pg-ficha .panel.on{display:block}
-/* Pestañas de crónica */
-body.ope-pg-ficha .subtabs{display:flex;flex-wrap:wrap;border:2px solid #000;margin-bottom:11px;width:fit-content}
-body.ope-pg-ficha .subtab{font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;padding:6px 12px;background:var(--fac-surface);color:var(--paper-dim);cursor:pointer;border-left:2px solid #000}
-body.ope-pg-ficha .subtab:first-child{border-left:none}
-body.ope-pg-ficha .subtab[aria-selected="true"]{background:var(--fac);color:var(--fac-ink)}
-/* Superficies interiores (coin, slot, of, filas) repintadas */
-body.ope-pg-ficha .coin,body.ope-pg-ficha .slot,body.ope-pg-ficha .of{background:var(--fac-surface2)}
-body.ope-pg-ficha .slot .ic,body.ope-pg-ficha .of .ico{background:var(--fac-surface)}
-body.ope-pg-ficha .coin .dot,body.ope-pg-ficha .coin b{color:var(--fac-hi)}
-body.ope-pg-ficha .coin .dot{background:var(--fac)}
-body.ope-pg-ficha .slot .ic svg,body.ope-pg-ficha .of .ico svg{stroke:var(--fac-hi)}
-body.ope-pg-ficha .of .lv{background:var(--fac);color:var(--fac-ink)}
+
+/* SUBTABS DE CRÓNICA */
+body.ope-pg-ficha .subtabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;border:none}
+body.ope-pg-ficha .subtab{font-family:var(--gbe-mark);font-size:.78rem;font-weight:500;padding:6px 14px;background:var(--gbe-card);color:var(--gbe-ink-dim);border:1px solid var(--gbe-line-soft);border-radius:8px;cursor:pointer;transition:all .15s}
+body.ope-pg-ficha .subtab:first-child{border-left:1px solid var(--gbe-line-soft)}
+body.ope-pg-ficha .subtab[aria-selected="true"]{background:var(--gbe-gold);color:#fff;border-color:var(--gbe-gold-deep)}
+
+/* SUPERFICIES INTERIORES (coin, slot, of) */
+body.ope-pg-ficha .coin,body.ope-pg-ficha .slot,body.ope-pg-ficha .of{background:var(--gbe-card-2);border:1px solid var(--gbe-line-soft);border-radius:10px}
+body.ope-pg-ficha .slot .ic,body.ope-pg-ficha .of .ico{background:var(--gbe-card)}
+body.ope-pg-ficha .coin .dot,body.ope-pg-ficha .coin b{color:var(--gbe-gold-deep)}
+body.ope-pg-ficha .coin .dot{background:var(--gbe-gold)}
+body.ope-pg-ficha .slot .ic svg,body.ope-pg-ficha .of .ico svg{stroke:var(--gbe-gold)}
+body.ope-pg-ficha .of .lv{background:var(--gbe-gold);color:#fff;border-radius:4px}
 body.ope-pg-ficha .of .lv{font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;padding:2px 7px;white-space:nowrap;height:fit-content}
-/* Botones "hot" dentro de la ficha (Gestión, modal) heredan la facción */
-body.ope-pg-ficha .btn-hot{background:var(--fac);color:var(--fac-ink);border-color:#000}
-body.ope-pg-ficha .btn-hot:hover{background:var(--fac-hi);color:var(--iron)}
-/* Retrato: banda de identidad y placa de nombre en facción */
-body.ope-pg-ficha .forge-portrait{background:var(--fac-surface2)}
-body.ope-pg-ficha .fp-temper{background:var(--fac)}
-body.ope-pg-ficha .pcol .under{background:var(--fac-surface)}
-/* Etiquetas del banner de identidad */
-body.ope-pg-ficha .tag.rank{background:var(--fac);color:var(--fac-ink)}
-body.ope-pg-ficha .tag.act{background:var(--fac-hi);color:var(--iron)}
-body.ope-pg-ficha .pgroup-h .bar{background:var(--fac);opacity:.5}
-body.ope-pg-ficha .pgroup-h .n{color:var(--fac-hi)}
-/* Crónica / timeline: nodos y viñetas de facción */
-body.ope-pg-ficha .tl-i::before{background:var(--fac)}
-/* Modal: rail y cabecera también repintados por facción */
-body.ope-pg-ficha .ope-modal{background:var(--fac-surface)}
-body.ope-pg-ficha .ope-modal-h{background:var(--fac-surface2)}
-body.ope-pg-ficha .ope-modal-rail{background:var(--fac-surface2)}
-body.ope-pg-ficha .ope-mtab[aria-selected="true"]{background:var(--fac);color:var(--fac-ink);box-shadow:inset 4px 0 0 #000}
-body.ope-pg-ficha .ope-cron-item,body.ope-pg-ficha .ope-tpl-item,body.ope-pg-ficha .ope-rel-item,body.ope-pg-ficha .ope-equip-item{background:var(--fac-surface2)}
+
+/* BOTONES (rectangulares, border-radius:8px — §4.4) */
+body.ope-pg-ficha .btn-hot{background:linear-gradient(135deg,var(--gbe-gold),var(--gbe-gold-deep));color:#fff;border:1px solid var(--gbe-gold-deep);border-radius:8px;box-shadow:var(--gbe-shadow-sm)}
+body.ope-pg-ficha .btn-hot:hover{background:linear-gradient(135deg,var(--gbe-gold-hi),var(--gbe-gold));transform:translateY(-2px);box-shadow:var(--gbe-shadow)}
+
+/* RETRATO */
+body.ope-pg-ficha .forge-portrait{background:var(--gbe-card-2);border:1px solid var(--gbe-line);border-radius:14px 14px 0 0;box-shadow:var(--gbe-shadow-sm)}
+body.ope-pg-ficha .fp-temper{background:linear-gradient(to top,var(--gbe-gold-deep),var(--gbe-gold),var(--gbe-gold-hi));border-right:1px solid var(--gbe-line-soft)}
+body.ope-pg-ficha .pcol .under{background:var(--gbe-card);border:1px solid var(--gbe-line);border-top:none;border-radius:0 0 14px 14px}
+
+/* ETIQUETAS */
+body.ope-pg-ficha .tag.rank{background:var(--gbe-gold);color:#fff;border-color:var(--gbe-gold-deep);border-radius:8px}
+body.ope-pg-ficha .tag.act{background:var(--gbe-eter);color:#fff;border-color:var(--gbe-eter);border-radius:8px}
+body.ope-pg-ficha .pgroup-h .bar{background:var(--gbe-gold);opacity:.4}
+body.ope-pg-ficha .pgroup-h .n{color:var(--gbe-gold-deep)}
+
+/* CRONOLOGÍA */
+body.ope-pg-ficha .tl-i::before{background:var(--gbe-gold)}
+
+/* MODAL */
+body.ope-pg-ficha .ope-modal{background:var(--gbe-card)}
+body.ope-pg-ficha .ope-modal-h{background:var(--gbe-wash)}
+body.ope-pg-ficha .ope-modal-rail{background:var(--gbe-wash)}
+body.ope-pg-ficha .ope-mtab[aria-selected="true"]{background:var(--gbe-gold);color:#fff;box-shadow:none;border-radius:0}
+body.ope-pg-ficha .ope-cron-item,body.ope-pg-ficha .ope-tpl-item,body.ope-pg-ficha .ope-rel-item,body.ope-pg-ficha .ope-equip-item{background:var(--gbe-card-2);border:1px solid var(--gbe-line-soft);border-radius:8px}
 
 /* CRISOL */
 body.ope-pg-ficha .pgroup{margin-bottom:14px}body.ope-pg-ficha .pgroup:last-child{margin-bottom:0}
