@@ -5423,6 +5423,54 @@ body.ope-pg-progresion .flash{border:1px solid var(--gbe-line)!important;border-
 body.ope-pg-progresion .ope-prog-log th{border-bottom:1px solid var(--gbe-line-soft)!important;color:var(--gbe-ink-dim)!important}
 body.ope-pg-progresion .ope-prog-ppbar--stack .ope-prog-ppbar-detail{border-top:1px solid var(--gbe-line-soft)!important}
 
+
 /* ── tienda.php: inputs/textareas brutalistas ── */
 body.ope-pg-tienda .nt-input,body.ope-pg-tienda .nt-textarea{border:1px solid var(--gbe-line)!important;border-radius:8px!important;background:var(--gbe-card)!important;color:var(--gbe-ink)!important}
 body.ope-pg-tienda .nt-input:focus,body.ope-pg-tienda .nt-textarea:focus{border-color:var(--gbe-gold)!important;outline:none!important;box-shadow:0 0 0 3px rgba(183,146,78,.15)!important}
+
+/* ============================================================
+   SCAFFOLDING GBE — PERSONAJES (personajes.php)
+   Scope: body.ope-pg-personajes
+   ============================================================ */
+
+/* Placas */
+body.ope-pg-personajes .plate{border:1px solid var(--gbe-line)!important;background:var(--gbe-card)!important;border-radius:14px!important;box-shadow:var(--gbe-shadow-sm)!important;margin-bottom:14px!important;overflow:hidden!important}
+body.ope-pg-personajes .plate-h{background:linear-gradient(120deg,var(--gbe-wash),var(--gbe-card))!important;border-bottom:1px solid var(--gbe-line-soft)!important;padding:10px 14px!important}
+body.ope-pg-personajes .plate-h .t{font-family:var(--gbe-disp)!important;color:var(--gbe-gold-deep)!important;text-transform:none!important;font-weight:700!important}
+body.ope-pg-personajes .plate-h .c{color:var(--gbe-ink-dim)!important}
+
+/* Botones */
+body.ope-pg-personajes .btn{font-family:var(--gbe-mark)!important;text-transform:none!important;border:1px solid var(--gbe-line)!important;border-radius:8px!important;box-shadow:var(--gbe-shadow-sm)!important;letter-spacing:0!important}
+body.ope-pg-personajes .btn-hot{background:linear-gradient(135deg,var(--gbe-gold),var(--gbe-gold-deep))!important;color:#fff!important;border-color:var(--gbe-gold-deep)!important}
+body.ope-pg-personajes .btn-hot:hover{transform:translateY(-2px)!important;box-shadow:var(--gbe-shadow)!important}
+body.ope-pg-personajes .btn-ghost{background:var(--gbe-card)!important;color:var(--gbe-ink-soft)!important;border-color:var(--gbe-line)!important}
+
+/* Flash / mensajes */
+body.ope-pg-personajes .flash{border:1px solid var(--gbe-line)!important;border-radius:10px!important;box-shadow:none!important;background:var(--gbe-card)!important}
+
+/* Tarjetas de personaje (.pjcard) */
+body.ope-pg-personajes .pjcard{border:1px solid var(--gbe-line)!important;background:var(--gbe-card)!important;border-radius:14px!important;box-shadow:var(--gbe-shadow-sm)!important;overflow:hidden!important}
+body.ope-pg-personajes .pjcard:hover{border-color:var(--gbe-gold)!important;box-shadow:var(--gbe-shadow)!important;transform:translateY(-3px)!important}
+body.ope-pg-personajes .pjcard.active::after{background:var(--gbe-gold)!important;color:#fff!important;border:none!important;border-radius:0 10px 0 8px!important;font-family:var(--mono)!important;font-size:.56rem!important;letter-spacing:.5px!important}
+body.ope-pg-personajes .pjcard-top{border-bottom:1px solid var(--gbe-line-soft)!important;background:linear-gradient(150deg,var(--gbe-wash),var(--gbe-card))!important;border-radius:14px 14px 0 0!important}
+body.ope-pg-personajes .pjcard-av{border:2px solid var(--gbe-gold)!important;border-radius:10px!important;background:var(--gbe-card-2)!important;color:var(--gbe-gold-deep)!important}
+body.ope-pg-personajes .pjcard-foot{border-top:1px solid var(--gbe-line-soft)!important}
+
+/* Chips de personaje */
+body.ope-pg-personajes .pjcard-chip{border:1px solid var(--gbe-line-soft)!important;border-radius:6px!important;background:var(--gbe-card-2)!important;color:var(--gbe-ink-soft)!important}
+body.ope-pg-personajes .pjcard-chip.npc{background:var(--gbe-eter)!important;color:#fff!important;border-color:var(--gbe-eter)!important}
+
+/* Heat badge (rango) */
+body.ope-pg-personajes .heat-badge{border:1px solid var(--gbe-line)!important;border-radius:6px!important;color:var(--gbe-gold-deep)!important;background:var(--gbe-card)!important}
+
+/* Toggle (Mis PJ / Todos) */
+body.ope-pg-personajes .pj-toggle{border:1px solid var(--gbe-line-soft)!important;border-radius:10px!important;overflow:hidden!important;background:var(--gbe-card)!important}
+body.ope-pg-personajes .pj-toggle-btn{border-right:1px solid var(--gbe-line-soft)!important;color:var(--gbe-ink-dim)!important;font-family:var(--gbe-mark)!important;text-transform:none!important;letter-spacing:0!important}
+body.ope-pg-personajes .pj-toggle-btn:last-child{border-right:none!important}
+body.ope-pg-personajes .pj-toggle-btn.active{background:var(--gbe-gold)!important;color:#fff!important}
+body.ope-pg-personajes .pj-toggle-btn:hover:not(.active){background:var(--gbe-wash)!important;color:var(--gbe-ink)!important}
+body.ope-pg-personajes .pj-toggle-n{border:1px solid var(--gbe-line-soft)!important;border-radius:4px!important;background:var(--gbe-card-2)!important;color:var(--gbe-gold-deep)!important}
+
+/* Estado vacío */
+body.ope-pg-personajes .pj-empty{border:1px dashed var(--gbe-line)!important;border-radius:14px!important;background:var(--gbe-card)!important}
+body.ope-pg-personajes .pj-empty .anvil{border:1px solid var(--gbe-line)!important;border-radius:10px!important;background:var(--gbe-card-2)!important}
