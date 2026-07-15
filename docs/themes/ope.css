@@ -4730,15 +4730,611 @@ body[data-ope-page="showthread"] .ope-avatar .ope-post-ico {
 }
 
 /* Spoilers en posts */
-body[data-ope-page="showthread"] .ope-spoiler {
-  border: 1px solid var(--gbe-line) !important;
-  background: var(--gbe-card-2) !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
-}
 body[data-ope-page="showthread"] .ope-spoiler-head {
   font-family: var(--gbe-disp) !important;
   font-weight: 700 !important;
   color: var(--gbe-gold-deep) !important;
+}
+
+/* ============================================================
+   SCAFFOLDING PAGINAS PHP — RPG & TRAMITES (Evitar brutalismo)
+   Scopes: tramites, crear-personaje, progresion, tienda
+   ============================================================ */
+
+body.ope-pg-tramites,
+body.ope-pg-crear-personaje,
+body.ope-pg-progresion,
+body.ope-pg-tienda {
+  --disp: 'Cinzel', Georgia, serif;
+  --mark: 'Cormorant Garamond', Georgia, serif;
+  --body: 'Spectral', Georgia, serif;
+  --mono: 'Space Mono', Menlo, Consolas, monospace;
+}
+
+body.ope-pg-tramites .shead h1, body.ope-pg-tramites .shead h2,
+body.ope-pg-crear-personaje .shead h1, body.ope-pg-crear-personaje .shead h2,
+body.ope-pg-progresion .shead h1, body.ope-pg-progresion .shead h2,
+body.ope-pg-tienda .shead h1, body.ope-pg-tienda .shead h2 {
+  font-family: var(--gbe-disp) !important;
+  color: var(--gbe-ink) !important;
+  text-transform: none !important;
+}
+
+/* Placas y Contenedores */
+body.ope-pg-tramites .plate,
+body.ope-pg-crear-personaje .plate,
+body.ope-pg-progresion .plate,
+body.ope-pg-tienda .plate {
+  border: 1px solid var(--gbe-line) !important;
+  background: var(--gbe-card) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--gbe-shadow-sm) !important;
+  overflow: hidden !important;
+}
+body.ope-pg-tramites .plate-h,
+body.ope-pg-crear-personaje .plate-h,
+body.ope-pg-progresion .plate-h,
+body.ope-pg-tienda .plate-h {
+  background: linear-gradient(120deg, var(--gbe-wash), var(--gbe-card)) !important;
+  padding: 12px 16px !important;
+  border-bottom: 1px solid var(--gbe-line-soft) !important;
+}
+body.ope-pg-tramites .plate-h .t,
+body.ope-pg-crear-personaje .plate-h .t,
+body.ope-pg-progresion .plate-h .t,
+body.ope-pg-tienda .plate-h .t {
+  font-family: var(--gbe-disp) !important;
+  color: var(--gbe-gold-deep) !important;
+  text-transform: none !important;
+}
+body.ope-pg-tramites .plate-h .c,
+body.ope-pg-crear-personaje .plate-h .c,
+body.ope-pg-progresion .plate-h .c,
+body.ope-pg-tienda .plate-h .c {
+  color: var(--gbe-ink-dim) !important;
+}
+body.ope-pg-tramites .plate-b,
+body.ope-pg-crear-personaje .plate-b,
+body.ope-pg-progresion .plate-b,
+body.ope-pg-tienda .plate-b {
+  padding: 16px !important;
+  color: var(--gbe-ink-soft) !important;
+  font-family: var(--gbe-body) !important;
+}
+
+/* Alertas y Notificaciones */
+body.ope-pg-tramites .flash,
+body.ope-pg-crear-personaje .flash,
+body.ope-pg-progresion .flash,
+body.ope-pg-tienda .flash {
+  border: 1px solid var(--gbe-line) !important;
+  border-radius: 8px !important;
+  box-shadow: var(--gbe-shadow-sm) !important;
+  font-family: var(--gbe-mono) !important;
+  padding: 11px 14px !important;
+}
+body.ope-pg-tramites .flash.ok,
+body.ope-pg-crear-personaje .flash.ok,
+body.ope-pg-progresion .flash.ok,
+body.ope-pg-tienda .flash.ok {
+  background: color-mix(in srgb, var(--gbe-eter) 15%, transparent) !important;
+  color: var(--gbe-ink) !important;
+  border-color: var(--gbe-line) !important;
+}
+body.ope-pg-tramites .flash.error,
+body.ope-pg-crear-personaje .flash.error,
+body.ope-pg-progresion .flash.error,
+body.ope-pg-tienda .flash.error {
+  background: color-mix(in srgb, var(--gbe-red) 15%, transparent) !important;
+  color: var(--gbe-ink) !important;
+  border-color: var(--gbe-red) !important;
+}
+body.ope-pg-tramites .flash.warn,
+body.ope-pg-crear-personaje .flash.warn,
+body.ope-pg-progresion .flash.warn,
+body.ope-pg-tienda .flash.warn {
+  background: color-mix(in srgb, var(--gbe-gold) 15%, transparent) !important;
+  color: var(--gbe-ink) !important;
+  border-color: var(--gbe-gold) !important;
+}
+
+/* Botones en páginas RPG */
+body.ope-pg-tramites .btn,
+body.ope-pg-crear-personaje .btn,
+body.ope-pg-progresion .btn,
+body.ope-pg-tienda .btn {
+  border-radius: 8px !important;
+  border: 1px solid var(--gbe-line) !important;
+  padding: 10px 22px !important;
+  font-family: var(--gbe-mark) !important;
+  text-transform: none !important;
+  box-shadow: var(--gbe-shadow-sm) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.2s ease !important;
+}
+body.ope-pg-tramites .btn-hot,
+body.ope-pg-crear-personaje .btn-hot,
+body.ope-pg-progresion .btn-hot,
+body.ope-pg-tienda .btn-hot {
+  background: linear-gradient(135deg, var(--gbe-gold), var(--gbe-gold-deep)) !important;
+  color: #fff !important;
+  border-color: var(--gbe-gold-deep) !important;
+}
+body.ope-pg-tramites .btn-hot:hover,
+body.ope-pg-crear-personaje .btn-hot:hover,
+body.ope-pg-progresion .btn-hot:hover,
+body.ope-pg-tienda .btn-hot:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--gbe-shadow) !important;
+  border-color: var(--gbe-gold-hi) !important;
+}
+body.ope-pg-tramites .btn-ghost,
+body.ope-pg-crear-personaje .btn-ghost,
+body.ope-pg-progresion .btn-ghost,
+body.ope-pg-tienda .btn-ghost {
+  background: var(--gbe-card) !important;
+  color: var(--gbe-ink-soft) !important;
+  border-color: var(--gbe-line) !important;
+}
+body.ope-pg-tramites .btn-ghost:hover,
+body.ope-pg-crear-personaje .btn-ghost:hover,
+body.ope-pg-progresion .btn-ghost:hover,
+body.ope-pg-tienda .btn-ghost:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--gbe-shadow) !important;
+  border-color: var(--gbe-gold) !important;
+  color: var(--gbe-gold-deep) !important;
+}
+
+/* Campos de Formulario (inputs y selectores) */
+body.ope-pg-tramites input[type=text],
+body.ope-pg-tramites select,
+body.ope-pg-tramites textarea,
+body.ope-pg-crear-personaje .field input[type=text],
+body.ope-pg-crear-personaje .field input[type=number],
+body.ope-pg-crear-personaje .field select,
+body.ope-pg-crear-personaje .field textarea,
+body.ope-pg-progresion input[type=text],
+body.ope-pg-progresion select,
+body.ope-pg-progresion textarea,
+body.ope-pg-tienda .nt-input,
+body.ope-pg-tienda .nt-textarea {
+  border: 1px solid var(--gbe-line-soft) !important;
+  border-radius: 8px !important;
+  background: var(--gbe-card-2) !important;
+  color: var(--gbe-ink) !important;
+  padding: 10px 12px !important;
+  font-family: var(--gbe-body) !important;
+}
+body.ope-pg-tramites input:focus,
+body.ope-pg-tramites select:focus,
+body.ope-pg-tramites textarea:focus,
+body.ope-pg-crear-personaje .field input:focus,
+body.ope-pg-crear-personaje .field select:focus,
+body.ope-pg-crear-personaje .field textarea:focus,
+body.ope-pg-progresion input:focus,
+body.ope-pg-progresion select:focus,
+body.ope-pg-progresion textarea:focus,
+body.ope-pg-tienda .nt-input:focus,
+body.ope-pg-tienda .nt-textarea:focus {
+  border-color: var(--gbe-gold) !important;
+  outline: none !important;
+}
+
+/* Tarjetas y Bento Cards (en trámites) */
+body.ope-pg-tramites .card {
+  border: 1px solid var(--gbe-line) !important;
+  background: var(--gbe-card) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--gbe-shadow-sm) !important;
+  overflow: hidden !important;
+  transition: transform .2s, box-shadow .2s !important;
+}
+body.ope-pg-tramites .card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--gbe-shadow) !important;
+  border-color: var(--gbe-gold) !important;
+}
+body.ope-pg-tramites .card-top {
+  border-bottom: 1px solid var(--gbe-line-soft) !important;
+  background: var(--gbe-card-2) !important;
+}
+body.ope-pg-tramites .card-ic {
+  border: 1px solid var(--gbe-line-soft) !important;
+  background: var(--gbe-card) !important;
+  border-radius: 8px !important;
+}
+body.ope-pg-tramites .card-title {
+  font-family: var(--gbe-disp) !important;
+  text-transform: none !important;
+  color: var(--gbe-ink) !important;
+}
+body.ope-pg-tramites .card-foot {
+  border-top: 1px solid var(--gbe-line-soft) !important;
+}
+
+/* Anvil y Asistentes de creación (crear-personaje) */
+body.ope-pg-crear-personaje .pj-empty {
+  border: 1px dashed var(--gbe-line) !important;
+  background: var(--gbe-card) !important;
+  border-radius: 14px !important;
+}
+body.ope-pg-crear-personaje .pj-empty .anvil {
+  border: 1px solid var(--gbe-line-soft) !important;
+  background: var(--gbe-card-2) !important;
+  border-radius: 8px !important;
+}
+body.ope-pg-crear-personaje .pj-empty .big {
+  font-family: var(--gbe-disp) !important;
+  text-transform: none !important;
+  color: var(--gbe-ink) !important;
+}
+body.ope-pg-crear-personaje .pj-empty p {
+  font-family: var(--gbe-body) !important;
+}
+
+/* Indicadores de Progreso del Wizard */
+body.ope-pg-crear-personaje .wiz-step-dot {
+  border: 1px solid var(--gbe-line-soft) !important;
+  background: var(--gbe-card) !important;
+  border-radius: 8px !important;
+  color: var(--gbe-ink-soft) !important;
+}
+body.ope-pg-crear-personaje .wiz-step-dot .n {
+  font-family: var(--gbe-disp) !important;
+  color: var(--gbe-ink-dim) !important;
+}
+body.ope-pg-crear-personaje .wiz-step-dot.done {
+  border-color: var(--gbe-eter) !important;
+  color: var(--gbe-eter) !important;
+}
+body.ope-pg-crear-personaje .wiz-step-dot.done .n {
+  color: var(--gbe-eter) !important;
+}
+body.ope-pg-crear-personaje .wiz-step-dot.on {
+  border-color: var(--gbe-gold) !important;
+  background: var(--gbe-gold) !important;
+  color: #fff !important;
+}
+body.ope-pg-crear-personaje .wiz-step-dot.on .n {
+  color: #fff !important;
+}
+
+/* Historial/Log de progresión */
+body.ope-pg-progresion .ope-prog-log th {
+  border-bottom: 1px solid var(--gbe-line) !important;
+  color: var(--gbe-ink-dim) !important;
+}
+body.ope-pg-progresion .ope-prog-log td {
+  border-bottom: 1px solid var(--gbe-line-soft) !important;
+}
+body.ope-pg-progresion .ope-prog-log-pp {
+  font-family: var(--gbe-disp) !important;
+}
+
+/* Haki Dots / Progresión de éter */
+body.ope-pg-progresion .ope-haki-dot {
+  background: var(--gbe-card-2) !important;
+  border: 1px solid var(--gbe-line-soft) !important;
+  border-radius: 6px !important;
+  color: var(--gbe-ink-soft) !important;
+}
+body.ope-pg-progresion .ope-haki-dot--on {
+  background: var(--gbe-gold) !important;
+  color: #fff !important;
+  border-color: var(--gbe-gold-deep) !important;
+}
+
+/* Overrides de componentes específicos RPG (Evitar brutalismo restante) */
+
+/* Trámites */
+body.ope-pg-tramites .tram-chip,
+body.ope-pg-tramites .chip,
+body.ope-pg-tramites .tag,
+body.ope-pg-tramites .card-ic {
+  border: 1px solid var(--gbe-line-soft) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+/* Creación de Personaje */
+body.ope-pg-crear-personaje .race-card {
+  border: 1px solid var(--gbe-line) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--gbe-shadow-sm) !important;
+  background: var(--gbe-card) !important;
+  transition: all 0.2s ease !important;
+}
+body.ope-pg-crear-personaje .race-card:hover {
+  border-color: var(--gbe-gold) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--gbe-shadow) !important;
+}
+
+/* Progresión */
+body.ope-pg-progresion .ope-prog-hero,
+body.ope-pg-progresion .ope-prog-ppbar,
+body.ope-pg-progresion .ope-prog-vital,
+body.ope-pg-progresion .ope-prog-stat,
+body.ope-pg-progresion .ope-lvl-plate {
+  border: 1px solid var(--gbe-line) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--gbe-shadow-sm) !important;
+  background: var(--gbe-card) !important;
+  padding: 16px !important;
+}
+body.ope-pg-progresion .ope-prog-ppbar-detail {
+  border-top: 1px solid var(--gbe-line-soft) !important;
+  border-left: none !important;
+}
+
+/* Tienda */
+body.ope-pg-tienda .shop-item,
+body.ope-pg-tienda .shop-banner,
+body.ope-pg-tienda .shop-tab,
+body.ope-pg-tienda .shop-cart,
+body.ope-pg-tienda .shop-cart-btn {
+  border: 1px solid var(--gbe-line) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--gbe-shadow-sm) !important;
+  background: var(--gbe-card) !important;
+  transition: all 0.2s ease !important;
+}
+body.ope-pg-tienda .shop-tab.on {
+  border-color: var(--gbe-gold) !important;
+  background: var(--gbe-gold) !important;
+  color: #fff !important;
+}
+body.ope-pg-tienda .shop-cart-btn:hover,
+body.ope-pg-tienda .shop-item:hover {
+  border-color: var(--gbe-gold) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--gbe-shadow) !important;
+}
+
+/* ============================================================
+   SCAFFOLDING FICHA DE PERSONAJE — ficha.php (Evitar brutalismo)
+   Scope: body.ope-pg-ficha
+   ============================================================ */
+
+body.ope-pg-ficha {
+  --disp: 'Cinzel', Georgia, serif;
+  --mark: 'Cormorant Garamond', Georgia, serif;
+  --body: 'Spectral', Georgia, serif;
+  --mono: 'Space Mono', Menlo, Consolas, monospace;
+}
+
+/* Banner de Ficha */
+body.ope-pg-ficha .char-banner {
+  border-bottom: 1px solid var(--gbe-line-soft) !important;
+  box-shadow: inset 0 -80px 80px -40px color-mix(in srgb, var(--fac-soft) 25%, transparent) !important;
+}
+body.ope-pg-ficha .char-banner-edge {
+  height: 2px !important;
+  background: linear-gradient(90deg, var(--fac), var(--gbe-gold), var(--fac)) !important;
+}
+
+/* Retrato de Ficha (Columna sticky) */
+body.ope-pg-ficha .forge-portrait {
+  border: 1px solid var(--gbe-line) !important;
+  background: var(--gbe-card-2) !important;
+  border-radius: 14px 14px 0 0 !important;
+  overflow: hidden !important;
+  box-shadow: var(--gbe-shadow-sm) !important;
+}
+body.ope-pg-ficha .fp-temper {
+  border-right: 1px solid var(--gbe-line-soft) !important;
+}
+body.ope-pg-ficha .fp-lv {
+  border: 1px solid var(--gbe-line-soft) !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-radius: 0 0 8px 0 !important;
+  background: var(--gbe-gold) !important;
+  color: #fff !important;
+}
+body.ope-pg-ficha .fp-rank {
+  border: 1px solid var(--gbe-line-soft) !important;
+  border-top: none !important;
+  border-right: none !important;
+  border-radius: 0 0 0 8px !important;
+  background: var(--gbe-card) !important;
+  color: var(--gbe-gold-deep) !important;
+  font-family: var(--gbe-disp) !important;
+}
+body.ope-pg-ficha .fp-nameplate {
+  background: linear-gradient(to top, var(--gbe-card-2), rgba(13,14,17,0.76) 70%, transparent) !important;
+}
+body.ope-pg-ficha .fp-nameplate b {
+  font-family: var(--gbe-disp) !important;
+  text-shadow: none !important;
+  color: var(--gbe-ink) !important;
+}
+body.ope-pg-ficha .pcol .under {
+  border: 1px solid var(--gbe-line) !important;
+  border-top: none !important;
+  background: var(--gbe-card) !important;
+  padding: 14px !important;
+  border-radius: 0 0 14px 14px !important;
+  box-shadow: var(--gbe-shadow-sm) !important;
+}
+body.ope-pg-ficha .estado-chip {
+  border: 1px solid var(--gbe-line) !important;
+  background: var(--gbe-card-2) !important;
+  color: var(--gbe-gold-deep) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  padding: 4px 10px !important;
+}
+
+/* Cabecera / Identidad */
+body.ope-pg-ficha .idbanner h1 {
+  font-family: var(--gbe-disp) !important;
+  text-shadow: none !important;
+  color: var(--gbe-ink) !important;
+  text-transform: none !important;
+}
+body.ope-pg-ficha .eyebrow {
+  color: var(--gbe-gold-deep) !important;
+}
+body.ope-pg-ficha .tag {
+  border: 1px solid var(--gbe-line-soft) !important;
+  border-radius: 8px !important;
+  background: var(--gbe-card) !important;
+  color: var(--gbe-ink-soft) !important;
+  box-shadow: none !important;
+  padding: 4px 10px !important;
+}
+body.ope-pg-ficha .tag.rank {
+  border-color: var(--gbe-gold) !important;
+  color: var(--gbe-gold-deep) !important;
+  background: var(--gbe-card-2) !important;
+}
+body.ope-pg-ficha .tag.act {
+  border-color: var(--gbe-eter) !important;
+  color: var(--gbe-eter) !important;
+}
+
+/* Botones en Ficha (Obligatorio rectangulares, NO pills) */
+body.ope-pg-ficha .btn,
+body.ope-pg-ficha .pcol .acts .btn {
+  border-radius: 8px !important;
+  border: 1px solid var(--gbe-line) !important;
+  padding: 10px 20px !important;
+  font-family: var(--gbe-mark) !important;
+  font-weight: 500 !important;
+  box-shadow: var(--gbe-shadow-sm) !important;
+  text-transform: none !important;
+  transition: all 0.2s ease !important;
+}
+body.ope-pg-ficha .btn-hot {
+  background: linear-gradient(135deg, var(--gbe-gold), var(--gbe-gold-deep)) !important;
+  color: #fff !important;
+  border-color: var(--gbe-gold-deep) !important;
+}
+body.ope-pg-ficha .btn-hot:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--gbe-shadow) !important;
+  border-color: var(--gbe-gold-hi) !important;
+}
+body.ope-pg-ficha .btn-ghost {
+  background: var(--gbe-card) !important;
+  color: var(--gbe-ink-soft) !important;
+  border-color: var(--gbe-line) !important;
+}
+body.ope-pg-ficha .btn-ghost:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--gbe-shadow) !important;
+  border-color: var(--gbe-gold) !important;
+  color: var(--gbe-gold-deep) !important;
+}
+
+/* Pestañas pegajosas */
+body.ope-pg-ficha .tabs-wrap {
+  border-bottom: 1px solid var(--gbe-line-soft) !important;
+}
+body.ope-pg-ficha .tab {
+  font-family: var(--gbe-mark) !important;
+  color: var(--gbe-ink-soft) !important;
+}
+body.ope-pg-ficha .tab::after {
+  background: var(--gbe-gold) !important;
+}
+body.ope-pg-ficha .tab.on {
+  color: var(--gbe-gold-deep) !important;
+}
+
+/* Paneles de Pestañas */
+body.ope-pg-ficha .panel {
+  border: 1px solid var(--gbe-line) !important;
+  background: var(--gbe-card) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--gbe-shadow-sm) !important;
+  overflow: hidden !important;
+}
+body.ope-pg-ficha .panel-h {
+  background: linear-gradient(120deg, var(--gbe-wash), var(--gbe-card)) !important;
+  border-bottom: 1px solid var(--gbe-line-soft) !important;
+}
+body.ope-pg-ficha .panel-h .t {
+  font-family: var(--gbe-disp) !important;
+  color: var(--gbe-gold-deep) !important;
+  text-transform: none !important;
+}
+body.ope-pg-ficha .panel-h .c {
+  color: var(--gbe-ink-dim) !important;
+}
+body.ope-pg-ficha .panel-b {
+  padding: 16px !important;
+  color: var(--gbe-ink-soft) !important;
+  font-family: var(--gbe-body) !important;
+}
+
+/* Barras de estadísticas y Vítales */
+body.ope-pg-ficha .stat .track {
+  background: var(--gbe-line-soft) !important;
+  border-radius: 5px !important;
+}
+body.ope-pg-ficha .stat .v {
+  font-family: var(--gbe-mono) !important;
+}
+body.ope-pg-ficha .vitals .vital .bar {
+  background: var(--gbe-line-soft) !important;
+  border-radius: 4px !important;
+}
+
+/* Tarjetas de Técnicas */
+body.ope-pg-ficha .tec {
+  border: 1px solid var(--gbe-line-soft) !important;
+  border-radius: 10px !important;
+  background: var(--gbe-card-2) !important;
+  padding: 12px !important;
+}
+body.ope-pg-ficha .tec-n {
+  font-family: var(--gbe-mark) !important;
+  color: var(--gbe-ink) !important;
+}
+body.ope-pg-ficha .tec-tier {
+  font-family: var(--gbe-mono) !important;
+  background: var(--gbe-gold) !important;
+  border-radius: 5px !important;
+}
+
+/* Pactos y Sellos */
+body.ope-pg-ficha .pact {
+  border: 1px solid var(--gbe-line) !important;
+  border-radius: 12px !important;
+  background: var(--gbe-card-2) !important;
+}
+body.ope-pg-ficha .pact .seal {
+  border: 2px solid var(--gbe-gold) !important;
+  color: var(--gbe-gold-deep) !important;
+  background: var(--gbe-card) !important;
+}
+body.ope-pg-ficha .pact .pt {
+  font-family: var(--gbe-mark) !important;
+  color: var(--gbe-ink) !important;
+}
+
+/* Inventario (Slots) */
+body.ope-pg-ficha .slot {
+  border: 1px solid var(--gbe-line-soft) !important;
+  border-radius: 10px !important;
+  background: var(--gbe-card-2) !important;
+}
+body.ope-pg-ficha .slot b {
+  font-family: var(--gbe-mark) !important;
+  color: var(--gbe-ink) !important;
+}
+
+/* Relaciones */
+body.ope-pg-ficha .rel {
+  border: 1px solid var(--gbe-line-soft) !important;
+  border-radius: 10px !important;
+  background: var(--gbe-card-2) !important;
+}
+body.ope-pg-ficha .rel-n {
+  font-family: var(--gbe-mark) !important;
 }
 
