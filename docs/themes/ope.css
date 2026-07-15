@@ -5348,3 +5348,81 @@ body.ope-pg-ficha .rel-n {
   font-family: var(--gbe-mark) !important;
 }
 
+/* ============================================================
+   SCAFFOLDING GBE — ELIMINACIÓN MASIVA DE BRUTALISMO RESTANTE
+   Scope: tramites · crear-personaje · progresion · ficha (detalles)
+   ============================================================ */
+
+/* ── ficha.php: detalles modal y miniatura previa ── */
+body.ope-pg-ficha .ope-mprev{border:1px solid var(--gbe-line)!important;background:var(--gbe-card)!important;border-radius:8px!important;overflow:hidden!important}
+body.ope-pg-ficha .ope-msoon-tag{background:var(--gbe-gold)!important;color:#fff!important;border:none!important;border-radius:4px!important}
+body.ope-pg-ficha .ope-modal-rail{border-right:1px solid var(--gbe-line-soft)!important}
+body.ope-pg-ficha .stat-bar-wrap{border:none!important;border-radius:5px!important;background:var(--gbe-line-soft)!important}
+body.ope-pg-ficha .sum-temp{border:1px solid var(--gbe-line)!important;border-radius:10px!important;background:var(--gbe-card-2)!important}
+body.ope-pg-ficha .sum-cell{border:1px solid var(--gbe-line)!important;border-radius:10px!important;background:var(--gbe-card)!important}
+body.ope-pg-ficha .sum-cell::after{background:var(--gbe-gold)!important}
+body.ope-pg-ficha .hs{border:1px solid var(--gbe-line-soft)!important;border-radius:5px!important}
+body.ope-pg-ficha .coin{border:1px solid var(--gbe-line)!important}
+body.ope-pg-ficha .trait{border-bottom:1px solid var(--gbe-line-soft)!important}
+body.ope-pg-ficha .mrow{border-bottom:1px solid var(--gbe-line-soft)!important}
+body.ope-pg-ficha .pgroup-h .bar{background:var(--gbe-gold)!important}
+body.ope-pg-ficha .fp-med{border:1px solid var(--gbe-line)!important;border-radius:50%!important;background:var(--gbe-card)!important;box-shadow:var(--gbe-shadow-sm)!important}
+body.ope-pg-ficha .tl-tab{font-family:var(--gbe-mark)!important;border-radius:8px!important;border:1px solid var(--gbe-line-soft)!important;background:var(--gbe-card)!important;color:var(--gbe-ink-dim)!important}
+body.ope-pg-ficha .tl-tab[aria-selected="true"]{background:var(--gbe-gold)!important;color:#fff!important;border-color:var(--gbe-gold-deep)!important}
+body.ope-pg-ficha .of{border:1px solid var(--gbe-line-soft)!important}
+body.ope-pg-ficha .ope-cron-item,body.ope-pg-ficha .ope-tpl-item{border:1px solid var(--gbe-line-soft)!important;border-radius:8px!important}
+body.ope-pg-ficha .ope-modal-x{border:1px solid var(--gbe-line)!important;border-radius:8px!important;background:var(--gbe-card)!important}
+
+/* ── tramites.php: .plate · .card · .btn · .tag · .filters · .flash ── */
+body.ope-pg-tramites .plate{border:1px solid var(--gbe-line)!important;background:var(--gbe-card)!important;border-radius:14px!important;box-shadow:var(--gbe-shadow-sm)!important;margin-bottom:14px!important;overflow:hidden!important}
+body.ope-pg-tramites .plate-h{background:linear-gradient(120deg,var(--gbe-wash),var(--gbe-card))!important;border-bottom:1px solid var(--gbe-line-soft)!important;padding:10px 14px!important}
+body.ope-pg-tramites .plate-h .t{font-family:var(--gbe-disp)!important;color:var(--gbe-gold-deep)!important;text-transform:none!important;font-weight:700!important}
+body.ope-pg-tramites .plate-h .c{color:var(--gbe-ink-dim)!important}
+body.ope-pg-tramites .plate-b{color:var(--gbe-ink-soft)!important}
+body.ope-pg-tramites .btn{font-family:var(--gbe-mark)!important;text-transform:none!important;border:1px solid var(--gbe-line)!important;border-radius:8px!important;box-shadow:var(--gbe-shadow-sm)!important;letter-spacing:0!important}
+body.ope-pg-tramites .btn-hot{background:linear-gradient(135deg,var(--gbe-gold),var(--gbe-gold-deep))!important;color:#fff!important;border-color:var(--gbe-gold-deep)!important}
+body.ope-pg-tramites .btn-hot:hover{transform:translateY(-2px)!important;box-shadow:var(--gbe-shadow)!important}
+body.ope-pg-tramites .btn-ghost{background:var(--gbe-card)!important;color:var(--gbe-ink-soft)!important;border-color:var(--gbe-line)!important}
+body.ope-pg-tramites .tag{border:1px solid var(--gbe-line-soft)!important;border-radius:8px!important;background:var(--gbe-card)!important;color:var(--gbe-ink-soft)!important;box-shadow:none!important}
+body.ope-pg-tramites .heat-badge{border:1px solid var(--gbe-line)!important;border-radius:6px!important;color:var(--gbe-gold-deep)!important;background:var(--gbe-card)!important}
+body.ope-pg-tramites .slab{border:1px solid var(--gbe-line)!important;border-radius:10px!important;background:var(--gbe-wash)!important}
+body.ope-pg-tramites .card{border:1px solid var(--gbe-line)!important;background:var(--gbe-card)!important;border-radius:14px!important;box-shadow:var(--gbe-shadow-sm)!important}
+body.ope-pg-tramites .card-top{border-bottom:1px solid var(--gbe-line-soft)!important;background:linear-gradient(150deg,var(--gbe-wash),var(--gbe-card))!important;border-radius:14px 14px 0 0!important}
+body.ope-pg-tramites .card-ic{border:1px solid var(--gbe-line)!important;border-radius:8px!important;background:var(--gbe-card-2)!important}
+body.ope-pg-tramites .card-foot{border-top:1px solid var(--gbe-line-soft)!important}
+body.ope-pg-tramites .card-tag{border:none!important;border-radius:0 10px 0 8px!important;background:var(--gbe-gold)!important;color:#fff!important}
+body.ope-pg-tramites .filters{border:1px solid var(--gbe-line-soft)!important;border-radius:10px!important;overflow:hidden!important;background:var(--gbe-card)!important}
+body.ope-pg-tramites .filt{border-left:1px solid var(--gbe-line-soft)!important;background:var(--gbe-card)!important;color:var(--gbe-ink-dim)!important;font-family:var(--gbe-mark)!important;text-transform:none!important;letter-spacing:0!important}
+body.ope-pg-tramites .filt.on{background:var(--gbe-gold)!important;color:#fff!important}
+body.ope-pg-tramites .flash{border:1px solid var(--gbe-line)!important;border-radius:10px!important;box-shadow:none!important;background:var(--gbe-card)!important}
+body.ope-pg-tramites .tram-chip{border:1px solid var(--gbe-line-soft)!important;border-radius:8px!important;background:var(--gbe-card-2)!important;color:var(--gbe-ink-soft)!important}
+body.ope-pg-tramites .tram-chip.on{background:var(--gbe-gold)!important;color:#fff!important;border-color:var(--gbe-gold-deep)!important}
+
+/* ── crear-personaje.php: .plate · .btn · .flash · .race-card · wiz-sum ── */
+body.ope-pg-crear-personaje .plate{border:1px solid var(--gbe-line)!important;background:var(--gbe-card)!important;border-radius:14px!important;box-shadow:var(--gbe-shadow-sm)!important;margin-bottom:14px!important;overflow:hidden!important}
+body.ope-pg-crear-personaje .plate-h{background:linear-gradient(120deg,var(--gbe-wash),var(--gbe-card))!important;border-bottom:1px solid var(--gbe-line-soft)!important;padding:10px 14px!important}
+body.ope-pg-crear-personaje .plate-h .t{font-family:var(--gbe-disp)!important;color:var(--gbe-gold-deep)!important;text-transform:none!important;font-weight:700!important}
+body.ope-pg-crear-personaje .plate-b{color:var(--gbe-ink-soft)!important}
+body.ope-pg-crear-personaje .btn{font-family:var(--gbe-mark)!important;text-transform:none!important;border:1px solid var(--gbe-line)!important;border-radius:8px!important;box-shadow:var(--gbe-shadow-sm)!important;letter-spacing:0!important}
+body.ope-pg-crear-personaje .btn-hot{background:linear-gradient(135deg,var(--gbe-gold),var(--gbe-gold-deep))!important;color:#fff!important;border-color:var(--gbe-gold-deep)!important}
+body.ope-pg-crear-personaje .btn-hot:hover{transform:translateY(-2px)!important;box-shadow:var(--gbe-shadow)!important}
+body.ope-pg-crear-personaje .flash{border:1px solid var(--gbe-line)!important;border-radius:10px!important;box-shadow:none!important;background:var(--gbe-card)!important}
+body.ope-pg-crear-personaje .pj-empty .anvil{border:1px solid var(--gbe-line)!important;border-radius:10px!important;background:var(--gbe-card-2)!important}
+body.ope-pg-crear-personaje .wiz-sum-bar{border:1px solid var(--gbe-line)!important;border-radius:10px!important;background:var(--gbe-wash)!important;box-shadow:none!important}
+body.ope-pg-crear-personaje .pc-bar{border:1px solid var(--gbe-line)!important;border-radius:10px!important;background:var(--gbe-card)!important;box-shadow:var(--gbe-shadow-sm)!important}
+body.ope-pg-crear-personaje .item-name .badge{border:1px solid var(--gbe-line-soft)!important;border-radius:4px!important;background:var(--gbe-card-2)!important;color:var(--gbe-gold-deep)!important}
+
+/* ── progresion.php: .plate · .btn · .flash · stats-table · ppbar ── */
+body.ope-pg-progresion .plate{border:1px solid var(--gbe-line)!important;background:var(--gbe-card)!important;border-radius:14px!important;box-shadow:var(--gbe-shadow-sm)!important;margin-bottom:14px!important;overflow:hidden!important}
+body.ope-pg-progresion .plate-h{background:linear-gradient(120deg,var(--gbe-wash),var(--gbe-card))!important;border-bottom:1px solid var(--gbe-line-soft)!important;padding:10px 14px!important}
+body.ope-pg-progresion .plate-h .t{font-family:var(--gbe-disp)!important;color:var(--gbe-gold-deep)!important;text-transform:none!important;font-weight:700!important}
+body.ope-pg-progresion .btn{font-family:var(--gbe-mark)!important;text-transform:none!important;border:1px solid var(--gbe-line)!important;border-radius:8px!important;box-shadow:var(--gbe-shadow-sm)!important;letter-spacing:0!important}
+body.ope-pg-progresion .btn-hot{background:linear-gradient(135deg,var(--gbe-gold),var(--gbe-gold-deep))!important;color:#fff!important;border-color:var(--gbe-gold-deep)!important}
+body.ope-pg-progresion .btn-hot:hover{transform:translateY(-2px)!important;box-shadow:var(--gbe-shadow)!important}
+body.ope-pg-progresion .flash{border:1px solid var(--gbe-line)!important;border-radius:10px!important;box-shadow:none!important;background:var(--gbe-card)!important}
+body.ope-pg-progresion .ope-prog-log th{border-bottom:1px solid var(--gbe-line-soft)!important;color:var(--gbe-ink-dim)!important}
+body.ope-pg-progresion .ope-prog-ppbar--stack .ope-prog-ppbar-detail{border-top:1px solid var(--gbe-line-soft)!important}
+
+/* ── tienda.php: inputs/textareas brutalistas ── */
+body.ope-pg-tienda .nt-input,body.ope-pg-tienda .nt-textarea{border:1px solid var(--gbe-line)!important;border-radius:8px!important;background:var(--gbe-card)!important;color:var(--gbe-ink)!important}
+body.ope-pg-tienda .nt-input:focus,body.ope-pg-tienda .nt-textarea:focus{border-color:var(--gbe-gold)!important;outline:none!important;box-shadow:0 0 0 3px rgba(183,146,78,.15)!important}
