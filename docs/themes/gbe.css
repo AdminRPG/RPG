@@ -3374,7 +3374,7 @@ body.gbe-pg-mundo-vivo .mv-json-dump{background:#f5f5f5;padding:.5rem;border-rad
 .bib-d-h,.trip-d-h{display:block;font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gbe-gold-deep);margin-bottom:6px}
 .bib-d-block p,.trip-d-block p{font-size:.86rem;color:var(--gbe-ink-soft);line-height:1.6;margin:0}
 .bib-d-actions{padding:16px 20px;display:flex;gap:10px;flex-wrap:wrap}
-@media(max-width:560px){/deep/ .bib-d-head,.trip-d-head{flex-direction:column}.bib-d-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.bib-d-head,.trip-d-head{flex-direction:column}.bib-d-grid{grid-template-columns:1fr}}
 
 /* ---- Tablón de misiones: selección de compañeros + flash ---- */
 body.gbe-pg-tablon-misiones .flash{border:1px solid var(--gbe-line-soft);border-left:4px solid var(--gbe-gold);padding:11px 15px;margin-bottom:16px;font-family:var(--mono);font-size:.74rem;font-weight:700;box-shadow:var(--gbe-shadow-sm);border-radius:8px}
