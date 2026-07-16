@@ -2,7 +2,7 @@
 /**
  * I-Forge · Biblioteca de NPCs
  * Catálogo poblado desde BD (rol_personajes, es_npc=1). Sin datos mockup.
- * Estilos en docs/themes/ope.css (scope: ope-pg-biblioteca).
+ * Estilos en docs/themes/gbe.css (scope: gbe-pg-biblioteca).
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'biblioteca-npc.php');
@@ -11,8 +11,8 @@ require_once './global.php';
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 
-$FACCIONES = ope_rol_facciones();
-$data = ope_rol_cat_npcs_publicos();
+$FACCIONES = gbe_rol_facciones();
+$data = gbe_rol_cat_npcs_publicos();
 
 $data_json = json_encode($data, JSON_UNESCAPED_UNICODE);
 $fac_labels = array();
@@ -25,10 +25,10 @@ header('Content-Type: text/html; charset=utf-8');
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Biblioteca de NPCs</title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-biblioteca bib-npc">
-<?php echo ope_rol_navbar_html(); ?>
+<body class="gbe-pg-biblioteca bib-npc">
+<?php echo gbe_rol_navbar_html(); ?>
 <div class="breadcrumb"><div class="breadcrumb-in"><a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span><b>Biblioteca de NPCs</b></div></div>
 <div class="wrap">
 <section class="reveal"><div class="shead"><h1>Biblioteca de NPCs</h1><span class="code">// personajes no jugadores · <?php echo count($data); ?> fichados</span><span class="rule"></span></div></section>
@@ -109,8 +109,8 @@ header('Content-Type: text/html; charset=utf-8');
       + '<div class="bib-d-head fac-'+esc(p.faccion_slug||'civil')+'">'
         + '<div class="bib-d-media">'+media(p)+'</div>'
         + '<div class="bib-d-title"><h2>'+esc(p.nombre)+'</h2>'+(p.apodo?'<span class="bib-d-apodo">«'+esc(p.apodo)+'»</span>':'')
-        + '<span class="ope-tag ope-tag-npc">NPC</span>'
-        + (p.faccion_slug?' <span class="ope-tag ope-tag-'+esc(p.faccion_slug)+'">'+esc(facLbl(p.faccion_slug))+'</span>':'')+'</div>'
+        + '<span class="gbe-tag gbe-tag-npc">NPC</span>'
+        + (p.faccion_slug?' <span class="gbe-tag gbe-tag-'+esc(p.faccion_slug)+'">'+esc(facLbl(p.faccion_slug))+'</span>':'')+'</div>'
       + '</div>'
       + '<div class="bib-d-grid">'+rows+'</div>'
       + blocks

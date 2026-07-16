@@ -1,7 +1,7 @@
 <?php
 if (!defined('IN_MYBB')) { die('Direct initialization of this file is not allowed.'); }
 
-function ope_racha_recompensas() {
+function gbe_racha_recompensas() {
     return array(
         7  => array('pp' => 5,  'berries' => 50000,   'cofre' => false, 'nombre' => 'Racha 7 días'),
         14 => array('pp' => 10, 'berries' => 100000,  'cofre' => false, 'nombre' => 'Racha 14 días'),
@@ -10,7 +10,7 @@ function ope_racha_recompensas() {
     );
 }
 
-function ope_racha_get($pid) {
+function gbe_racha_get($pid) {
     global $db;
     $pid = (int)$pid;
     if ($pid < 1 || !$db->table_exists('rol_rachas')) {
@@ -22,12 +22,12 @@ function ope_racha_get($pid) {
     return array('racha_dias' => 0, 'ultimo_post' => 0, 'recompensa_dia7' => 0, 'recompensa_dia14' => 0, 'recompensa_dia21' => 0, 'recompensa_dia30' => 0);
 }
 
-function ope_racha_procesar_post($pid) {
+function gbe_racha_procesar_post($pid) {
     global $db;
     $pid = (int)$pid;
     if ($pid < 1 || !$db->table_exists('rol_rachas')) return array('ok' => false);
 
-    $racha = ope_racha_get($pid);
+    $racha = gbe_racha_get($pid);
     $ahora = TIME_NOW;
     $ultimo = (int)$racha['ultimo_post'];
     $dias_actual = (int)$racha['racha_dias'];
@@ -49,7 +49,7 @@ function ope_racha_procesar_post($pid) {
         $dias_actual++;
         $update = array('racha_dias' => $dias_actual, 'ultimo_post' => $ahora, 'updated_at' => $ahora);
 
-        $recompensas = ope_racha_recompensas();
+        $recompensas = gbe_racha_recompensas();
         $recompensa_otorgada = null;
         foreach (array(7, 14, 21, 30) as $hito) {
             $flag = "recompensa_dia{$hito}";
@@ -57,8 +57,8 @@ function ope_racha_procesar_post($pid) {
                 $r = $recompensas[$hito];
                 $updated = $db->write_query("UPDATE " . TABLE_PREFIX . "rol_rachas SET {$flag} = 1, updated_at = {$ahora} WHERE pid = {$pid} AND {$flag} = 0");
                 if ($db->affected_rows() > 0) {
-                    if (function_exists('ope_pp_add')) {
-                        ope_pp_add($pid, $r['pp'], 'racha', 0, 0, 0, "Racha día {$hito}");
+                    if (function_exists('gbe_pp_add')) {
+                        gbe_pp_add($pid, $r['pp'], 'racha', 0, 0, 0, "Racha día {$hito}");
                     }
                     $pj_q = $db->simple_select('rol_personajes', 'economia', "pid = {$pid}", array('limit' => 1));
                     if ($db->num_rows($pj_q)) {

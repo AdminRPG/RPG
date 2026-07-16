@@ -19,22 +19,22 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'crear-cartas.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_data.php';
 
 $bburl    = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int) ($mybb->user['uid'] ?? 0);
 
-$staff = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0);
+$staff = $loggedin ? gbe_rol_active_staff($uid) : array('rank' => 0);
 $rank  = (int) $staff['rank'];
 if (!$loggedin || $rank < 3) {
     header('Location: ' . $bburl . '/index.php');
     exit;
 }
 
-$TAGS     = ope_rol_tecnica_tags();
-$TIERS    = ope_rol_tecnica_tiers();
+$TAGS     = gbe_rol_tecnica_tags();
+$TIERS    = gbe_rol_tecnica_tiers();
 $buscar   = trim((string) $mybb->get_input('q'));
 $ftier    = (int) $mybb->get_input('tier_f', MyBB::INPUT_INT);
 $flash    = '';
@@ -59,7 +59,7 @@ if ($mybb->request_method === 'post'
         $nombre   = cc_clean($mybb->get_input('nombre'), 160);
         $tags_in  = $mybb->get_input('tags', MyBB::INPUT_ARRAY);
         if (!is_array($tags_in)) $tags_in = array();
-        $tags     = ope_rol_tecnica_valida_tags($tags_in);
+        $tags     = gbe_rol_tecnica_valida_tags($tags_in);
 
         $tier = (int) $mybb->get_input('tier', MyBB::INPUT_INT);
         if (!isset($TIERS[$tier])) $tier = 1;
@@ -134,7 +134,7 @@ $f_get_multi  = function ($ck) use ($f_tags) { return isset($f_tags[$ck]) && is_
 $f_get_single = function ($ck) use ($f_tags) { return isset($f_tags[$ck]) ? (string) $f_tags[$ck] : ''; };
 
 // ── Biblioteca ──
-$lib = $table_ok ? ope_rol_cartas_lib($buscar, $ftier) : array();
+$lib = $table_ok ? gbe_rol_cartas_lib($buscar, $ftier) : array();
 
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
@@ -143,13 +143,13 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Crear cartas</title>
-<?php echo ope_rol_head_base(); ?>
-<?php echo ope_rol_tecnica_card_css(); ?>
-<?php echo ope_rol_tecnica_forge_css(); ?>
+<?php echo gbe_rol_head_base(); ?>
+<?php echo gbe_rol_tecnica_card_css(); ?>
+<?php echo gbe_rol_tecnica_forge_css(); ?>
 </head>
-<body class="ope-pg-zona-staff ope-pg-crear-personaje ope-pg-gestionar-personaje ope-pg-gestionar-cartas">
+<body class="gbe-pg-zona-staff gbe-pg-crear-personaje gbe-pg-gestionar-personaje gbe-pg-gestionar-cartas">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -278,7 +278,7 @@ header('Content-Type: text/html; charset=utf-8');
     <!-- Vista previa -->
     <div class="gc-preview-col">
       <p class="gc-preview-lbl">// vista previa en vivo</p>
-      <div class="ope-tk-deck gc-deck-single"><div id="gcPreview"></div></div>
+      <div class="gbe-tk-deck gc-deck-single"><div id="gcPreview"></div></div>
     </div>
   </div>
 
@@ -302,10 +302,10 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if (empty($lib)): ?>
     <div class="empty-state"><div class="big">Biblioteca vac&iacute;a</div><p>Crea tu primera carta con el formulario de arriba. Luego podr&aacute;s asignarla a los personajes.</p></div>
 <?php else: ?>
-    <div class="ope-tk-deck">
+    <div class="gbe-tk-deck">
 <?php foreach ($lib as $carta): ?>
       <div class="deck-item" id="carta-<?php echo (int)$carta['id']; ?>">
-        <?php echo ope_rol_tecnica_card_html($carta); ?>
+        <?php echo gbe_rol_tecnica_card_html($carta); ?>
         <div class="deck-tools">
           <a href="<?php echo $bburl; ?>/crear-cartas.php?edit=<?php echo (int)$carta['id']; ?>#editor" class="btn btn-ghost btn-sm">Editar</a>
           <a href="<?php echo $bburl; ?>/asignar-cartas.php?carta=<?php echo (int)$carta['id']; ?>" class="btn btn-ghost btn-sm">Asignar</a>
@@ -337,7 +337,7 @@ header('Content-Type: text/html; charset=utf-8');
 
         <div class="gc-tabpane on" data-gcpane="prompt">
           <p class="lead">Copia este prompt y p&eacute;galo en tu IA (ChatGPT, Claude, Gemini&hellip;). Le da TODO el sistema INI-03 para dise&ntilde;ar cartas equilibradas. Luego describe tu concepto y te devolver&aacute; una carta en YAML.</p>
-          <textarea class="gc-md" id="gcMd" readonly spellcheck="false"><?php echo htmlspecialchars_uni(ope_rol_tecnica_ia_prompt()); ?></textarea>
+          <textarea class="gc-md" id="gcMd" readonly spellcheck="false"><?php echo htmlspecialchars_uni(gbe_rol_tecnica_ia_prompt()); ?></textarea>
           <div class="gc-copybar">
             <button type="button" class="btn btn-hot btn-sm" id="gcCopy">Copiar prompt</button>
             <span class="gc-copied" id="gcCopied">&#10003; Copiado</span>
@@ -423,15 +423,15 @@ header('Content-Type: text/html; charset=utf-8');
         rp = document.getElementById('fReposo').value || 0, dd = document.getElementById('fDados').value.trim(),
         req = document.getElementById('fReq').value.trim(), desc = document.getElementById('fDesc').value.trim();
     var tags = collectTags();
-    var chips = tags.map(function(t){ return '<span class="ope-tk-chip" style="--tk:'+t.accent+'">'+esc(t.txt)+'</span>'; }).join('');
-    var html = '<article class="ope-tk ope-tk-t'+tier+'">';
-    html += '<div class="ope-tk-h"><span class="ope-tk-tier">'+TIER_ROMAN[tier]+'</span><div class="ope-tk-tt"><h4 class="ope-tk-name">'+esc(nombre)+'</h4></div></div>';
-    if (chips) html += '<div class="ope-tk-chips">'+chips+'</div>';
-    if (desc) html += '<p class="ope-tk-desc">'+esc(desc).replace(/\n/g,'<br>')+'</p>';
-    html += '<div class="ope-tk-stats"><span class="ope-tk-stat"><b>'+esc(pa)+'</b><small>PA</small></span><span class="ope-tk-stat"><b>'+esc(en)+'</b><small>EN</small></span><span class="ope-tk-stat"><b>'+esc(rp)+'</b><small>Reposo</small></span>';
-    if (dd) html += '<span class="ope-tk-stat ope-tk-dice"><b>'+esc(dd)+'</b><small>Dados</small></span>';
+    var chips = tags.map(function(t){ return '<span class="gbe-tk-chip" style="--tk:'+t.accent+'">'+esc(t.txt)+'</span>'; }).join('');
+    var html = '<article class="gbe-tk gbe-tk-t'+tier+'">';
+    html += '<div class="gbe-tk-h"><span class="gbe-tk-tier">'+TIER_ROMAN[tier]+'</span><div class="gbe-tk-tt"><h4 class="gbe-tk-name">'+esc(nombre)+'</h4></div></div>';
+    if (chips) html += '<div class="gbe-tk-chips">'+chips+'</div>';
+    if (desc) html += '<p class="gbe-tk-desc">'+esc(desc).replace(/\n/g,'<br>')+'</p>';
+    html += '<div class="gbe-tk-stats"><span class="gbe-tk-stat"><b>'+esc(pa)+'</b><small>PA</small></span><span class="gbe-tk-stat"><b>'+esc(en)+'</b><small>EN</small></span><span class="gbe-tk-stat"><b>'+esc(rp)+'</b><small>Reposo</small></span>';
+    if (dd) html += '<span class="gbe-tk-stat gbe-tk-dice"><b>'+esc(dd)+'</b><small>Dados</small></span>';
     html += '</div>';
-    if (req) html += '<div class="ope-tk-req"><span class="ope-tk-req-l">Requisitos</span> '+esc(req)+'</div>';
+    if (req) html += '<div class="gbe-tk-req"><span class="gbe-tk-req-l">Requisitos</span> '+esc(req)+'</div>';
     html += '</article>';
     box.innerHTML = html;
   }

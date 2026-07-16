@@ -1,11 +1,11 @@
 <?php
 /**
  * I-Forge · Biblioteca de Lore
- * Crónica del mundo de One Piece Eternal: historia, cronología y eras.
+ * Crónica del mundo de Granblue Fantasy: Eternal: historia, cronología y eras.
  * Reutiliza el shell de Guías (selectores a la izquierda, contenido a la
  * derecha) con extras de lore. NPCs referenciados vía {npc:slug} que
  * enlazan a ficha.php (coloreados por facción).
- * Estilos en docs/themes/ope.css (scope: ope-pg-guias + .bib-lore).
+ * Estilos en docs/themes/gbe.css (scope: gbe-pg-guias + .bib-lore).
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'biblioteca-lore.php');
@@ -14,7 +14,7 @@ require_once './global.php';
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 
-$npcs = ope_rol_cat_npcs_publicos();
+$npcs = gbe_rol_cat_npcs_publicos();
 $npc_map = array();
 foreach ($npcs as $n) {
     $s = $n['slug'] ?? '';
@@ -48,11 +48,11 @@ ob_start();
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Biblioteca de Lore</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-guias + .bib-lore) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-guias + .bib-lore) -->
 </head>
-<body class="ope-pg-guias bib-lore">
-<?php echo ope_rol_navbar_html(); ?>
+<body class="gbe-pg-guias bib-lore">
+<?php echo gbe_rol_navbar_html(); ?>
 <div class="breadcrumb"><div class="breadcrumb-in"><a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span><b>Biblioteca de Lore</b></div></div>
 <div class="wrap">
 
@@ -63,7 +63,7 @@ ob_start();
     <span class="code">// crónica del mundo · <?php echo $total_capitulos; ?> capítulos</span>
     <span class="rule"></span>
   </div>
-  <p class="guia-intro">El <b>archivo oficial</b> de One Piece Eternal: la historia del mundo, su cronología y las cuatro grandes eras. <b>Elige un capítulo</b> en la izquierda para leer su crónica; los <b>personajes</b> enlazan a su ficha.</p>
+  <p class="guia-intro">El <b>archivo oficial</b> de Granblue Fantasy: Eternal: la historia del mundo, su cronología y las cuatro grandes eras. <b>Elige un capítulo</b> en la izquierda para leer su crónica; los <b>personajes</b> enlazan a su ficha.</p>
 </section>
 
 <!-- SELECTORES (izquierda) + CONTENIDO (derecha) -->

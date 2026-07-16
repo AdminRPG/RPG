@@ -1,6 +1,6 @@
 <?php
 /**
- * One Piece Eternal · Migración "día y estación para rol_thread_meta"
+ * Granblue Fantasy: Eternal · Migración "día y estación para rol_thread_meta"
  * ---------------------------------------------------------------------
  * Añade a rol_thread_meta las columnas:
  *   - fecha_dia : día in-rol dentro de la estación (1-65)

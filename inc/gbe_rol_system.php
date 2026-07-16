@@ -1,8 +1,8 @@
 <?php
 /**
- * I-Forge · Funciones del Sistema (OP-Eternal + PP).
+ * I-Forge · Funciones del Sistema (GBEternal + PP).
  *
- * Incluido desde inc/plugins/ope_rol.php. Usa $db (MyBB) contra tablas mybb_rol_*.
+ * Incluido desde inc/plugins/gbe_rol.php. Usa $db (MyBB) contra tablas mybb_rol_*.
  */
 
 if (!defined('IN_MYBB')) {
@@ -10,18 +10,18 @@ if (!defined('IN_MYBB')) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// OP-Eternal: usuario y personaje del sistema
+// GBEternal: usuario y personaje del sistema
 // ─────────────────────────────────────────────────────────────────────────
 
-/** Devuelve el uid de MyBB del bot OP-Eternal. */
-function ope_system_uid()
+/** Devuelve el uid de MyBB del bot GBEternal. */
+function gbe_system_uid()
 {
     global $db;
     static $uid = null;
     if ($uid !== null) return $uid;
 
     if ($db->table_exists('users')) {
-        $q = $db->simple_select('users', 'uid', "username = 'OP-Eternal'", array('limit' => 1));
+        $q = $db->simple_select('users', 'uid', "username = 'GBEternal'", array('limit' => 1));
         if ($db->num_rows($q)) {
             $uid = (int) $db->fetch_field($q, 'uid');
             return $uid;
@@ -31,16 +31,16 @@ function ope_system_uid()
     return $uid;
 }
 
-/** Devuelve el pid del personaje OP-Eternal. */
-function ope_system_pid()
+/** Devuelve el pid del personaje GBEternal. */
+function gbe_system_pid()
 {
     global $db;
     static $pid = null;
     if ($pid !== null) return $pid;
 
-    $suid = ope_system_uid();
+    $suid = gbe_system_uid();
     if ($suid > 0 && $db->table_exists('rol_personajes')) {
-        $q = $db->simple_select('rol_personajes', 'pid', "uid = {$suid} AND nombre = 'OP-Eternal'", array('limit' => 1));
+        $q = $db->simple_select('rol_personajes', 'pid', "uid = {$suid} AND nombre = 'GBEternal'", array('limit' => 1));
         if ($db->num_rows($q)) {
             $pid = (int) $db->fetch_field($q, 'pid');
             return $pid;
@@ -51,15 +51,15 @@ function ope_system_pid()
 }
 
 /**
- * Publica un tema/hilo como OP-Eternal en el foro indicado.
+ * Publica un tema/hilo como GBEternal en el foro indicado.
  * Devuelve el tid creado o 0 en caso de error.
  */
-function ope_system_create_thread($fid, $subject, $message, $tag = '')
+function gbe_system_create_thread($fid, $subject, $message, $tag = '')
 {
     global $mybb, $db;
 
-    $sys_uid = ope_system_uid();
-    $sys_pid = ope_system_pid();
+    $sys_uid = gbe_system_uid();
+    $sys_pid = gbe_system_pid();
     if ($sys_uid < 1 || $sys_pid < 1) return 0;
     if ((int) $fid < 1) return 0;
 
@@ -68,7 +68,7 @@ function ope_system_create_thread($fid, $subject, $message, $tag = '')
     $dh->set_data(array(
         'fid'         => (int) $fid,
         'uid'         => $sys_uid,
-        'username'    => 'OP-Eternal',
+        'username'    => 'GBEternal',
         'subject'     => $subject,
         'message'     => $message,
         'visible'     => 1,
@@ -80,35 +80,35 @@ function ope_system_create_thread($fid, $subject, $message, $tag = '')
     if (!$valid) {
         $errors = $dh->get_errors();
         if (!empty($errors)) {
-            error_log('OP-Eternal create_thread error: ' . implode(', ', $errors));
+            error_log('GBEternal create_thread error: ' . implode(', ', $errors));
         }
         return 0;
     }
 
     // Forzar el pid del personaje sistema en el post estampado
-    $dh->thread_insert_data['ope_pid'] = $sys_pid;
-    $dh->post_insert_data['ope_pid']   = $sys_pid;
+    $dh->thread_insert_data['gbe_pid'] = $sys_pid;
+    $dh->post_insert_data['gbe_pid']   = $sys_pid;
 
     $thread_info = $dh->insert_thread();
     $tid = isset($thread_info['tid']) ? (int) $thread_info['tid'] : 0;
     if ($tid > 0) {
         if ($db->table_exists('rol_thread_meta')) {
-            ope_rol_store_thread_meta($tid, (int) $fid, 'presente', 0, $tag);
+            gbe_rol_store_thread_meta($tid, (int) $fid, 'presente', 0, $tag);
         }
     }
     return $tid;
 }
 
 /**
- * Publica una respuesta como OP-Eternal en un tema existente.
+ * Publica una respuesta como GBEternal en un tema existente.
  * Devuelve el pid del post creado o 0 en caso de error.
  */
-function ope_system_create_post($tid, $message)
+function gbe_system_create_post($tid, $message)
 {
     global $mybb, $db;
 
-    $sys_uid = ope_system_uid();
-    $sys_pid = ope_system_pid();
+    $sys_uid = gbe_system_uid();
+    $sys_pid = gbe_system_pid();
     if ($sys_uid < 1 || $sys_pid < 1) return 0;
     if ((int) $tid < 1) return 0;
 
@@ -117,7 +117,7 @@ function ope_system_create_post($tid, $message)
     $dh->set_data(array(
         'tid'      => (int) $tid,
         'uid'      => $sys_uid,
-        'username' => 'OP-Eternal',
+        'username' => 'GBEternal',
         'message'  => $message,
         'visible'  => 1,
         'options'  => array(),
@@ -128,12 +128,12 @@ function ope_system_create_post($tid, $message)
     if (!$valid) {
         $errors = $dh->get_errors();
         if (!empty($errors)) {
-            error_log('OP-Eternal create_post error: ' . implode(', ', $errors));
+            error_log('GBEternal create_post error: ' . implode(', ', $errors));
         }
         return 0;
     }
 
-    $dh->post_insert_data['ope_pid'] = $sys_pid;
+    $dh->post_insert_data['gbe_pid'] = $sys_pid;
     $post_info = $dh->insert_post();
     return isset($post_info['pid']) ? (int) $post_info['pid'] : 0;
 }
@@ -147,7 +147,7 @@ function ope_system_create_post($tid, $message)
  * Tabla de PP por número de palabras (ver INI-04).
  * Devuelve [min, max, pp].
  */
-function ope_pp_word_table()
+function gbe_pp_word_table()
 {
     return array(
         array(0, 300, 1),
@@ -160,9 +160,9 @@ function ope_pp_word_table()
 /**
  * Calcula PP según el número de palabras.
  */
-function ope_pp_for_words($word_count)
+function gbe_pp_for_words($word_count)
 {
-    foreach (ope_pp_word_table() as $row) {
+    foreach (gbe_pp_word_table() as $row) {
         if ($word_count >= $row[0] && $word_count <= $row[1]) {
             return (int) $row[2];
         }
@@ -173,7 +173,7 @@ function ope_pp_for_words($word_count)
 /**
  * Cuenta palabras reales en texto (ignora BBCode, espacios extra y saltos de línea).
  */
-function ope_count_words($text)
+function gbe_count_words($text)
 {
     // Quitar BBCode básico
     $clean = preg_replace('/\[[^\]]*\]/', ' ', $text);
@@ -187,7 +187,7 @@ function ope_count_words($text)
  * Obtiene el saldo de PP de un personaje (crea la fila si no existe).
  * Devuelve array con pp_total, pp_gastado, pp_disponible.
  */
-function ope_pp_saldo($pid)
+function gbe_pp_saldo($pid)
 {
     global $db;
     $pid = (int) $pid;
@@ -229,7 +229,7 @@ function ope_pp_saldo($pid)
  * @param string $notas     Notas (opcional)
  * @param int    $uid_staff UID del staff (0 = automático)
  */
-function ope_pp_add($pid, $pp, $tipo = 'post', $tid = 0, $post_pid = 0, $palabras = 0, $notas = '', $uid_staff = 0)
+function gbe_pp_add($pid, $pp, $tipo = 'post', $tid = 0, $post_pid = 0, $palabras = 0, $notas = '', $uid_staff = 0)
 {
     global $db;
     $pid  = (int) $pid;
@@ -251,7 +251,7 @@ function ope_pp_add($pid, $pp, $tipo = 'post', $tid = 0, $post_pid = 0, $palabra
     ));
 
     // Actualizar saldo
-    $saldo = ope_pp_saldo($pid);
+    $saldo = gbe_pp_saldo($pid);
     $nuevo_total = $saldo['pp_total'] + $pp;
     $nuevo_disp  = $saldo['pp_disponible'] + $pp;
     $db->update_query('rol_pp_saldo', array(
@@ -267,7 +267,7 @@ function ope_pp_add($pid, $pp, $tipo = 'post', $tid = 0, $post_pid = 0, $palabra
  * Gasta PP de un personaje.
  * @return bool false si saldo insuficiente
  */
-function ope_pp_spend($pid, $cost, $tipo = 'gasto_stat', $notas = '')
+function gbe_pp_spend($pid, $cost, $tipo = 'gasto_stat', $notas = '')
 {
     global $db;
     $pid  = (int) $pid;
@@ -275,7 +275,7 @@ function ope_pp_spend($pid, $cost, $tipo = 'gasto_stat', $notas = '')
     if ($pid < 1 || $cost < 1) return false;
     if (!$db->table_exists('rol_pp_log') || !$db->table_exists('rol_pp_saldo')) return false;
 
-    $saldo = ope_pp_saldo($pid);
+    $saldo = gbe_pp_saldo($pid);
     if ($saldo['pp_disponible'] < $cost) return false;
 
     // Insertar log (negativo)
@@ -307,7 +307,7 @@ function ope_pp_spend($pid, $cost, $tipo = 'gasto_stat', $notas = '')
  * Hook: cuenta palabras de cada post y asigna PP automáticamente.
  * Se ejecuta tras snapshot_post para no interferir.
  */
-function ope_pp_on_post(&$dh)
+function gbe_pp_on_post(&$dh)
 {
     global $db;
 
@@ -324,13 +324,13 @@ function ope_pp_on_post(&$dh)
     $uid  = (int) ($dh->data['uid'] ?? 0);
     $tid  = (int) ($dh->data['tid'] ?? ($dh->post_insert_data['tid'] ?? 0));
 
-    // No contar PP para OP-Eternal ni posts del sistema
-    if ($uid === ope_system_uid()) return $dh;
+    // No contar PP para GBEternal ni posts del sistema
+    if ($uid === gbe_system_uid()) return $dh;
 
     // Personaje que firma el post (estampado en insert_post)
-    $char_pid = (int) ($dh->post_insert_data['ope_pid'] ?? 0);
+    $char_pid = (int) ($dh->post_insert_data['gbe_pid'] ?? 0);
     if ($char_pid < 1) {
-        $char_pid = ope_rol_active_pid_for($uid);
+        $char_pid = gbe_rol_active_pid_for($uid);
     }
     if ($char_pid < 1) return $dh;
 
@@ -340,7 +340,7 @@ function ope_pp_on_post(&$dh)
         if ($db->num_rows($cq)) {
             $crow = $db->fetch_array($cq);
             if ((int) ($crow['es_npc'] ?? 0) === 1) return $dh;
-            if ((int) ($crow['uid'] ?? 0) === ope_system_uid()) return $dh;
+            if ((int) ($crow['uid'] ?? 0) === gbe_system_uid()) return $dh;
         }
     }
 
@@ -350,16 +350,16 @@ function ope_pp_on_post(&$dh)
 
     // Contar palabras del mensaje
     $message = (string) ($dh->post_insert_data['message'] ?? '');
-    $words = ope_count_words($message);
-    $pp = ope_pp_for_words($words);
+    $words = gbe_count_words($message);
+    $pp = gbe_pp_for_words($words);
 
     if ($pp > 0) {
-        ope_pp_add($char_pid, $pp, 'post', $tid, $post_pid, $words);
+        gbe_pp_add($char_pid, $pp, 'post', $tid, $post_pid, $words);
     }
 
     // Procesar racha diaria
-    if (function_exists('ope_racha_procesar_post')) {
-        ope_racha_procesar_post($char_pid);
+    if (function_exists('gbe_racha_procesar_post')) {
+        gbe_racha_procesar_post($char_pid);
     }
 
     return $dh;
@@ -373,22 +373,22 @@ function ope_pp_on_post(&$dh)
 /**
  * Calcula PV máximos: (FUE + VIG) × 5 + (VOL + CON) × 2
  */
-function ope_combat_calc_pv($stats)
+function gbe_combat_calc_pv($stats)
 {
-    $fue = ope_rol_stat_num($stats, 'FUE');
-    $vig = ope_rol_stat_num($stats, 'VIG');
-    $vol = ope_rol_stat_num($stats, 'VOL');
-    $con = ope_rol_stat_num($stats, 'CON');
+    $fue = gbe_rol_stat_num($stats, 'FUE');
+    $vig = gbe_rol_stat_num($stats, 'VIG');
+    $vol = gbe_rol_stat_num($stats, 'VOL');
+    $con = gbe_rol_stat_num($stats, 'CON');
     return ($fue + $vig) * 5 + ($vol + $con) * 2;
 }
 
-function ope_combat_calc_en($stats) {
-    $vol = ope_rol_stat_num($stats, 'VOL');
-    $con = ope_rol_stat_num($stats, 'CON');
+function gbe_combat_calc_en($stats) {
+    $vol = gbe_rol_stat_num($stats, 'VOL');
+    $con = gbe_rol_stat_num($stats, 'CON');
     return ($vol * 3) + ($con * 2);
 }
 
-function ope_combat_pa_bonus($nivel) {
+function gbe_combat_pa_bonus($nivel) {
     $n = (int)$nivel;
     if ($n >= 80) return 3;
     if ($n >= 50) return 2;
@@ -396,16 +396,16 @@ function ope_combat_pa_bonus($nivel) {
     return 0;
 }
 
-function ope_combat_calc_pa($stats, $nivel) {
-    $agi = ope_rol_stat_num($stats, 'AGI');
-    $int = ope_rol_stat_num($stats, 'INT');
-    $ing = ope_rol_stat_num($stats, 'ING');
-    $car = ope_rol_stat_num($stats, 'CAR');
-    $bonus = ope_combat_pa_bonus($nivel);
+function gbe_combat_calc_pa($stats, $nivel) {
+    $agi = gbe_rol_stat_num($stats, 'AGI');
+    $int = gbe_rol_stat_num($stats, 'INT');
+    $ing = gbe_rol_stat_num($stats, 'ING');
+    $car = gbe_rol_stat_num($stats, 'CAR');
+    $bonus = gbe_combat_pa_bonus($nivel);
     return 3 + (int)($agi / 20) + (int)(max($int, $ing, $car) / 20) + $bonus;
 }
 
-function ope_combat_recalc($pid)
+function gbe_combat_recalc($pid)
 {
     global $db;
     $pid = (int)$pid;
@@ -428,12 +428,12 @@ function ope_combat_recalc($pid)
     }
     if (empty($stats)) return false;
 
-    $sum = ope_rol_stat_sum($stats);
-    $nivel = ope_rol_nivel_from_sum($sum);
+    $sum = gbe_rol_stat_sum($stats);
+    $nivel = gbe_rol_nivel_from_sum($sum);
 
-    $pv = ope_combat_calc_pv($stats);
-    $en = ope_combat_calc_en($stats);
-    $pa = ope_combat_calc_pa($stats, $nivel);
+    $pv = gbe_combat_calc_pv($stats);
+    $en = gbe_combat_calc_en($stats);
+    $pa = gbe_combat_calc_pa($stats, $nivel);
 
     $db->update_query('rol_personajes', array(
         'pv_max'       => $pv,
@@ -447,7 +447,7 @@ function ope_combat_recalc($pid)
 /**
  * Catálogo completo de estados (de BD o fallback estático).
  */
-function ope_combat_estados()
+function gbe_combat_estados()
 {
     global $db;
     static $cache = null;
@@ -469,7 +469,7 @@ function ope_combat_estados()
  * Localización: 1=Cabeza, 2=Torso, 3=Brazo izq, 4=Brazo der, 5=Pierna izq, 6=Pierna der.
  */
 
-function ope_combat_herida_partes()
+function gbe_combat_herida_partes()
 {
     return array(1 => 'Cabeza', 2 => 'Torso', 3 => 'Brazo izquierdo', 4 => 'Brazo derecho', 5 => 'Pierna izquierda', 6 => 'Pierna derecha');
 }
@@ -477,7 +477,7 @@ function ope_combat_herida_partes()
 /**
  * Determina tipo de herida según % de PV max.
  */
-function ope_combat_herida_tipo($dano, $pv_max)
+function gbe_combat_herida_tipo($dano, $pv_max)
 {
     if ($pv_max < 1) return 'sin_herida';
     $pct = ($dano / $pv_max) * 100;
@@ -490,7 +490,7 @@ function ope_combat_herida_tipo($dano, $pv_max)
 /**
  * Efectos de herida por tipo.
  */
-function ope_combat_herida_efecto($tipo)
+function gbe_combat_herida_efecto($tipo)
 {
     $efectos = array(
         'leve'    => array('penalizacion' => -1, 'desc' => '-1 a acciones con esa parte. Cura con descanso breve (30 min).'),
@@ -504,7 +504,7 @@ function ope_combat_herida_efecto($tipo)
  * Acumulación de heridas en la misma parte.
  * 2 leves → 1 grave, 2 graves → 1 crítica, 2 críticas → inutilizada permanente.
  */
-function ope_combat_acumular_heridas($existing, $new_type)
+function gbe_combat_acumular_heridas($existing, $new_type)
 {
     if ($existing === 'critica' && $new_type === 'critica') return 'inutilizada';
     if ($existing === 'grave'   && $new_type === 'grave')   return 'critica';

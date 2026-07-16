@@ -1,6 +1,6 @@
 <?php
 /**
- * One Piece Eternal · Migración "cronología por personaje"
+ * Granblue Fantasy: Eternal · Migración "cronología por personaje"
  * --------------------------------------------------------
  * Crea la tabla que guarda la DESCRIPCIÓN que un personaje le pone a cada tema
  * de su línea de tiempo. La descripción es por (personaje, tema), de ahí la PK

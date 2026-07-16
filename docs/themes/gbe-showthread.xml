@@ -33,8 +33,8 @@
 </head>
 <body>
 
-<nav id="ope-breadcrumb" aria-label="Ruta">
-  <div class="ope-breadcrumb-in">
+<nav id="gbe-breadcrumb" aria-label="Ruta">
+  <div class="gbe-breadcrumb-in">
     <a href="{$mybb->settings['bburl']}/index.php">Inicio</a>
     <span class="sep">&rsaquo;</span>
     {$breadcrumb}
@@ -43,22 +43,22 @@
 
 {$header}
 
-<main class="ope-wrap" style="padding-top:16px;padding-bottom:24px">
+<main class="gbe-wrap" style="padding-top:16px;padding-bottom:24px">
 
-  <header class="ope-thread-head">
-    <div class="ope-thread-head-in">
-      <div class="ope-th-badge-row">
+  <header class="gbe-thread-head">
+    <div class="gbe-thread-head-in">
+      <div class="gbe-th-badge-row">
         {$thread['displayprefix']}
-        <span class="ope-mono" style="font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ember-hi)">// {$thread['views']} vistas &middot; {$thread['replies']} respuestas</span>
+        <span class="gbe-mono" style="font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ember-hi)">// {$thread['views']} vistas &middot; {$thread['replies']} respuestas</span>
       </div>
-      <h1 class="ope-th-title">{$thread['subject']}</h1>
-      <div class="ope-th-meta">
+      <h1 class="gbe-th-title">{$thread['subject']}</h1>
+      <div class="gbe-th-meta">
         <span>por <b>{$thread['username']}</b></span>
       </div>
-      <div class="ope-th-controls">
-        <a href="newreply.php?tid={$tid}" class="ope-btn ope-btn-hot" id="ope-reply-top">Responder</a>
+      <div class="gbe-th-controls">
+        <a href="newreply.php?tid={$tid}" class="gbe-btn gbe-btn-hot" id="gbe-reply-top">Responder</a>
         {$moderationoptions}
-        <div class="ope-pager">{$multipage}</div>
+        <div class="gbe-pager">{$multipage}</div>
       </div>
     </div>
   </header>
@@ -66,17 +66,17 @@
   {$threadnotesbox}
   {$pollbox}
 
-  {$ope_viaje_panel}
+  {$gbe_viaje_panel}
 
   <div id="posts">{$posts}</div>
 
-  <div class="ope-thread-bar">
-    <div class="ope-pager">{$multipage}</div>
+  <div class="gbe-thread-bar">
+    <div class="gbe-pager">{$multipage}</div>
     <span style="flex:1"></span>
-    <a href="newreply.php?tid={$tid}" class="ope-btn ope-btn-hot">Responder</a>
+    <a href="newreply.php?tid={$tid}" class="gbe-btn gbe-btn-hot">Responder</a>
   </div>
 
-  <div class="ope-thread-nav">
+  <div class="gbe-thread-nav">
     {$search_thread}
     <div style="font-family:var(--mono);font-size:.68rem;color:var(--paper-dim);margin-top:6px"><strong>&laquo; <a href="{$next_oldest_link}">{$lang->next_oldest}</a> | <a href="{$next_newest_link}">{$lang->next_newest}</a> &raquo;</strong></div>
   </div>
@@ -86,9 +86,9 @@
   {$similarthreads}
   <div style="margin-top:12px">{$ratethread}</div>
 
-  {$ope_viaje_scripts}
+  {$gbe_viaje_scripts}
 
-  <div class="ope-thread-tools">
+  <div class="gbe-thread-tools">
     <div class="float_left"><ul class="thread_tools">{$printthread}{$sendthread}{$addremovesubscription}</ul></div>
     <div class="float_right">{$moderationoptions}{$forumjump}</div>
     <br class="clear" />
@@ -113,25 +113,25 @@
 
     <template name="postbit" version="1839"><![CDATA[{$ignore_bit}{$deleted_bit}
 <a name="pid{$post['pid']}" id="pid{$post['pid']}"></a>
-<article class="ope-post {$unapproved_shade}" style="{$post_visibility}" id="post_{$post['pid']}">
-  <div class="ope-post-author {$post['ope_fac_class']}">
+<article class="gbe-post {$unapproved_shade}" style="{$post_visibility}" id="post_{$post['pid']}">
+  <div class="gbe-post-author {$post['gbe_fac_class']}">
     {$post['useravatar']}
-    <div class="ope-pa-name">{$post['profilelink']}</div>
-    <div class="ope-pa-rank">
-      <span class="ope-tag ope-tag-rank" style="background:var(--h3)">{$post['usertitle']}</span>
+    <div class="gbe-pa-name">{$post['profilelink']}</div>
+    <div class="gbe-pa-rank">
+      <span class="gbe-tag gbe-tag-rank" style="background:var(--h3)">{$post['usertitle']}</span>
       {$post['groupimage']}
     </div>
-    {$post['ope_char_side']}
+    {$post['gbe_char_side']}
   </div>
 
-  <div class="ope-post-body">
-    <div class="ope-post-head">
-      <div class="ope-post-head-row">
-        <span class="ope-post-date">{$post['postdate']} &middot; {$post['posttime']}</span>
-        <div class="ope-post-actions">
-          <a href="{$post['postlink']}#pid{$post['pid']}" class="ope-post-num">#{$post['postnum']}</a>
-          <a href="newreply.php?tid={$tid}&amp;pid={$post['pid']}" class="ope-btn ope-btn-sm ope-btn-ghost">Citar</a>
-          <a href="newreply.php?tid={$tid}" class="ope-btn ope-btn-sm ope-btn-ghost">Responder</a>
+  <div class="gbe-post-body">
+    <div class="gbe-post-head">
+      <div class="gbe-post-head-row">
+        <span class="gbe-post-date">{$post['postdate']} &middot; {$post['posttime']}</span>
+        <div class="gbe-post-actions">
+          <a href="{$post['postlink']}#pid{$post['pid']}" class="gbe-post-num">#{$post['postnum']}</a>
+          <a href="newreply.php?tid={$tid}&amp;pid={$post['pid']}" class="gbe-btn gbe-btn-sm gbe-btn-ghost">Citar</a>
+          <a href="newreply.php?tid={$tid}" class="gbe-btn gbe-btn-sm gbe-btn-ghost">Responder</a>
           {$post['button_edit']}
           {$post['button_report']}
           {$post['button_warn']}
@@ -140,9 +140,9 @@
           {$post['button_quickrestore']}
         </div>
       </div>
-      <div class="ope-post-head-ip" id="post_meta_{$post['pid']}">{$post['iplogged']}{$post['poststatus']}</div>
+      <div class="gbe-post-head-ip" id="post_meta_{$post['pid']}">{$post['iplogged']}{$post['poststatus']}</div>
     </div>
-    <div class="ope-post-content" id="pid_{$post['pid']}">
+    <div class="gbe-post-content" id="pid_{$post['pid']}">
       {$post['message']}
     </div>
     {$post['signature']}
@@ -150,16 +150,16 @@
     {$post['editedmsg']}
   </div>
 </article>
-{$post['ope_rpgsys']}]]></template>
+{$post['gbe_rpgsys']}]]></template>
 
     <template name="postbit_author_user" version="1839"><![CDATA[]]></template>
 
-    <template name="postbit_avatar" version="1839"><![CDATA[<div class="ope-avatar">
+    <template name="postbit_avatar" version="1839"><![CDATA[<div class="gbe-avatar">
   <img src="{$post['avatar']}" alt="{$post['username']}" onerror="this.remove()" />
   <span>{$post['username']}</span>
 </div>]]></template>
 
-    <template name="postbit_signature" version="1839"><![CDATA[<div class="ope-post-sig">{$post['signature']}</div>]]></template>
+    <template name="postbit_signature" version="1839"><![CDATA[<div class="gbe-post-sig">{$post['signature']}</div>]]></template>
 
     <template name="postbit_editedby" version="1839"><![CDATA[<div style="font-family:var(--mono);font-size:.62rem;color:var(--ash);margin-top:8px">{$post['editedmsg']}</div>]]></template>
 
@@ -168,10 +168,10 @@
     <template name="showthread_quickreply" version="1839"><![CDATA[<div id="quickreply_spinner" class="showthread_spinner" style="display: none"><img src="{$theme['imgdir']}/spinner.gif" /></div>
 <br />
 {$moderation_notice}
-<div class="ope-plate" id="quickreply">
-  <div class="ope-plate-h"><span class="ope-plate-h-t">{$lang->quick_reply}</span><span class="ope-plate-h-c">// {$lang->message_note}</span></div>
-  <div class="ope-plate-b">
-    <div class="ope-qreply">
+<div class="gbe-plate" id="quickreply">
+  <div class="gbe-plate-h"><span class="gbe-plate-h-t">{$lang->quick_reply}</span><span class="gbe-plate-h-c">// {$lang->message_note}</span></div>
+  <div class="gbe-plate-b">
+    <div class="gbe-qreply">
       <form method="post" action="newreply.php?tid={$tid}&amp;processed=1" name="quick_reply_form" id="quick_reply_form">
         <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
         <input type="hidden" name="subject" value="RE: {$reply_subject}" />
@@ -182,7 +182,7 @@
         <input type="hidden" name="from_page" value="{$page}" />
         <input type="hidden" name="tid" value="{$tid}" />
         <input type="hidden" name="method" value="quickreply" />
-        <div class="ope-qreply-options">
+        <div class="gbe-qreply-options">
           {$option_signature}
           <label style="font-family:var(--mono);font-size:.62rem"><input type="checkbox" class="checkbox" name="postoptions[disablesmilies]" value="1" /> {$lang->disable_smilies}</label>
           {$closeoption}
@@ -192,29 +192,29 @@
           <span class="smalltext">{$lang->quickreply_multiquote_selected} <a href="./newreply.php?tid={$tid}&amp;load_all_quotes=1" onclick="return Thread.loadMultiQuoted();">{$lang->quickreply_multiquote_now}</a> {$lang->or} <a href="javascript:void(0)" onclick="Thread.clearMultiQuoted(); return false;">{$lang->quickreply_multiquote_deselect}</a>.</span>
         </div>
         {$captcha}
-        <div class="ope-q-actions">
-          <input type="submit" class="ope-btn ope-btn-hot" value="{$lang->post_reply}" tabindex="2" accesskey="s" id="quick_reply_submit" />
-          <input type="submit" class="ope-btn ope-btn-ghost" name="previewpost" value="{$lang->preview_post}" tabindex="3" />
-          <span class="ope-q-note">Conectado como <b>{$mybb->user['username']}</b></span>
+        <div class="gbe-q-actions">
+          <input type="submit" class="gbe-btn gbe-btn-hot" value="{$lang->post_reply}" tabindex="2" accesskey="s" id="quick_reply_submit" />
+          <input type="submit" class="gbe-btn gbe-btn-ghost" name="previewpost" value="{$lang->preview_post}" tabindex="3" />
+          <span class="gbe-q-note">Conectado como <b>{$mybb->user['username']}</b></span>
         </div>
       </form>
     </div>
   </div>
 </div>]]></template>
 
-    <template name="showthread_newreply" version="1839"><![CDATA[<a href="newreply.php?tid={$tid}" class="ope-btn ope-btn-hot">{$lang->new_reply}</a>]]></template>
+    <template name="showthread_newreply" version="1839"><![CDATA[<a href="newreply.php?tid={$tid}" class="gbe-btn gbe-btn-hot">{$lang->new_reply}</a>]]></template>
 
-    <template name="showthread_newreply_closed" version="1839"><![CDATA[<span class="ope-tag ope-tag-line" style="background:var(--crack);color:var(--iron)">{$lang->thread_closed}</span>]]></template>
+    <template name="showthread_newreply_closed" version="1839"><![CDATA[<span class="gbe-tag gbe-tag-line" style="background:var(--crack);color:var(--iron)">{$lang->thread_closed}</span>]]></template>
 
-    <template name="showthread_poll" version="1839"><![CDATA[<form action="polls.php" method="post" class="ope-plate">
+    <template name="showthread_poll" version="1839"><![CDATA[<form action="polls.php" method="post" class="gbe-plate">
   <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
   <input type="hidden" name="action" value="vote" />
   <input type="hidden" name="pid" value="{$poll['pid']}" />
-  <div class="ope-plate-h"><span class="ope-plate-h-t">{$lang->poll}</span><span class="ope-plate-h-c">// {$poll['question']}</span></div>
-  <div class="ope-plate-b">
+  <div class="gbe-plate-h"><span class="gbe-plate-h-t">{$lang->poll}</span><span class="gbe-plate-h-c">// {$poll['question']}</span></div>
+  <div class="gbe-plate-b">
     <div style="margin-bottom:12px">{$polloptions}</div>
-    <div class="ope-q-actions">
-      <input type="submit" class="ope-btn ope-btn-hot" value="{$lang->vote}" />
+    <div class="gbe-q-actions">
+      <input type="submit" class="gbe-btn gbe-btn-hot" value="{$lang->vote}" />
       <span style="font-family:var(--mono);font-size:.64rem;color:var(--ash)">{$lang->total_votes} {$poll['totalvotes']} &middot; {$poll['closednotice']}</span>
       <span style="flex:1"></span>
       {$resetvotebtn}{$undovotebtn}{$viewresultsbtn}
@@ -257,25 +257,25 @@
 
     <template name="showthread_poll_undovote" version="1839"><![CDATA[ [<a href="polls.php?action=do_undovote&amp;pid={$poll['pid']}&amp;my_post_key={$mybb->post_code}">{$lang->undo_vote}</a>]]></template>
 
-    <template name="showthread_usersbrowsing" version="1839"><![CDATA[<div class="ope-plate" style="margin-top:14px">
-  <div class="ope-plate-h"><span class="ope-plate-h-t">{$lang->users_browsing_thread}</span></div>
-  <div class="ope-plate-b">{$onlinemembers}</div>
+    <template name="showthread_usersbrowsing" version="1839"><![CDATA[<div class="gbe-plate" style="margin-top:14px">
+  <div class="gbe-plate-h"><span class="gbe-plate-h-t">{$lang->users_browsing_thread}</span></div>
+  <div class="gbe-plate-b">{$onlinemembers}</div>
 </div>]]></template>
 
-    <template name="showthread_usersbrowsing_user" version="1839"><![CDATA[{$comma}<a href="{$user['profilelink']}" class="ope-chip" title="{$lang->users_browsing_thread_reading} ({$user['reading']})">{$user['username']}</a>{$invisiblemark}]]></template>
+    <template name="showthread_usersbrowsing_user" version="1839"><![CDATA[{$comma}<a href="{$user['profilelink']}" class="gbe-chip" title="{$lang->users_browsing_thread_reading} ({$user['reading']})">{$user['username']}</a>{$invisiblemark}]]></template>
 
-    <template name="showthread_threadnotes" version="1839"><![CDATA[<div class="ope-plate" id="threadnotes" style="margin-top:14px">
-  <div class="ope-plate-h"><span class="ope-plate-h-t">{$lang->view_thread_notes}</span></div>
-  <div class="ope-plate-b">{$threadnotes}</div>
+    <template name="showthread_threadnotes" version="1839"><![CDATA[<div class="gbe-plate" id="threadnotes" style="margin-top:14px">
+  <div class="gbe-plate-h"><span class="gbe-plate-h-t">{$lang->view_thread_notes}</span></div>
+  <div class="gbe-plate-b">{$threadnotes}</div>
 </div>]]></template>
 
-    <template name="showthread_threadnotes_viewnotes" version="1839"><![CDATA[<a href="javascript:void(0)" class="ope-btn ope-btn-sm ope-btn-ghost" onclick="Thread.viewNotes({$thread['tid']}); return false;">{$lang->view_all_notes}</a>]]></template>
+    <template name="showthread_threadnotes_viewnotes" version="1839"><![CDATA[<a href="javascript:void(0)" class="gbe-btn gbe-btn-sm gbe-btn-ghost" onclick="Thread.viewNotes({$thread['tid']}); return false;">{$lang->view_all_notes}</a>]]></template>
 
-    <template name="showthread_threadnoteslink" version="1839"><![CDATA[ <a href="moderation.php?action=threadnotes&amp;modtype=thread&amp;tid={$thread['tid']}" class="ope-thread-notes-link">{$lang->view_thread_notes}</a>]]></template>
+    <template name="showthread_threadnoteslink" version="1839"><![CDATA[ <a href="moderation.php?action=threadnotes&amp;modtype=thread&amp;tid={$thread['tid']}" class="gbe-thread-notes-link">{$lang->view_thread_notes}</a>]]></template>
 
-    <template name="showthread_similarthreads" version="1839"><![CDATA[<div class="ope-plate" style="margin-top:14px">
-  <div class="ope-plate-h"><span class="ope-plate-h-t">{$lang->similar_threads}</span></div>
-  <div class="ope-plate-b">{$similarthreads}</div>
+    <template name="showthread_similarthreads" version="1839"><![CDATA[<div class="gbe-plate" style="margin-top:14px">
+  <div class="gbe-plate-h"><span class="gbe-plate-h-t">{$lang->similar_threads}</span></div>
+  <div class="gbe-plate-b">{$similarthreads}</div>
 </div>]]></template>
 
     <template name="showthread_similarthreads_bit" version="1839"><![CDATA[<div style="padding:6px 0;border-bottom:1px solid var(--iron);font-family:var(--mono);font-size:.68rem">
@@ -283,9 +283,9 @@
   <span style="color:var(--ash)">&middot; {$thread['replies']} {$lang->replies}</span>
 </div>]]></template>
 
-    <template name="showthread_ratethread" version="1839"><![CDATA[<div class="ope-plate">
-  <div class="ope-plate-h"><span class="ope-plate-h-t">{$lang->thread_rating}</span></div>
-  <div class="ope-plate-b">
+    <template name="showthread_ratethread" version="1839"><![CDATA[<div class="gbe-plate">
+  <div class="gbe-plate-h"><span class="gbe-plate-h-t">{$lang->thread_rating}</span></div>
+  <div class="gbe-plate-b">
     <div class="inline_rating">
       <ul class="star_rating star_rating_notrated" id="rating_thread_{$thread['tid']}">
         <li style="width:{$thread['width']}%" class="current_rating" id="current_rating_{$thread['tid']}">{$rating_votes}</li>
@@ -295,12 +295,12 @@
   </div>
 </div>]]></template>
 
-    <template name="showthread_search" version="1839"><![CDATA[<form action="search.php" method="post" class="ope-plate" style="margin-top:12px">
-  <div class="ope-plate-h"><span class="ope-plate-h-t">{$lang->search_thread}</span></div>
-  <div class="ope-plate-b">
+    <template name="showthread_search" version="1839"><![CDATA[<form action="search.php" method="post" class="gbe-plate" style="margin-top:12px">
+  <div class="gbe-plate-h"><span class="gbe-plate-h-t">{$lang->search_thread}</span></div>
+  <div class="gbe-plate-b">
     <div style="display:flex;gap:8px">
       <input type="text" name="keywords" value="{$lang->enter_keywords}" onfocus="if(this.value=='{$lang->enter_keywords}'){this.value=''}" onblur="if(this.value==''){this.value='{$lang->enter_keywords}'}" style="padding:8px;border:2px solid #000;background:var(--concrete);color:var(--ink);font-family:var(--body);flex:1" />
-      <input type="submit" class="ope-btn ope-btn-hot" value="Buscar" />
+      <input type="submit" class="gbe-btn gbe-btn-hot" value="Buscar" />
     </div>
   </div>
 </form>]]></template>
@@ -359,7 +359,7 @@
 {$standardposttools}
 {$customposttools}
 </select>
-<input type="submit" class="ope-btn ope-btn-sm ope-btn-hot" name="go" value="{$lang->go}" id="inline_go" />&nbsp;
+<input type="submit" class="gbe-btn gbe-btn-sm gbe-btn-hot" name="go" value="{$lang->go}" id="inline_go" />&nbsp;
 </form>
 <script type="text/javascript">
 <!--
@@ -412,13 +412,13 @@
     <template name="showthread_inlinemoderation_approve" version="1839"><![CDATA[<option value="multiapproveposts">{$lang->inline_approve_posts}</option>
 <option value="multiunapproveposts">{$lang->inline_unapprove_posts}</option>]]></template>
 
-    <template name="showthread_printthread" version="1839"><![CDATA[<a href="printthread.php?tid={$tid}" class="ope-btn ope-btn-sm ope-btn-ghost">{$lang->view_printable}</a>]]></template>
+    <template name="showthread_printthread" version="1839"><![CDATA[<a href="printthread.php?tid={$tid}" class="gbe-btn gbe-btn-sm gbe-btn-ghost">{$lang->view_printable}</a>]]></template>
 
-    <template name="showthread_send_thread" version="1839"><![CDATA[<a href="sendthread.php?tid={$tid}" class="ope-btn ope-btn-sm ope-btn-ghost">{$lang->send_thread}</a>]]></template>
+    <template name="showthread_send_thread" version="1839"><![CDATA[<a href="sendthread.php?tid={$tid}" class="gbe-btn gbe-btn-sm gbe-btn-ghost">{$lang->send_thread}</a>]]></template>
 
-    <template name="showthread_add_poll" version="1839"><![CDATA[<a href="polls.php?action=newpoll&amp;tid={$tid}" class="ope-btn ope-btn-sm ope-btn-ghost">{$lang->add_poll_to_thread}</a>]]></template>
+    <template name="showthread_add_poll" version="1839"><![CDATA[<a href="polls.php?action=newpoll&amp;tid={$tid}" class="gbe-btn gbe-btn-sm gbe-btn-ghost">{$lang->add_poll_to_thread}</a>]]></template>
 
-    <template name="showthread_subscription" version="1839"><![CDATA[<a href="usercp.php?action={$add_remove_subscription}subscription&amp;tid={$tid}&amp;my_post_key={$mybb->post_code}" class="ope-btn ope-btn-sm ope-btn-ghost">{$add_remove_subscription_text}</a>]]></template>
+    <template name="showthread_subscription" version="1839"><![CDATA[<a href="usercp.php?action={$add_remove_subscription}subscription&amp;tid={$tid}&amp;my_post_key={$mybb->post_code}" class="gbe-btn gbe-btn-sm gbe-btn-ghost">{$add_remove_subscription_text}</a>]]></template>
 
     <template name="showthread_quickreply_options_signature" version="1839"><![CDATA[<label style="font-family:var(--mono);font-size:.62rem"><input type="checkbox" class="checkbox" name="postoptions[signature]" value="1" {$postoptionschecked['signature']} /> <strong>{$lang->signature}</strong></label>]]></template>
 
@@ -426,16 +426,16 @@
 
     <template name="showthread_quickreply_options_stick" version="1839"><![CDATA[<label style="font-family:var(--mono);font-size:.62rem"><input type="checkbox" class="checkbox" name="modoptions[stickthread]" value="1"{$stickch} /> <strong>{$lang->stick_thread}</strong></label>]]></template>
 
-    <template name="showthread_classic_header" version="1839"><![CDATA[<div class="ope-plate">
-  <div class="ope-plate-h"><span class="ope-plate-h-t">{$thread['subject']}</span></div>
-  <div class="ope-plate-b">{$message}</div>
+    <template name="showthread_classic_header" version="1839"><![CDATA[<div class="gbe-plate">
+  <div class="gbe-plate-h"><span class="gbe-plate-h-t">{$thread['subject']}</span></div>
+  <div class="gbe-plate-b">{$message}</div>
 </div>]]></template>
 
-    <template name="showthread_newthread" version="1839"><![CDATA[<a href="newthread.php?fid={$fid}" class="ope-btn ope-btn-hot">+ {$lang->post_thread}</a>]]></template>
+    <template name="showthread_newthread" version="1839"><![CDATA[<a href="newthread.php?fid={$fid}" class="gbe-btn gbe-btn-hot">+ {$lang->post_thread}</a>]]></template>
 
-    <template name="showthread_threadedbox" version="1839"><![CDATA[<div class="ope-plate" style="margin-top:14px">
-  <div class="ope-plate-h"><span class="ope-plate-h-t">{$lang->threaded_mode}</span></div>
-  <div class="ope-plate-b">{$threadedlist}</div>
+    <template name="showthread_threadedbox" version="1839"><![CDATA[<div class="gbe-plate" style="margin-top:14px">
+  <div class="gbe-plate-h"><span class="gbe-plate-h-t">{$lang->threaded_mode}</span></div>
+  <div class="gbe-plate-b">{$threadedlist}</div>
 </div>]]></template>
 
     <template name="showthread_threaded_bit" version="1839"><![CDATA[<div style="margin-left:{$indentsize}px;padding:4px 0;font-family:var(--mono);font-size:.64rem;border-bottom:1px solid var(--iron)">

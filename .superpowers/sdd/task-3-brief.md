@@ -2,7 +2,7 @@
 
 ## Contexto
 Archivo: `mundo-vivo.php` (670 líneas)
-Panel de staff/WebMaster. Ya se actualizó `inc/ope_rol_mundo.php` con las nuevas funciones v3.
+Panel de staff/WebMaster. Ya se actualizó `inc/gbe_rol_mundo.php` con las nuevas funciones v3.
 
 ## Cambios a hacer
 
@@ -15,7 +15,7 @@ foreach ($zMetricsDef as $k => $m):
   <input type="number" ... name="zona[...][$k]" value="...">
 endforeach;
 ```
-Esto funciona automáticamente porque `$zMetricsDef = ope_rol_mv_zona_metrics()` ahora devuelve 10 keys.
+Esto funciona automáticamente porque `$zMetricsDef = gbe_rol_mv_zona_metrics()` ahora devuelve 10 keys.
 
 Lo mismo para facciones con `$fMetricsDef`.
 
@@ -94,7 +94,7 @@ $npcTrackPrev = (is_array($preview['estado']) && !empty($preview['estado']['npc_
 if (empty($npcTrackPrev)): ?>
 <p class="mv-empty">La IA no devolvió tracking de NPCs.</p>
 <?php else: 
-  $currentTracking = ope_rol_mv_npc_tracking_from_db(); 
+  $currentTracking = gbe_rol_mv_npc_tracking_from_db(); 
   foreach ($npcTrackPrev as $pid => $track): 
     $old = $currentTracking[(int)$pid] ?? array();
 ?>
@@ -137,7 +137,7 @@ Y en el HTML del tab Generar:
 ### 6. Indicaciones del staff — persistencia entre ciclos
 Actualmente las indicaciones se guardan en el ciclo actual. Al abrir un nuevo ciclo, las indicaciones están vacías. Añadir lógica para que al crear un ciclo nuevo, se copien las indicaciones del ciclo anterior (opcional pero útil).
 
-Esto implica modificar `ope_rol_mv_ciclo_actual()` — pero esa función no acepta parámetros. En su lugar, simplemente mostrar un mensaje en el panel: "Las indicaciones no se heredan automáticamente. Cópialas manualmente del mes anterior si es necesario."
+Esto implica modificar `gbe_rol_mv_ciclo_actual()` — pero esa función no acepta parámetros. En su lugar, simplemente mostrar un mensaje en el panel: "Las indicaciones no se heredan automáticamente. Cópialas manualmente del mes anterior si es necesario."
 
 ## Reglas generales
 - Mantener el estilo HTML del archivo (clases CSS, estructura plate/plate-h/plate-b)

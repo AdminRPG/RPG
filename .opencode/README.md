@@ -18,7 +18,7 @@ py -m graphify query "tu pregunta"
 
 ## Tema MyBB
 
-Tras editar `docs/themes/ope.css` o `ope-index.xml`:
+Tras editar `docs/themes/gbe.css` o `gbe-index.xml`:
 
 ```powershell
 php scripts/sync-theme.php import; php scripts/sync-theme.php verify

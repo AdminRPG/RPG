@@ -735,7 +735,7 @@ body{background:var(--iron);color:var(--paper);font-family:var(--body);font-size
 
 <footer class="foot">
   <div class="foot-in">
-    <div class="foot-b">One Piece Eternal</div>
+    <div class="foot-b">Granblue Fantasy: Eternal</div>
   </div>
 </footer>
 
@@ -1095,7 +1095,7 @@ a{color:var(--ember-hi);text-decoration:none}
 
 <footer class="foot">
   <div class="foot-in">
-    <div class="foot-b">One Piece Eternal</div>
+    <div class="foot-b">Granblue Fantasy: Eternal</div>
   </div>
 </footer>
 
@@ -1319,7 +1319,7 @@ a{color:var(--ember-hi);text-decoration:none}
 
 <footer class="foot">
   <div class="foot-in">
-    <div class="foot-b">One Piece Eternal</div>
+    <div class="foot-b">Granblue Fantasy: Eternal</div>
   </div>
 </footer>
 

@@ -2,7 +2,7 @@
 /**
  * I-Forge · Biblioteca de Estilos de lucha
  * Catálogo poblado desde BD (rol_estilos). Sin datos mockup.
- * Estilos en docs/themes/ope.css (scope: ope-pg-biblioteca).
+ * Estilos en docs/themes/gbe.css (scope: gbe-pg-biblioteca).
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'biblioteca-estilos.php');
@@ -11,8 +11,8 @@ require_once './global.php';
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 
-$data = ope_rol_cat_estilos();
-foreach ($data as &$d) { $d['tier'] = ope_rol_cat_rareza_tier($d['dificultad']); }
+$data = gbe_rol_cat_estilos();
+foreach ($data as &$d) { $d['tier'] = gbe_rol_cat_rareza_tier($d['dificultad']); }
 unset($d);
 $data_json = json_encode($data, JSON_UNESCAPED_UNICODE);
 
@@ -22,10 +22,10 @@ header('Content-Type: text/html; charset=utf-8');
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Estilos de lucha</title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-biblioteca bib-estilos">
-<?php echo ope_rol_navbar_html(); ?>
+<body class="gbe-pg-biblioteca bib-estilos">
+<?php echo gbe_rol_navbar_html(); ?>
 <div class="breadcrumb"><div class="breadcrumb-in"><a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span><b>Estilos de lucha</b></div></div>
 <div class="wrap">
 <section class="reveal"><div class="shead"><h1>Estilos de lucha</h1><span class="code">// técnicas y habilidades · <?php echo count($data); ?> documentados</span><span class="rule"></span></div></section>
@@ -101,7 +101,7 @@ header('Content-Type: text/html; charset=utf-8');
       + '<div class="bib-d-head">'
         + '<div class="bib-d-media">'+media(p)+'</div>'
         + '<div class="bib-d-title"><h2>'+esc(p.nombre)+'</h2>'
-        + '<span class="ope-tag">'+esc(p.categoria)+'</span> <span class="bib-card-badge '+esc(p.tier)+'">'+esc(p.dificultad)+'</span></div>'
+        + '<span class="gbe-tag">'+esc(p.categoria)+'</span> <span class="bib-card-badge '+esc(p.tier)+'">'+esc(p.dificultad)+'</span></div>'
       + '</div>'
       + '<div class="bib-d-grid">'+rows+'</div>'
       + blocks;

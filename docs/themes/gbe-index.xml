@@ -4,6 +4,7 @@
     <template name="headerinclude" version="1839"><![CDATA[<link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<script>document.documentElement.setAttribute("data-theme",(function(){var m=document.cookie.match(/(?:^|; )gbe_theme=([^;]+)/);var t=m?decodeURIComponent(m[1]):"";return t==="noche"?"noche":"cielo";})());</script>
 <link rel="alternate" type="application/rss+xml" title="{$lang->latest_threads} (RSS 2.0)" href="{$mybb->settings['bburl']}/syndication.php" />
 <link rel="alternate" type="application/atom+xml" title="{$lang->latest_threads} (Atom 1.0)" href="{$mybb->settings['bburl']}/syndication.php?type=atom1.0" />
 <meta http-equiv="Content-Type" content="text/html; charset={$charset}" />
@@ -66,7 +67,7 @@
 </head>
 <body class="gbe-index">
 <!-- La navbar (única para todo el sitio) la inyecta el hook pre_output_page
-     del plugin ope_rol justo tras <body>. -->
+     del plugin gbe_rol justo tras <body>. -->
 
 {$header}
 
@@ -123,47 +124,47 @@
   <div class="gbe-bento-grid">
 
     <!-- Calendario on-rol -->
-    <a href="{$mybb->settings['bburl']}/calendario-onrol.php" class="gbe-panel gbe-p-onrol" style="--season:{$ope_rol_season_color}">
+    <a href="{$mybb->settings['bburl']}/calendario-onrol.php" class="gbe-panel gbe-p-onrol" style="--season:{$gbe_rol_season_color}">
       <span class="gbe-kick">Calendario on-rol</span>
-      <span class="gbe-onrol-season">{$ope_rol_season}</span>
-      <span class="gbe-onrol-day">D&iacute;a {$ope_rol_day} <i>/ 65</i> &middot; A&ntilde;o {$ope_rol_year_label}</span>
-      <span class="gbe-onrol-bar"><i style="width:{$ope_rol_progress}%"></i></span>
+      <span class="gbe-onrol-season">{$gbe_rol_season}</span>
+      <span class="gbe-onrol-day">D&iacute;a {$gbe_rol_day} <i>/ 65</i> &middot; A&ntilde;o {$gbe_rol_year_label}</span>
+      <span class="gbe-onrol-bar"><i style="width:{$gbe_rol_progress}%"></i></span>
     </a>
 
     <!-- Panel destacado: lore -->
-    <article class="ope-panel ope-panel-lore">
-      <div class="ope-panel-kicker">// el mundo ahora</div>
-      <h3 class="ope-panel-title">{$ope_lore_title}</h3>
-      <p class="ope-panel-text">{$ope_lore_text}</p>
+    <article class="gbe-panel gbe-panel-lore">
+      <div class="gbe-panel-kicker">// el mundo ahora</div>
+      <h3 class="gbe-panel-title">{$gbe_lore_title}</h3>
+      <p class="gbe-panel-text">{$gbe_lore_text}</p>
       <a href="{$mybb->settings['bburl']}/guias.php" class="gbe-btn gbe-btn-hot">Leer m&aacute;s &rarr;</a>
     </article>
 
     <!-- Feed: &uacute;ltimas historias -->
-    <article class="ope-panel ope-panel-feed">
-      <div class="ope-panel-h">
-        <span class="ope-live" aria-hidden="true"></span>
-        <span class="ope-panel-h-t">&Uacute;ltimas historias</span>
-        <a class="ope-panel-h-more" href="{$mybb->settings['bburl']}/search.php?action=getnew">ver todas &rarr;</a>
+    <article class="gbe-panel gbe-panel-feed">
+      <div class="gbe-panel-h">
+        <span class="gbe-live" aria-hidden="true"></span>
+        <span class="gbe-panel-h-t">&Uacute;ltimas historias</span>
+        <a class="gbe-panel-h-more" href="{$mybb->settings['bburl']}/search.php?action=getnew">ver todas &rarr;</a>
       </div>
-      <div class="ope-feed">{$ope_latest_posts}</div>
+      <div class="gbe-feed">{$gbe_latest_posts}</div>
     </article>
 
     <!-- Gaceta del Cielo (Mundo Vivo) -->
-    <article class="ope-panel ope-panel-curio ope-panel-news">
-      <div class="ope-panel-kicker">{$ope_noticia_kicker}</div>
-      <div id="ope-news-item" class="ope-news-item" role="button" tabindex="0">
-        <b id="ope-news-title" class="ope-news-title">{$ope_noticia_first_title}</b>
-        <p id="ope-curiosidad-text" class="ope-curio-text">{$ope_noticia_first_text}</p>
-        <span class="ope-news-more">Leer más &rarr;</span>
+    <article class="gbe-panel gbe-panel-curio gbe-panel-news">
+      <div class="gbe-panel-kicker">{$gbe_noticia_kicker}</div>
+      <div id="gbe-news-item" class="gbe-news-item" role="button" tabindex="0">
+        <b id="gbe-news-title" class="gbe-news-title">{$gbe_noticia_first_title}</b>
+        <p id="gbe-curiosidad-text" class="gbe-curio-text">{$gbe_noticia_first_text}</p>
+        <span class="gbe-news-more">Leer más &rarr;</span>
       </div>
-      <span class="ope-curio-bar"><i id="ope-curio-bar"></i></span>
+      <span class="gbe-curio-bar"><i id="gbe-curio-bar"></i></span>
     </article>
 
     <!-- Staff -->
-    <article class="ope-panel ope-panel-staff">
-      <div class="ope-panel-kicker">// el equipo</div>
-      <div class="ope-staff-list">{$ope_staff_list}</div>
-      <a href="{$ope_discord_url}" target="_blank" rel="noopener" class="gbe-staff-discord" title="Discord">
+    <article class="gbe-panel gbe-panel-staff">
+      <div class="gbe-panel-kicker">// el equipo</div>
+      <div class="gbe-staff-list">{$gbe_staff_list}</div>
+      <a href="{$gbe_discord_url}" target="_blank" rel="noopener" class="gbe-staff-discord" title="Discord">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.07.07 0 0 0-.075.035c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.076-.035A19.736 19.736 0 0 0 3.68 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.128 12.3 12.3 0 0 1-1.873.891.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.955 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
         <span>Discord</span>
       </a>
@@ -183,44 +184,44 @@
     <span class="gbe-eyebrow">Censo del cielo</span>
     <h2 class="gbe-stitle">El Puerto</h2>
     <div class="gbe-gold-rule"></div>
-  <div class="ope-datos gbe-datos">
+  <div class="gbe-datos gbe-datos">
 
-    <div class="ope-datos-head">
-      <span class="ope-datos-dot" aria-hidden="true"></span>
-      <h2 class="ope-datos-title">Datos</h2>
-      <span class="ope-datos-rule" aria-hidden="true"></span>
-      <span class="ope-datos-tag">// censo del mundo</span>
+    <div class="gbe-datos-head">
+      <span class="gbe-datos-dot" aria-hidden="true"></span>
+      <h2 class="gbe-datos-title">Datos</h2>
+      <span class="gbe-datos-rule" aria-hidden="true"></span>
+      <span class="gbe-datos-tag">// censo del mundo</span>
     </div>
 
     <!-- Censo del mundo -->
-    <div class="ope-census-in">
-      <div class="ope-census-c"><div class="ope-census-v">{$stats['numusers']}</div><div class="ope-census-l">Skyfarers</div></div>
-      <div class="ope-census-c"><div class="ope-census-v">{$stats['numthreads']}</div><div class="ope-census-l">Historias</div></div>
-      <div class="ope-census-c"><div class="ope-census-v">{$stats['numposts']}</div><div class="ope-census-l">Mensajes</div></div>
-      <div class="ope-census-c"><div class="ope-census-v ope-census-v-name">{$ope_last_char}</div><div class="ope-census-l">&Uacute;ltimo skyfarer</div></div>
+    <div class="gbe-census-in">
+      <div class="gbe-census-c"><div class="gbe-census-v">{$stats['numusers']}</div><div class="gbe-census-l">Skyfarers</div></div>
+      <div class="gbe-census-c"><div class="gbe-census-v">{$stats['numthreads']}</div><div class="gbe-census-l">Historias</div></div>
+      <div class="gbe-census-c"><div class="gbe-census-v">{$stats['numposts']}</div><div class="gbe-census-l">Mensajes</div></div>
+      <div class="gbe-census-c"><div class="gbe-census-v gbe-census-v-name">{$gbe_last_char}</div><div class="gbe-census-l">&Uacute;ltimo skyfarer</div></div>
     </div>
 
     <!-- Presencia -->
-    <div class="ope-presence">
-      <div class="ope-pres-col">
-        <div class="ope-pres-h"><span class="ope-pres-t">En l&iacute;nea ahora</span><span class="ope-pres-c">{$ope_online_now_count}</span></div>
-        <div class="ope-online">{$ope_online_now}</div>
+    <div class="gbe-presence">
+      <div class="gbe-pres-col">
+        <div class="gbe-pres-h"><span class="gbe-pres-t">En l&iacute;nea ahora</span><span class="gbe-pres-c">{$gbe_online_now_count}</span></div>
+        <div class="gbe-online">{$gbe_online_now}</div>
       </div>
-      <div class="ope-pres-col">
-        <div class="ope-pres-h"><span class="ope-pres-t">Activos en las &uacute;ltimas 24 h</span><span class="ope-pres-c">{$ope_online_24h_count}</span></div>
-        <div class="ope-online">{$ope_online_24h}</div>
+      <div class="gbe-pres-col">
+        <div class="gbe-pres-h"><span class="gbe-pres-t">Activos en las &uacute;ltimas 24 h</span><span class="gbe-pres-c">{$gbe_online_24h_count}</span></div>
+        <div class="gbe-online">{$gbe_online_24h}</div>
       </div>
     </div>
 
     <!-- Afiliados: hermanos (botones grandes) + afiliados normales (88x31) -->
-    <div class="ope-affiliates">
-      <div class="ope-affil-block">
-        <div class="ope-affil-h"><span class="ope-affil-h-t">Tripulaciones hermanas</span><span class="ope-affil-h-c">// afiliados &eacute;lite</span></div>
-        <div class="ope-affil-hermanos">{$ope_hermanos_html}</div>
+    <div class="gbe-affiliates">
+      <div class="gbe-affil-block">
+        <div class="gbe-affil-h"><span class="gbe-affil-h-t">Tripulaciones hermanas</span><span class="gbe-affil-h-c">// afiliados &eacute;lite</span></div>
+        <div class="gbe-affil-hermanos">{$gbe_hermanos_html}</div>
       </div>
-      <div class="ope-affil-block">
-        <div class="ope-affil-h"><span class="ope-affil-h-t">Puertos aliados</span><span class="ope-affil-h-c">// afiliados 88&times;31</span></div>
-        <div class="ope-affil-grid">{$ope_afiliados_html}</div>
+      <div class="gbe-affil-block">
+        <div class="gbe-affil-h"><span class="gbe-affil-h-t">Puertos aliados</span><span class="gbe-affil-h-c">// afiliados 88&times;31</span></div>
+        <div class="gbe-affil-grid">{$gbe_afiliados_html}</div>
       </div>
     </div>
 
@@ -228,13 +229,13 @@
   </div>
 </section>
 
-<div id="ope-news-modal" class="ope-news-modal" hidden>
-  <div class="ope-news-modal-bg" data-close="1"></div>
-  <div class="ope-news-modal-box" role="dialog" aria-modal="true" aria-labelledby="ope-news-modal-title">
-    <button type="button" class="ope-news-modal-x" data-close="1" aria-label="Cerrar">&times;</button>
-    <div class="ope-panel-kicker">// últimas noticias</div>
-    <h3 id="ope-news-modal-title"></h3>
-    <div id="ope-news-modal-body" class="ope-news-modal-body"></div>
+<div id="gbe-news-modal" class="gbe-news-modal" hidden>
+  <div class="gbe-news-modal-bg" data-close="1"></div>
+  <div class="gbe-news-modal-box" role="dialog" aria-modal="true" aria-labelledby="gbe-news-modal-title">
+    <button type="button" class="gbe-news-modal-x" data-close="1" aria-label="Cerrar">&times;</button>
+    <div class="gbe-panel-kicker">// últimas noticias</div>
+    <h3 id="gbe-news-modal-title"></h3>
+    <div id="gbe-news-modal-body" class="gbe-news-modal-body"></div>
   </div>
 </div>
 
@@ -272,14 +273,14 @@
 
 <script type="text/javascript">
 (function(){
-  var data = {$ope_noticias_json};
-  var el = document.getElementById('ope-curiosidad-text');
-  var titleEl = document.getElementById('ope-news-title');
-  var bar = document.getElementById('ope-curio-bar');
-  var item = document.getElementById('ope-news-item');
-  var modal = document.getElementById('ope-news-modal');
-  var mTitle = document.getElementById('ope-news-modal-title');
-  var mBody = document.getElementById('ope-news-modal-body');
+  var data = {$gbe_noticias_json};
+  var el = document.getElementById('gbe-curiosidad-text');
+  var titleEl = document.getElementById('gbe-news-title');
+  var bar = document.getElementById('gbe-curio-bar');
+  var item = document.getElementById('gbe-news-item');
+  var modal = document.getElementById('gbe-news-modal');
+  var mTitle = document.getElementById('gbe-news-modal-title');
+  var mBody = document.getElementById('gbe-news-modal-body');
   if(!el || !data || !data.length) return;
   var i = 0, period = 9000;
   function render(){
@@ -325,7 +326,7 @@
 </html>]]></template>
 
     <!-- Obsoleto: la navbar única (invitado o logueado) la genera ahora
-         ope_rol_navbar_html() en el plugin, inyectada por pre_output_page.
+         gbe_rol_navbar_html() en el plugin, inyectada por pre_output_page.
          Este template ya no se referencia desde "header", se deja vacío. -->
     <template name="header_welcomeblock_guest" version="1839"><![CDATA[]]></template>
 
@@ -339,32 +340,32 @@
 </div></div></div>
 <debugstuff>]]></template>
 
-    <template name="forumbit_depth1_cat" version="1839"><![CDATA[<section class="ope-block-cat" id="cat_{$forum['fid']}">
-  <div class="ope-shead"><h2>{$forum['name']}</h2><span class="ope-shead-code">// zona</span><span class="ope-shead-rule"></span></div>
-  <div class="ope-slab">
+    <template name="forumbit_depth1_cat" version="1839"><![CDATA[<section class="gbe-block-cat" id="cat_{$forum['fid']}">
+  <div class="gbe-shead"><h2>{$forum['name']}</h2><span class="gbe-shead-code">// zona</span><span class="gbe-shead-rule"></span></div>
+  <div class="gbe-slab">
     {$forums}
   </div>
 </section>]]></template>
 
-    <template name="forumbit_depth2_forum" version="1839"><![CDATA[<a href="{$mybb->settings['bburl']}/forumdisplay.php?fid={$forum['fid']}" class="ope-forum">
-  <span class="ope-forum-ic">
+    <template name="forumbit_depth2_forum" version="1839"><![CDATA[<a href="{$mybb->settings['bburl']}/forumdisplay.php?fid={$forum['fid']}" class="gbe-forum">
+  <span class="gbe-forum-ic">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
     </svg>
   </span>
   <div>
-    <div class="ope-forum-n">{$forum['name']} <span class="ope-forum-fid">FID-{$forum['fid']}</span></div>
-    <div class="ope-forum-d">{$forum['description']}</div>
-    <div class="ope-forum-last">&Uacute;ltima: <b>{$lastpost_subject}</b> &middot; {$lastpost_date}</div>
+    <div class="gbe-forum-n">{$forum['name']} <span class="gbe-forum-fid">FID-{$forum['fid']}</span></div>
+    <div class="gbe-forum-d">{$forum['description']}</div>
+    <div class="gbe-forum-last">&Uacute;ltima: <b>{$lastpost_subject}</b> &middot; {$lastpost_date}</div>
   </div>
-  <div class="ope-forum-stat"><b>{$threads}</b><i>temas</i> &middot; {$posts} msgs</div>
+  <div class="gbe-forum-stat"><b>{$threads}</b><i>temas</i> &middot; {$posts} msgs</div>
 </a>{$subforums}]]></template>
 
-    <template name="forumbit_depth3" version="1839"><![CDATA[<a href="{$mybb->settings['bburl']}/forumdisplay.php?fid={$forum['fid']}" class="ope-chip">{$forum['name']}</a>]]></template>
+    <template name="forumbit_depth3" version="1839"><![CDATA[<a href="{$mybb->settings['bburl']}/forumdisplay.php?fid={$forum['fid']}" class="gbe-chip">{$forum['name']}</a>]]></template>
 
-    <template name="nav" version="1839"><![CDATA[<div id="ope-breadcrumb">
-  <div class="ope-breadcrumb-in">
+    <template name="nav" version="1839"><![CDATA[<div id="gbe-breadcrumb">
+  <div class="gbe-breadcrumb-in">
     <a href="{$mybb->settings['bburl']}/index.php">Inicio</a>
     <span class="sep">›</span>
     {$breadcrumb}

@@ -15,7 +15,7 @@ $loggedin  = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid       = (int) ($mybb->user['uid'] ?? 0);
 
 $staff = $loggedin
-    ? ope_rol_active_staff($uid)
+    ? gbe_rol_active_staff($uid)
     : array('pid' => 0, 'rol' => '', 'narrador' => 0, 'rank' => 0, 'is_staff' => false, 'nombre' => '');
 $rank      = (int) $staff['rank'];
 $is_staff  = !empty($staff['is_staff']);
@@ -23,19 +23,19 @@ $puede_editar = ($rank >= 1);
 
 $rol_seasons = array('Primavera', 'Verano', 'Otoño', 'Invierno');
 
-$cal = ope_rol_onrol_calendar();
+$cal = gbe_rol_onrol_calendar();
 $rol_year       = (int) $cal['year'];
 $rol_day        = (int) $cal['day'];
 $rol_season     = (string) $cal['season'];
 $rol_season_idx = (int) $cal['season_idx'];
 $season_colors  = array('var(--patina-hi)', 'var(--ember)', 'var(--h4)', 'var(--h1)');
 $s_color        = $season_colors[$rol_season_idx];
-$year_label = function_exists('ope_rol_year_label') ? ope_rol_year_label($rol_year) : (string)$rol_year;
+$year_label = function_exists('gbe_rol_year_label') ? gbe_rol_year_label($rol_year) : (string)$rol_year;
 
 $flash_msg = '';
 $flash_type = '';
 
-if ($puede_editar && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['ope_cal_save'])) {
+if ($puede_editar && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['gbe_cal_save'])) {
     $post_dia      = (int) ($_POST['dia'] ?? 0);
     $post_estacion = trim((string) ($_POST['estacion'] ?? ''));
     $post_dato     = trim((string) ($_POST['dato'] ?? ''));
@@ -90,11 +90,11 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Gestionar Calendario</title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-calendario-onrol">
+<body class="gbe-pg-calendario-onrol">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -220,7 +220,7 @@ header('Content-Type: text/html; charset=utf-8');
             <textarea id="ocal-f-dato" name="dato" class="mv-textarea" rows="5" placeholder="Escribe aqu&iacute; la informaci&oacute;n de este d&iacute;a..."></textarea>
           </div>
           <div class="ocal-form-actions">
-            <button type="submit" name="ope_cal_save" value="1" class="btn btn-hot btn-sm">Guardar anotaci&oacute;n</button>
+            <button type="submit" name="gbe_cal_save" value="1" class="btn btn-hot btn-sm">Guardar anotaci&oacute;n</button>
             <button type="button" class="btn btn-ghost btn-sm" onclick="closeCalModal()">Cancelar</button>
           </div>
         </form>

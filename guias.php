@@ -1,9 +1,9 @@
 <?php
 /**
  * I-Forge · Guías
- * Página de front-end MyBB (dirección "One Piece Eternal").
+ * Página de front-end MyBB (dirección "Granblue Fantasy: Eternal").
  * Visor de guías para jugadores: navegación izquierda, contenido a la derecha.
- * v3.0 — Sistema completo de One Piece Eternal
+ * v3.0 — Sistema completo de Granblue Fantasy: Eternal
  */
 
 define('IN_MYBB', 1);
@@ -18,8 +18,8 @@ $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
 $staff_level = 0;
 if ($loggedin) {
-    if (isset($mybb->user['ope_staff_level'])) {
-        $staff_level = (int)$mybb->user['ope_staff_level'];
+    if (isset($mybb->user['gbe_staff_level'])) {
+        $staff_level = (int)$mybb->user['gbe_staff_level'];
     } elseif ($db->table_exists('rol_cuentas')) {
         $cq = $db->simple_select('rol_cuentas', 'staff_level', "uid = {$uid}", array('limit' => 1));
         if ($db->num_rows($cq)) {
@@ -48,12 +48,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Guías</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-guias) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-guias) -->
 </head>
-<body class="ope-pg-guias">
+<body class="gbe-pg-guias">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -66,15 +66,15 @@ header('Content-Type: text/html; charset=utf-8');
 <div class="wrap">
 
   <!-- INTRO -->
-  <section class="reveal ope-deco-split">
-    <?php echo ope_rol_deco_aside('ope/deco/guias', 'Manuales y guías del sistema de rol', 'Guías del sistema'); ?>
-    <div class="ope-deco-split-main">
+  <section class="reveal gbe-deco-split">
+    <?php echo gbe_rol_deco_aside('ope/deco/guias', 'Manuales y guías del sistema de rol', 'Guías del sistema'); ?>
+    <div class="gbe-deco-split-main">
       <div class="shead">
         <h1>Guías</h1>
         <span class="code">// reglamento &amp; sistema</span>
         <span class="rule"></span>
       </div>
-      <p class="guia-intro">Aquí encontrarás <b>todas las guías oficiales</b> del sistema de juego de One Piece Eternal: desde cómo crear tu personaje hasta las reglas de combate, progresión y el funcionamiento del mundo. <b>Navega por las categorías</b> de abajo para encontrar lo que buscas.</p>
+      <p class="guia-intro">Aquí encontrarás <b>todas las guías oficiales</b> del sistema de juego de Granblue Fantasy: Eternal: desde cómo crear tu personaje hasta las reglas de combate, progresión y el funcionamiento del mundo. <b>Navega por las categorías</b> de abajo para encontrar lo que buscas.</p>
     </div>
   </section>
 
@@ -355,11 +355,11 @@ header('Content-Type: text/html; charset=utf-8');
           <table class="guide-table">
             <thead><tr><th>Facción</th><th>Descripción</th><th>Ventaja Inicial</th></tr></thead>
             <tbody>
-              <tr><td><strong>Marine</strong></td><td>Soldado del Gobierno Mundial.</td><td>+1 rango de facción. Acceso a recursos Marines.</td></tr>
-              <tr><td><strong>Pirata</strong></td><td>Libre en el mar. Tripulación, sueños.</td><td>Barco pequeño inicial. +10% ganancia de Wanted.</td></tr>
-              <tr><td><strong>Revolucionario</strong></td><td>Ejército Revolucionario.</td><td>Identidad secreta gratuita. Red de contactos.</td></tr>
-              <tr><td><strong>Cazarrecompensas</strong></td><td>Caza piratas por dinero.</td><td>+1 nivel en el Gremio. +10% berries por capturas.</td></tr>
-              <tr><td><strong>Civil</strong></td><td>Comerciante, médico, erudito...</td><td>+1 Oficio gratuito. Sin Wanted ni enemigos.</td></tr>
+              <tr><td><strong>Ejército Imperial</strong></td><td>Soldados y caballeros del Imperio de Erste.</td><td>+1 rango de facción. Acceso a recursos Imperiales.</td></tr>
+              <tr><td><strong>Skyfarer</strong></td><td>Navegantes libres del cielo. Tripulación, sueños.</td><td>Aeronave pequeña inicial. +10% ganancia de Renombre.</td></tr>
+              <tr><td><strong>La Sociedad / Rebeldes</strong></td><td>Luchadores encubiertos contra el Imperio.</td><td>Identidad secreta gratuita. Red de contactos.</td></tr>
+              <tr><td><strong>Gremio de Cazadores</strong></td><td>Cazan bestias y forajidos por dinero.</td><td>+1 nivel en el Gremio. +10% rupias por capturas.</td></tr>
+              <tr><td><strong>Civil</strong></td><td>Comerciante, médico, erudito...</td><td>+1 Oficio gratuito. Sin Renombre ni enemigos.</td></tr>
               <tr><td><strong>Independiente</strong></td><td>Sin afiliación.</td><td>Máxima libertad narrativa.</td></tr>
             </tbody>
           </table>
@@ -369,9 +369,9 @@ header('Content-Type: text/html; charset=utf-8');
             <li>1 arma básica a elección. Rango F de daño.</li>
             <li>1 objeto personal definido por el jugador.</li>
             <li>Ropa y pertenencias básicas.</li>
-            <li><strong>50,000 berries</strong> iniciales.</li>
-            <li>Sin Fruta del Diablo al inicio (debe encontrarse en juego).</li>
-            <li>Sin Haki al inicio (debe comprarse con PP a partir de rango B).</li>
+            <li><strong>50,000 rupias</strong> iniciales.</li>
+            <li>Sin Pacto Primal al inicio (debe encontrarse en juego).</li>
+            <li>Sin Clase Avanzada al inicio (debe comprarse con PP a partir de rango B).</li>
           </ul>
 
           <div class="guide-note"><strong>¿Listo?</strong> Con esto puedes empezar a rolear. Cuando quieras optimizar tu build, consulta la guía de <strong>Virtudes y defectos</strong> y <strong>Progresión</strong>.</div>
@@ -381,7 +381,7 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="guide-content" id="g-acciones">
           <div class="g-title">Acciones y PA</div>
           <div class="g-sub">// cómo funciona tu turno</div>
-          <p>Sistema de Puntos de Acción para el mundo de One Piece.</p>
+          <p>Sistema de Puntos de Acción para el cielo de los Skydoms.</p>
 
           <h3>Puntos de Acción (PA)</h3>
           <p><strong>PA por post = AGI + la mejor entre INT, ING y CAR</strong></p>
@@ -425,7 +425,7 @@ header('Content-Type: text/html; charset=utf-8');
             </tbody>
           </table>
 
-          <h3>Acciones Específicas de One Piece Eternal</h3>
+          <h3>Acciones Específicas de Granblue Fantasy: Eternal</h3>
           <table class="guide-table">
             <thead><tr><th>Acción</th><th>Coste PA</th><th>Notas</th></tr></thead>
             <tbody>
@@ -615,10 +615,10 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="guide-content" id="g-equipo">
           <div class="g-title">Equipo y objetos</div>
           <div class="g-sub">// lo que llevas encima</div>
-          <p>Equipamiento, objetos especiales y recursos del mundo de One Piece.</p>
+          <p>Equipamiento, objetos especiales y recursos del cielo de los Skydoms.</p>
 
           <h3>Equipo Inicial</h3>
-          <p>1 arma básica (Rango F), 1 objeto personal, ropa básica y <strong>50,000 berries</strong>. Sin Fruta del Diablo ni Haki al inicio.</p>
+          <p>1 arma básica (Rango F), 1 objeto personal, ropa básica y <strong>50,000 rupias</strong>. Sin Pacto Primal ni Clase Avanzada al inicio.</p>
 
           <h3>Armas Cuerpo a Cuerpo</h3>
           <table class="guide-table">
@@ -687,14 +687,14 @@ header('Content-Type: text/html; charset=utf-8');
             </tbody>
           </table>
 
-          <div class="guide-note"><strong>Tener objetos raros atrae atención.</strong> Un Poneglyph, un Arma Suprema o una Fruta del Diablo te convierten en objetivo de facciones, cazadores y el Gobierno Mundial.</div>
+          <div class="guide-note"><strong>Tener objetos raros atrae atención.</strong> Un artefacto de los Astrales, un Arma Suprema o un Pacto Primal te convierten en objetivo de facciones, cazadores y el Imperio de Erste.</div>
         </div>
 
         <!-- 06 · Combate -->
         <div class="guide-content" id="g-combate">
           <div class="g-title">Combate</div>
           <div class="g-sub">// cómo luchar en el rol</div>
-          <p>Sistema de combate completo con todas las interacciones especiales de One Piece.</p>
+          <p>Sistema de combate completo con todas las interacciones especiales del cielo.</p>
 
           <h3>Modo Combate Lite (Duelos Rápidos)</h3>
           <p>Para peleas de taberna, entrenamientos y duelos amistosos sin el sistema táctico completo. Tirada única: 1D20 + mejor stat ofensiva. 3 asaltos máximo. Sin muerte. 50% del PP.</p>
@@ -1047,7 +1047,7 @@ header('Content-Type: text/html; charset=utf-8');
             <li><strong>Físicas:</strong> Grandullón (1 PC), El Más Grande (3 PC), Pequeñín (1 PC), Nadador Nato (1 PC), Sentidos Aumentados (2-5 PC).</li>
             <li><strong>Supervivencia:</strong> Sueño Ligero (2 PC), Afinidad Animal (1 PC), Orientación (1 PC), Optimista (3 PC, +5 VOL).</li>
             <li><strong>Progresión:</strong> Entrenamiento Intensivo (3 PC, +25% PP), Erudito (4 PC), Polivalente (2 PC), Iron Heart (2 PC, +3 Slots de implante).</li>
-            <li><strong>Riqueza:</strong> Adinerado 1-3 (1-3 PC, hasta +10M berries).</li>
+            <li><strong>Riqueza:</strong> Adinerado 1-3 (1-3 PC, hasta +10M rupias).</li>
             <li><strong>Especiales:</strong> Voz de Todas las Cosas (5 PC), Potencial de Fruta (1 PC).</li>
           </ul>
 
@@ -1228,7 +1228,7 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="guide-content" id="g-conquistas">
           <div class="g-title">Conquistas</div>
           <div class="g-sub">// adquisición de territorios</div>
-          <p>Cómo adquirir, mantener, defender y perder islas en el mundo de One Piece Eternal.</p>
+          <p>Cómo adquirir, mantener, defender y perder islas en el mundo de Granblue Fantasy: Eternal.</p>
 
           <h3>Métodos de Adquisición</h3>
           <table class="guide-table">
@@ -1303,7 +1303,7 @@ header('Content-Type: text/html; charset=utf-8');
             <thead><tr><th>Recurso</th><th>Torpe</th><th>Normal</th><th>Digna</th><th>Épica</th><th>Legendaria</th></tr></thead>
             <tbody>
               <tr><td>PP</td><td>10%</td><td>25%</td><td>40%</td><td>60%</td><td>80%</td></tr>
-              <tr><td>Berries</td><td>10%</td><td>25%</td><td>40%</td><td>60%</td><td>80%</td></tr>
+              <tr><td>Rupias</td><td>10%</td><td>25%</td><td>40%</td><td>60%</td><td>80%</td></tr>
               <tr><td>Objetos</td><td>1</td><td>2</td><td>3</td><td>5</td><td>Todos</td></tr>
               <tr><td>REP (misma facción)</td><td>10%</td><td>25%</td><td>40%</td><td>60%</td><td>80%</td></tr>
               <tr><td>PL</td><td>0%</td><td>0%</td><td>0%</td><td>50%</td><td>100%</td></tr>
@@ -1312,10 +1312,10 @@ header('Content-Type: text/html; charset=utf-8');
 
           <h3>Lo que NUNCA se Hereda</h3>
           <ul>
-            <li>Fruta del Diablo (renace en el mundo)</li>
-            <li>Haki de cualquier tipo</li>
+            <li>Pacto Primal (renace en el mundo)</li>
+            <li>Clase Avanzada de cualquier tipo</li>
             <li>Estilos de combate aprendidos</li>
-            <li>Wanted (recompensa)</li>
+            <li>Renombre (recompensa)</li>
             <li>Rango de facción</li>
             <li>Títulos y apodos</li>
             <li>Relaciones personales y conocimiento narrativo</li>
@@ -1332,7 +1332,7 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="guide-content" id="g-mundo-vivo">
           <div class="g-title">Mundo Vivo — La Balanza v3</div>
           <div class="g-sub">// tus acciones cambian el mundo</div>
-          <p>El Sistema de Mundo Vivo "La Balanza" es el corazón de One Piece Eternal: <strong>todo lo que haces tiene peso</strong>. Cada misión, cada combate, cada alianza o traición afecta al equilibrio del mundo. Cada mes natural se publica el periódico <strong>Eternal News</strong> contando qué ha pasado y cómo ha cambiado el mundo.</p>
+          <p>El Sistema de Mundo Vivo "La Balanza" es el corazón de Granblue Fantasy: Eternal: <strong>todo lo que haces tiene peso</strong>. Cada misión, cada combate, cada alianza o traición afecta al equilibrio del mundo. Cada mes natural se publica el periódico <strong>Eternal News</strong> contando qué ha pasado y cómo ha cambiado el mundo.</p>
 
           <h3>¿Cómo afecta a tu personaje?</h3>
           <ul>
@@ -1397,10 +1397,10 @@ header('Content-Type: text/html; charset=utf-8');
           </table>
 
           <h3>Cómo se Obtiene una Fruta</h3>
-          <p>Los personajes <strong>no empiezan con Fruta del Diablo.</strong> Cinco métodos:</p>
+          <p>Los personajes <strong>no empiezan con Pacto Primal.</strong> Cinco métodos:</p>
           <ol>
             <li><strong>Evento aleatorio Mundo Vivo (FO-01):</strong> 3% por región por ciclo.</li>
-            <li><strong>Mercado negro:</strong> 100M-5,000M berries. Requiere contactos de Inframundo.</li>
+            <li><strong>Mercado negro:</strong> 100M-5,000M rupias. Requiere contactos de Inframundo.</li>
             <li><strong>Derrotar a un usuario:</strong> Debes vencer y matar cerca de una fruta normal.</li>
             <li><strong>Misiones de exploración:</strong> Ruinas, islas vírgenes.</li>
             <li><strong>Compra con PL:</strong> 3 PL garantizan la fruta en tu camino.</li>
@@ -1434,7 +1434,7 @@ header('Content-Type: text/html; charset=utf-8');
           <h3>Desventajas Universales</h3>
           <ul>
             <li><strong>Agua de mar:</strong> 4 niveles de inmersión. Nivel 4 = stats 0, ahogo en 3 turnos.</li>
-            <li><strong>Kairoseki:</strong> Contacto prolongado anula poderes.</li>
+            <li><strong>Sello de Energía:</strong> Contacto prolongado anula poderes.</li>
             <li><strong>No puedes comer dos frutas:</strong> Muerte instantánea.</li>
             <li><strong>Nunca puedes nadar:</strong> Permanente e irreversible.</li>
           </ul>
@@ -1450,13 +1450,13 @@ header('Content-Type: text/html; charset=utf-8');
           <p>Sistema de recompensas automáticas por constancia y calidad de rol. Tres capas: diaria, semanal y de temporada.</p>
 
           <h3>La Racha (Diaria — cada 48h)</h3>
-          <p>Cada 48 horas, si has posteado al menos 1 vez, ganas PP + berries y tu racha sube. La racha llega hasta 30 (60 días de actividad continua) con premios crecientes.</p>
+          <p>Cada 48 horas, si has posteado al menos 1 vez, ganas PP + rupias y tu racha sube. La racha llega hasta 30 (60 días de actividad continua) con premios crecientes.</p>
           <table class="guide-table">
-            <thead><tr><th>Racha</th><th>Días</th><th>PP</th><th>Berries</th><th>Premio Especial</th></tr></thead>
+            <thead><tr><th>Racha</th><th>Días</th><th>PP</th><th>Rupias</th><th>Premio Especial</th></tr></thead>
             <tbody>
-              <tr><td>7</td><td>14</td><td>8</td><td>100K</td><td>Cofre Básico</td></tr>
-              <tr><td>14</td><td>28</td><td>12</td><td>200K</td><td>Cofre Decente</td></tr>
-              <tr><td>21</td><td>42</td><td>18</td><td>300K</td><td>Cofre Gigante</td></tr>
+              <tr><td>7</td><td>14</td><td>8</td><td>100K</td><td>Cofre Celeste</td></tr>
+              <tr><td>14</td><td>28</td><td>12</td><td>200K</td><td>Cofre Primal</td></tr>
+              <tr><td>21</td><td>42</td><td>18</td><td>300K</td><td>Cofre de Plata</td></tr>
               <tr><td>28</td><td>56</td><td>22</td><td>600K</td><td>Cofre Áureo</td></tr>
               <tr><td>30</td><td>60</td><td>25</td><td>1M</td><td><strong>+1 PL</strong></td></tr>
             </tbody>
@@ -1464,7 +1464,7 @@ header('Content-Type: text/html; charset=utf-8');
 
           <h3>El Jornal (Semanal — cada lunes)</h3>
           <table class="guide-table">
-            <thead><tr><th>Posts esta semana</th><th>PP base</th><th>Berries</th><th>Bonus</th></tr></thead>
+            <thead><tr><th>Posts esta semana</th><th>PP base</th><th>Rupias</th><th>Bonus</th></tr></thead>
             <tbody>
               <tr><td>1-2 posts</td><td>5</td><td>25K</td><td>—</td></tr>
               <tr><td>6-10 posts</td><td>15</td><td>100K</td><td>+3 REP</td></tr>
@@ -1656,7 +1656,7 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="g-title">Inicio rápido</div>
           <div class="g-sub">// empieza en 2 minutos</div>
 
-          <h3>One Piece Eternal en 2 Minutos</h3>
+          <h3>Granblue Fantasy: Eternal en 2 Minutos</h3>
           <p>La Reina Pirata ha sido capturada por el Gobierno Mundial y su ejecución es inminente. El trono del Rey de los Piratas está vacante. <strong>Tus acciones cambian el mundo.</strong> Cada 15 días publicamos una Crónica del Mundo. Tu personaje puede salir en ella.</p>
 
           <h3>Crear tu Personaje (30 segundos)</h3>
@@ -1694,7 +1694,7 @@ header('Content-Type: text/html; charset=utf-8');
               <tr><td>Pelear con reglas completas</td><td>AV-01 — Combate</td></tr>
               <tr><td>Viajar entre islas</td><td>AV-02 — Viajes</td></tr>
               <tr><td>Unirte a una facción</td><td>AV-05 — Facciones</td></tr>
-              <tr><td>Conseguir una Fruta del Diablo</td><td>AV-14 — Frutas del Diablo</td></tr>
+              <tr><td>Conseguir un Pacto Primal</td><td>AV-14 — Pactos Primles</td></tr>
               <tr><td>Ganar recompensas diarias</td><td>AV-16 — Recompensas</td></tr>
               <tr><td>Crear o unirte a una tripulación</td><td>AV-06 — Grupos y Bases</td></tr>
             </tbody>

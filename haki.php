@@ -2,30 +2,30 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'haki.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
-require_once MYBB_ROOT . 'inc/ope_rol_haki.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_data.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_haki.php';
 
 $bburl    = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int)($mybb->user['uid'] ?? 0);
 
-require_once MYBB_ROOT . 'inc/ope_user_init.php';
+require_once MYBB_ROOT . 'inc/gbe_user_init.php';
 
-$initials       = ope_get_initials($mybb->user['username'] ?? '');
+$initials       = gbe_get_initials($mybb->user['username'] ?? '');
 $initials_e     = htmlspecialchars_uni($initials);
-$display_name   = ope_get_display_name();
+$display_name   = gbe_get_display_name();
 $display_name_e = htmlspecialchars_uni($display_name);
 
 $active_pid = 0;
-if ($loggedin && isset($mybb->user['ope_active_pid']) && (int)$mybb->user['ope_active_pid'] > 0) {
-    $active_pid = (int)$mybb->user['ope_active_pid'];
+if ($loggedin && isset($mybb->user['gbe_active_pid']) && (int)$mybb->user['gbe_active_pid'] > 0) {
+    $active_pid = (int)$mybb->user['gbe_active_pid'];
 } elseif ($loggedin && $db->table_exists('rol_cuentas')) {
     $cq = $db->simple_select('rol_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
     if ($db->num_rows($cq)) $active_pid = (int)$db->fetch_field($cq, 'personaje_activo');
 }
 
-$staff_level = ope_get_staff_level($uid, $active_pid);
+$staff_level = gbe_get_staff_level($uid, $active_pid);
 
 $flash = '';
 $flash_kind = 'ok';
@@ -33,7 +33,7 @@ $flash_kind = 'ok';
 // Procesar subida de Haki
 if ($loggedin && $active_pid > 0 && $mybb->request_method === 'post' && verify_post_check($mybb->get_input('my_post_key'), true)) {
     $tipo = $mybb->get_input('haki_tipo');
-    $resultado = ope_haki_subir($active_pid, $tipo);
+    $resultado = gbe_haki_subir($active_pid, $tipo);
     if ($resultado === '') {
         $flash = '¡Haki mejorado!';
     } else {
@@ -52,10 +52,10 @@ if ($active_pid > 0 && $db->table_exists('rol_personajes')) {
         $pj_nivel = (int)$pj['nivel'];
     }
 }
-$haki = function_exists('ope_haki_get') ? ope_haki_get($active_pid) : array();
-$pp_data = function_exists('ope_pp_saldo') ? ope_pp_saldo($active_pid) : array('pp_disponible' => 0);
-$haki_tipos = function_exists('ope_haki_tipos') ? ope_haki_tipos() : array();
-$haki_niveles = function_exists('ope_haki_niveles') ? ope_haki_niveles() : array();
+$haki = function_exists('gbe_haki_get') ? gbe_haki_get($active_pid) : array();
+$pp_data = function_exists('gbe_pp_saldo') ? gbe_pp_saldo($active_pid) : array('pp_disponible' => 0);
+$haki_tipos = function_exists('gbe_haki_tipos') ? gbe_haki_tipos() : array();
+$haki_niveles = function_exists('gbe_haki_niveles') ? gbe_haki_niveles() : array();
 
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
@@ -64,12 +64,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Haki</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-haki) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-haki) -->
 </head>
-<body class="ope-pg-haki">
+<body class="gbe-pg-haki">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -106,19 +106,19 @@ header('Content-Type: text/html; charset=utf-8');
 
   <!-- ── Barra de PP ── -->
   <section class="reveal">
-    <div class="ope-prog-ppbar">
-      <div class="ope-prog-ppbar-total">
-        <span class="ope-prog-ppbar-val"><?php echo (int)$pp_data['pp_disponible']; ?></span>
-        <span class="ope-prog-ppbar-label">PP disponibles</span>
+    <div class="gbe-prog-ppbar">
+      <div class="gbe-prog-ppbar-total">
+        <span class="gbe-prog-ppbar-val"><?php echo (int)$pp_data['pp_disponible']; ?></span>
+        <span class="gbe-prog-ppbar-label">PP disponibles</span>
       </div>
-      <div class="ope-prog-ppbar-detail">
-        <div class="ope-prog-ppbar-stat">
-          <span class="ope-prog-ppbar-num"><?php echo (int)$pp_data['pp_total']; ?></span>
-          <span class="ope-prog-ppbar-lbl">Total ganados</span>
+      <div class="gbe-prog-ppbar-detail">
+        <div class="gbe-prog-ppbar-stat">
+          <span class="gbe-prog-ppbar-num"><?php echo (int)$pp_data['pp_total']; ?></span>
+          <span class="gbe-prog-ppbar-lbl">Total ganados</span>
         </div>
-        <div class="ope-prog-ppbar-stat">
-          <span class="ope-prog-ppbar-num"><?php echo (int)$pp_data['pp_gastado']; ?></span>
-          <span class="ope-prog-ppbar-lbl">Gastados</span>
+        <div class="gbe-prog-ppbar-stat">
+          <span class="gbe-prog-ppbar-num"><?php echo (int)$pp_data['pp_gastado']; ?></span>
+          <span class="gbe-prog-ppbar-lbl">Gastados</span>
         </div>
       </div>
     </div>
@@ -144,19 +144,19 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate-b">
         <p><?php echo htmlspecialchars_uni($tipo_info['desc']); ?></p>
         <!-- Barra de progreso niveles -->
-        <div class="ope-haki-bar">
+        <div class="gbe-haki-bar">
           <?php for ($i = 1; $i <= 4; $i++): ?>
-          <span class="ope-haki-dot<?php echo $i <= $nivel ? ' ope-haki-dot--on' : ''; ?>">Nv.<?php echo $i; ?></span>
+          <span class="gbe-haki-dot<?php echo $i <= $nivel ? ' gbe-haki-dot--on' : ''; ?>">Nv.<?php echo $i; ?></span>
           <?php endfor; ?>
         </div>
         <?php if ($nivel >= 4): ?>
-          <p class="ope-haki-max">&#9733; Nivel Supremo alcanzado</p>
+          <p class="gbe-haki-max">&#9733; Nivel Supremo alcanzado</p>
         <?php elseif ($tipo_key === 'haoshoku' && $nivel >= 1): ?>
-          <p class="ope-haki-pl">Haoshoku se mejora con Puntos de Leyenda (PL), no con PP.</p>
+          <p class="gbe-haki-pl">Haoshoku se mejora con Puntos de Leyenda (PL), no con PP.</p>
         <?php elseif ($bloqueado): ?>
-          <p class="ope-haki-locked">Requiere nivel <?php echo $requiere; ?> (tienes <?php echo $pj_nivel; ?>)</p>
+          <p class="gbe-haki-locked">Requiere nivel <?php echo $requiere; ?> (tienes <?php echo $pj_nivel; ?>)</p>
         <?php elseif ($sin_pp): ?>
-          <p class="ope-haki-locked">Necesitas <?php echo $coste; ?> PP (tienes <?php echo (int)$pp_data['pp_disponible']; ?>)</p>
+          <p class="gbe-haki-locked">Necesitas <?php echo $coste; ?> PP (tienes <?php echo (int)$pp_data['pp_disponible']; ?>)</p>
         <?php else: ?>
           <form method="post" action="haki.php">
             <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">

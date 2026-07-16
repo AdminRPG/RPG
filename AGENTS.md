@@ -31,11 +31,11 @@ Checklist completo: **`docs/AGENTES-Y-HERRAMIENTAS.md` §2–§3**. Regla Cursor
 
 ### Portada — mínimo antes de cerrar tarea
 
-- `body.gbe-index` en `ope-index.xml`
-- Hero 100vh full-bleed + gaceta bento debajo (no `ope-top` OP)
-- Overrides `body.gbe-index` para `.ope-panel`, categorías `.gbe-section`, navbar
+- `body.gbe-index` en `gbe-index.xml`
+- Hero 100vh full-bleed + gaceta bento debajo (no `gbe-top` OP)
+- Overrides `body.gbe-index` para `.gbe-panel`, categorías `.gbe-section`, navbar
 - `index.php` genera Skydoms/OT con watermark y títulos GBF
-- Fuentes en `ope_rol_head_base()` **y** `headerinclude`
+- Fuentes en `gbe_rol_head_base()` **y** `headerinclude`
 - `sync-theme import` + `verify` → `OK CSS: in sync` + hard refresh
 
 ### Definición de “hecho” UI
@@ -49,15 +49,15 @@ Solo **Done** si: checklist §2 + verify CSS + `check-inline-styles` limpio + co
 Fuente de verdad: **`docs/DESIGN-GRANBLUE-ETERNAL.md` §5** y `docs/GUIA-ESTILOS-PHP.md`.
 
 Reglas que NO se pueden saltar:
-- Las clases **`.shead .plate .plate-h .plate-b .reveal .flash .pj-empty` NO son globales**: se re-declaran por scope `body.ope-pg-<pagina>` (o `gbe-pg-*`). Sin scaffolding → texto plano.
+- Las clases **`.shead .plate .plate-h .plate-b .reveal .flash .pj-empty` NO son globales**: se re-declaran por scope `body.gbe-pg-<pagina>` (o `gbe-pg-*`). Sin scaffolding → texto plano.
 - **Nuevas páginas GBF:** scaffolding con tokens claros (`--line`, `border-radius`) — ver §5.4 DESIGN, **no** copiar brutalismo OP (`border:2px solid #000`) del scaffolding antiguo.
 - Prohibido `<style>` y `style="..."` estáticos; solo `style` dinámico de PHP.
-- El navegador sirve `cache/themes/theme13/ope.css`. Tras editar CSS: `php scripts/sync-theme.php import` y `verify`.
+- El navegador sirve `cache/themes/theme13/gbe.css`. Tras editar CSS: `php scripts/sync-theme.php import` y `verify`.
 - Antes de terminar: `check-inline-styles` limpio + `OK CSS: in sync` + comparación visual en navegador.
 
 ### Portada MyBB
 
-No usa `body.ope-pg-*`. Usa **`body.gbe-index`**. Ver DESIGN §6 y §6.7 (estado F2b / brecha vs prototipo).
+No usa `body.gbe-pg-*`. Usa **`body.gbe-index`**. Ver DESIGN §6 y §6.7 (estado F2b / brecha vs prototipo).
 
 **Botones:** rectangulares `border-radius: 8px` — prohibido pill (DESIGN §4.4).
 

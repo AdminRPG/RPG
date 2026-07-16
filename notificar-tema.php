@@ -13,7 +13,7 @@ $bburl     = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname    = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin  = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid       = (int)($mybb->user['uid'] ?? 0);
-$activePid = (int)($mybb->user['ope_active_pid'] ?? 0);
+$activePid = (int)($mybb->user['gbe_active_pid'] ?? 0);
 
 if ($activePid <= 0 && $loggedin && $db->table_exists('rol_personajes')) {
     $aq = $db->simple_select('rol_personajes', 'pid', "uid = {$uid} AND activo = 1", array('limit' => 1));
@@ -27,7 +27,7 @@ if ($activePid > 0) {
 }
 
 $flash = ''; $flash_kind = 'ok';
-$ciclo = ope_rol_mv_ciclo_actual();
+$ciclo = gbe_rol_mv_ciclo_actual();
 
 // ── POST: notificar ──
 if ($loggedin && $activePid > 0 && $mybb->request_method === 'post' && is_array($ciclo)) {
@@ -57,7 +57,7 @@ if ($loggedin && $activePid > 0 && $mybb->request_method === 'post' && is_array(
                 $flash = 'No existe ningún tema con ese enlace.'; $flash_kind = 'warn';
             } else {
                 $th = $db->fetch_array($tq);
-                $zona = ope_rol_mv_zona_from_fid((int)$th['fid']);
+                $zona = gbe_rol_mv_zona_from_fid((int)$th['fid']);
 
                 // Época del tema (rol_thread_meta)
                 $era = '';
@@ -120,12 +120,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Notificar tema</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-notificar-tema) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-notificar-tema) -->
 </head>
-<body class="ope-pg-notificar-tema">
+<body class="gbe-pg-notificar-tema">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

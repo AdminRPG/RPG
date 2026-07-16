@@ -14,9 +14,9 @@ if (!defined('IN_MYBB')) {
     die('Direct initialization of this file is not allowed.');
 }
 
-if (!function_exists('ope_rol_cat_tiendas')) {
+if (!function_exists('gbe_rol_cat_tiendas')) {
     /** Secciones fijas del Bazar (metadatos de presentación + banner 4:5). */
-    function ope_rol_cat_tiendas()
+    function gbe_rol_cat_tiendas()
     {
         return array(
             'armeria'       => array(
@@ -47,7 +47,7 @@ if (!function_exists('ope_rol_cat_tiendas')) {
     }
 
     /** Etiquetas de categorías de producto. */
-    function ope_rol_cat_categoria_labels()
+    function gbe_rol_cat_categoria_labels()
     {
         return array(
             'armas' => 'Armas', 'armaduras' => 'Armaduras', 'barcos' => 'Barcos',
@@ -57,9 +57,9 @@ if (!function_exists('ope_rol_cat_tiendas')) {
     }
 }
 
-if (!function_exists('ope_rol_cat_tienda_items')) {
+if (!function_exists('gbe_rol_cat_tienda_items')) {
     /** Productos de tienda. $solo_activos filtra activo=1. */
-    function ope_rol_cat_tienda_items($solo_activos = true)
+    function gbe_rol_cat_tienda_items($solo_activos = true)
     {
         global $db;
         $out = array();
@@ -69,15 +69,15 @@ if (!function_exists('ope_rol_cat_tienda_items')) {
         $where = $solo_activos ? 'activo = 1' : '';
         $q = $db->simple_select('rol_tienda_items', '*', $where, array('order_by' => 'orden, id', 'order_dir' => 'ASC'));
         while ($r = $db->fetch_array($q)) {
-            $r['detalles_arr'] = ope_rol_cat_json_list($r['detalles'] ?? '');
+            $r['detalles_arr'] = gbe_rol_cat_json_list($r['detalles'] ?? '');
             $out[] = $r;
         }
         return $out;
     }
 }
 
-if (!function_exists('ope_rol_cat_tripulaciones')) {
-    function ope_rol_cat_tripulaciones($solo_activos = true)
+if (!function_exists('gbe_rol_cat_tripulaciones')) {
+    function gbe_rol_cat_tripulaciones($solo_activos = true)
     {
         global $db;
         $out = array();
@@ -93,8 +93,8 @@ if (!function_exists('ope_rol_cat_tripulaciones')) {
     }
 }
 
-if (!function_exists('ope_rol_cat_akuma')) {
-    function ope_rol_cat_akuma($solo_activos = true)
+if (!function_exists('gbe_rol_cat_akuma')) {
+    function gbe_rol_cat_akuma($solo_activos = true)
     {
         global $db;
         $out = array();
@@ -110,8 +110,8 @@ if (!function_exists('ope_rol_cat_akuma')) {
     }
 }
 
-if (!function_exists('ope_rol_cat_bestiario')) {
-    function ope_rol_cat_bestiario($solo_activos = true)
+if (!function_exists('gbe_rol_cat_bestiario')) {
+    function gbe_rol_cat_bestiario($solo_activos = true)
     {
         global $db;
         $out = array();
@@ -127,8 +127,8 @@ if (!function_exists('ope_rol_cat_bestiario')) {
     }
 }
 
-if (!function_exists('ope_rol_cat_estilos')) {
-    function ope_rol_cat_estilos($solo_activos = true)
+if (!function_exists('gbe_rol_cat_estilos')) {
+    function gbe_rol_cat_estilos($solo_activos = true)
     {
         global $db;
         $out = array();
@@ -144,32 +144,32 @@ if (!function_exists('ope_rol_cat_estilos')) {
     }
 }
 
-if (!function_exists('ope_rol_cat_personajes_publicos')) {
+if (!function_exists('gbe_rol_cat_personajes_publicos')) {
     /**
      * Biblioteca de personajes jugadores: reutiliza rol_personajes.
      * Solo PJs aprobados y no NPC. Resuelve facción, raza y concepto del JSON
      * `datos`. No inventa nada: si un campo no existe queda vacío.
      */
-    function ope_rol_cat_personajes_publicos()
+    function gbe_rol_cat_personajes_publicos()
     {
-        return ope_rol_cat_fichas_query('es_npc = 0 AND estado = \'aprobado\'');
+        return gbe_rol_cat_fichas_query('es_npc = 0 AND estado = \'aprobado\'');
     }
 
     /** Biblioteca de NPCs: rol_personajes con es_npc=1 (auto-aprobados). */
-    function ope_rol_cat_npcs_publicos()
+    function gbe_rol_cat_npcs_publicos()
     {
-        return ope_rol_cat_fichas_query('es_npc = 1');
+        return gbe_rol_cat_fichas_query('es_npc = 1');
     }
 
     /** Consulta común de fichas para las bibliotecas de personajes/NPC. */
-    function ope_rol_cat_fichas_query($where)
+    function gbe_rol_cat_fichas_query($where)
     {
         global $db;
         $out = array();
         if (!$db->table_exists('rol_personajes')) {
             return $out;
         }
-        $razas = function_exists('ope_rol_razas') ? ope_rol_razas() : array();
+        $razas = function_exists('gbe_rol_razas') ? gbe_rol_razas() : array();
         $q = $db->simple_select(
             'rol_personajes',
             'pid, nombre, slug, rango, nivel, avatar, icono, rango_faccion, desc_fisica, personalidad, datos, es_npc',
@@ -192,7 +192,7 @@ if (!function_exists('ope_rol_cat_personajes_publicos')) {
                 'nivel'        => (int) $r['nivel'],
                 'imagen'       => trim((string) ($r['icono'] ?: $r['avatar'])),
                 'faccion'      => $fac,
-                'faccion_slug' => function_exists('ope_rol_faccion_slug') ? ope_rol_faccion_slug($fac) : strtolower($fac),
+                'faccion_slug' => function_exists('gbe_rol_faccion_slug') ? gbe_rol_faccion_slug($fac) : strtolower($fac),
                 'rango_faccion' => (string) $r['rango_faccion'],
                 'raza'         => $hib && $raza2_lbl !== '' ? ($raza1_lbl . ' / ' . $raza2_lbl) : $raza1_lbl,
                 'concepto'     => (string) ($datos['concepto'] ?? ''),
@@ -207,9 +207,9 @@ if (!function_exists('ope_rol_cat_personajes_publicos')) {
     }
 }
 
-if (!function_exists('ope_rol_cat_json_list')) {
+if (!function_exists('gbe_rol_cat_json_list')) {
     /** Normaliza un campo JSON a lista de strings (para 'detalles'). */
-    function ope_rol_cat_json_list($raw)
+    function gbe_rol_cat_json_list($raw)
     {
         if (is_array($raw)) {
             return array_values(array_filter(array_map('strval', $raw), function ($s) { return trim($s) !== ''; }));
@@ -222,9 +222,9 @@ if (!function_exists('ope_rol_cat_json_list')) {
     }
 }
 
-if (!function_exists('ope_rol_cat_rareza_tier')) {
+if (!function_exists('gbe_rol_cat_rareza_tier')) {
     /** Mapea una rareza textual a la clase de tier de color (t2..t5). */
-    function ope_rol_cat_rareza_tier($rareza)
+    function gbe_rol_cat_rareza_tier($rareza)
     {
         $map = array(
             'Legendario' => 't5', 'Legendaria' => 't5',
@@ -236,9 +236,9 @@ if (!function_exists('ope_rol_cat_rareza_tier')) {
     }
 }
 
-if (!function_exists('ope_rol_mv_mision_asignacion')) {
+if (!function_exists('gbe_rol_mv_mision_asignacion')) {
     /** Devuelve la asignación (quién cogió) de una misión, o null. */
-    function ope_rol_mv_mision_asignacion($mid)
+    function gbe_rol_mv_mision_asignacion($mid)
     {
         global $db;
         $mid = (int) $mid;
@@ -250,12 +250,12 @@ if (!function_exists('ope_rol_mv_mision_asignacion')) {
             return null;
         }
         $row = $db->fetch_array($q);
-        $row['companeros_arr'] = ope_rol_cat_json_list($row['companeros'] ?? '');
+        $row['companeros_arr'] = gbe_rol_cat_json_list($row['companeros'] ?? '');
         return $row;
     }
 
     /** Mapa mision_id => asignación, para pintar listados sin N consultas. */
-    function ope_rol_mv_asignaciones_map()
+    function gbe_rol_mv_asignaciones_map()
     {
         global $db;
         $out = array();
@@ -264,14 +264,14 @@ if (!function_exists('ope_rol_mv_mision_asignacion')) {
         }
         $q = $db->simple_select('rol_mv_mision_asignaciones', '*');
         while ($r = $db->fetch_array($q)) {
-            $r['companeros_arr'] = ope_rol_cat_json_list($r['companeros'] ?? '');
+            $r['companeros_arr'] = gbe_rol_cat_json_list($r['companeros'] ?? '');
             $out[(int) $r['mision_id']] = $r;
         }
         return $out;
     }
 
     /** Nombre de un personaje por pid (con caché estática). */
-    function ope_rol_cat_nombre_pid($pid)
+    function gbe_rol_cat_nombre_pid($pid)
     {
         global $db;
         static $cache = array();
@@ -294,17 +294,17 @@ if (!function_exists('ope_rol_mv_mision_asignacion')) {
     }
 }
 
-if (!function_exists('ope_rol_pid_activo')) {
+if (!function_exists('gbe_rol_pid_activo')) {
     /** pid del personaje activo de la cuenta, o 0. */
-    function ope_rol_pid_activo($uid)
+    function gbe_rol_pid_activo($uid)
     {
         global $db, $mybb;
         $uid = (int) $uid;
         if ($uid < 1) {
             return 0;
         }
-        if (isset($mybb->user['ope_active_pid']) && (int) $mybb->user['uid'] === $uid) {
-            $ap = (int) $mybb->user['ope_active_pid'];
+        if (isset($mybb->user['gbe_active_pid']) && (int) $mybb->user['uid'] === $uid) {
+            $ap = (int) $mybb->user['gbe_active_pid'];
             if ($ap > 0) {
                 return $ap;
             }
@@ -317,9 +317,9 @@ if (!function_exists('ope_rol_pid_activo')) {
     }
 }
 
-if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
+if (!function_exists('gbe_rol_cat_tripulacion_miembro')) {
     /** Membresía activa de un personaje, o null. */
-    function ope_rol_cat_tripulacion_miembro($pid)
+    function gbe_rol_cat_tripulacion_miembro($pid)
     {
         global $db;
         $pid = (int) $pid;
@@ -331,10 +331,10 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
     }
 
     /** Tripulación + rol del personaje (vista “mi tripulación”), o null. */
-    function ope_rol_cat_tripulacion_de_personaje($pid)
+    function gbe_rol_cat_tripulacion_de_personaje($pid)
     {
         global $db;
-        $m = ope_rol_cat_tripulacion_miembro($pid);
+        $m = gbe_rol_cat_tripulacion_miembro($pid);
         if (!$m || !$db->table_exists('rol_tripulaciones')) {
             return null;
         }
@@ -352,7 +352,7 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
     }
 
     /** Recalcula el contador de miembros activos en rol_tripulaciones. */
-    function ope_rol_cat_tripulacion_sync_conteo($tripulacion_id)
+    function gbe_rol_cat_tripulacion_sync_conteo($tripulacion_id)
     {
         global $db;
         $tripulacion_id = (int) $tripulacion_id;
@@ -368,7 +368,7 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
     }
 
     /** ¿Tiene un trámite de tripulación pendiente este personaje? */
-    function ope_rol_cat_tripulacion_tramite_pendiente($pid)
+    function gbe_rol_cat_tripulacion_tramite_pendiente($pid)
     {
         global $db;
         $pid = (int) $pid;
@@ -388,7 +388,7 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
      * Aprueba un trámite de tripulación (fundar o unirse).
      * Devuelve array('ok'=>bool, 'msg'=>string).
      */
-    function ope_rol_cat_tripulacion_aprobar_tramite($tid)
+    function gbe_rol_cat_tripulacion_aprobar_tramite($tid)
     {
         global $db;
         $tid = (int) $tid;
@@ -408,7 +408,7 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
         if ($pid < 1) {
             return array('ok' => false, 'msg' => 'Trámite sin personaje asociado.');
         }
-        if (ope_rol_cat_tripulacion_miembro($pid)) {
+        if (gbe_rol_cat_tripulacion_miembro($pid)) {
             return array('ok' => false, 'msg' => 'Ese personaje ya pertenece a una tripulación.');
         }
         $datos = json_decode((string) ($t['datos'] ?? ''), true);
@@ -416,7 +416,7 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
             $datos = array();
         }
         $now = (int) TIME_NOW;
-        $nombre_pj = ope_rol_cat_nombre_pid($pid);
+        $nombre_pj = gbe_rol_cat_nombre_pid($pid);
 
         if ($t['tipo'] === 'fundar_tripulacion') {
             $nombre = trim((string) ($datos['nombre'] ?? ''));
@@ -468,7 +468,7 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
                 'estado'         => 'activo',
                 'dateline'       => $now,
             ));
-            ope_rol_cat_tripulacion_sync_conteo($trip_id);
+            gbe_rol_cat_tripulacion_sync_conteo($trip_id);
         } else {
             return array('ok' => false, 'msg' => 'Tipo de trámite no soportado.');
         }
@@ -477,9 +477,9 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
         return array('ok' => true, 'msg' => 'Trámite aprobado.');
     }
 
-if (!function_exists('ope_rol_cat_lore')) {
+if (!function_exists('gbe_rol_cat_lore')) {
     /** Biblioteca de Lore: devuelve todos los artículos activos de rol_lore. */
-    function ope_rol_cat_lore($solo_activos = true)
+    function gbe_rol_cat_lore($solo_activos = true)
     {
         global $db;
         $out = array();
@@ -495,7 +495,7 @@ if (!function_exists('ope_rol_cat_lore')) {
     }
 
     /** Etiquetas legibles para categorías de lore. */
-    function ope_rol_cat_lore_categoria_labels()
+    function gbe_rol_cat_lore_categoria_labels()
     {
         return array(
             'historia'   => 'Historia',
@@ -509,7 +509,7 @@ if (!function_exists('ope_rol_cat_lore')) {
     }
 
     /** Slug de categoría de lore a color de acento (CSS var). */
-    function ope_rol_cat_lore_categoria_color($cat)
+    function gbe_rol_cat_lore_categoria_color($cat)
     {
         $map = array(
             'historia'   => 'var(--ember-hi)',
@@ -525,7 +525,7 @@ if (!function_exists('ope_rol_cat_lore')) {
 }
 
     /** Rechaza un trámite de tripulación. */
-    function ope_rol_cat_tripulacion_rechazar_tramite($tid)
+    function gbe_rol_cat_tripulacion_rechazar_tramite($tid)
     {
         global $db;
         $tid = (int) $tid;

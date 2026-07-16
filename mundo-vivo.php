@@ -14,14 +14,14 @@ $bbname    = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin  = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid       = (int)($mybb->user['uid'] ?? 0);
 
-$staff = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0, 'is_staff' => false, 'nombre' => '');
+$staff = $loggedin ? gbe_rol_active_staff($uid) : array('rank' => 0, 'is_staff' => false, 'nombre' => '');
 $rank  = (int)$staff['rank'];
 $is_webmaster = ($rank >= 4);
 
 $flash = ''; $flash_kind = 'ok';
 $preview = null;   // resultado parseado a previsualizar
 
-$ciclo = ope_rol_mv_ciclo_actual();
+$ciclo = gbe_rol_mv_ciclo_actual();
 $ciclo_id = is_array($ciclo) ? (int)$ciclo['ciclo_id'] : 0;
 
 // ── POST ──
@@ -40,14 +40,14 @@ if ($is_webmaster && $mybb->request_method === 'post' && $ciclo_id > 0) {
             $flash = 'Indicaciones guardadas.';
 
         } elseif ($action === 'generar_prompt') {
-            $ciclo = ope_rol_mv_ciclo_by_id($ciclo_id);
-            $prompt = ope_rol_mv_build_prompt($ciclo);
+            $ciclo = gbe_rol_mv_ciclo_by_id($ciclo_id);
+            $prompt = gbe_rol_mv_build_prompt($ciclo);
             $db->update_query('rol_mv_ciclos', array('prompt' => $db->escape_string($prompt), 'estado' => 'prompt'), 'ciclo_id = ' . $ciclo_id);
             $flash = 'Prompt generado. Cópialo y pégalo en tu IA.';
 
         } elseif ($action === 'ingerir') {
             $raw = (string)$mybb->get_input('resultado');
-            $preview = ope_rol_mv_parse_resultado($raw);
+            $preview = gbe_rol_mv_parse_resultado($raw);
             $db->update_query('rol_mv_ciclos', array('resultado_raw' => $db->escape_string($raw), 'estado' => 'preview'), 'ciclo_id = ' . $ciclo_id);
             if (!empty($preview['errores'])) {
                 $flash = 'El resultado tiene problemas: ' . implode(' ', $preview['errores']); $flash_kind = 'warn';
@@ -56,14 +56,14 @@ if ($is_webmaster && $mybb->request_method === 'post' && $ciclo_id > 0) {
             }
 
         } elseif ($action === 'publicar') {
-            $ciclo = ope_rol_mv_ciclo_by_id($ciclo_id);
+            $ciclo = gbe_rol_mv_ciclo_by_id($ciclo_id);
             $raw = (string)$ciclo['resultado_raw'];
-            $parsed = ope_rol_mv_parse_resultado($raw);
+            $parsed = gbe_rol_mv_parse_resultado($raw);
             // Links de imagen pegados por el staff: map id => url. Se inyectan en el
-            // periódico/noticia dentro de ope_rol_mv_publicar (evita subir al backend).
+            // periódico/noticia dentro de gbe_rol_mv_publicar (evita subir al backend).
             $imgUrls = $mybb->get_input('img_url', MyBB::INPUT_ARRAY);
             if (!is_array($imgUrls)) { $imgUrls = array(); }
-            $r = ope_rol_mv_publicar($ciclo_id, $parsed, $raw, $imgUrls);
+            $r = gbe_rol_mv_publicar($ciclo_id, $parsed, $raw, $imgUrls);
             if (!empty($r['ok'])) {
                 $flash = 'Publicado: el nuevo estado del mundo, el periódico Eternal News y la noticia ya están en línea.';
                 if (!empty($r['caps'])) {
@@ -79,22 +79,22 @@ if ($is_webmaster && $mybb->request_method === 'post' && $ciclo_id > 0) {
         }
     }
     // Refrescar ciclo tras cambios
-    $ciclo = ope_rol_mv_ciclo_by_id($ciclo_id);
+    $ciclo = gbe_rol_mv_ciclo_by_id($ciclo_id);
 }
 
 // ── Datos para render ──
-$zonas       = ope_rol_mv_zonas();
-$facciones   = ope_rol_mv_facciones();
-$tension     = ope_rol_mv_tension();          // anidado por zona
-$zMetricsDef = ope_rol_mv_zona_metrics();
-$fMetricsDef = ope_rol_mv_faccion_metrics();
-$arcos       = ope_rol_mv_arcos();
-$eventos   = $ciclo_id ? ope_rol_mv_eventos($ciclo_id) : array();
-$misiones  = $ciclo_id ? ope_rol_mv_misiones($ciclo_id) : array();
-$npcs      = ope_rol_mv_npc_mayores();
-$menores   = $ciclo_id ? ope_rol_mv_npc_menores($ciclo_id) : array();
-$periodicos = ope_rol_mv_periodicos(60);
-$auditLog  = ope_rol_mv_audit_list(15);
+$zonas       = gbe_rol_mv_zonas();
+$facciones   = gbe_rol_mv_facciones();
+$tension     = gbe_rol_mv_tension();          // anidado por zona
+$zMetricsDef = gbe_rol_mv_zona_metrics();
+$fMetricsDef = gbe_rol_mv_faccion_metrics();
+$arcos       = gbe_rol_mv_arcos();
+$eventos   = $ciclo_id ? gbe_rol_mv_eventos($ciclo_id) : array();
+$misiones  = $ciclo_id ? gbe_rol_mv_misiones($ciclo_id) : array();
+$npcs      = gbe_rol_mv_npc_mayores();
+$menores   = $ciclo_id ? gbe_rol_mv_npc_menores($ciclo_id) : array();
+$periodicos = gbe_rol_mv_periodicos(60);
+$auditLog  = gbe_rol_mv_audit_list(15);
 $pk = htmlspecialchars_uni($mybb->post_code);
 $mes_label = is_array($ciclo) ? htmlspecialchars_uni($ciclo['periodo']) : '';
 
@@ -105,12 +105,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Mundo Vivo</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-mundo-vivo) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-mundo-vivo) -->
 </head>
-<body class="ope-pg-mundo-vivo">
+<body class="gbe-pg-mundo-vivo">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -163,8 +163,8 @@ header('Content-Type: text/html; charset=utf-8');
 <?php
 // Auto-clasificar eventos sin clasificar (se persiste en DB para la próxima)
 if (!empty($eventos) && $ciclo['ciclo_id'] > 0) {
-    ope_rol_mv_auto_classify_pendientes((int)$ciclo['ciclo_id']);
-    $eventos = ope_rol_mv_eventos((int)$ciclo['ciclo_id']);
+    gbe_rol_mv_auto_classify_pendientes((int)$ciclo['ciclo_id']);
+    $eventos = gbe_rol_mv_eventos((int)$ciclo['ciclo_id']);
 }
 ?>
   <section class="mv-panel reveal" id="tab-eventos">
@@ -336,7 +336,7 @@ if (!empty($eventos) && $ciclo['ciclo_id'] > 0) {
       <div class="plate-h"><span class="t">Hilos narrativos</span><span class="c">// tramas persistentes entre periódicos</span></div>
       <div class="plate-b">
 <?php
-$threadsList = ope_rol_mv_threads_activos();
+$threadsList = gbe_rol_mv_threads_activos();
 if (empty($threadsList)): ?>
         <p class="mv-empty">No hay hilos narrativos activos.</p>
 <?php else: foreach ($threadsList as $th): if (!is_array($th)) continue; ?>
@@ -381,7 +381,7 @@ if (empty($threadsList)): ?>
     <div class="plate">
       <div class="plate-h"><span class="t">Auditoría de publicaciones</span><span class="c">// red de seguridad para publicación desatendida</span></div>
       <div class="plate-b">
-        <p class="mv-note">Cada vez que se publica un ciclo, el sistema guarda aquí si tuvo que recortar algún cambio de la IA por superar los topes anti-escalada (±<?php echo (int)(defined('OPE_MV_METRIC_MAX_DELTA') ? OPE_MV_METRIC_MAX_DELTA : 15); ?> por métrica y ciclo), y qué pasó con las misiones. Sirve para revisar cualquier publicación sin depender de la memoria de quien la hizo.</p>
+        <p class="mv-note">Cada vez que se publica un ciclo, el sistema guarda aquí si tuvo que recortar algún cambio de la IA por superar los topes anti-escalada (±<?php echo (int)(defined('GBE_MV_METRIC_MAX_DELTA') ? GBE_MV_METRIC_MAX_DELTA : 15); ?> por métrica y ciclo), y qué pasó con las misiones. Sirve para revisar cualquier publicación sin depender de la memoria de quien la hizo.</p>
 <?php if (empty($auditLog)): ?>
         <p class="mv-empty">Aún no hay publicaciones registradas (o la migración v4 no se ha ejecutado todavía: <code>php scripts/migrate-mundo-vivo-v4.php</code>).</p>
 <?php else: foreach ($auditLog as $al): ?>
@@ -446,11 +446,11 @@ if (empty($threadsList)): ?>
 
 <?php if ($preview !== null && empty($preview['errores'])):
       // Diff entre el tablero ACTUAL (aún no publicado) y el estado nuevo de la IA.
-      $tablero = ope_rol_mv_tablero();
-      $diff = ope_rol_mv_diff_estado($tablero, $preview['estado']);
+      $tablero = gbe_rol_mv_tablero();
+      $diff = gbe_rol_mv_diff_estado($tablero, $preview['estado']);
       $diffVacio = empty($diff['zonas']) && empty($diff['facciones']) && empty($diff['tension']);
       $arcosNuevos = (is_array($preview['estado']) && !empty($preview['estado']['arcos']) && is_array($preview['estado']['arcos'])) ? $preview['estado']['arcos'] : array();
-      $capsPrevistos = ope_rol_mv_calcular_caps_previstos($preview['estado']);
+      $capsPrevistos = gbe_rol_mv_calcular_caps_previstos($preview['estado']);
 ?>
     <div class="plate">
       <div class="plate-h"><span class="t">3 · Vista previa</span><span class="c">// revisa antes de publicar</span></div>
@@ -469,7 +469,7 @@ if (empty($threadsList)): ?>
         <div class="mv-prev-box"><b><?php echo htmlspecialchars_uni($preview['noticia']['titulo']); ?></b><p><?php echo htmlspecialchars_uni($preview['noticia']['resumen']); ?></p><div class="mv-prev-html"><?php echo $preview['noticia']['cuerpo']; ?></div></div>
 
         <h3 class="mv-prev-h">Cómo se vería el periódico</h3>
-        <div class="ope-periodico mv-prev-per" style="background-image:url('<?php echo $bburl; ?>/images/mundo-vivo/paper.jpg')"><?php echo $preview['periodico']; ?></div>
+        <div class="gbe-periodico mv-prev-per" style="background-image:url('<?php echo $bburl; ?>/images/mundo-vivo/paper.jpg')"><?php echo $preview['periodico']; ?></div>
 
         <h3 class="mv-prev-h">Cambios en el mundo</h3>
 <?php if ($diffVacio): ?>
@@ -602,7 +602,7 @@ $npcTrackPrev = (is_array($preview['estado']) && !empty($preview['estado']['npc_
 if (empty($npcTrackPrev)): ?>
         <p class="mv-empty">La IA no devolvió tracking de NPCs.</p>
 <?php else:
-  $currentTracking = ope_rol_mv_npc_tracking_from_db();
+  $currentTracking = gbe_rol_mv_npc_tracking_from_db();
   foreach ($npcTrackPrev as $pid => $track):
     $old = $currentTracking[(int)$pid] ?? array();
 ?>

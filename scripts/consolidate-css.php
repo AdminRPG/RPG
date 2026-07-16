@@ -1,9 +1,9 @@
 <?php
 /**
- * One Piece Eternal · Consolidación de CSS inline -> ope.css
+ * Granblue Fantasy: Eternal · Consolidación de CSS inline -> gbe.css
  * ---------------------------------------------------------
- * Mueve el bloque <style> de cada página PHP autónoma a docs/themes/ope.css,
- * SCOPEADO bajo una clase única de <body> (body.ope-pg-<pagina>), de modo que:
+ * Mueve el bloque <style> de cada página PHP autónoma a docs/themes/gbe.css,
+ * SCOPEADO bajo una clase única de <body> (body.gbe-pg-<pagina>), de modo que:
  *   - No queda CSS inline (una sola fuente de verdad, cacheada).
  *   - El render es idéntico (mismas reglas, solo relocalizadas + scopeadas).
  *   - No hay colisiones entre páginas ni con las plantillas MyBB.
@@ -13,7 +13,7 @@
  */
 $apply = in_array('--apply', $argv, true);
 $root  = dirname(__DIR__);
-$cssFile = $root . '/docs/themes/ope.css';
+$cssFile = $root . '/docs/themes/gbe.css';
 
 $pages = [
     'personajes.php', 'ficha.php', 'tramites.php', 'guias.php',
@@ -22,7 +22,7 @@ $pages = [
 ];
 
 /** Prefija cada selector de una lista separada por comas con el scope. */
-function scope_selectors(string $sel, string $scope): string {
+function scgbe_selectors(string $sel, string $scope): string {
     $parts = preg_split('/,(?![^(]*\))/', $sel); // no partir comas dentro de ()
     $res = [];
     foreach ($parts as $p) {
@@ -39,7 +39,7 @@ function scope_selectors(string $sel, string $scope): string {
 }
 
 /** Scopea un bloque CSS completo bajo $scope (maneja comentarios, @media, @keyframes). */
-function scope_css(string $css, string $scope): string {
+function scgbe_css(string $css, string $scope): string {
     $out = ''; $i = 0; $n = strlen($css);
     while ($i < $n) {
         $ch = $css[$i];
@@ -62,11 +62,11 @@ function scope_css(string $css, string $scope): string {
         }
         $body = substr($css, $j + 1, $k - $j - 1);
         if (preg_match('/^@(media|supports|-moz-document)/i', $prelude)) {
-            $out .= $prelude . '{' . scope_css($body, $scope) . '}';
+            $out .= $prelude . '{' . scgbe_css($body, $scope) . '}';
         } elseif (preg_match('/^@/', $prelude)) { // keyframes, font-face, page...
             $out .= $prelude . '{' . $body . '}';
         } else {
-            $out .= scope_selectors($prelude, $scope) . '{' . $body . '}';
+            $out .= scgbe_selectors($prelude, $scope) . '{' . $body . '}';
         }
         $i = $k + 1;
     }
@@ -75,7 +75,7 @@ function scope_css(string $css, string $scope): string {
 
 $collected = "\n\n/* ============================================================\n";
 $collected .= "   PÁGINAS AUTÓNOMAS (CSS consolidado, antes inline) — scopeado por\n";
-$collected .= "   body.ope-pg-<pagina>. Fuente ÚNICA: NO reintroducir <style> en PHP.\n";
+$collected .= "   body.gbe-pg-<pagina>. Fuente ÚNICA: NO reintroducir <style> en PHP.\n";
 $collected .= "   ============================================================ */\n";
 
 $report = [];
@@ -85,16 +85,16 @@ foreach ($pages as $page) {
     $src = file_get_contents($path);
     if (!preg_match('/<style>(.*?)<\/style>/s', $src, $m)) { $report[] = "$page: sin <style>"; continue; }
 
-    $slug  = 'ope-pg-' . preg_replace('/\.php$/', '', $page);
+    $slug  = 'gbe-pg-' . preg_replace('/\.php$/', '', $page);
     $scope = 'body.' . $slug;
     $inner = $m[1];
-    $scoped = scope_css($inner, $scope);
+    $scoped = scgbe_css($inner, $scope);
 
     $collected .= "\n/* ---- {$page} ---- */\n" . trim($scoped) . "\n";
 
     // Quitar el bloque <style> del PHP (deja un comentario de rastro).
     $newSrc = preg_replace('/<style>.*?<\/style>/s',
-        '<!-- estilos en docs/themes/ope.css (scope: ' . $slug . ') -->', $src, 1);
+        '<!-- estilos en docs/themes/gbe.css (scope: ' . $slug . ') -->', $src, 1);
 
     // Añadir la clase de scope al <body> (soporta <body> y <body ...>).
     if (preg_match('/<body\s+class\s*=\s*"([^"]*)"/i', $newSrc)) {
@@ -112,5 +112,5 @@ if ($apply) {
 }
 
 echo implode("\n", $report) . "\n\n";
-echo ($apply ? 'APLICADO' : 'DRY-RUN') . ": " . strlen($collected) . " bytes añadidos a ope.css\n";
+echo ($apply ? 'APLICADO' : 'DRY-RUN') . ": " . strlen($collected) . " bytes añadidos a gbe.css\n";
 if (!$apply) echo "Ejecuta con --apply para escribir.\n";

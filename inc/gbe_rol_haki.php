@@ -6,7 +6,7 @@ if (!defined('IN_MYBB')) {
 /**
  * Devuelve los 3 tipos de Haki con sus descripciones.
  */
-function ope_haki_tipos() {
+function gbe_haki_tipos() {
     return array(
         'busoshoku' => array(
             'nombre' => 'Busoshoku (Armadura)',
@@ -26,7 +26,7 @@ function ope_haki_tipos() {
 /**
  * Niveles de maestría con costes PP y requisitos de nivel.
  */
-function ope_haki_niveles() {
+function gbe_haki_niveles() {
     return array(
         1 => array('nombre' => 'Básico',    'coste_pp' => 15,  'requiere_nivel' => 5),
         2 => array('nombre' => 'Intermedio', 'coste_pp' => 40,  'requiere_nivel' => 15),
@@ -39,7 +39,7 @@ function ope_haki_niveles() {
  * Obtiene el estado de Haki de un personaje.
  * Devuelve array con los 3 tipos => ['nivel' => int, 'pp_gastado' => int].
  */
-function ope_haki_get($pid) {
+function gbe_haki_get($pid) {
     global $db;
     $pid = (int)$pid;
     $result = array(
@@ -62,15 +62,15 @@ function ope_haki_get($pid) {
  * Intenta subir un nivel de Haki. Gasta PP, valida requisitos.
  * @return string Mensaje de resultado (vacío = éxito).
  */
-function ope_haki_subir($pid, $tipo) {
+function gbe_haki_subir($pid, $tipo) {
     global $db;
     $pid = (int)$pid;
-    $tipos = ope_haki_tipos();
+    $tipos = gbe_haki_tipos();
     if (!isset($tipos[$tipo])) return 'Tipo de Haki no válido.';
-    $niveles = ope_haki_niveles();
+    $niveles = gbe_haki_niveles();
 
     // Obtener estado actual
-    $haki = ope_haki_get($pid);
+    $haki = gbe_haki_get($pid);
     $nivel_actual = $haki[$tipo]['nivel'];
     if ($nivel_actual >= 4) return 'Ya has alcanzado el nivel Supremo.';
 
@@ -94,7 +94,7 @@ function ope_haki_subir($pid, $tipo) {
     // Gastar PP y guardar Haki atómicamente
     $db->write_query('START TRANSACTION');
     try {
-        $ok = ope_pp_spend($pid, $coste, 'gasto_haki', "{$tipos[$tipo]['nombre']} Nivel {$siguiente}");
+        $ok = gbe_pp_spend($pid, $coste, 'gasto_haki', "{$tipos[$tipo]['nombre']} Nivel {$siguiente}");
         if (!$ok) {
             $db->write_query('ROLLBACK');
             return "No tienes suficientes PP. Necesitas {$coste}.";
@@ -131,8 +131,8 @@ function ope_haki_subir($pid, $tipo) {
  * Requiere d100 >= 70 para desbloquear.
  * @return array ['exito' => bool, 'tirada' => int, 'mensaje' => string]
  */
-function ope_haki_haoshoku_tirada($pid) {
-    $haki = ope_haki_get($pid);
+function gbe_haki_haoshoku_tirada($pid) {
+    $haki = gbe_haki_get($pid);
     if ($haki['haoshoku']['nivel'] > 0) {
         return array('exito' => true, 'tirada' => 0, 'mensaje' => 'Ya posees Haoshoku.');
     }

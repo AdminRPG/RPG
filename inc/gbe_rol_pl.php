@@ -9,7 +9,7 @@ if (!defined('IN_MYBB')) {
     die('Direct initialization of this file is not allowed.');
 }
 
-function ope_pl_saldo($pid) {
+function gbe_pl_saldo($pid) {
     global $db;
     $pid = (int)$pid;
     if ($pid < 1 || !$db->table_exists('rol_pl')) {
@@ -28,7 +28,7 @@ function ope_pl_saldo($pid) {
     return array('pl_total' => 0, 'pl_gastado' => 0, 'pl_disponible' => 0);
 }
 
-function ope_pl_add($pid, $pl, $tipo = '', $notas = '') {
+function gbe_pl_add($pid, $pl, $tipo = '', $notas = '') {
     global $db;
     $pid = (int)$pid; $pl = (int)$pl;
     if ($pid < 1 || $pl < 1) return false;
@@ -38,7 +38,7 @@ function ope_pl_add($pid, $pl, $tipo = '', $notas = '') {
         'pid' => $pid, 'pl_cambio' => $pl, 'tipo' => $db->escape_string($tipo),
         'notas' => $db->escape_string($notas), 'dateline' => TIME_NOW,
     ));
-    $saldo = ope_pl_saldo($pid);
+    $saldo = gbe_pl_saldo($pid);
     $db->update_query('rol_pl', array(
         'pl_total' => $saldo['pl_total'] + $pl,
         'pl_disponible' => $saldo['pl_disponible'] + $pl,
@@ -47,11 +47,11 @@ function ope_pl_add($pid, $pl, $tipo = '', $notas = '') {
     return true;
 }
 
-function ope_pl_spend($pid, $cost, $tipo = '', $notas = '') {
+function gbe_pl_spend($pid, $cost, $tipo = '', $notas = '') {
     global $db;
     $pid = (int)$pid; $cost = (int)$cost;
     if ($pid < 1 || $cost < 1) return false;
-    $saldo = ope_pl_saldo($pid);
+    $saldo = gbe_pl_saldo($pid);
     if ($saldo['pl_disponible'] < $cost) return false;
 
     $db->insert_query('rol_pl_log', array(
@@ -69,7 +69,7 @@ function ope_pl_spend($pid, $cost, $tipo = '', $notas = '') {
 /**
  * Tienda de PL: qué se puede comprar y cuánto cuesta.
  */
-function ope_pl_tienda() {
+function gbe_pl_tienda() {
     return array(
         'voluntad_d' => array('nombre' => 'Voluntad de D.', 'coste' => 5, 'desc' => 'Añade "D." a tu nombre. +10% de que tus eventos afecten a los Dragones Celestiales.'),
         'fruta_especifica' => array('nombre' => 'Fruta del Diablo específica', 'coste' => 3, 'desc' => 'Elige qué fruta quieres (sujeto a disponibilidad y aprobación).'),

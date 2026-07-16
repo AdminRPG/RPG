@@ -5,7 +5,7 @@
 ## Cambios realizados
 
 ### 1. Render de zonas — 10 métricas en modal ✅
-No requiere cambios. El bucle `foreach ($zMetrics as $k => $m)` en el modal (línea 208) ya itera dinámicamente sobre las 10 keys que devuelve `ope_rol_mv_zona_metrics()`. El teaser de tarjetas sigue usando 3 hardcodeadas (`est`, `mar`, `pir`) — es intencional.
+No requiere cambios. El bucle `foreach ($zMetrics as $k => $m)` en el modal (línea 208) ya itera dinámicamente sobre las 10 keys que devuelve `gbe_rol_mv_zona_metrics()`. El teaser de tarjetas sigue usando 3 hardcodeadas (`est`, `mar`, `pir`) — es intencional.
 
 ### 2. Render de facciones — 7 métricas en tarjetas ✅
 No requiere cambios. El bucle `foreach ($fMetrics as $k => $m)` (línea 118) ya itera dinámicamente sobre las 7 keys.
@@ -21,7 +21,7 @@ No requiere cambios. El bucle `foreach ($fMetrics as $k => $m)` (línea 118) ya 
 
 ### 5. Nueva sección: Hilos del mundo ✅
 - Líneas 146-164, después de arcos.
-- Usa `ope_rol_mv_threads_activos()`, filtra por estado `activo`/`reabierto`.
+- Usa `gbe_rol_mv_threads_activos()`, filtra por estado `activo`/`reabierto`.
 - Render con clases `.em-arcos`/`.em-arco`/`.em-arco-st` existentes.
 - Muestra título, tipo, descripción y facciones implicadas.
 

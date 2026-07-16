@@ -17,21 +17,21 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'asignar-cartas.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_data.php';
 
 $bburl    = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int) ($mybb->user['uid'] ?? 0);
 
-$staff = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0);
+$staff = $loggedin ? gbe_rol_active_staff($uid) : array('rank' => 0);
 $rank  = (int) $staff['rank'];
 if (!$loggedin || $rank < 3) {
     header('Location: ' . $bburl . '/index.php');
     exit;
 }
 
-$TIERS    = ope_rol_tecnica_tiers();
+$TIERS    = gbe_rol_tecnica_tiers();
 $pid      = (int) $mybb->get_input('pid', MyBB::INPUT_INT);
 $buscar   = trim((string) $mybb->get_input('q'));
 $libq     = trim((string) $mybb->get_input('lq'));
@@ -112,13 +112,13 @@ if ($pid > 0 && $db->table_exists('rol_personajes')) {
     if ($db->num_rows($q)) $pj = $db->fetch_array($q);
 }
 
-$deck = $pj && $table_ok ? ope_rol_char_tecnicas($pid) : array();
+$deck = $pj && $table_ok ? gbe_rol_char_tecnicas($pid) : array();
 // ids de biblioteca ya asignados a este personaje (para marcar "ya asignada").
 $asignados_origen = array();
 foreach ($deck as $d) { if ((int)($d['origen_id'] ?? 0) > 0) $asignados_origen[(int)$d['origen_id']] = true; }
 
 // ── Biblioteca (solo si hay personaje) ──
-$lib = ($pj && $table_ok) ? ope_rol_cartas_lib($libq, $ltier) : array();
+$lib = ($pj && $table_ok) ? gbe_rol_cartas_lib($libq, $ltier) : array();
 
 // ── Listado de personajes (sin pid) ──
 $listado = array();
@@ -151,13 +151,13 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; <?php echo $pj ? 'Asignar cartas: ' . htmlspecialchars_uni($pj['nombre']) : 'Asignar cartas'; ?></title>
-<?php echo ope_rol_head_base(); ?>
-<?php echo ope_rol_tecnica_card_css(); ?>
-<?php echo ope_rol_tecnica_forge_css(); ?>
+<?php echo gbe_rol_head_base(); ?>
+<?php echo gbe_rol_tecnica_card_css(); ?>
+<?php echo gbe_rol_tecnica_forge_css(); ?>
 </head>
-<body class="ope-pg-zona-staff ope-pg-crear-personaje ope-pg-gestionar-personaje ope-pg-gestionar-cartas">
+<body class="gbe-pg-zona-staff gbe-pg-crear-personaje gbe-pg-gestionar-personaje gbe-pg-gestionar-cartas">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -258,10 +258,10 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if (empty($deck)): ?>
     <div class="empty-state"><div class="big">Deck vac&iacute;o</div><p>Asigna cartas desde la biblioteca de abajo.</p></div>
 <?php else: ?>
-    <div class="ope-tk-deck">
+    <div class="gbe-tk-deck">
 <?php foreach ($deck as $carta): ?>
       <div class="deck-item">
-        <?php echo ope_rol_tecnica_card_html($carta); ?>
+        <?php echo gbe_rol_tecnica_card_html($carta); ?>
         <div class="deck-tools">
           <form method="post" action="<?php echo $bburl; ?>/asignar-cartas.php?pid=<?php echo (int)$pj['pid']; ?>">
             <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
@@ -306,7 +306,7 @@ header('Content-Type: text/html; charset=utf-8');
     <div class="gc-libgrid">
 <?php foreach ($lib as $carta): $ya = isset($asignados_origen[(int)$carta['id']]); $hl = ($hi_carta === (int)$carta['id']); ?>
       <div class="deck-item<?php echo $hl ? ' gc-assigned' : ''; ?>" id="lib-<?php echo (int)$carta['id']; ?>">
-        <?php echo ope_rol_tecnica_card_html($carta); ?>
+        <?php echo gbe_rol_tecnica_card_html($carta); ?>
         <div class="deck-tools">
           <form method="post" action="<?php echo $bburl; ?>/asignar-cartas.php?pid=<?php echo (int)$pj['pid']; ?>">
             <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">

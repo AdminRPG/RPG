@@ -17,14 +17,14 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'crear-npc-secundario.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_data.php';
 
 $bburl    = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int) ($mybb->user['uid'] ?? 0);
 
-$staff = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0);
+$staff = $loggedin ? gbe_rol_active_staff($uid) : array('rank' => 0);
 $rank  = (int) $staff['rank'];
 if (!$loggedin || $rank < 3) {
     header('Location: ' . $bburl . '/index.php');
@@ -130,7 +130,7 @@ if ($edit_id > 0 && $table_ok) {
 }
 
 // ── Biblioteca ──
-$lib = $table_ok ? ope_rol_npc_sec_lib($buscar, $tec_buscar) : array();
+$lib = $table_ok ? gbe_rol_npc_sec_lib($buscar, $tec_buscar) : array();
 
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
@@ -139,13 +139,13 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; NPCs Secundarios</title>
-<?php echo ope_rol_head_base(); ?>
-<?php echo ope_rol_npc_sec_card_css(); ?>
-<?php echo ope_rol_npc_sec_forge_css(); ?>
+<?php echo gbe_rol_head_base(); ?>
+<?php echo gbe_rol_npc_sec_card_css(); ?>
+<?php echo gbe_rol_npc_sec_forge_css(); ?>
 </head>
-<body class="ope-pg-zona-staff ope-pg-crear-personaje ope-pg-gestionar-personaje ope-pg-crear-npc-sec">
+<body class="gbe-pg-zona-staff gbe-pg-crear-personaje gbe-pg-gestionar-personaje gbe-pg-crear-npc-sec">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -263,7 +263,7 @@ header('Content-Type: text/html; charset=utf-8');
     <div class="ons-deck">
 <?php foreach ($lib as $npc): ?>
       <div class="ons-deck-item" id="npc-<?php echo (int)$npc['id']; ?>">
-        <?php echo ope_rol_npc_sec_card_html($npc); ?>
+        <?php echo gbe_rol_npc_sec_card_html($npc); ?>
         <div class="ons-deck-tools">
           <a href="<?php echo $bburl; ?>/crear-npc-secundario.php?edit=<?php echo (int)$npc['id']; ?>#editor" class="btn btn-ghost btn-sm">Editar</a>
           <form method="post" action="<?php echo $bburl; ?>/crear-npc-secundario.php" onsubmit="return confirm('Eliminar este NPC secundario de la biblioteca?');">

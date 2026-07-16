@@ -49,7 +49,7 @@ No estilo One Piece brutalista. Tokens GBF claros/acuarela (Relink).
 ```
 Sigue docs/AGENTES-Y-HERRAMIENTAS.md §2.
 Prototipo: docs/Prototypes/Granblue/[archivo].html
-Producción: [ope-index.xml | ficha.php | ope.css | index.php]
+Producción: [gbe-index.xml | ficha.php | gbe.css | index.php]
 No marcar hecho sin comparación visual lado a lado y sync-theme verify OK.
 ```
 
@@ -57,7 +57,7 @@ No marcar hecho sin comparación visual lado a lado y sync-theme verify OK.
 
 ```
 Sigue DESIGN-GRANBLUE-ETERNAL.md §5 y docs/GUIA-ESTILOS-PHP.md.
-body.ope-pg-<slug> + scaffolding GBF en ope.css (sin bordes negros 2px OP).
+body.gbe-pg-<slug> + scaffolding GBF en gbe.css (sin bordes negros 2px OP).
 ```
 
 ### Solo backend / BD

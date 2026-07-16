@@ -15,7 +15,7 @@ $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid = (int)($mybb->user['uid'] ?? 0);
 
-$staff = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0);
+$staff = $loggedin ? gbe_rol_active_staff($uid) : array('rank' => 0);
 $rank  = (int)$staff['rank'];
 $is_admin = ($rank >= 3);
 
@@ -92,12 +92,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Noticias</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-gestionar-noticias) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-gestionar-noticias) -->
 </head>
-<body class="ope-pg-gestionar-noticias">
+<body class="gbe-pg-gestionar-noticias">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

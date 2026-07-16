@@ -15,7 +15,7 @@ $uid       = (int)($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
 // Las alertas son POR PERSONAJE: se muestran las del personaje activo.
-$activePid = (int)($mybb->user['ope_active_pid'] ?? 0);
+$activePid = (int)($mybb->user['gbe_active_pid'] ?? 0);
 if ($activePid <= 0 && $loggedin && $db->table_exists('rol_personajes')) {
     $aq0 = $db->simple_select('rol_personajes', 'pid', "uid = {$uid} AND activo = 1", array('limit' => 1));
     if ($db->num_rows($aq0)) $activePid = (int)$db->fetch_field($aq0, 'pid');
@@ -57,9 +57,9 @@ if ($loggedin && $activePid > 0 && $db->table_exists('rol_alertas')) {
     while ($row = $db->fetch_array($aq)) $alertas[] = $row;
 }
 
-require_once MYBB_ROOT . 'inc/ope_user_init.php';
+require_once MYBB_ROOT . 'inc/gbe_user_init.php';
 
-$initials   = ope_get_initials($mybb->user['username'] ?? '');
+$initials   = gbe_get_initials($mybb->user['username'] ?? '');
 $initials_e = htmlspecialchars_uni($initials);
 
 $tipo_iconos = [
@@ -84,12 +84,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Alertas</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-alertas) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-alertas) -->
 </head>
-<body class="ope-pg-alertas">
+<body class="gbe-pg-alertas">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -171,7 +171,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 <footer class="foot">
   <div class="foot-in">
-    <div class="foot-b">One Piece Eternal</div>
+    <div class="foot-b">Granblue Fantasy: Eternal</div>
   </div>
 </footer>
 

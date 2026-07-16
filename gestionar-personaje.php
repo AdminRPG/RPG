@@ -9,30 +9,30 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'gestionar-personaje.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_data.php';
 
 $bburl    = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int) ($mybb->user['uid'] ?? 0);
 
-require_once MYBB_ROOT . 'inc/ope_user_init.php';
+require_once MYBB_ROOT . 'inc/gbe_user_init.php';
 
-$rank = ope_get_staff_level($uid);
+$rank = gbe_get_staff_level($uid);
 
 if (!$loggedin || $rank < 3) {
     header('Location: ' . $bburl . '/index.php');
     exit;
 }
 
-$STAT_KEYS  = ope_rol_stat_keys();
-$RAZAS      = ope_rol_razas();
-$FACCIONES  = ope_rol_facciones();
-$ARMAS      = ope_rol_armas();
-$PACKS      = ope_rol_packs_equipo();
-$VIRTUDES   = ope_rol_virtudes();
-$DEFECTOS   = ope_rol_defectos();
-$PC_BASE    = ope_rol_pc_iniciales();
+$STAT_KEYS  = gbe_rol_stat_keys();
+$RAZAS      = gbe_rol_razas();
+$FACCIONES  = gbe_rol_facciones();
+$ARMAS      = gbe_rol_armas();
+$PACKS      = gbe_rol_packs_equipo();
+$VIRTUDES   = gbe_rol_virtudes();
+$DEFECTOS   = gbe_rol_defectos();
+$PC_BASE    = gbe_rol_pc_iniciales();
 $ESTADOS    = array('borrador', 'revision', 'aprobado', 'rechazado', 'eliminado');
 $RANGOS     = array('F', 'E', 'D', 'C', 'B', 'A', 'S', 'SS', 'M', 'M+');
 $pid        = (int) $mybb->get_input('pid', MyBB::INPUT_INT);
@@ -146,8 +146,8 @@ if ($pid > 0 && $mybb->request_method === 'post'
                             $datos['stats_efectivas'][$sk] = max(5, (int) $stats_in[$sk]);
                         }
                     }
-                    $datos['rango_suma'] = ope_rol_stat_sum($datos['stats_efectivas']);
-                    $nivel = ope_rol_nivel_from_sum((int) ($datos['rango_suma'] ?? 0));
+                    $datos['rango_suma'] = gbe_rol_stat_sum($datos['stats_efectivas']);
+                    $nivel = gbe_rol_nivel_from_sum((int) ($datos['rango_suma'] ?? 0));
                 }
 
                 // ---- Virtudes y defectos (checkboxes reales del catálogo) ----
@@ -159,7 +159,7 @@ if ($pid > 0 && $mybb->request_method === 'post'
                 $pc_gastado = 0;
                 $virtudes_sel = array();
                 foreach ($virtudes_in as $vid) {
-                    $v = ope_rol_find_virtud($vid);
+                    $v = gbe_rol_find_virtud($vid);
                     if ($v === null) continue;
                     $spec = !empty($v['spec']) ? gp_clean($mybb->get_input('virtud_spec_' . $vid), 200) : '';
                     $pc_gastado += (int) $v['coste'];
@@ -168,7 +168,7 @@ if ($pid > 0 && $mybb->request_method === 'post'
                 $pc_devuelto = 0;
                 $defectos_sel = array();
                 foreach ($defectos_in as $did) {
-                    $d = ope_rol_find_defecto($did);
+                    $d = gbe_rol_find_defecto($did);
                     if ($d === null) continue;
                     $spec = !empty($d['spec']) ? gp_clean($mybb->get_input('defecto_spec_' . $did), 200) : '';
                     $pc_devuelto += (int) $d['devuelve'];
@@ -232,8 +232,8 @@ if ($pid > 0 && $mybb->request_method === 'post'
                     }
                 }
 
-                if (function_exists('ope_combat_recalc')) {
-                    ope_combat_recalc($pid);
+                if (function_exists('gbe_combat_recalc')) {
+                    gbe_combat_recalc($pid);
                 }
 
                 header('Location: ' . $bburl . '/gestionar-personaje.php?pid=' . $pid . '&ok=1#top');
@@ -242,13 +242,13 @@ if ($pid > 0 && $mybb->request_method === 'post'
         }
 
     // ---- Añadir PP manual (misiones, arcos, eventos) ----
-    } elseif ($action === 'pp_add' && function_exists('ope_pp_add')) {
+    } elseif ($action === 'pp_add' && function_exists('gbe_pp_add')) {
         $pp_amt = (int) $mybb->get_input('pp_amount', MyBB::INPUT_INT);
         $pp_tipo = (string) $mybb->get_input('pp_tipo');
         $pp_notas = gp_clean($mybb->get_input('pp_notas'), 500);
         $tipos_ok = array('mision', 'arco', 'evento', 'staff');
         if ($pp_amt > 0 && in_array($pp_tipo, $tipos_ok, true)) {
-            ope_pp_add($pid, $pp_amt, $pp_tipo, 0, 0, 0, $pp_notas, $uid);
+            gbe_pp_add($pid, $pp_amt, $pp_tipo, 0, 0, 0, $pp_notas, $uid);
         }
         header('Location: ' . $bburl . '/gestionar-personaje.php?pid=' . $pid . '&ok=1#pp');
         exit;
@@ -363,8 +363,8 @@ if (!$pj && $db->table_exists('rol_personajes')) {
 }
 
 $stats_ef  = $datos['stats_efectivas'] ?? $datos['stats_base'] ?? array();
-$pp_saldo  = ($pj && function_exists('ope_pp_saldo'))
-    ? ope_pp_saldo((int) $pj['pid'])
+$pp_saldo  = ($pj && function_exists('gbe_pp_saldo'))
+    ? gbe_pp_saldo((int) $pj['pid'])
     : array('pp_total' => 0, 'pp_gastado' => 0, 'pp_disponible' => 0);
 $virtudes_sel_ids = is_array($datos['virtudes'] ?? null) ? $datos['virtudes'] : array();
 $defectos_sel_ids = is_array($datos['defectos'] ?? null) ? $datos['defectos'] : array();
@@ -380,11 +380,11 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; <?php echo $pj ? 'Editar: ' . htmlspecialchars_uni($pj['nombre']) : 'Gestionar personaje'; ?></title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-zona-staff ope-pg-crear-personaje ope-pg-gestionar-personaje">
+<body class="gbe-pg-zona-staff gbe-pg-crear-personaje gbe-pg-gestionar-personaje">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

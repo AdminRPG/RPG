@@ -12,7 +12,7 @@ require_once './global.php';
 $bburl = $mybb->settings['bburl'];
 $uid   = (int) ($mybb->user['uid'] ?? 0);
 
-function ope_tm_back($qs = '')
+function gbe_tm_back($qs = '')
 {
     global $bburl;
     header('Location: ' . $bburl . '/tablon-misiones.php' . ($qs !== '' ? ('?' . $qs) : ''));
@@ -20,12 +20,12 @@ function ope_tm_back($qs = '')
 }
 
 if ($uid < 1 || !verify_post_check($mybb->get_input('my_post_key'), true)) {
-    ope_tm_back('e=sesion');
+    gbe_tm_back('e=sesion');
 }
 
 $mid = (int) $mybb->get_input('mision_id', MyBB::INPUT_INT);
 if ($mid < 1) {
-    ope_tm_back();
+    gbe_tm_back();
 }
 
 // Personaje activo del jugador (con el que "coge" la misión).
@@ -37,17 +37,17 @@ if ($db->table_exists('rol_cuentas')) {
     }
 }
 if ($pid < 1) {
-    ope_tm_back('e=sin_personaje');
+    gbe_tm_back('e=sin_personaje');
 }
 
 // La misión debe existir, estar en curso y no estar ya asignada.
 $q = $db->simple_select('rol_mv_misiones', '*', 'mision_id = ' . $mid, array('limit' => 1));
 $mision = $db->num_rows($q) ? $db->fetch_array($q) : null;
 if (!$mision || $mision['estado'] !== 'en_curso') {
-    ope_tm_back('e=no_disponible');
+    gbe_tm_back('e=no_disponible');
 }
-if (ope_rol_mv_mision_asignacion($mid)) {
-    ope_tm_back('e=ya_cogida');
+if (gbe_rol_mv_mision_asignacion($mid)) {
+    gbe_tm_back('e=ya_cogida');
 }
 
 $modalidad = (string) $mision['modalidad'];
@@ -79,4 +79,4 @@ $db->insert_query('rol_mv_mision_asignaciones', array(
     'dateline'   => (int) TIME_NOW,
 ));
 
-ope_tm_back('a=ok');
+gbe_tm_back('a=ok');

@@ -18,7 +18,7 @@ $uid      = (int) ($mybb->user['uid'] ?? 0);
 $active_pid = 0;
 $char_name  = '';
 if ($loggedin) {
-    $active_pid = function_exists('ope_rol_active_pid_for') ? ope_rol_active_pid_for($uid) : (int) ($mybb->user['ope_active_pid'] ?? 0);
+    $active_pid = function_exists('gbe_rol_active_pid_for') ? gbe_rol_active_pid_for($uid) : (int) ($mybb->user['gbe_active_pid'] ?? 0);
     if ($active_pid > 0 && $db->table_exists('rol_personajes')) {
         $pq = $db->simple_select('rol_personajes', 'nombre', "pid = {$active_pid} AND uid = {$uid}", array('limit' => 1));
         if ($db->num_rows($pq)) {
@@ -32,7 +32,7 @@ if ($loggedin) {
 $flash = '';
 $flash_kind = 'ok';
 $table_ok = $db->table_exists('rol_npcs_secundarios') && $db->table_exists('rol_acompanantes') && $db->table_exists('rol_acompanante_solicitudes');
-$max_slots = function_exists('ope_rol_acompanantes_max') ? ope_rol_acompanantes_max() : 2;
+$max_slots = function_exists('gbe_rol_acompanantes_max') ? gbe_rol_acompanantes_max() : 2;
 
 // ── POST ──
 if ($loggedin && $active_pid > 0 && $mybb->request_method === 'post' && $table_ok) {
@@ -44,7 +44,7 @@ if ($loggedin && $active_pid > 0 && $mybb->request_method === 'post' && $table_o
         if ($action === 'solicitar') {
             $npc_id = (int) $mybb->get_input('npc_id', MyBB::INPUT_INT);
             $motivo = (string) $mybb->get_input('motivo');
-            $res = ope_rol_acompanante_solicitar($active_pid, $uid, $npc_id, $motivo);
+            $res = gbe_rol_acompanante_solicitar($active_pid, $uid, $npc_id, $motivo);
             $flash = $res['msg'];
             $flash_kind = $res['ok'] ? 'ok' : 'warn';
             if ($res['ok']) {
@@ -53,7 +53,7 @@ if ($loggedin && $active_pid > 0 && $mybb->request_method === 'post' && $table_o
             }
         } elseif ($action === 'cancelar') {
             $sid = (int) $mybb->get_input('sid', MyBB::INPUT_INT);
-            $res = ope_rol_acompanante_solicitud_cancelar($sid, $active_pid);
+            $res = gbe_rol_acompanante_solicitud_cancelar($sid, $active_pid);
             $flash = $res['msg'];
             $flash_kind = $res['ok'] ? 'ok' : 'warn';
             if ($res['ok']) {
@@ -62,7 +62,7 @@ if ($loggedin && $active_pid > 0 && $mybb->request_method === 'post' && $table_o
             }
         } elseif ($action === 'quitar') {
             $slot = (int) $mybb->get_input('slot', MyBB::INPUT_INT);
-            $res = ope_rol_acompanante_quitar($active_pid, $slot);
+            $res = gbe_rol_acompanante_quitar($active_pid, $slot);
             $flash = $res['msg'];
             $flash_kind = $res['ok'] ? 'ok' : 'warn';
             if ($res['ok']) {
@@ -78,9 +78,9 @@ if ($okp === 'req')         { $flash = 'Solicitud enviada. El staff la revisará
 elseif ($okp === 'cancel')  { $flash = 'Solicitud cancelada.'; $flash_kind = 'ok'; }
 elseif ($okp === 'del')     { $flash = 'Acompañante retirado.'; $flash_kind = 'ok'; }
 
-$mis_acomps   = ($active_pid > 0 && $table_ok) ? ope_rol_char_acompanantes($active_pid) : array();
-$mis_solicit  = ($active_pid > 0 && $table_ok) ? ope_rol_char_solicitudes_acompanante($active_pid) : array();
-$lib          = $table_ok ? ope_rol_npc_sec_lib('', '') : array();
+$mis_acomps   = ($active_pid > 0 && $table_ok) ? gbe_rol_char_acompanantes($active_pid) : array();
+$mis_solicit  = ($active_pid > 0 && $table_ok) ? gbe_rol_char_solicitudes_acompanante($active_pid) : array();
+$lib          = $table_ok ? gbe_rol_npc_sec_lib('', '') : array();
 
 // Estados usados por el jugador (para bloquear duplicados en el selector).
 $bloqueados = array();
@@ -120,12 +120,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Solicitar acompa&ntilde;ante</title>
-<?php echo ope_rol_head_base(); ?>
-<?php echo ope_rol_npc_sec_card_css(); ?>
+<?php echo gbe_rol_head_base(); ?>
+<?php echo gbe_rol_npc_sec_card_css(); ?>
 </head>
-<body class="ope-pg-tramites ope-pg-solicitar-acomp">
+<body class="gbe-pg-tramites gbe-pg-solicitar-acomp">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

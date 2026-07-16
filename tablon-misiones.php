@@ -8,10 +8,10 @@ $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int)($mybb->user['uid'] ?? 0);
 
-$ciclo    = ope_rol_mv_ciclo_actual();
+$ciclo    = gbe_rol_mv_ciclo_actual();
 $ciclo_id = $ciclo ? (int)$ciclo['ciclo_id'] : 0;
-$todas    = $ciclo_id ? ope_rol_mv_misiones($ciclo_id) : array();
-$asignadas = ope_rol_mv_asignaciones_map();
+$todas    = $ciclo_id ? gbe_rol_mv_misiones($ciclo_id) : array();
+$asignadas = gbe_rol_mv_asignaciones_map();
 $misiones = array();
 foreach ($todas as $m) {
     // Disponibles = en curso y que nadie haya cogido todavía.
@@ -44,9 +44,9 @@ elseif ($error === 'ya_cogida') { $tm_flash = 'Esa misión ya la ha cogido otro 
 elseif ($error === 'no_disponible') { $tm_flash = 'Esa misión ya no está disponible.'; $tm_flash_kind = 'warn'; }
 elseif ($error === 'sesion') { $tm_flash = 'La sesión caducó. Vuelve a intentarlo.'; $tm_flash_kind = 'warn'; }
 
-$zonas     = $db->table_exists('rol_mv_zonas') ? ope_rol_mv_zonas() : array();
-$facciones = $db->table_exists('rol_mv_facciones') ? ope_rol_mv_facciones() : array();
-$orden_fac = ope_rol_mv_faccion_order();
+$zonas     = $db->table_exists('rol_mv_zonas') ? gbe_rol_mv_zonas() : array();
+$facciones = $db->table_exists('rol_mv_facciones') ? gbe_rol_mv_facciones() : array();
+$orden_fac = gbe_rol_mv_faccion_order();
 
 $mes_label = is_array($ciclo) ? htmlspecialchars_uni($ciclo['periodo']) : '';
 
@@ -72,11 +72,11 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Tablón de Misiones</title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-tramites ope-pg-tablon-misiones">
+<body class="gbe-pg-tramites gbe-pg-tablon-misiones">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

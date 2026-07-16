@@ -12,7 +12,7 @@ $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid = (int) ($mybb->user['uid'] ?? 0);
 
-$staff = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0);
+$staff = $loggedin ? gbe_rol_active_staff($uid) : array('rank' => 0);
 $is_admin = ((int) $staff['rank'] >= 3);
 
 $flash = '';
@@ -27,11 +27,11 @@ if ($is_admin && $mybb->request_method === 'post') {
         $action = $mybb->get_input('action');
         $tid = (int) $mybb->get_input('tid', MyBB::INPUT_INT);
         if ($tid > 0 && $action === 'aprobar') {
-            $res = ope_rol_cat_tripulacion_aprobar_tramite($tid);
+            $res = gbe_rol_cat_tripulacion_aprobar_tramite($tid);
             $flash = $res['msg'];
             $flash_kind = $res['ok'] ? 'ok' : 'warn';
         } elseif ($tid > 0 && $action === 'rechazar') {
-            $res = ope_rol_cat_tripulacion_rechazar_tramite($tid);
+            $res = gbe_rol_cat_tripulacion_rechazar_tramite($tid);
             $flash = $res['msg'];
             $flash_kind = $res['ok'] ? 'ok' : 'warn';
         }
@@ -51,7 +51,7 @@ if ($is_admin && $db->table_exists('rol_tramites')) {
         if (!is_array($r['datos_arr'])) {
             $r['datos_arr'] = array();
         }
-        $r['pj_nombre'] = ope_rol_cat_nombre_pid((int) $r['pid']);
+        $r['pj_nombre'] = gbe_rol_cat_nombre_pid((int) $r['pid']);
         $pendientes[] = $r;
     }
 }
@@ -63,11 +63,11 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Trámites de tripulación</title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-mundo-vivo">
+<body class="gbe-pg-mundo-vivo">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

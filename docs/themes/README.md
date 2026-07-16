@@ -4,48 +4,48 @@
 
 El tema **no** vive en un único XML monolítico. Está repartido en archivos con
 roles claros para que un import no pise otro. Todo el CSS vive en **una sola
-hoja** (`ope.css`); ninguna página PHP lleva `<style>` inline. Ver la convención
+hoja** (`gbe.css`); ninguna página PHP lleva `<style>` inline. Ver la convención
 completa en `docs/DESIGN-GRANBLUE-ETERNAL.md` (§5).
 
 ## Archivos canónicos (edita estos)
 
 | Archivo | Contenido |
 |---------|-----------|
-| `ope.css` | **Única** hoja de estilos: tokens + componentes + CSS por página (`body.ope-pg-*`) |
-| `ope-index.xml` | Portada, navbar, footer, forumbit |
-| `ope-forumdisplay.xml` | Lista de temas |
-| `ope-showthread.xml` | Hilo y postbit principal |
-| `ope-forms.xml` | newthread, newreply, editpost, errores |
-| `ope-shared.xml` | Plantillas auxiliares MyBB (postbit_*, opciones de formulario, etc.) |
+| `gbe.css` | **Única** hoja de estilos: tokens + componentes + CSS por página (`body.gbe-pg-*`) |
+| `gbe-index.xml` | Portada, navbar, footer, forumbit |
+| `gbe-forumdisplay.xml` | Lista de temas |
+| `gbe-showthread.xml` | Hilo y postbit principal |
+| `gbe-forms.xml` | newthread, newreply, editpost, errores |
+| `gbe-shared.xml` | Plantillas auxiliares MyBB (postbit_*, opciones de formulario, etc.) |
 
 > La navbar (HTML y su CSS) y el `<head>` de las páginas autónomas se generan
-> desde `inc/plugins/ope_rol.php` (`ope_rol_navbar_html()`, `ope_rol_navbar_css()`,
-> `ope_rol_head_base()`). No dupliques esas reglas en `ope.css` ni en PHP.
+> desde `inc/plugins/gbe_rol.php` (`gbe_rol_navbar_html()`, `gbe_rol_navbar_css()`,
+> `gbe_rol_head_base()`). No dupliques esas reglas en `gbe.css` ni en PHP.
 
 ## Portada (`index.php`)
 
-La portada **no** usa `body.ope-pg-*`. Usa `body.gbe-index` (plantilla `ope-index.xml`) con componentes `.gbe-section`, `.gbe-bento`, `.gbe-hero`. Las categorías las genera `index.php`. Ver `DESIGN-GRANBLUE-ETERNAL.md` §6, §6.7 y `docs/AGENTES-Y-HERRAMIENTAS.md` §2.5.
+La portada **no** usa `body.gbe-pg-*`. Usa `body.gbe-index` (plantilla `gbe-index.xml`) con componentes `.gbe-section`, `.gbe-bento`, `.gbe-hero`. Las categorías las genera `index.php`. Ver `DESIGN-GRANBLUE-ETERNAL.md` §6, §6.7 y `docs/AGENTES-Y-HERRAMIENTAS.md` §2.5.
 
-**No declarar portada terminada** sin overrides `body.gbe-index` en `ope.css` y comparación con `docs/Prototypes/Granblue/index.html`.
+**No declarar portada terminada** sin overrides `body.gbe-index` en `gbe.css` y comparación con `docs/Prototypes/Granblue/index.html`.
 
 ## Color por facción
 
-> **Pendiente F3:** las facciones en código siguen siendo las de One Piece (`ope_rol_facciones()`). Los tokens `--fac-*` en `ope.css` se renombrarán cuando existan facciones GBF (Gremio, Erste, etc.). Hasta entonces, no añadir facciones OP nuevas en copy GBF.
+> **Pendiente F3:** las facciones en código siguen siendo las de One Piece (`gbe_rol_facciones()`). Los tokens `--fac-*` en `gbe.css` se renombrarán cuando existan facciones GBF (Gremio, Erste, etc.). Hasta entonces, no añadir facciones OP nuevas en copy GBF.
 
-- Resolución del slug: `ope_rol_faccion_slug($faccion)` en `inc/plugins/ope_rol.php`
-  (normaliza acentos y alias). `ope_rol_char()` ya devuelve `faccion` y `faccion_slug`.
-- **Ficha** (`ficha.php`): el `<body>` lleva `ope-pg-ficha fac-<slug>`; en `ope.css`
+- Resolución del slug: `gbe_rol_faccion_slug($faccion)` en `inc/plugins/gbe_rol.php`
+  (normaliza acentos y alias). `gbe_rol_char()` ya devuelve `faccion` y `faccion_slug`.
+- **Ficha** (`ficha.php`): el `<body>` lleva `gbe-pg-ficha fac-<slug>`; en `gbe.css`
   eso resuelve `--fac/--fac-hi/--fac-ink` y tiñe idbanner, retrato, nameplate y `.tag.line`.
-- **Postbit** (`ope-showthread.xml`): `.ope-post-author {$post['ope_fac_class']}` +
-  nombre envuelto en `.ope-pa-fac fac-<slug>` (lo pone el hook `ope_rol_postbit`).
+- **Postbit** (`gbe-showthread.xml`): `.gbe-post-author {$post['gbe_fac_class']}` +
+  nombre envuelto en `.gbe-pa-fac fac-<slug>` (lo pone el hook `gbe_rol_postbit`).
 
 ## Archivos generados (no edites a mano)
 
 | Archivo | Cómo se genera |
 |---------|----------------|
-| `ope-child-theme.xml` | Solo propiedades del tema (stub con `templateset`) |
-| `ope-child-theme.bundle.xml` | `php scripts/sync-theme.php build-xml` — bundle para importar en Admin CP (regenerable, no versionado) |
-| `cache/themes/theme*/ope.css` | Al hacer `import` |
+| `gbe-child-theme.xml` | Solo propiedades del tema (stub con `templateset`) |
+| `gbe-child-theme.bundle.xml` | `php scripts/sync-theme.php build-xml` — bundle para importar en Admin CP (regenerable, no versionado) |
+| `cache/themes/theme*/gbe.css` | Al hacer `import` |
 
 ## Comandos
 
@@ -67,11 +67,11 @@ php scripts/sync-theme.php build-xml
 
 Si dos XML definen la misma plantilla, gana el **último** en este orden:
 
-1. `ope-shared.xml`
-2. `ope-forms.xml`
-3. `ope-showthread.xml`
-4. `ope-forumdisplay.xml`
-5. `ope-index.xml`
+1. `gbe-shared.xml`
+2. `gbe-forms.xml`
+3. `gbe-showthread.xml`
+4. `gbe-forumdisplay.xml`
+5. `gbe-index.xml`
 
 Así las pantallas principales (index, foro, hilo) siempre prevalecen sobre las
 auxiliares.
@@ -85,7 +85,7 @@ auxiliares.
 
 ## Flujo recomendado
 
-1. Editar `ope.css` y/o `ope-*.xml` (nunca añadir `<style>` en `.php`)
+1. Editar `gbe.css` y/o `gbe-*.xml` (nunca añadir `<style>` en `.php`)
 2. `php scripts/sync-theme.php import`
 3. `php scripts/sync-theme.php verify`
 4. Commit de los archivos en `docs/themes/`

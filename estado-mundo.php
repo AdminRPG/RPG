@@ -13,15 +13,15 @@ require_once './global.php';
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 
-$zonas     = ope_rol_mv_zonas();
-$facciones = ope_rol_mv_facciones();
-$tension   = ope_rol_mv_tension();          // anidado por zona
-$arcos     = ope_rol_mv_arcos();
-$npcs      = ope_rol_mv_npc_mayores();
-$ultimo    = ope_rol_mv_ultimo_publicado();
+$zonas     = gbe_rol_mv_zonas();
+$facciones = gbe_rol_mv_facciones();
+$tension   = gbe_rol_mv_tension();          // anidado por zona
+$arcos     = gbe_rol_mv_arcos();
+$npcs      = gbe_rol_mv_npc_mayores();
+$ultimo    = gbe_rol_mv_ultimo_publicado();
 
-$zMetrics = ope_rol_mv_zona_metrics();
-$fMetrics = ope_rol_mv_faccion_metrics();
+$zMetrics = gbe_rol_mv_zona_metrics();
+$fMetrics = gbe_rol_mv_faccion_metrics();
 
 $hero = $bburl . '/images/mundo-vivo/estado-hero.jpg';
 
@@ -60,12 +60,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Estado del mundo</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-estado-mundo) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-estado-mundo) -->
 </head>
-<body class="ope-pg-estado-mundo">
+<body class="gbe-pg-estado-mundo">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -93,7 +93,7 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="em-zona-top"><h3><?php echo htmlspecialchars_uni($z['nombre']); ?></h3><span class="em-zona-more">Ver notas &rarr;</span></div>
         <div class="em-bars">
 <?php foreach ($zMetrics as $k => $m):
-          echo mv_metric_bar($m['label'], $z[$k], ope_rol_mv_band5($z[$k], $m['bands']), $m['col']);
+          echo mv_metric_bar($m['label'], $z[$k], gbe_rol_mv_band5($z[$k], $m['bands']), $m['col']);
         endforeach; ?>
         </div>
       </button>
@@ -110,7 +110,7 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="em-bars">
 <?php foreach ($fMetrics as $k => $m):
           $signed = !empty($m['special']) && $m['special'] === 'rep';
-          $band = ope_rol_mv_faccion_metric_label($k, $f[$k]);
+          $band = gbe_rol_mv_faccion_metric_label($k, $f[$k]);
           echo mv_metric_bar($m['label'], $f[$k], $band, $m['col'], $signed);
         endforeach; ?>
         </div>
@@ -137,7 +137,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endif; ?>
 
 <?php
-$threadsPub = ope_rol_mv_threads_activos();
+$threadsPub = gbe_rol_mv_threads_activos();
 if (!empty($threadsPub)):
   $threadsActivos = array_filter($threadsPub, function($t) { return in_array($t['estado'] ?? '', ['activo', 'reabierto']); });
   if (!empty($threadsActivos)):
@@ -202,7 +202,7 @@ if (!empty($threadsPub)):
   <div id="zfull-<?php echo htmlspecialchars_uni($z['slug']); ?>" data-title="<?php echo htmlspecialchars_uni($z['nombre']); ?>">
     <div class="em-full-metrics">
 <?php foreach ($zMetrics as $k => $m):
-        echo mv_metric_bar($m['label'], $z[$k], ope_rol_mv_band5($z[$k], $m['bands']), $m['col']);
+        echo mv_metric_bar($m['label'], $z[$k], gbe_rol_mv_band5($z[$k], $m['bands']), $m['col']);
       endforeach; ?>
     </div>
 <?php if (trim((string)$z['notas']) !== ''): ?>
@@ -221,7 +221,7 @@ if (!empty($threadsPub)):
 ?>
       <div class="em-ten <?php echo mv_tension_class($info['valor']); ?>">
         <span class="em-ten-p"><?php echo htmlspecialchars_uni($na); ?> <em>vs</em> <?php echo htmlspecialchars_uni($nb); ?></span>
-        <span class="em-ten-l"><?php echo ope_rol_mv_tension_label($info['valor']); ?> <em><?php echo (int)$info['valor']; ?></em></span>
+        <span class="em-ten-l"><?php echo gbe_rol_mv_tension_label($info['valor']); ?> <em><?php echo (int)$info['valor']; ?></em></span>
       </div>
 <?php if (trim((string)$info['notas']) !== ''): ?>
       <p class="em-ten-note"><?php echo nl2br(htmlspecialchars_uni((string)$info['notas'])); ?></p>
@@ -236,7 +236,7 @@ if (!empty($threadsPub)):
 ?>
         <div class="em-ten <?php echo mv_tension_class($info['valor']); ?>">
           <span class="em-ten-p"><?php echo htmlspecialchars_uni($na); ?> <em>vs</em> <?php echo htmlspecialchars_uni($nb); ?></span>
-          <span class="em-ten-l"><?php echo ope_rol_mv_tension_label($info['valor']); ?> <em><?php echo (int)$info['valor']; ?></em></span>
+          <span class="em-ten-l"><?php echo gbe_rol_mv_tension_label($info['valor']); ?> <em><?php echo (int)$info['valor']; ?></em></span>
         </div>
 <?php if (trim((string)$info['notas']) !== ''): ?>
         <p class="em-ten-note"><?php echo nl2br(htmlspecialchars_uni((string)$info['notas'])); ?></p>

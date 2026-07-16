@@ -2,7 +2,7 @@
 /**
  * I-Forge · Tripulaciones
  * Catálogo de tripulaciones poblado desde BD (rol_tripulaciones). Sin mockup.
- * Estilos en docs/themes/ope.css (scope: ope-pg-tripulacion).
+ * Estilos en docs/themes/gbe.css (scope: gbe-pg-tripulacion).
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'tripulacion.php');
@@ -13,11 +13,11 @@ $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 $uid    = (int) ($mybb->user['uid'] ?? 0);
 $loggedin = $uid > 0;
 
-$FACCIONES     = ope_rol_facciones();
-$tripulaciones = ope_rol_cat_tripulaciones();
-$active_pid    = $loggedin ? ope_rol_pid_activo($uid) : 0;
-$mi_tripulacion = ($active_pid > 0) ? ope_rol_cat_tripulacion_de_personaje($active_pid) : null;
-$tramite_pendiente = ($active_pid > 0 && !$mi_tripulacion) ? ope_rol_cat_tripulacion_tramite_pendiente($active_pid) : null;
+$FACCIONES     = gbe_rol_facciones();
+$tripulaciones = gbe_rol_cat_tripulaciones();
+$active_pid    = $loggedin ? gbe_rol_pid_activo($uid) : 0;
+$mi_tripulacion = ($active_pid > 0) ? gbe_rol_cat_tripulacion_de_personaje($active_pid) : null;
+$tramite_pendiente = ($active_pid > 0 && !$mi_tripulacion) ? gbe_rol_cat_tripulacion_tramite_pendiente($active_pid) : null;
 
 $fac_labels = array();
 foreach ($FACCIONES as $slug => $f) { $fac_labels[$slug] = $f['nombre']; }
@@ -31,19 +31,19 @@ header('Content-Type: text/html; charset=utf-8');
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Tripulaciones</title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-tripulacion">
+<body class="gbe-pg-tripulacion">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb"><div class="breadcrumb-in"><a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span><b>Tripulaciones</b></div></div>
 
 <div class="wrap">
 
-  <section class="reveal ope-deco-split">
-    <?php echo ope_rol_deco_aside('ope/deco/tripulacion', 'Tripulación reunida en la cubierta de un navío', 'Tripulaciones'); ?>
-    <div class="ope-deco-split-main">
+  <section class="reveal gbe-deco-split">
+    <?php echo gbe_rol_deco_aside('ope/deco/tripulacion', 'Tripulación reunida en la cubierta de un navío', 'Tripulaciones'); ?>
+    <div class="gbe-deco-split-main">
       <div class="shead">
         <h1>Tripulaciones</h1>
         <span class="code">// navega con los tuyos</span>
@@ -130,7 +130,7 @@ header('Content-Type: text/html; charset=utf-8');
     grid.innerHTML = data.map(function(t){
       var i = data.indexOf(t);
       return '<article class="trip-card fac-'+esc(t.faccion)+'" data-i="'+i+'">'
-        + '<div class="trip-card-media">'+media(t)+'<span class="ope-tag ope-tag-'+esc(t.faccion)+' trip-card-fac">'+esc(facLbl(t.faccion))+'</span></div>'
+        + '<div class="trip-card-media">'+media(t)+'<span class="gbe-tag gbe-tag-'+esc(t.faccion)+' trip-card-fac">'+esc(facLbl(t.faccion))+'</span></div>'
         + '<div class="trip-card-body">'
           + '<h3 class="trip-card-nom">'+esc(t.nombre)+'</h3>'
           + '<div class="trip-card-cap"><span class="trip-card-cap-l">Capitán</span><span class="trip-card-cap-n">'+esc(t.capitan||'—')+'</span></div>'
@@ -150,7 +150,7 @@ header('Content-Type: text/html; charset=utf-8');
       + '<div class="trip-d-head fac-'+esc(t.faccion)+'">'
         + '<div class="trip-d-media">'+media(t)+'</div>'
         + '<div class="trip-d-title"><h2>'+esc(t.nombre)+'</h2>'
-        + '<span class="ope-tag ope-tag-'+esc(t.faccion)+'">'+esc(facLbl(t.faccion))+'</span></div>'
+        + '<span class="gbe-tag gbe-tag-'+esc(t.faccion)+'">'+esc(facLbl(t.faccion))+'</span></div>'
       + '</div>'
       + (t.lema?'<p class="trip-d-lema">«'+esc(t.lema)+'»</p>':'')
       + '<div class="trip-d-grid">'

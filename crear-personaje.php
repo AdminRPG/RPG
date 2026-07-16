@@ -1,13 +1,13 @@
 <?php
 /**
  * I-Forge · Forjar personaje (wizard de creación)
- * Página de front-end MyBB (dirección "One Piece Eternal").
+ * Página de front-end MyBB (dirección "Granblue Fantasy: Eternal").
  *
  * Wizard de un único envío (sin borradores intermedios) que sigue los
  * 7 pasos de one-piece-eternal-sistemas/01-creacion-de-personaje.md:
  * raza, concepto, stats, virtudes/defectos, facción, equipo, historia.
  *
- * Al enviar: valida TODO en servidor contra inc/ope_rol_data.php
+ * Al enviar: valida TODO en servidor contra inc/gbe_rol_data.php
  * (nunca confía en lo que calculó el JS), inserta en mybb_rol_personajes
  * con estado=revision y abre un trámite en mybb_rol_tramites para que el
  * staff lo apruebe desde "Mi expediente".
@@ -16,8 +16,8 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'crear-personaje.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
-require_once MYBB_ROOT . 'inc/ope_rol_wanted.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_data.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_wanted.php';
 
 $bburl    = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
@@ -25,22 +25,22 @@ $loggedin = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int)($mybb->user['uid'] ?? 0);
 $username = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
-require_once MYBB_ROOT . 'inc/ope_user_init.php';
+require_once MYBB_ROOT . 'inc/gbe_user_init.php';
 
-$staff_level = ope_get_staff_level($uid);
+$staff_level = gbe_get_staff_level($uid);
 
-$initials   = ope_get_initials($mybb->user['username'] ?? '');
+$initials   = gbe_get_initials($mybb->user['username'] ?? '');
 $initials_e = htmlspecialchars_uni($initials);
 
-$RAZAS      = ope_rol_razas();
-$VIRTUDES   = ope_rol_virtudes();
-$DEFECTOS   = ope_rol_defectos();
-$FACCIONES  = ope_rol_facciones();
-$PACKS      = ope_rol_packs_equipo();
-$STATS      = ope_rol_stats();
-$STAT_KEYS  = ope_rol_stat_keys();
-$PC_BASE    = ope_rol_pc_iniciales();
-$BERRIES_BASE = ope_rol_berries_iniciales();
+$RAZAS      = gbe_rol_razas();
+$VIRTUDES   = gbe_rol_virtudes();
+$DEFECTOS   = gbe_rol_defectos();
+$FACCIONES  = gbe_rol_facciones();
+$PACKS      = gbe_rol_packs_equipo();
+$STATS      = gbe_rol_stats();
+$STAT_KEYS  = gbe_rol_stat_keys();
+$PC_BASE    = gbe_rol_pc_iniciales();
+$RUPIES_BASE = gbe_rol_rupies_iniciales();
 
 // ─────────────────────────────────────────────────────────────
 // Slots disponibles
@@ -80,7 +80,7 @@ $errores = array();
 $ok = false;
 $old = $_POST;
 
-function ope_rol_clean($s, $max = 4000)
+function gbe_rol_clean($s, $max = 4000)
 {
     $s = trim((string)$s);
     if (function_exists('mb_substr')) {
@@ -108,10 +108,10 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         }
 
         // ---- Nombre ----
-        $nombre = ope_rol_clean($mybb->get_input('nombre'), 120);
-        $apodo = ope_rol_clean($mybb->get_input('apodo'), 60);
-        $edad = ope_rol_clean($mybb->get_input('edad'), 20);
-        $genero = ope_rol_clean($mybb->get_input('genero'), 40);
+        $nombre = gbe_rol_clean($mybb->get_input('nombre'), 120);
+        $apodo = gbe_rol_clean($mybb->get_input('apodo'), 60);
+        $edad = gbe_rol_clean($mybb->get_input('edad'), 20);
+        $genero = gbe_rol_clean($mybb->get_input('genero'), 40);
 
         if ($nombre === '' || function_exists('mb_strlen') ? mb_strlen($nombre, 'UTF-8') < 3 : strlen($nombre) < 3) {
             $errores[] = 'El nombre del personaje debe tener al menos 3 caracteres.';
@@ -139,9 +139,9 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         }
 
         // ---- Stats v2: reparto numérico de PS (5-100+) ----
-        $stats_base = ope_rol_stats_base(); // Todos en 5
+        $stats_base = gbe_rol_stats_base(); // Todos en 5
         $raza_data = isset($RAZAS[$raza1]) ? $RAZAS[$raza1] : array();
-        $ps_disponibles = ope_rol_ps_iniciales($raza1);
+        $ps_disponibles = gbe_rol_ps_iniciales($raza1);
 
         // Recoger valores repartidos por el jugador (vienen como array numerico)
         $ps_asignados_raw = $mybb->get_input('ps_stats', MyBB::INPUT_ARRAY);
@@ -177,10 +177,10 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         }
 
         // Aplicar pasivas raciales (multiplicadores %)
-        $stats_efectivas = ope_rol_aplicar_pasivas($stats_sin_pasivas, $raza_data);
+        $stats_efectivas = gbe_rol_aplicar_pasivas($stats_sin_pasivas, $raza_data);
         if ($hibrido && isset($RAZAS[$raza2])) {
             // En híbrido: solo primaria de ambas razas (no secundaria)
-            $stats_efectivas = ope_rol_aplicar_pasivas($stats_efectivas, $RAZAS[$raza2]);
+            $stats_efectivas = gbe_rol_aplicar_pasivas($stats_efectivas, $RAZAS[$raza2]);
         } elseif (!$hibrido) {
             // Puro: aplicar multiplicadores de secundaria
             $mults_sec = isset($raza_data['multiplicadores_secundaria']) ? $raza_data['multiplicadores_secundaria'] : array();
@@ -191,7 +191,7 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             }
         }
 
-        $suma = ope_rol_stat_sum($stats_efectivas);
+        $suma = gbe_rol_stat_sum($stats_efectivas);
         $nivel = 1;
 
         // ---- Virtudes y Defectos ----
@@ -203,9 +203,9 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         $pc_gastado = 0;
         $virtudes_sel = array();
         foreach ($virtudes_in as $vid) {
-            $v = ope_rol_find_virtud($vid);
+            $v = gbe_rol_find_virtud($vid);
             if ($v === null) continue;
-            $spec = !empty($v['spec']) ? ope_rol_clean($mybb->get_input('virtud_spec_' . $vid), 200) : '';
+            $spec = !empty($v['spec']) ? gbe_rol_clean($mybb->get_input('virtud_spec_' . $vid), 200) : '';
             if (!empty($v['spec']) && $spec === '') {
                 $errores[] = 'La virtud "' . $v['nombre'] . '" requiere que especifiques un detalle.';
             }
@@ -223,9 +223,9 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         $pc_devuelto = 0;
         $defectos_sel = array();
         foreach ($defectos_in as $did) {
-            $d = ope_rol_find_defecto($did);
+            $d = gbe_rol_find_defecto($did);
             if ($d === null) continue;
-            $spec = !empty($d['spec']) ? ope_rol_clean($mybb->get_input('defecto_spec_' . $did), 200) : '';
+            $spec = !empty($d['spec']) ? gbe_rol_clean($mybb->get_input('defecto_spec_' . $did), 200) : '';
             if (!empty($d['spec']) && $spec === '') {
                 $errores[] = 'El defecto "' . $d['nombre'] . '" requiere que especifiques un detalle.';
             }
@@ -249,15 +249,15 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         if (!isset($PACKS[$pack_equipo])) {
             $errores[] = 'Elige un Pack de Equipo Inicial válido.';
         }
-        $berries = $BERRIES_BASE;
-        if (isset($virtudes_sel['V-RIQ-01'])) $berries += 1000000;
-        if (isset($virtudes_sel['V-RIQ-02'])) $berries += 3000000;
-        if (isset($virtudes_sel['V-RIQ-03'])) $berries += 10000000;
+        $rupies = $RUPIES_BASE;
+        if (isset($virtudes_sel['V-RIQ-01'])) $rupies += 1000000;
+        if (isset($virtudes_sel['V-RIQ-02'])) $rupies += 3000000;
+        if (isset($virtudes_sel['V-RIQ-03'])) $rupies += 10000000;
 
         // ---- Historia ----
-        $historia_pasado = ope_rol_clean($mybb->get_input('historia_pasado'), 6000);
-        $historia_motivacion = ope_rol_clean($mybb->get_input('historia_motivacion'), 3000);
-        $historia_relaciones = ope_rol_clean($mybb->get_input('historia_relaciones'), 3000);
+        $historia_pasado = gbe_rol_clean($mybb->get_input('historia_pasado'), 6000);
+        $historia_motivacion = gbe_rol_clean($mybb->get_input('historia_motivacion'), 3000);
+        $historia_relaciones = gbe_rol_clean($mybb->get_input('historia_relaciones'), 3000);
         $min_len = function_exists('mb_strlen') ? mb_strlen($historia_pasado, 'UTF-8') : strlen($historia_pasado);
         if ($min_len < 80) {
             $errores[] = 'Cuenta el pasado de tu personaje con algo más de detalle (mínimo ~80 caracteres).';
@@ -296,7 +296,7 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             $inventario = array(
                 'pack_equipo' => $pack_equipo,
             );
-            $economia = array('berries' => $berries);
+            $economia = array('rupies' => $rupies, 'berries' => $rupies);
             $bio = array(
                 'pasado' => $historia_pasado,
                 'motivacion' => $historia_motivacion,
@@ -341,8 +341,8 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             $ok = true;
 
             // Inicializar Wanted según raza
-            if (function_exists('ope_wanted_init_raza')) {
-                ope_wanted_init_raza((int)$pid, $raza1);
+            if (function_exists('gbe_wanted_init_raza')) {
+                gbe_wanted_init_raza((int)$pid, $raza1);
             }
         }
     }
@@ -360,12 +360,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Crear personaje</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-crear-personaje) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-crear-personaje) -->
 </head>
-<body class="ope-pg-crear-personaje">
+<body class="gbe-pg-crear-personaje">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

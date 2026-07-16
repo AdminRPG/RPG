@@ -24,12 +24,12 @@ $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 // El rol de staff vive en el personaje: si tienes activo un personaje sin rol,
 // no eres staff aquí aunque otro de tus personajes lo sea.
 $staff = $loggedin
-    ? ope_rol_active_staff($uid)
+    ? gbe_rol_active_staff($uid)
     : array('pid' => 0, 'rol' => '', 'narrador' => 0, 'rank' => 0, 'is_staff' => false, 'nombre' => '');
 $rank      = (int) $staff['rank'];
 $narrador  = (int) $staff['narrador'];
 $is_staff  = !empty($staff['is_staff']);
-$rol_lbl   = ope_rol_staff_label($staff['rol']);
+$rol_lbl   = gbe_rol_staff_label($staff['rol']);
 $char_name = htmlspecialchars_uni((string) $staff['nombre']);
 
 // Etiqueta de rango a mostrar ("Administrador + Narrador", "Narrador", ...).
@@ -93,7 +93,7 @@ if ($db->table_exists('rol_tecnicas')) {
 $mv_eventos_pend = 0;
 $mv_noticias_activas = 0;
 if ($db->table_exists('rol_mv_eventos')) {
-    $mv_ciclo = ope_rol_mv_ciclo_actual();
+    $mv_ciclo = gbe_rol_mv_ciclo_actual();
     if (is_array($mv_ciclo)) {
         $mv_eventos_pend = (int) $db->fetch_field($db->simple_select('rol_mv_eventos', 'COUNT(*) c', "ciclo_id = " . (int)$mv_ciclo['ciclo_id'] . " AND estado = 'pendiente'"), 'c');
     }
@@ -107,8 +107,8 @@ if ($db->table_exists('rol_npcs_secundarios')) {
     $npc_sec_count = (int) $db->fetch_field($db->simple_select('rol_npcs_secundarios', 'COUNT(*) c'), 'c');
 }
 
-$acomp_sol_pend = function_exists('ope_rol_acompanante_solicitudes_pend_count')
-    ? ope_rol_acompanante_solicitudes_pend_count()
+$acomp_sol_pend = function_exists('gbe_rol_acompanante_solicitudes_pend_count')
+    ? gbe_rol_acompanante_solicitudes_pend_count()
     : 0;
 
 $trip_tramites_pend = 0;
@@ -210,12 +210,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Zona Staff</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-zona-staff) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-zona-staff) -->
 </head>
-<body class="ope-pg-zona-staff">
+<body class="gbe-pg-zona-staff">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

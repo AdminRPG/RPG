@@ -1,10 +1,10 @@
 # PLAN MAESTRO — GRANBLUE FANTASY: ETERNAL
 
-> **Propuesta de reconversión total** del foro (hoy *One Piece Eternal*, codename `ope`, restos `iforge`) a **Granblue Fantasy: Eternal**: un foro de rol play-by-post ambientado en el **universo de Granblue Fantasy** (el cielo de islas flotantes, Skyfarers, Primal Beasts) con **historia y personajes propios**, conservando lo que hace grandes a los foros de One Piece.
+> **Propuesta de reconversión total** del foro (hoy *Granblue Fantasy: Eternal*, codename `ope`, restos `iforge`) a **Granblue Fantasy: Eternal**: un foro de rol play-by-post ambientado en el **universo de Granblue Fantasy** (el cielo de islas flotantes, Skyfarers, Primal Beasts) con **historia y personajes propios**, conservando lo que hace grandes a los foros de One Piece.
 >
 > **Los 6 pilares que NO se negocian:** `Personalización · Combate · Tramas · Misiones · Social · Aventuras`.
 >
-> **Fuentes de verdad del diseño:** `docs/themes/ope.css` (servido desde `cache/themes/theme13/ope.css`) + `docs/DESIGN-GRANBLUE-ETERNAL.md`.
+> **Fuentes de verdad del diseño:** `docs/themes/gbe.css` (servido desde `cache/themes/theme13/gbe.css`) + `docs/DESIGN-GRANBLUE-ETERNAL.md`.
 >
 > **Documentos hermanos:** `MIGRACION-GRANBLUE-TECNICA.md` (proceso de purga).
 >
@@ -42,7 +42,7 @@
 | Assets Skydom | `skydom-zeephone.jpg`, `skydom-estalucia.jpg` |
 | Wizard GBF | F3 — razas, clases, elemento, arma en `crear-personaje.php` |
 | BD mecánicas | `rol_clases`, `rol_renombre`, `rol_pactos`, `elemento`, `nave_json` |
-| Facciones GBF | `ope_rol_facciones()` sigue OP (Marine/Pirata…) hasta F3 |
+| Facciones GBF | `gbe_rol_facciones()` sigue OP (Marine/Pirata…) hasta F3 |
 
 ### Descartado en prototipo ❌
 
@@ -100,7 +100,7 @@ Cada Skyfarer tiene **tres assets propios**, configurables por el dueño en Gest
 1. [Visión y posicionamiento](#1-visión-y-posicionamiento)
 2. [Los 6 pilares → sistemas](#2-los-6-pilares--sistemas)
 3. [Identidad de marca y dirección estética](#3-identidad-de-marca-y-dirección-estética)
-4. [Transformación visual: de ope.css a Granblue](#4-transformación-visual-de-opecss-a-granblue)
+4. [Transformación visual: de gbe.css a Granblue](#4-transformación-visual-de-opecss-a-granblue)
 5. [El mundo: Skydoms y estructura del foro](#5-el-mundo-skydoms-y-estructura-del-foro)
 6. [Personalización: razas, clases, poder único](#6-personalización-razas-clases-poder-único)
 7. [Combate: el motor que conservamos](#7-combate-el-motor-que-conservamos)
@@ -150,7 +150,7 @@ Cada pilar se ancla a código existente. La regla: **el motor se conserva, el sk
 - Poder único vía **Pacto Primal** (opcional, panel en ficha; la mayoría sin pacto).
 
 ### 2.2 Combate
-- Motor `inc/ope_rol_system.php` intacto (PV/EN/PA, heridas localizadas, estados).
+- Motor `inc/gbe_rol_system.php` intacto (PV/EN/PA, heridas localizadas, estados).
 - Añadido opcional: **ventaja elemental** (6 elementos GBF) y **Charge/Chain**.
 - Parser `[rpgsys]` + dados bloqueados = justicia percibida.
 
@@ -170,7 +170,7 @@ Cada pilar se ancla a código existente. La regla: **el motor se conserva, el sk
 
 ### 2.6 Aventuras
 - Estructura del foro por **Skydoms** (regiones) con progresión geográfica.
-- Viajes entre islas (`inc/ope_rol_viajes.php`) → rutas de aeronave.
+- Viajes entre islas (`inc/gbe_rol_viajes.php`) → rutas de aeronave.
 - Eventos de mundo vivo que abren nuevas islas.
 
 ---
@@ -202,13 +202,13 @@ Cada pilar se ancla a código existente. La regla: **el motor se conserva, el sk
 
 ---
 
-## 4. Transformación visual: de ope.css a Granblue
+## 4. Transformación visual: de gbe.css a Granblue
 
-> El CSS real hoy (`ope.css`) usa una **paleta océano** (`--op-ocean:#10477B`, acentos melocotón `--ember:#FFCB93`) y fuentes **Big Shoulders Display / Space Mono / Archivo**, con scoping por página `body.ope-pg-*`. La reconversión visual toca `:root`, fuentes y copy — la **estructura de componentes se conserva**.
+> El CSS real hoy (`gbe.css`) usa una **paleta océano** (`--op-ocean:#10477B`, acentos melocotón `--ember:#FFCB93`) y fuentes **Big Shoulders Display / Space Mono / Archivo**, con scoping por página `body.gbe-pg-*`. La reconversión visual toca `:root`, fuentes y copy — la **estructura de componentes se conserva**.
 
 ### 4.1 Sistema de dos temas (CERRADO)
 
-Inspirado en la identidad Granblue (ver `docs/references/relink.granbluefantasy.jp/resumen.md`): índigo cielo + oro amanecer + turquesa Éter + crema pergamino. Se implementan **dos temas** conmutables reusando el sistema de variables `:root` de `ope.css` (se conservan los nombres de variable, cambian los valores).
+Inspirado en la identidad Granblue (ver `docs/references/relink.granbluefantasy.jp/resumen.md`): índigo cielo + oro amanecer + turquesa Éter + crema pergamino. Se implementan **dos temas** conmutables reusando el sistema de variables `:root` de `gbe.css` (se conservan los nombres de variable, cambian los valores).
 
 **Tema A — "Amanecer" (oscuro, por defecto):** el cielo antes del alba visto desde una aeronave.
 
@@ -266,13 +266,13 @@ Inspirado en la identidad Granblue (ver `docs/references/relink.granbluefantasy.
 
 | Archivo | Versión | Estructura clave |
 |---|---|---|
-| `docs/Prototypes/Granblue/index.html` | v3.2 | Hero-carrusel 4 slides (portada + 3 ambientación) · flechas laterales · Gaceta bento · **Skydoms bento** (como `ope-world-bento`) · **Off Topic slab** · censo |
+| `docs/Prototypes/Granblue/index.html` | v3.2 | Hero-carrusel 4 slides (portada + 3 ambientación) · flechas laterales · Gaceta bento · **Skydoms bento** (como `gbe-world-bento`) · **Off Topic slab** · censo |
 | `docs/Prototypes/Granblue/ficha.html` | v4 | **Banner 16:9** · tarjeta identidad (avatar 72px + chips + renombre/vitales) · tabs: Atributos / Crónica / Combate / Equipo / Relaciones |
 
 **Index — mapa del foro en portada (igual que `index.php` real):**
-1. Categoría **El Cielo** → foros hijos = **Skydoms** → paneles-región con imagen (`ope_render_region_cards`).
+1. Categoría **El Cielo** → foros hijos = **Skydoms** → paneles-región con imagen (`gbe_render_region_cards`).
 2. Al entrar en un Skydom → **islas** como subforos (`forumdisplay.php`).
-3. Categoría **Off Topic** → filas `ope-forum` en placa (`ope-slab`), debajo de El Cielo.
+3. Categoría **Off Topic** → filas `gbe-forum` en placa (`gbe-slab`), debajo de El Cielo.
 
 **Ficha — campos visibles en cabecera (GBF):**
 - Mantener: elemento, clase, arma, raza, renombre, nivel/rango, crew, PV/Éter/PA, estado.
@@ -334,9 +334,9 @@ Hoy: `--fac-pirata`, `--fac-marine`, `--fac-revolucionario`, `--fac-gobierno`, `
 Propuesta GBF: `--fac-skyfarer`, `--fac-imperio`, `--fac-sociedad`, `--fac-orden`, `--fac-gremio`, `--fac-libre`.
 
 ### 4.5 Proceso técnico del reskin visual
-1. Editar `:root` en `docs/themes/ope.css` (paleta + fuentes + facciones).
+1. Editar `:root` en `docs/themes/gbe.css` (paleta + fuentes + facciones).
 2. Cambiar el link de Google Fonts (§14 del DESIGN) a las nuevas familias.
-3. Renombrar scope `body.ope-pg-*` → `body.<codename>-pg-*` (ver §10).
+3. Renombrar scope `body.gbe-pg-*` → `body.<codename>-pg-*` (ver §10).
 4. `php scripts/sync-theme.php import && verify` → `OK CSS: in sync`.
 5. `php scripts/check-inline-styles.php` limpio.
 6. ~~Reescribir `DESIGN-ONE-PIECE-ETERNAL.md` → `DESIGN-GRANBLUE-ETERNAL.md`.~~ ✅
@@ -362,7 +362,7 @@ PORTADA
 └── FOOTER
 ```
 
-Código de referencia: `index.php` L741–832 (`$isWorld` → `ope_render_region_cards` + `ope-world-bento`).
+Código de referencia: `index.php` L741–832 (`$isWorld` → `gbe_render_region_cards` + `gbe-world-bento`).
 
 ### 5.2 Árbol conceptual del foro
 
@@ -402,7 +402,7 @@ GRANBLUE FANTASY: ETERNAL
 
 ## 6. Personalización: razas, clases, poder único
 
-### 6.1 Razas jugables (reemplazan `ope_rol_razas()`)
+### 6.1 Razas jugables (reemplazan `gbe_rol_razas()`)
 
 | Raza GBF | Rasgo | Afinidad de stats sugerida |
 |---|---|---|
@@ -418,7 +418,7 @@ GRANBLUE FANTASY: ETERNAL
 
 Ver **§0.3**. El wizard (`crear-personaje.php`) debe pedir o sugerir avatar + icono; el banner se configura después en Gestión. Placeholder de banner: gradiente por elemento hasta que el jugador suba URL.
 
-### 6.2 Clases / Jobs (reskin de Haki → `inc/ope_rol_clases.php`)
+### 6.2 Clases / Jobs (reskin de Haki → `inc/gbe_rol_clases.php`)
 
 GBF tiene un sistema de clases icónico. Propuesta: cada PJ elige una **clase** (ramas × niveles) que define técnicas disponibles y bonus. Reutiliza la mecánica de progresión por tiers del Haki.
 
@@ -443,7 +443,7 @@ Los **6 elementos de GBF** con triángulo de ventaja. **Fijo en creación** (§0
 
 ## 7. Combate: el motor que conservamos
 
-**Principio: no se reescribe el motor.** `inc/ope_rol_system.php` (PV/EN/PA, heridas localizadas `ope_combat_herida_*`, estados `ope_combat_estados`) se conserva y se renombra de codename. Lo que cambia:
+**Principio: no se reescribe el motor.** `inc/gbe_rol_system.php` (PV/EN/PA, heridas localizadas `gbe_combat_herida_*`, estados `gbe_combat_estados`) se conserva y se renombra de codename. Lo que cambia:
 
 | Elemento | Acción |
 |---|---|
@@ -480,7 +480,7 @@ El gancho de largo plazo (equivalente al "One Piece" como misterio): **Estalucia
 NPCs secundarios (`rol_npcs_secundarios`) pueden marcarse como **summon** invocable 1×/combate.
 
 ### 9.3 Renombre (reskin de Wanted)
-`inc/ope_rol_wanted.php` → `renombre`. La fama del Skyfarer por Skydom, visible en la carta, con rangos (Novato → Leyenda del Cielo).
+`inc/gbe_rol_wanted.php` → `renombre`. La fama del Skyfarer por Skydom, visible en la carta, con rangos (Novato → Leyenda del Cielo).
 
 ---
 
@@ -489,9 +489,9 @@ NPCs secundarios (`rol_npcs_secundarios`) pueden marcarse como **summon** invoca
 Detalle completo en `MIGRACION-GRANBLUE-TECNICA.md`. Resumen:
 
 - **Codename:** `ope`/`iforge` → nuevo prefijo (decisión §12). Script `rename-<codename>.php` clonando `scripts/rename-ope.php`.
-- **Archivos:** renombrar `inc/ope_rol_*.php`, `haki.php`, `biblioteca-akuma.php`, temas XML; borrar seeds OP (`seed-yonko`, `seed-marines`, `seed-isabella`).
+- **Archivos:** renombrar `inc/gbe_rol_*.php`, `haki.php`, `biblioteca-akuma.php`, temas XML; borrar seeds OP (`seed-yonko`, `seed-marines`, `seed-isabella`).
 - **BD:** conservar prefijo `rol_`; renombrar `rol_haki`→`rol_clases`, `rol_wanted`→`rol_renombre`; nuevas `rol_pactos`, columnas `elemento`/`nave_json`.
-- **Marca:** `bbname`, datacache `ope_home`, bot `OP-Eternal`→`Lyria`.
+- **Marca:** `bbname`, datacache `gbe_home`, bot `GBEternal`→`Lyria`.
 - **Validación:** greps a cero + `check-inline-styles` + `sync-theme verify` + graphify update.
 
 ---
@@ -502,7 +502,7 @@ Detalle completo en `MIGRACION-GRANBLUE-TECNICA.md`. Resumen:
 |---|---|---|---|---|
 | **F0** | Decisiones | ✅ | Cuestionario §12 | §0.1 |
 | **F2a** | Prototipo HTML | ✅ | index v3.2 + ficha v4 + assets globales | `docs/Prototypes/Granblue/` |
-| **F2b** | Portado visual MyBB | ⏳ **EN CURSO** | `ope.css`, `ope-index.xml`, `index.php`, `ficha.php`, sync-theme | Paridad portada con prototipo |
+| **F2b** | Portado visual MyBB | ⏳ **EN CURSO** | `gbe.css`, `gbe-index.xml`, `index.php`, `ficha.php`, sync-theme | Paridad portada con prototipo |
 | **F2c** | DESIGN + PRODUCT GBF | ✅ | `DESIGN-GRANBLUE-ETERNAL.md`, `PRODUCT.md` | Fuente de verdad §5 |
 | **F1** | Purga codename | ⏳ | `rename-gbe.php`, greps, bbname, Lyria bot | Cero `ope`/`iforge` |
 | **F3** | Datos y catálogos | ⏳ | razas, facciones, clases, elementos, Skydoms en wizard | `crear-personaje.php` GBF |
@@ -557,7 +557,7 @@ Detalle completo en `MIGRACION-GRANBLUE-TECNICA.md`. Resumen:
 
 Tras cerrar prototipos, el camino natural es **F2b (portar a MyBB)**. Alternativas válidas:
 
-1. **Portar index + ficha al tema real** (`ope.css`, templates, `ficha.php`) siguiendo prototipos.
+1. **Portar index + ficha al tema real** (`gbe.css`, templates, `ficha.php`) siguiendo prototipos.
 2. **Purga codename `ope`→`gbe`** antes del portado (más trabajo upfront, menos deuda).
 3. **Generar assets Skydom faltantes** (Zeephone, Estalucia) y revalidar prototipo.
 4. **Reestructurar foros en BD** (categorías El Cielo + Skydoms + islas + Off Topic).

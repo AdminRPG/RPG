@@ -16,15 +16,15 @@ $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid = (int)($mybb->user['uid'] ?? 0);
 
-$staff = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0);
+$staff = $loggedin ? gbe_rol_active_staff($uid) : array('rank' => 0);
 $is_admin = ((int)$staff['rank'] >= 3);
 
 // ── Opciones de selects reutilizables ──
 $fac_opts = array();
-foreach (ope_rol_facciones() as $slug => $f) { $fac_opts[$slug] = $f['nombre']; }
+foreach (gbe_rol_facciones() as $slug => $f) { $fac_opts[$slug] = $f['nombre']; }
 $tienda_opts = array();
-foreach (ope_rol_cat_tiendas() as $slug => $t) { $tienda_opts[$slug] = $t['nombre']; }
-$cat_prod_opts = ope_rol_cat_categoria_labels();
+foreach (gbe_rol_cat_tiendas() as $slug => $t) { $tienda_opts[$slug] = $t['nombre']; }
+$cat_prod_opts = gbe_rol_cat_categoria_labels();
 $rareza_opts = array('Común' => 'Común', 'Raro' => 'Raro', 'Épico' => 'Épico', 'Legendario' => 'Legendario');
 $dif_opts = array('Baja' => 'Baja', 'Media' => 'Media', 'Alta' => 'Alta', 'Legendaria' => 'Legendaria');
 $peligro_opts = array('Bajo' => 'Bajo', 'Moderado' => 'Moderado', 'Alto' => 'Alto', 'Extremo' => 'Extremo');
@@ -223,11 +223,11 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Gestionar catálogos</title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-gestionar-catalogos ope-pg-mundo-vivo">
+<body class="gbe-pg-gestionar-catalogos gbe-pg-mundo-vivo">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

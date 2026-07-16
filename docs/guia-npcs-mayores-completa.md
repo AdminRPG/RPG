@@ -1,4 +1,4 @@
-# Guía Definitiva de NPCs Mayores — One Piece Eternal · I-Forge (v2)
+# Guía Definitiva de NPCs Mayores — Granblue Fantasy: Eternal · I-Forge (v2)
 
 > **Propósito:** Cómo tomar cualquier NPC del lore y convertirlo en un **NPC Mayor completamente funcional** en el sistema. Todas las descripciones son extensas y detalladas porque alimentan directamente el prompt de la IA del Mundo Vivo.
 >
@@ -35,7 +35,7 @@ El sistema usa **12 stats numéricas** agrupadas en 3 pilares. Cada stat arranca
 | | Voluntad | VOL |
 | | Sensibilidad | SEN |
 
-La **suma de las 12 stats** dividida entre 10 determina el **nivel** del personaje: `nivel = floor(suma / 10)`. El nivel se traduce a una etiqueta según `ope_rol_nivel_label()`:
+La **suma de las 12 stats** dividida entre 10 determina el **nivel** del personaje: `nivel = floor(suma / 10)`. El nivel se traduce a una etiqueta según `gbe_rol_nivel_label()`:
 
 | Nivel | Etiqueta |
 |---|---|
@@ -48,7 +48,7 @@ La **suma de las 12 stats** dividida entre 10 determina el **nivel** del persona
 | 80-99 | Emperador |
 | 100+ | Leyenda |
 
-Y cada stat individual tiene su propia etiqueta según `ope_rol_stat_label()`:
+Y cada stat individual tiene su propia etiqueta según `gbe_rol_stat_label()`:
 
 | Valor | Etiqueta |
 |---|---|
@@ -80,13 +80,13 @@ Y cada stat individual tiene su propia etiqueta según `ope_rol_stat_label()`:
 > [!CAUTION]
 > **Sin `desc_fisica`, `personalidad` y `bio`, la ficha del NPC se ve vacía.** `datos_publicos` alimenta el prompt de la IA pero NO se muestra en `ficha.php`. La ficha lee las columnas `desc_fisica`, `from_fisico`, `personalidad`, y el JSON `bio` (concepto, pasado, motivacion). Si solo rellenas `datos_publicos`, la IA sabrá quién es el NPC pero los jugadores verán una ficha casi en blanco.
 >
-> **Sin `datos_publicos`/`datos_internos`, el NPC es un fantasma para la IA.** La función `ope_rol_mv_npc_mayores()` lee *todos* los NPCs con `es_npc=1`, pero si no tienen estos JSONs rellenos, el prompt de la IA los lista como `zona: ? | ubicación: ? | estado: ? | acción:` — la IA no tiene con qué trabajar y los ignora narrativamente.
+> **Sin `datos_publicos`/`datos_internos`, el NPC es un fantasma para la IA.** La función `gbe_rol_mv_npc_mayores()` lee *todos* los NPCs con `es_npc=1`, pero si no tienen estos JSONs rellenos, el prompt de la IA los lista como `zona: ? | ubicación: ? | estado: ? | acción:` — la IA no tiene con qué trabajar y los ignora narrativamente.
 >
 > **Hay que rellenar AMBOS grupos**: los campos de ficha (`desc_fisica`, `personalidad`, `bio`) para los jugadores, y los JSONs (`datos_publicos`, `datos_internos`) para la IA.
 
 ### Cómo consume el prompt de la IA los datos del NPC
 
-La función `ope_rol_mv_generar_prompt()` en `inc/ope_rol_mundo.php` construye esto para **cada NPC mayor**:
+La función `gbe_rol_mv_generar_prompt()` en `inc/gbe_rol_mundo.php` construye esto para **cada NPC mayor**:
 
 ```
 - Isabella D. Vega | facción: pirata | nivel: 82 (Emperador) | zona: paraiso | ubicación: Marineford — Celda | estado: Capturada | acción: Esperando ejecución | título: Reina Pirata | desc: [TODA la descripción de datos_publicos.descripcion, SIN truncar]
@@ -703,4 +703,4 @@ flowchart TD
 
 ---
 
-*Guía v2 — 2026-07-14. Verificada contra el código real de `ope_rol_mv_generar_prompt()`, `ope_rol_mv_npc_mayores()`, `crear-npc.php`, `crear-personaje.php` y `ficha.php`.*
+*Guía v2 — 2026-07-14. Verificada contra el código real de `gbe_rol_mv_generar_prompt()`, `gbe_rol_mv_npc_mayores()`, `crear-npc.php`, `crear-personaje.php` y `ficha.php`.*

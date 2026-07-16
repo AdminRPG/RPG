@@ -18,7 +18,7 @@ $templatelist .= ",forumbit_moderators_group,forumbit_moderators_user,forumbit_d
 require_once './global.php';
 require_once MYBB_ROOT.'inc/functions_forumlist.php';
 require_once MYBB_ROOT.'inc/class_parser.php';
-require_once MYBB_ROOT.'inc/ope_functions.php';
+require_once MYBB_ROOT.'inc/gbe_functions.php';
 $parser = new postParser;
 
 // Load global language phrases
@@ -467,35 +467,35 @@ $forums = $forum_list['forum_list'];
 $plugins->run_hooks('index_end');
 
 // I-Forge: Register link for guests
-$ope_register_link = '';
+$gbe_register_link = '';
 if ($mybb->user['uid'] == 0) {
-    $ope_register_link = '<a href="'.$mybb->settings['bburl'].'/member.php?action=register" class="ope-nav-link" style="color:var(--color-accent)">Registrarse</a>';
+    $gbe_register_link = '<a href="'.$mybb->settings['bburl'].'/member.php?action=register" class="gbe-nav-link" style="color:var(--color-accent)">Registrarse</a>';
 }
 
 // I-Forge navbar: Zona Privada link visibility
-$ope_zona_privada_link = '';
+$gbe_zona_privada_link = '';
 if ($mybb->usergroup['cancp'] == 1 || $mybb->usergroup['issupermod'] == 1) {
-    $ope_zona_privada_link = '<a href="'.$mybb->settings['bburl'].'/private.php" class="ope-nav-link">Zona Privada</a>';
+    $gbe_zona_privada_link = '<a href="'.$mybb->settings['bburl'].'/private.php" class="gbe-nav-link">Zona Privada</a>';
 }
 
 // I-Forge navbar: User menu
 if ($mybb->user['uid']) {
-    $ope_user_menu = '
-    <div class="ope-user-menu">
-      <button class="ope-user-btn" id="ope-user-btn">
+    $gbe_user_menu = '
+    <div class="gbe-user-menu">
+      <button class="gbe-user-btn" id="gbe-user-btn">
         <img src="'.$mybb->settings['bburl'].'/images/nav-icon.svg" width="28" height="28" alt="Personaje">
       </button>
-      <div class="ope-dropdown" id="ope-dropdown">
-        <a href="'.$mybb->settings['bburl'].'/mensajes.php" class="ope-dropdown-item">Mensajería</a>
-        <a href="'.$mybb->settings['bburl'].'/configuracion.php" class="ope-dropdown-item">Configuración</a>
-        <hr class="ope-dropdown-divider">
-        <a href="'.$mybb->settings['bburl'].'/member.php?action=logout&amp;logoutkey='.$mybb->user['logoutkey'].'" class="ope-dropdown-item">Cerrar sesión</a>
+      <div class="gbe-dropdown" id="gbe-dropdown">
+        <a href="'.$mybb->settings['bburl'].'/mensajes.php" class="gbe-dropdown-item">Mensajería</a>
+        <a href="'.$mybb->settings['bburl'].'/configuracion.php" class="gbe-dropdown-item">Configuración</a>
+        <hr class="gbe-dropdown-divider">
+        <a href="'.$mybb->settings['bburl'].'/member.php?action=logout&amp;logoutkey='.$mybb->user['logoutkey'].'" class="gbe-dropdown-item">Cerrar sesión</a>
       </div>
     </div>';
 } else {
-    $ope_user_menu = '
-    <a href="'.$mybb->settings['bburl'].'/member.php?action=login" class="ope-nav-link">Iniciar sesión</a>
-    '.$ope_register_link;
+    $gbe_user_menu = '
+    <a href="'.$mybb->settings['bburl'].'/member.php?action=login" class="gbe-nav-link">Iniciar sesión</a>
+    '.$gbe_register_link;
 }
 
 // I-Forge: Random banner
@@ -511,14 +511,14 @@ if (!empty($banners)) {
 $calendario_texto = 'DÍA 1 · PRIMAVERA · AÑO I';
 
 // I-Forge: Latest posts (feed with avatar initial + relative time)
-// El autor mostrado es el PERSONAJE que posteó (ope_pid), no la cuenta.
-$ope_latest_posts = '';
-$ope_has_rol = $db->table_exists('rol_personajes');
+// El autor mostrado es el PERSONAJE que posteó (gbe_pid), no la cuenta.
+$gbe_latest_posts = '';
+$gbe_has_rol = $db->table_exists('rol_personajes');
 $feedSelect = "p.pid, p.subject, p.tid, p.uid, p.dateline, u.username";
 $feedJoin   = "";
-if ($ope_has_rol) {
-    $feedSelect .= ", p.ope_pid, rp.nombre AS char_name";
-    $feedJoin    = "LEFT JOIN ".TABLE_PREFIX."rol_personajes rp ON (rp.pid = p.ope_pid)";
+if ($gbe_has_rol) {
+    $feedSelect .= ", p.gbe_pid, rp.nombre AS char_name";
+    $feedJoin    = "LEFT JOIN ".TABLE_PREFIX."rol_personajes rp ON (rp.pid = p.gbe_pid)";
 }
 $q = $db->query("
     SELECT {$feedSelect}
@@ -530,7 +530,7 @@ $q = $db->query("
     LIMIT 6
 ");
 while ($post = $db->fetch_array($q)) {
-    $charPid  = (int) ($post['ope_pid'] ?? 0);
+    $charPid  = (int) ($post['gbe_pid'] ?? 0);
     $charName = trim((string) ($post['char_name'] ?? ''));
     if ($charPid > 0 && $charName !== '') {
         $author   = $charName;
@@ -540,20 +540,20 @@ while ($post = $db->fetch_array($q)) {
         $linkHref = '';
     }
     $initial = htmlspecialchars_uni(my_strtoupper(my_substr($author, 0, 1)));
-    $ope_latest_posts .= '
-    <a href="'.$mybb->settings['bburl'].'/showthread.php?tid='.$post['tid'].'&amp;pid='.$post['pid'].'#pid'.$post['pid'].'" class="ope-feed-i">
-        <span class="ope-feed-av">'.$initial.'</span>
-        <span class="ope-feed-main">
-            <span class="ope-feed-t">'.htmlspecialchars_uni($post['subject']).'</span>
-            <span class="ope-feed-m">'.htmlspecialchars_uni($author).' &middot; '.ope_reltime($post['dateline']).'</span>
+    $gbe_latest_posts .= '
+    <a href="'.$mybb->settings['bburl'].'/showthread.php?tid='.$post['tid'].'&amp;pid='.$post['pid'].'#pid'.$post['pid'].'" class="gbe-feed-i">
+        <span class="gbe-feed-av">'.$initial.'</span>
+        <span class="gbe-feed-main">
+            <span class="gbe-feed-t">'.htmlspecialchars_uni($post['subject']).'</span>
+            <span class="gbe-feed-m">'.htmlspecialchars_uni($author).' &middot; '.gbe_reltime($post['dateline']).'</span>
         </span>
     </a>';
 }
 
 // I-Forge: Home dynamic content (curiosidades + lore) — stored as JSON in datacache, admin-editable
-$ope_home = $cache->read('ope_home');
-if (!is_array($ope_home) || empty($ope_home)) {
-    $ope_home = [
+$gbe_home = $cache->read('gbe_home');
+if (!is_array($gbe_home) || empty($gbe_home)) {
+    $gbe_home = [
         'curiosidades' => [
             'En el Grand Line las brújulas normales no sirven: solo un Log Pose marca el rumbo entre islas.',
             'La escala de poder mide fuerza, no tamaño. Un rango alto impone aunque el personaje parezca inofensivo.',
@@ -568,24 +568,24 @@ if (!is_array($ope_home) || empty($ope_home)) {
         'rol_epoch' => mktime(0, 0, 0, 1, 1, 2026),
         'discord_url' => 'https://discord.gg/',
     ];
-    $cache->update('ope_home', $ope_home);
+    $cache->update('gbe_home', $gbe_home);
 }
 // Afiliados (admin-editable). 'hermanos' = botones grandes; 'afiliados' = botones 88x31.
 // Cada entrada: ['url' => ..., 'img' => ..., 'nombre' => ...].
-if (!isset($ope_home['afiliados'])) { $ope_home['afiliados'] = []; }
-if (!isset($ope_home['hermanos'])) { $ope_home['hermanos'] = []; }
-$ope_hermanos = is_array($ope_home['hermanos']) ? $ope_home['hermanos'] : [];
-$ope_afiliados = is_array($ope_home['afiliados']) ? $ope_home['afiliados'] : [];
+if (!isset($gbe_home['afiliados'])) { $gbe_home['afiliados'] = []; }
+if (!isset($gbe_home['hermanos'])) { $gbe_home['hermanos'] = []; }
+$gbe_hermanos = is_array($gbe_home['hermanos']) ? $gbe_home['hermanos'] : [];
+$gbe_afiliados = is_array($gbe_home['afiliados']) ? $gbe_home['afiliados'] : [];
 
 // GBE: banner del hero — images/gbe/hero-mundo.jpg
-$ope_hero_banner = $mybb->settings['bburl'] . '/images/gbe/hero-mundo.jpg';
+$gbe_hero_banner = $mybb->settings['bburl'] . '/images/gbe/hero-mundo.jpg';
 if (!is_file(MYBB_ROOT . 'images/gbe/hero-mundo.jpg')) {
-    $ope_hero_banner = '';
+    $gbe_hero_banner = '';
 }
 
 // Construye los botones de afiliados/hermanos (HTML) para el template.
-$ope_hermanos_html = '';
-foreach ($ope_hermanos as $af) {
+$gbe_hermanos_html = '';
+foreach ($gbe_hermanos as $af) {
     $url = htmlspecialchars_uni((string)($af['url'] ?? '#'));
     $img = trim((string)($af['img'] ?? ''));
     $nombre = htmlspecialchars_uni((string)($af['nombre'] ?? 'Afiliado hermano'));
@@ -594,10 +594,10 @@ foreach ($ope_hermanos as $af) {
     } else {
         $inner = '<span>'.$nombre.'</span>';
     }
-    $ope_hermanos_html .= '<a href="'.$url.'" class="ope-afil-hermano" title="'.$nombre.'" target="_blank" rel="noopener">'.$inner.'</a>';
+    $gbe_hermanos_html .= '<a href="'.$url.'" class="gbe-afil-hermano" title="'.$nombre.'" target="_blank" rel="noopener">'.$inner.'</a>';
 }
-$ope_afiliados_html = '';
-foreach ($ope_afiliados as $af) {
+$gbe_afiliados_html = '';
+foreach ($gbe_afiliados as $af) {
     $url = htmlspecialchars_uni((string)($af['url'] ?? '#'));
     $img = trim((string)($af['img'] ?? ''));
     $nombre = htmlspecialchars_uni((string)($af['nombre'] ?? 'Afiliado'));
@@ -606,11 +606,11 @@ foreach ($ope_afiliados as $af) {
     } else {
         $inner = '<span>'.$nombre.'</span>';
     }
-    $ope_afiliados_html .= '<a href="'.$url.'" class="ope-afil-btn" title="'.$nombre.'" target="_blank" rel="noopener">'.$inner.'</a>';
+    $gbe_afiliados_html .= '<a href="'.$url.'" class="gbe-afil-btn" title="'.$nombre.'" target="_blank" rel="noopener">'.$inner.'</a>';
 }
 
 // I-Forge: calendario on-rol (4 estaciones × 65 días; 1 día OOC = 2 días on-rol)
-$rol_epoch = isset($ope_home['rol_epoch']) ? (int)$ope_home['rol_epoch'] : mktime(0, 0, 0, 1, 1, 2026);
+$rol_epoch = isset($gbe_home['rol_epoch']) ? (int)$gbe_home['rol_epoch'] : mktime(0, 0, 0, 1, 1, 2026);
 $rol_seasons = [
     ['Primavera', 'var(--patina-hi)'],
     ['Verano',    'var(--ember)'],
@@ -624,53 +624,53 @@ $rol_year = (int)floor($rol_day_index / 260) + 1;
 $rol_doy = $rol_day_index % 260;                // día dentro del año (0..259)
 $rol_season_idx = (int)floor($rol_doy / 65);    // 0..3
 $rol_day_in_season = ($rol_doy % 65) + 1;       // 1..65
-$ope_rol_season = $rol_seasons[$rol_season_idx][0];
-$ope_rol_season_color = $rol_seasons[$rol_season_idx][1];
-$ope_rol_day = $rol_day_in_season;
-$ope_rol_year = $rol_year;
-$ope_rol_progress = round(($rol_day_in_season / 65) * 100);
-$ope_rol_year_label = function_exists('ope_rol_year_label') ? ope_rol_year_label($rol_year) : (string)$rol_year;
+$gbe_rol_season = $rol_seasons[$rol_season_idx][0];
+$gbe_rol_season_color = $rol_seasons[$rol_season_idx][1];
+$gbe_rol_day = $rol_day_in_season;
+$gbe_rol_year = $rol_year;
+$gbe_rol_progress = round(($rol_day_in_season / 65) * 100);
+$gbe_rol_year_label = function_exists('gbe_rol_year_label') ? gbe_rol_year_label($rol_year) : (string)$rol_year;
 
-$curiosidades = (isset($ope_home['curiosidades']) && is_array($ope_home['curiosidades'])) ? array_values($ope_home['curiosidades']) : [];
-$lore = (isset($ope_home['lore']) && is_array($ope_home['lore'])) ? $ope_home['lore'] : ['titulo' => '', 'texto' => ''];
+$curiosidades = (isset($gbe_home['curiosidades']) && is_array($gbe_home['curiosidades'])) ? array_values($gbe_home['curiosidades']) : [];
+$lore = (isset($gbe_home['lore']) && is_array($gbe_home['lore'])) ? $gbe_home['lore'] : ['titulo' => '', 'texto' => ''];
 
 $curiosidades_json = json_encode($curiosidades, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 if ($curiosidades_json === false) {
     $curiosidades_json = '[]';
 }
-$ope_curiosidad = !empty($curiosidades) ? htmlspecialchars_uni($curiosidades[0]) : '';
+$gbe_curiosidad = !empty($curiosidades) ? htmlspecialchars_uni($curiosidades[0]) : '';
 
 // I-Forge: Últimas noticias (Mundo Vivo + manuales). Rotación + clic despliega.
-$ope_noticias = function_exists('ope_rol_mv_noticias_activas') ? ope_rol_mv_noticias_activas(8) : array();
-$ope_noticias_data = array();
-foreach ($ope_noticias as $n) {
-    $ope_noticias_data[] = array(
+$gbe_noticias = function_exists('gbe_rol_mv_noticias_activas') ? gbe_rol_mv_noticias_activas(8) : array();
+$gbe_noticias_data = array();
+foreach ($gbe_noticias as $n) {
+    $gbe_noticias_data[] = array(
         'titulo'  => (string)$n['titulo'],
         'resumen' => (string)($n['resumen'] !== '' ? $n['resumen'] : $n['titulo']),
         'cuerpo'  => (string)$n['cuerpo_html'],
     );
 }
-$ope_has_news = !empty($ope_noticias_data);
-if (!$ope_has_news) {
+$gbe_has_news = !empty($gbe_noticias_data);
+if (!$gbe_has_news) {
     foreach ($curiosidades as $c) {
-        $ope_noticias_data[] = array('titulo' => '', 'resumen' => (string)$c, 'cuerpo' => '');
+        $gbe_noticias_data[] = array('titulo' => '', 'resumen' => (string)$c, 'cuerpo' => '');
     }
 }
-$ope_noticias_json = json_encode($ope_noticias_data, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
-if ($ope_noticias_json === false) { $ope_noticias_json = '[]'; }
-$ope_noticia_kicker = $ope_has_news ? '// últimas noticias' : '// curiosidad';
-$ope_noticia_first_title = !empty($ope_noticias_data) ? htmlspecialchars_uni($ope_noticias_data[0]['titulo']) : '';
-$ope_noticia_first_text = !empty($ope_noticias_data) ? htmlspecialchars_uni($ope_noticias_data[0]['resumen']) : '';
+$gbe_noticias_json = json_encode($gbe_noticias_data, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+if ($gbe_noticias_json === false) { $gbe_noticias_json = '[]'; }
+$gbe_noticia_kicker = $gbe_has_news ? '// últimas noticias' : '// curiosidad';
+$gbe_noticia_first_title = !empty($gbe_noticias_data) ? htmlspecialchars_uni($gbe_noticias_data[0]['titulo']) : '';
+$gbe_noticia_first_text = !empty($gbe_noticias_data) ? htmlspecialchars_uni($gbe_noticias_data[0]['resumen']) : '';
 
-$ope_lore_title = htmlspecialchars_uni($lore['titulo'] ?? '');
-$ope_lore_text = htmlspecialchars_uni($lore['texto'] ?? '');
-$ope_discord_url = htmlspecialchars_uni((string)($ope_home['discord_url'] ?? 'https://discord.gg/'));
+$gbe_lore_title = htmlspecialchars_uni($lore['titulo'] ?? '');
+$gbe_lore_text = htmlspecialchars_uni($lore['texto'] ?? '');
+$gbe_discord_url = htmlspecialchars_uni((string)($gbe_home['discord_url'] ?? 'https://discord.gg/'));
 
 // I-Forge: Presence — active now + last 24h (real MyBB session/user data)
-$ope_online_now = '';
-$ope_online_now_count = 0;
-$ope_online_24h = '';
-$ope_online_24h_count = 0;
+$gbe_online_now = '';
+$gbe_online_now_count = 0;
+$gbe_online_24h = '';
+$gbe_online_24h_count = 0;
 
 $now_cut = TIME_NOW - (int)$mybb->settings['wolcutoff'];
 $q_now = $db->query("
@@ -687,8 +687,8 @@ while ($ou = $db->fetch_array($q_now)) {
     }
     $name = format_name(htmlspecialchars_uni($ou['username']), $ou['usergroup'], $ou['displaygroup']);
     $link = build_profile_link($name, $ou['uid']);
-    $ope_online_now .= '<span class="ope-ou">'.$link.'</span>';
-    $ope_online_now_count++;
+    $gbe_online_now .= '<span class="gbe-ou">'.$link.'</span>';
+    $gbe_online_now_count++;
 }
 
 $day_cut = TIME_NOW - 86400;
@@ -702,12 +702,12 @@ $q_day = $db->query("
 while ($du = $db->fetch_array($q_day)) {
     $name = format_name(htmlspecialchars_uni($du['username']), $du['usergroup'], $du['displaygroup']);
     $link = build_profile_link($name, $du['uid']);
-    $ope_online_24h .= '<span class="ope-ou">'.$link.'</span>';
-    $ope_online_24h_count++;
+    $gbe_online_24h .= '<span class="gbe-ou">'.$link.'</span>';
+    $gbe_online_24h_count++;
 }
 
 // I-Forge: Staff list (portraits with role + heat ring)
-$ope_staff_list = '';
+$gbe_staff_list = '';
 $staffQuery = $db->query("
     SELECT u.uid, u.username, u.usergroup, u.displaygroup, g.title AS grouptitle, g.issupermod, g.cancp
     FROM ".TABLE_PREFIX."users u
@@ -728,15 +728,15 @@ while ($staff = $db->fetch_array($staffQuery)) {
     $uname = htmlspecialchars_uni($staff['username']);
     $displayName = $uname;
     $roleOut = $role;
-    if (strcasecmp($staff['username'], 'OP-Eternal') === 0) {
+    if (strcasecmp($staff['username'], 'GBEternal') === 0) {
         $displayName = 'Lyria';
         $roleOut = 'Cronista &middot; Bot';
     }
     $initial = htmlspecialchars_uni(my_strtoupper(my_substr($displayName, 0, 1)));
-    $ope_staff_list .= '
-    <a href="'.$mybb->settings['bburl'].'/member.php?action=profile&amp;uid='.$staff['uid'].'" class="ope-staff-p" title="'.htmlspecialchars_uni(strip_tags($roleOut)).'">
-        <span class="ope-staff-av" style="--ring:'.$ring.'">'.$initial.'</span>
-        <span class="ope-staff-meta"><span class="ope-staff-n">'.$displayName.'</span><span class="ope-staff-r">'.$roleOut.'</span></span>
+    $gbe_staff_list .= '
+    <a href="'.$mybb->settings['bburl'].'/member.php?action=profile&amp;uid='.$staff['uid'].'" class="gbe-staff-p" title="'.htmlspecialchars_uni(strip_tags($roleOut)).'">
+        <span class="gbe-staff-av" style="--ring:'.$ring.'">'.$initial.'</span>
+        <span class="gbe-staff-meta"><span class="gbe-staff-n">'.$displayName.'</span><span class="gbe-staff-r">'.$roleOut.'</span></span>
     </a>';
 }
 
@@ -744,7 +744,7 @@ while ($staff = $db->fetch_array($staffQuery)) {
 //   · "El Mundo" (o cualquier categoría cuyos foros tengan subforos/islas) => tarjetas-región con foto.
 //   · Resto ("Off Topic", etc.) => lista de foros estilo placa (concrete slab).
 $bburl = $mybb->settings['bburl'];
-$ope_categories = '';
+$gbe_categories = '';
 $catQuery = $db->query("
     SELECT fid, name, description
     FROM ".TABLE_PREFIX."forums
@@ -757,11 +757,11 @@ while ($cat = $db->fetch_array($catQuery)) {
     // Recolectar foros de la categoría + detectar si alguno tiene islas (subforos)
     $forumQuery = $db->query("
         SELECT f.fid, f.name, f.description, f.threads, f.posts, f.lastpost, f.lastpostsubject, f.lastposter, f.lastposteruid,
-               f.ope_lastpid, rp.nombre AS lastchar_name,
+               f.gbe_lastpid, rp.nombre AS lastchar_name,
                t.tid AS lastpost_tid
         FROM ".TABLE_PREFIX."forums f
         LEFT JOIN ".TABLE_PREFIX."threads t ON (t.fid = f.fid AND t.lastpost = f.lastpost)
-        LEFT JOIN ".TABLE_PREFIX."rol_personajes rp ON (rp.pid = f.ope_lastpid)
+        LEFT JOIN ".TABLE_PREFIX."rol_personajes rp ON (rp.pid = f.gbe_lastpid)
         WHERE f.type = 'f' AND f.pid = '{$cat['fid']}' AND f.active = 1
         ORDER BY f.disporder ASC
     ");
@@ -783,26 +783,26 @@ while ($cat = $db->fetch_array($catQuery)) {
     $isWorld = (mb_stripos($cat['name'], 'mundo') !== false)
         || (mb_stripos($cat['name'], 'cielo') !== false)
         || $catHasIslas;
-    $bentoClass = (mb_stripos($cat['name'], 'cielo') !== false) ? 'gbe-world-bento' : 'ope-world-bento';
+    $bentoClass = (mb_stripos($cat['name'], 'cielo') !== false) ? 'gbe-world-bento' : 'gbe-world-bento';
 
     if ($isWorld) {
         $catDesc = trim($cat['description']) !== '' ? htmlspecialchars_uni($cat['description']) : 'skydoms &middot; navega para ver las islas';
         $wm = (mb_stripos($cat['name'], 'cielo') !== false) ? 'Skydoms' : $catName;
         $eyebrow = (mb_stripos($cat['name'], 'cielo') !== false) ? 'El Cielo &middot; navega por regi&oacute;n' : $catDesc;
         $stitle = (mb_stripos($cat['name'], 'cielo') !== false) ? 'Carta Celeste' : $catName;
-        $cards = ope_render_region_cards($cat['fid'], $forumpermissions);
+        $cards = gbe_render_region_cards($cat['fid'], $forumpermissions);
         $slug = 'cat_'.$cat['fid'];
         if (mb_stripos($cat['name'], 'cielo') !== false) {
             $slug = 'cat_el-cielo';
         }
-        $ope_categories .= '
+        $gbe_categories .= '
         <section class="gbe-section gbe-cat" id="'.$slug.'">
             <span class="gbe-wm" aria-hidden="true">'.htmlspecialchars_uni($wm).'</span>
             <div class="gbe-wrap">
                 <span class="gbe-eyebrow">'.$eyebrow.'</span>
                 <h2 class="gbe-stitle">'.$stitle.'</h2>
                 <div class="gbe-gold-rule"></div>
-                <div class="ope-regions '.$bentoClass.'">
+                <div class="gbe-regions '.$bentoClass.'">
                     '.$cards.'
                 </div>
             </div>
@@ -821,53 +821,53 @@ while ($cat = $db->fetch_array($catQuery)) {
                 $lastAuthor = trim((string) ($forum['lastchar_name'] ?? '')) !== ''
                     ? $forum['lastchar_name']
                     : $forum['lastposter'];
-                $lastMeta = '<b>'.htmlspecialchars_uni($forum['lastpostsubject']).'</b> &middot; '.htmlspecialchars_uni($lastAuthor).' &middot; '.ope_reltime($forum['lastpost']);
+                $lastMeta = '<b>'.htmlspecialchars_uni($forum['lastpostsubject']).'</b> &middot; '.htmlspecialchars_uni($lastAuthor).' &middot; '.gbe_reltime($forum['lastpost']);
             } else {
                 $lastMeta = 'Sin mensajes a&uacute;n';
             }
-            $descHtml = $forumDesc !== '' ? '<div class="ope-forum-d">'.$forumDesc.'</div>' : '';
+            $descHtml = $forumDesc !== '' ? '<div class="gbe-forum-d">'.$forumDesc.'</div>' : '';
             $rows .= '
-            <a href="'.$bburl.'/forumdisplay.php?fid='.$forum['fid'].'" class="ope-forum">
-                <div class="ope-forum-ic"><span>'.$initial.'</span></div>
+            <a href="'.$bburl.'/forumdisplay.php?fid='.$forum['fid'].'" class="gbe-forum">
+                <div class="gbe-forum-ic"><span>'.$initial.'</span></div>
                 <div>
-                    <div class="ope-forum-n">'.$forumName.' <span class="ope-forum-fid">FID-'.$forum['fid'].'</span></div>
+                    <div class="gbe-forum-n">'.$forumName.' <span class="gbe-forum-fid">FID-'.$forum['fid'].'</span></div>
                     '.$descHtml.'
-                    <div class="ope-forum-last">'.$lastMeta.'</div>
+                    <div class="gbe-forum-last">'.$lastMeta.'</div>
                 </div>
-                <div class="ope-forum-stat"><b>'.$threads.'</b><i>temas</i> '.$posts.' msgs</div>
+                <div class="gbe-forum-stat"><b>'.$threads.'</b><i>temas</i> '.$posts.' msgs</div>
             </a>';
         }
-        $ope_categories .= '
+        $gbe_categories .= '
         <section class="gbe-section gbe-cat gbe-cat-ot" id="cat_'.$cat['fid'].'">
             <span class="gbe-wm" aria-hidden="true">Off Topic</span>
             <div class="gbe-wrap">
                 <span class="gbe-eyebrow">'.$catDesc.'</span>
                 <h2 class="gbe-stitle">'.$catName.'</h2>
                 <div class="gbe-gold-rule"></div>
-                <div class="ope-slab gbe-slab">
+                <div class="gbe-slab gbe-slab">
                     '.$rows.'
                 </div>
             </div>
         </section>';
     }
 }
-$forums = $ope_categories;
+$forums = $gbe_categories;
 
 // I-Forge: último personaje creado (para el censo del pie de portada)
-$ope_last_char = '';
+$gbe_last_char = '';
 if ($db->table_exists('rol_personajes')) {
     $lcq = $db->simple_select('rol_personajes', 'pid, nombre', "estado = 'aprobado'", array('order_by' => 'pid', 'order_dir' => 'DESC', 'limit' => 1));
     if ($db->num_rows($lcq)) {
         $lcRow = $db->fetch_array($lcq);
-        $ope_last_char = '<a href="'.$mybb->settings['bburl'].'/ficha.php?pid='.(int)$lcRow['pid'].'">'.htmlspecialchars_uni($lcRow['nombre']).'</a>';
+        $gbe_last_char = '<a href="'.$mybb->settings['bburl'].'/ficha.php?pid='.(int)$lcRow['pid'].'">'.htmlspecialchars_uni($lcRow['nombre']).'</a>';
     }
 }
-if ($ope_last_char === '') {
+if ($gbe_last_char === '') {
     $laststats = $cache->read('stats');
     if (!empty($laststats['lastusername'])) {
-        $ope_last_char = build_profile_link($laststats['lastusername'], $laststats['lastuid']);
+        $gbe_last_char = build_profile_link($laststats['lastusername'], $laststats['lastuid']);
     } else {
-        $ope_last_char = 'Nadie a&uacute;n';
+        $gbe_last_char = 'Nadie a&uacute;n';
     }
 }
 

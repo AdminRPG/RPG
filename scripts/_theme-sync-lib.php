@@ -3,37 +3,37 @@
  * Shared helpers for I-Forge theme sync (repo <-> MyBB DB).
  *
  * Canonical sources in docs/themes/:
- *   - ope.css                      (stylesheet)
- *   - ope-shared.xml       (auxiliary MyBB templates)
- *   - ope-index.xml
- *   - ope-forumdisplay.xml
- *   - ope-showthread.xml
- *   - ope-forms.xml
+ *   - gbe.css                      (stylesheet)
+ *   - gbe-shared.xml       (auxiliary MyBB templates)
+ *   - gbe-index.xml
+ *   - gbe-forumdisplay.xml
+ *   - gbe-showthread.xml
+ *   - gbe-forms.xml
  *
- * ope-child-theme.xml is GENERATED (build-xml) for Admin CP import only.
+ * gbe-child-theme.xml is GENERATED (build-xml) for Admin CP import only.
  */
 
-define('OPE_THEME_ROOT', dirname(__DIR__) . '/docs/themes');
-define('OPE_CSS_FILE', OPE_THEME_ROOT . '/ope.css');
-define('OPE_CHILD_XML', OPE_THEME_ROOT . '/ope-child-theme.xml');
-define('OPE_CHILD_BUNDLE_XML', OPE_THEME_ROOT . '/ope-child-theme.bundle.xml');
+define('GBE_THEME_ROOT', dirname(__DIR__) . '/docs/themes');
+define('GBE_CSS_FILE', GBE_THEME_ROOT . '/gbe.css');
+define('GBE_CHILD_XML', GBE_THEME_ROOT . '/gbe-child-theme.xml');
+define('GBE_CHILD_BUNDLE_XML', GBE_THEME_ROOT . '/gbe-child-theme.bundle.xml');
 
 /** Import order: earlier files are overridden by later ones on name collision. */
-define('OPE_TEMPLATE_XML_FILES', [
-    OPE_THEME_ROOT . '/ope-shared.xml',
-    OPE_THEME_ROOT . '/ope-forms.xml',
-    OPE_THEME_ROOT . '/ope-showthread.xml',
-    OPE_THEME_ROOT . '/ope-forumdisplay.xml',
-    OPE_THEME_ROOT . '/ope-index.xml',
+define('GBE_TEMPLATE_XML_FILES', [
+    GBE_THEME_ROOT . '/gbe-shared.xml',
+    GBE_THEME_ROOT . '/gbe-forms.xml',
+    GBE_THEME_ROOT . '/gbe-showthread.xml',
+    GBE_THEME_ROOT . '/gbe-forumdisplay.xml',
+    GBE_THEME_ROOT . '/gbe-index.xml',
 ]);
 
-function ope_db_connect(): mysqli
+function gbe_db_connect(): mysqli
 {
     require __DIR__ . '/_db-config.php';
     return $db;
 }
 
-function ope_resolve_theme(mysqli $db): array
+function gbe_resolve_theme(mysqli $db): array
 {
     $result = $db->query("SELECT tid, name, properties FROM mybb_themes WHERE name = 'I-Forge RPG' OR name = 'RPG' ORDER BY tid DESC LIMIT 1");
     $theme = $result ? $result->fetch_assoc() : null;
@@ -55,13 +55,13 @@ function ope_resolve_theme(mysqli $db): array
     ];
 }
 
-function ope_read_css(): string
+function gbe_read_css(): string
 {
-    if (!is_file(OPE_CSS_FILE)) {
-        fwrite(STDERR, "Missing canonical CSS: " . OPE_CSS_FILE . "\n");
+    if (!is_file(GBE_CSS_FILE)) {
+        fwrite(STDERR, "Missing canonical CSS: " . GBE_CSS_FILE . "\n");
         exit(1);
     }
-    $css = file_get_contents(OPE_CSS_FILE);
+    $css = file_get_contents(GBE_CSS_FILE);
     if ($css === false || $css === '') {
         fwrite(STDERR, "Could not read CSS file or it is empty.\n");
         exit(1);
@@ -70,10 +70,10 @@ function ope_read_css(): string
 }
 
 /** @return array<string, array{file:string, version:string, content:string}> */
-function ope_load_repo_templates(): array
+function gbe_load_repo_templates(): array
 {
     $templates = [];
-    foreach (OPE_TEMPLATE_XML_FILES as $path) {
+    foreach (GBE_TEMPLATE_XML_FILES as $path) {
         if (!is_file($path)) {
             fwrite(STDERR, "Missing template XML: $path\n");
             exit(1);
@@ -95,19 +95,19 @@ function ope_load_repo_templates(): array
 }
 
 /** @return array<string, string> template name => owning filename */
-function ope_template_ownership_map(): array
+function gbe_template_ownership_map(): array
 {
     $map = [];
-    foreach (ope_load_repo_templates() as $name => $meta) {
+    foreach (gbe_load_repo_templates() as $name => $meta) {
         $map[$name] = $meta['file'];
     }
     return $map;
 }
 
-function ope_import_css(mysqli $db, int $tid, bool $quiet = false): void
+function gbe_import_css(mysqli $db, int $tid, bool $quiet = false): void
 {
-    $css = ope_read_css();
-    $name = 'ope.css';
+    $css = gbe_read_css();
+    $name = 'gbe.css';
     $now = time();
 
     $stmt = $db->prepare('SELECT sid FROM mybb_themestylesheets WHERE tid = ? AND name = ?');
@@ -139,17 +139,17 @@ function ope_import_css(mysqli $db, int $tid, bool $quiet = false): void
     if (!is_dir($theme_dir)) {
         @mkdir($theme_dir, 0755, true);
     }
-    $cache_path = "{$theme_dir}/ope.css";
+    $cache_path = "{$theme_dir}/gbe.css";
     if (@file_put_contents($cache_path, $css) === false) {
         fwrite(STDERR, "  WARNING: could not write $cache_path\n");
     } elseif (!$quiet) {
-        echo "  CSS: cache written -> cache/themes/theme{$tid}/ope.css\n";
+        echo "  CSS: cache written -> cache/themes/theme{$tid}/gbe.css\n";
     }
 }
 
-function ope_import_templates(mysqli $db, int $templateset, bool $quiet = false): int
+function gbe_import_templates(mysqli $db, int $templateset, bool $quiet = false): int
 {
-    $repo = ope_load_repo_templates();
+    $repo = gbe_load_repo_templates();
     $count = 0;
 
     foreach ($repo as $title => $meta) {
@@ -186,16 +186,16 @@ function ope_import_templates(mysqli $db, int $templateset, bool $quiet = false)
     return $count;
 }
 
-function ope_clear_theme_caches(mysqli $db): void
+function gbe_clear_theme_caches(mysqli $db): void
 {
     $db->query("DELETE FROM mybb_datacache WHERE title IN ('themes', 'themestylesheets', 'templates', 'default_theme')");
     $db->query("UPDATE mybb_datacache SET cache = '' WHERE title LIKE '%stylesheet%' OR title LIKE '%theme%'");
 }
 
-function ope_export_css(mysqli $db, int $tid): void
+function gbe_export_css(mysqli $db, int $tid): void
 {
     $stmt = $db->prepare('SELECT stylesheet FROM mybb_themestylesheets WHERE tid = ? AND name = ?');
-    $name = 'ope.css';
+    $name = 'gbe.css';
     $stmt->bind_param('is', $tid, $name);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -203,7 +203,7 @@ function ope_export_css(mysqli $db, int $tid): void
     $stmt->close();
 
     if (!$row || $row['stylesheet'] === '') {
-        fwrite(STDERR, "No ope.css in database for tid=$tid\n");
+        fwrite(STDERR, "No gbe.css in database for tid=$tid\n");
         exit(1);
     }
 
@@ -211,14 +211,14 @@ function ope_export_css(mysqli $db, int $tid): void
     if (substr($css, -1) !== "\n") {
         $css .= "\n";
     }
-    if (file_put_contents(OPE_CSS_FILE, $css) === false) {
-        fwrite(STDERR, "Could not write " . OPE_CSS_FILE . "\n");
+    if (file_put_contents(GBE_CSS_FILE, $css) === false) {
+        fwrite(STDERR, "Could not write " . GBE_CSS_FILE . "\n");
         exit(1);
     }
-    echo "Exported CSS -> docs/themes/ope.css (" . strlen($css) . " bytes)\n";
+    echo "Exported CSS -> docs/themes/gbe.css (" . strlen($css) . " bytes)\n";
 }
 
-function ope_update_template_in_xml_file(string $path, string $title, string $content, string $version = '1839'): bool
+function gbe_update_template_in_xml_file(string $path, string $title, string $content, string $version = '1839'): bool
 {
     $dom = new DOMDocument('1.0', 'UTF-8');
     $dom->preserveWhiteSpace = false;
@@ -250,9 +250,9 @@ function ope_update_template_in_xml_file(string $path, string $title, string $co
     return $dom->save($path) !== false;
 }
 
-function ope_export_templates(mysqli $db, int $templateset): void
+function gbe_export_templates(mysqli $db, int $templateset): void
 {
-    $ownership = ope_template_ownership_map();
+    $ownership = gbe_template_ownership_map();
     $by_file = [];
     foreach ($ownership as $name => $file) {
         $by_file[$file][] = $name;
@@ -262,7 +262,7 @@ function ope_export_templates(mysqli $db, int $templateset): void
     $missing = 0;
 
     foreach ($by_file as $file => $names) {
-        $path = OPE_THEME_ROOT . '/' . $file;
+        $path = GBE_THEME_ROOT . '/' . $file;
         sort($names);
         foreach ($names as $title) {
             $stmt = $db->prepare('SELECT template, version FROM mybb_templates WHERE title = ? AND sid = ?');
@@ -278,7 +278,7 @@ function ope_export_templates(mysqli $db, int $templateset): void
                 continue;
             }
 
-            if (!ope_update_template_in_xml_file($path, $title, $row['template'], $row['version'] ?? '1839')) {
+            if (!gbe_update_template_in_xml_file($path, $title, $row['template'], $row['version'] ?? '1839')) {
                 echo "  FAIL (not in XML): $title -> $file\n";
                 $missing++;
                 continue;
@@ -288,20 +288,20 @@ function ope_export_templates(mysqli $db, int $templateset): void
         echo "  $file: " . count($names) . " templates checked\n";
     }
 
-    echo "Exported $updated templates to docs/themes/ope-*.xml";
+    echo "Exported $updated templates to docs/themes/gbe-*.xml";
     if ($missing > 0) {
         echo " ($missing skipped/failed)";
     }
     echo "\n";
 }
 
-function ope_verify_sync(mysqli $db, int $tid, int $templateset): int
+function gbe_verify_sync(mysqli $db, int $tid, int $templateset): int
 {
     $errors = 0;
 
-    $repoCss = ope_read_css();
+    $repoCss = gbe_read_css();
     $stmt = $db->prepare('SELECT stylesheet FROM mybb_themestylesheets WHERE tid = ? AND name = ?');
-    $name = 'ope.css';
+    $name = 'gbe.css';
     $stmt->bind_param('is', $tid, $name);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -312,13 +312,13 @@ function ope_verify_sync(mysqli $db, int $tid, int $templateset): int
         echo "DRIFT CSS: missing in database\n";
         $errors++;
     } elseif (md5($repoCss) !== md5($row['stylesheet'])) {
-        echo "DRIFT CSS: docs/themes/ope.css != database\n";
+        echo "DRIFT CSS: docs/themes/gbe.css != database\n";
         $errors++;
     } else {
         echo "OK   CSS: in sync\n";
     }
 
-    $repo = ope_load_repo_templates();
+    $repo = gbe_load_repo_templates();
     foreach ($repo as $title => $meta) {
         $stmt = $db->prepare('SELECT template, version FROM mybb_templates WHERE title = ? AND sid = ?');
         $stmt->bind_param('si', $title, $templateset);
@@ -343,10 +343,10 @@ function ope_verify_sync(mysqli $db, int $tid, int $templateset): int
     return $errors;
 }
 
-function ope_child_theme_properties(): array
+function gbe_child_theme_properties(): array
 {
-    if (is_file(OPE_CHILD_XML)) {
-        $xml = simplexml_load_file(OPE_CHILD_XML);
+    if (is_file(GBE_CHILD_XML)) {
+        $xml = simplexml_load_file(GBE_CHILD_XML);
         if ($xml && $xml->properties) {
             $props = [];
             foreach ($xml->properties->children() as $child) {
@@ -375,7 +375,7 @@ function ope_child_theme_properties(): array
         'borderwidth' => '0',
         'editortheme' => 'mybb.css',
         'disporder' => [
-            'ope.css' => '1',
+            'gbe.css' => '1',
             'global.css' => '2',
             'usercp.css' => '3',
             'modcp.css' => '4',
@@ -387,18 +387,18 @@ function ope_child_theme_properties(): array
     ];
 }
 
-function ope_build_child_theme_xml(): void
+function gbe_build_child_theme_xml(): void
 {
-    $css = ope_read_css();
-    $repo = ope_load_repo_templates();
-    $props = ope_child_theme_properties();
+    $css = gbe_read_css();
+    $repo = gbe_load_repo_templates();
+    $props = gbe_child_theme_properties();
 
     $dom = new DOMDocument('1.0', 'UTF-8');
     $dom->formatOutput = true;
 
     $comment = $dom->createComment(
         ' GENERATED by scripts/sync-theme.php build-xml — do not edit manually. '
-        . 'Edit docs/themes/ope.css and docs/themes/ope-*.xml, then run: php scripts/sync-theme.php import '
+        . 'Edit docs/themes/gbe.css and docs/themes/gbe-*.xml, then run: php scripts/sync-theme.php import '
     );
     $dom->appendChild($comment);
 
@@ -422,7 +422,7 @@ function ope_build_child_theme_xml(): void
 
     $sheetsEl = $dom->createElement('stylesheets');
     $sheet = $dom->createElement('stylesheet');
-    $sheet->setAttribute('name', 'ope.css');
+    $sheet->setAttribute('name', 'gbe.css');
     $sheet->setAttribute('version', '1839');
     $sheet->appendChild($dom->createCDATASection($css));
     $sheetsEl->appendChild($sheet);
@@ -440,11 +440,11 @@ function ope_build_child_theme_xml(): void
     $themeEl->appendChild($tempsEl);
 
     $dom->appendChild($themeEl);
-    if ($dom->save(OPE_CHILD_BUNDLE_XML) === false) {
-        fwrite(STDERR, "Could not write " . OPE_CHILD_BUNDLE_XML . "\n");
+    if ($dom->save(GBE_CHILD_BUNDLE_XML) === false) {
+        fwrite(STDERR, "Could not write " . GBE_CHILD_BUNDLE_XML . "\n");
         exit(1);
     }
 
-    echo "Built " . OPE_CHILD_BUNDLE_XML . " (" . count($repo) . " templates, " . strlen($css) . " bytes CSS)\n";
-    echo "Import that file in Admin CP if needed. Do not edit it — edit ope.css and ope-*.xml instead.\n";
+    echo "Built " . GBE_CHILD_BUNDLE_XML . " (" . count($repo) . " templates, " . strlen($css) . " bytes CSS)\n";
+    echo "Import that file in Admin CP if needed. Do not edit it — edit gbe.css and gbe-*.xml instead.\n";
 }

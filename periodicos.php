@@ -2,7 +2,7 @@
 /**
  * I-Forge · Periódicos "Eternal News" (público)
  * Lista de números anteriores a la izquierda; el seleccionado (o el último) a la
- * derecha, renderizado con el componente ope-periodico.
+ * derecha, renderizado con el componente gbe-periodico.
  */
 
 define('IN_MYBB', 1);
@@ -12,16 +12,16 @@ require_once './global.php';
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 
-$periodicos = ope_rol_mv_periodicos(120);
+$periodicos = gbe_rol_mv_periodicos(120);
 
 $sel_id = (int)$mybb->get_input('c', MyBB::INPUT_INT);
 $actual = null;
 if ($sel_id > 0) {
-    $actual = ope_rol_mv_ciclo_by_id($sel_id);
+    $actual = gbe_rol_mv_ciclo_by_id($sel_id);
     if ($actual && (int)$actual['published_at'] <= 0) { $actual = null; }
 }
 if (!$actual && !empty($periodicos)) {
-    $actual = ope_rol_mv_ciclo_by_id((int)$periodicos[0]['ciclo_id']);
+    $actual = gbe_rol_mv_ciclo_by_id((int)$periodicos[0]['ciclo_id']);
 }
 
 $masthead = $bburl . '/images/mundo-vivo/masthead.png';
@@ -33,12 +33,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Eternal News</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-periodicos + ope-periodico) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-periodicos + gbe-periodico) -->
 </head>
-<body class="ope-pg-periodicos">
+<body class="gbe-pg-periodicos">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -50,7 +50,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 <div class="wrap">
 
-  <?php echo ope_rol_deco_banner('ope/deco/periodicos', 'Prensa y periódicos del mundo', 'Prensa del mundo'); ?>
+  <?php echo gbe_rol_deco_banner('ope/deco/periodicos', 'Prensa y periódicos del mundo', 'Prensa del mundo'); ?>
 
   <section class="reveal">
     <div class="shead"><h1>Eternal News</h1><span class="code">// hemeroteca del mundo</span><span class="rule"></span></div>
@@ -80,24 +80,24 @@ header('Content-Type: text/html; charset=utf-8');
       <main class="pe-current">
 <?php
         $ts_onrol   = (int)($actual['published_at'] ?? 0) > 0 ? (int)$actual['published_at'] : TIME_NOW;
-        $ooc_label   = ope_rol_mv_periodo_label($actual['periodo']);
-        $onrol_label = ope_rol_mv_fecha_onrol($ts_onrol);
+        $ooc_label   = gbe_rol_mv_periodo_label($actual['periodo']);
+        $onrol_label = gbe_rol_mv_fecha_onrol($ts_onrol);
 ?>
-        <div class="ope-periodico" style="background-image:url('<?php echo $bburl; ?>/images/mundo-vivo/paper.jpg')">
-          <header class="ope-per-masthead">
-            <div class="ope-per-date ope-per-date-ooc">
+        <div class="gbe-periodico" style="background-image:url('<?php echo $bburl; ?>/images/mundo-vivo/paper.jpg')">
+          <header class="gbe-per-masthead">
+            <div class="gbe-per-date gbe-per-date-ooc">
               <span class="k">Edición</span>
               <b><?php echo htmlspecialchars_uni($ooc_label); ?></b>
               <small>tiempo real</small>
             </div>
-            <img class="ope-per-logo" src="<?php echo $masthead; ?>" alt="Eternal News">
-            <div class="ope-per-date ope-per-date-onrol">
+            <img class="gbe-per-logo" src="<?php echo $masthead; ?>" alt="Eternal News">
+            <div class="gbe-per-date gbe-per-date-onrol">
               <span class="k">Era del mundo</span>
               <b><?php echo htmlspecialchars_uni($onrol_label); ?></b>
               <small>tiempo in-rol</small>
             </div>
           </header>
-          <div class="ope-per-body">
+          <div class="gbe-per-body">
 <?php echo (string)$actual['periodico_html']; ?>
           </div>
         </div>

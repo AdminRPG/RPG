@@ -1,6 +1,6 @@
 <?php
 /**
- * One Piece Eternal · Migración "staff por personaje + firma/icono + tablas de rol"
+ * Granblue Fantasy: Eternal · Migración "staff por personaje + firma/icono + tablas de rol"
  * --------------------------------------------------------------------------------
  * 1) Añade a rol_personajes las columnas que convierten al PERSONAJE (no la cuenta)
  *    en la unidad de staff, más su icono y firma propios:

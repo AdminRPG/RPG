@@ -9,7 +9,7 @@ if (!defined('IN_MYBB')) {
 }
 
 /** Oficios de a bordo reconocidos y sus bonificaciones por mesa. */
-function ope_oraculo_oficios_config()
+function gbe_oraculo_oficios_config()
 {
     return array(
         'navegante'  => array('clima' => -12, 'peligros' => -4),
@@ -23,7 +23,7 @@ function ope_oraculo_oficios_config()
 }
 
 /** Tipos de barco y sus modificadores base. */
-function ope_oraculo_barcos_config()
+function gbe_oraculo_barcos_config()
 {
     return array(
         'bote'     => array('label' => 'Bote / chalupa', 'clima' => -8, 'peligros' => 8,  'vel' => 1),
@@ -34,7 +34,7 @@ function ope_oraculo_barcos_config()
     );
 }
 
-function ope_oraculo_mesa_clima()
+function gbe_oraculo_mesa_clima()
 {
     return array(
         array('max' => 8,  'key' => 'tormenta_cat', 'nombre' => 'Tormenta catastrófica', 'icon' => '⛈', 'efecto' => 'Casco -15%. Timón bloqueado 1 tramo. Tirada de supervivencia obligatoria.', 'tone' => 'crit'),
@@ -48,7 +48,7 @@ function ope_oraculo_mesa_clima()
     );
 }
 
-function ope_oraculo_mesa_encuentros()
+function gbe_oraculo_mesa_encuentros()
 {
     return array(
         array('max' => 10, 'key' => 'yonko',       'nombre' => 'Flota de un Yonko',           'icon' => '👑', 'efecto' => 'Evitar o negociar. Combate naval PE 5+ si se enfrentan.', 'tone' => 'crit'),
@@ -64,7 +64,7 @@ function ope_oraculo_mesa_encuentros()
     );
 }
 
-function ope_oraculo_mesa_hallazgos()
+function gbe_oraculo_mesa_hallazgos()
 {
     return array(
         array('max' => 12, 'key' => 'poneglyph',   'nombre' => 'Poneglyph fragmentado',       'icon' => '🗿', 'efecto' => 'Historia antigua. Requiere Arqueólogo/Navegante para descifrar.', 'tone' => 'great'),
@@ -80,7 +80,7 @@ function ope_oraculo_mesa_hallazgos()
     );
 }
 
-function ope_oraculo_mesa_peligros()
+function gbe_oraculo_mesa_peligros()
 {
     return array(
         array('max' => 8,  'key' => 'kraken',      'nombre' => 'Rey del Mar menor',           'icon' => '🦑', 'efecto' => 'Casco -25%. Evitar combate requiere tirada grupal.', 'tone' => 'crit'),
@@ -97,7 +97,7 @@ function ope_oraculo_mesa_peligros()
 }
 
 /** Busca entrada de mesa por D100 (tabla acumulativa por max). */
-function ope_oraculo_lookup(array $mesa, int $roll)
+function gbe_oraculo_lookup(array $mesa, int $roll)
 {
     $roll = max(1, min(100, $roll));
     foreach ($mesa as $row) {
@@ -109,10 +109,10 @@ function ope_oraculo_lookup(array $mesa, int $roll)
 }
 
 /** Calcula modificadores acumulados de oficios + barco. */
-function ope_oraculo_calc_mods(array $tripulantes, string $barco_tipo)
+function gbe_oraculo_calc_mods(array $tripulantes, string $barco_tipo)
 {
     $mods = array('clima' => 0, 'encuentros' => 0, 'hallazgos' => 0, 'peligros' => 0);
-    $cfg  = ope_oraculo_oficios_config();
+    $cfg  = gbe_oraculo_oficios_config();
     foreach ($tripulantes as $t) {
         $of = strtolower(trim((string) ($t['oficio'] ?? '')));
         if ($of === '' || !isset($cfg[$of])) continue;
@@ -120,7 +120,7 @@ function ope_oraculo_calc_mods(array $tripulantes, string $barco_tipo)
             $mods[$mesa] = ($mods[$mesa] ?? 0) + (int) $val;
         }
     }
-    $barcos = ope_oraculo_barcos_config();
+    $barcos = gbe_oraculo_barcos_config();
     $bt = isset($barcos[$barco_tipo]) ? $barcos[$barco_tipo] : $barcos['estandar'];
     $mods['clima']    += (int) ($bt['clima'] ?? 0);
     $mods['peligros'] += (int) ($bt['peligros'] ?? 0);
@@ -128,19 +128,19 @@ function ope_oraculo_calc_mods(array $tripulantes, string $barco_tipo)
 }
 
 /** Aplica mod a un d100 (negativo = mejor suerte en mesas malas). */
-function ope_oraculo_roll_mod(int $base, int $mod)
+function gbe_oraculo_roll_mod(int $base, int $mod)
 {
     return max(1, min(100, $base + $mod));
 }
 
 /** Un tramo completo: 4 tiradas + narrativa. */
-function ope_oraculo_tramo(int $num, array $mods, ?array $forced = null)
+function gbe_oraculo_tramo(int $num, array $mods, ?array $forced = null)
 {
     $mesas = array(
-        'clima'      => ope_oraculo_mesa_clima(),
-        'encuentros' => ope_oraculo_mesa_encuentros(),
-        'hallazgos'  => ope_oraculo_mesa_hallazgos(),
-        'peligros'   => ope_oraculo_mesa_peligros(),
+        'clima'      => gbe_oraculo_mesa_clima(),
+        'encuentros' => gbe_oraculo_mesa_encuentros(),
+        'hallazgos'  => gbe_oraculo_mesa_hallazgos(),
+        'peligros'   => gbe_oraculo_mesa_peligros(),
     );
     $out = array('num' => $num, 'cartas' => array(), 'narrativa' => '');
     $parts = array();
@@ -148,8 +148,8 @@ function ope_oraculo_tramo(int $num, array $mods, ?array $forced = null)
         $raw = isset($forced[$key]) ? (int) $forced[$key] : random_int(1, 100);
         $mod = (int) ($mods[$key] ?? 0);
         // Clima/peligros: mod negativo mejora (baja el roll). Hallazgos/encuentros hostiles: positivo sube.
-        $adj = ($key === 'hallazgos') ? ope_oraculo_roll_mod($raw, $mod) : ope_oraculo_roll_mod($raw, -$mod);
-        $hit = ope_oraculo_lookup($mesa, $adj);
+        $adj = ($key === 'hallazgos') ? gbe_oraculo_roll_mod($raw, $mod) : gbe_oraculo_roll_mod($raw, -$mod);
+        $hit = gbe_oraculo_lookup($mesa, $adj);
         $out['cartas'][$key] = array(
             'roll'    => $raw,
             'roll_adj'=> $adj,
@@ -162,12 +162,12 @@ function ope_oraculo_tramo(int $num, array $mods, ?array $forced = null)
         );
         $parts[] = $hit['nombre'];
     }
-    $out['narrativa'] = ope_oraculo_narrativa_tramo($num, $out['cartas']);
+    $out['narrativa'] = gbe_oraculo_narrativa_tramo($num, $out['cartas']);
     return $out;
 }
 
 /** Texto narrativo combinado para un tramo. */
-function ope_oraculo_narrativa_tramo(int $num, array $cartas)
+function gbe_oraculo_narrativa_tramo(int $num, array $cartas)
 {
     $c = $cartas['clima']['nombre'] ?? 'mar impredecible';
     $e = $cartas['encuentros']['nombre'] ?? 'silencio en el horizonte';
@@ -179,19 +179,19 @@ function ope_oraculo_narrativa_tramo(int $num, array $cartas)
 }
 
 /** Ejecuta el oráculo para N tramos. */
-function ope_oraculo_viaje(int $tramos, array $tripulantes, string $barco_tipo)
+function gbe_oraculo_viaje(int $tramos, array $tripulantes, string $barco_tipo)
 {
     $tramos = max(1, min(5, $tramos));
-    $mods   = ope_oraculo_calc_mods($tripulantes, $barco_tipo);
+    $mods   = gbe_oraculo_calc_mods($tripulantes, $barco_tipo);
     $result = array('mods' => $mods, 'tramos' => array());
     for ($i = 1; $i <= $tramos; $i++) {
-        $result['tramos'][] = ope_oraculo_tramo($i, $mods);
+        $result['tramos'][] = gbe_oraculo_tramo($i, $mods);
     }
     return $result;
 }
 
 /** Posts mínimos y plazo según tramos (INI guía viajes). */
-function ope_oraculo_posts_plazo(int $tramos)
+function gbe_oraculo_posts_plazo(int $tramos)
 {
     $map = array(1 => array(6, 5), 2 => array(12, 10), 3 => array(18, 15), 4 => array(24, 20), 5 => array(30, 25));
     $t = max(1, min(5, $tramos));

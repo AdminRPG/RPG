@@ -1,14 +1,14 @@
 # DESIGN — Granblue Fantasy: Eternal
 
-> **Fuente de verdad del diseño** para el foro de rol *Granblue Fantasy: Eternal* (migración desde *One Piece Eternal*).
+> **Fuente de verdad del diseño** para el foro de rol *Granblue Fantasy: Eternal* (migración desde *Granblue Fantasy: Eternal*).
 >
 > **Estado:** v1 — derivado de prototipos aprobados (`docs/Prototypes/Granblue/index.html` v3.2, `ficha.html` v4) y `docs/PLAN-MAESTRO-GRANBLUE-ETERNAL.md` v3.
 >
 > **Documentos hermanos:** `docs/PLAN-MAESTRO-GRANBLUE-ETERNAL.md` (visión/producto), `docs/MIGRACION-GRANBLUE-TECNICA.md` (purga codename).
 >
-> **CSS en producción:** `docs/themes/ope.css` → servido desde `cache/themes/theme13/ope.css` (renombrar a `gbe.css` en F1).
+> **CSS en producción:** `docs/themes/gbe.css` → servido desde `cache/themes/theme13/gbe.css` (renombrar a `gbe.css` en F1).
 >
-> **Plantillas MyBB:** `docs/themes/ope-index.xml` (portada), páginas PHP autónomas (`index.php`, `ficha.php`, …).
+> **Plantillas MyBB:** `docs/themes/gbe-index.xml` (portada), páginas PHP autónomas (`index.php`, `ficha.php`, …).
 
 ---
 
@@ -20,7 +20,7 @@
 3. [Sistema de dos temas (tokens)](#3-sistema-de-dos-temas-tokens)
 4. [Tipografía](#4-tipografía)
 5. [§7.8 — Scoping de CSS en páginas PHP](#58-scoping-de-css-en-páginas-php)
-6. [Portada (`index.php` / `ope-index.xml`)](#6-portada-indexphp--ope-indexxml)
+6. [Portada (`index.php` / `gbe-index.xml`)](#6-portada-indexphp--gbe-indexxml)
 7. [Tríada visual del personaje](#7-tríada-visual-del-personaje)
 8. [Ficha (`ficha.php`) — layout v4](#8-ficha-fichaphp--layout-v4)
 9. [Convención de imágenes (`images/gbe/`)](#9-convención-de-imágenes-imagesgbe)
@@ -41,10 +41,10 @@ Portar un prototipo (`docs/Prototypes/Granblue/`) = implementar **todas** las ca
 
 | # | Capa | Archivos típicos |
 |---|---|---|
-| 1 | Estructura HTML/XML/PHP | `ope-index.xml`, `index.php`, `ficha.php` |
-| 2 | Tokens `:root` | `docs/themes/ope.css` |
-| 3 | Overrides legacy bajo scope | `body.gbe-index`, `body.ope-pg-*` |
-| 4 | Fuentes / head | `inc/plugins/ope_rol.php`, `headerinclude` |
+| 1 | Estructura HTML/XML/PHP | `gbe-index.xml`, `index.php`, `ficha.php` |
+| 2 | Tokens `:root` | `docs/themes/gbe.css` |
+| 3 | Overrides legacy bajo scope | `body.gbe-index`, `body.gbe-pg-*` |
+| 4 | Fuentes / head | `inc/plugins/gbe_rol.php`, `headerinclude` |
 | 5 | Datos y copy | `index.php`, datacache lore |
 
 ### 0.3 Cierre de tarea UI
@@ -75,11 +75,11 @@ Tema emocional: de *Libertad* (mar, OP) → **Horizonte** (cielo, GBF). La escen
 | Pilar | Sistema en código | Reskin GBF |
 |---|---|---|
 | **Personalización** | `crear-personaje.php`, ficha, stats 12×3 | Razas GBF, clase, elemento, arma, tríada visual |
-| **Combate** | `inc/ope_rol_system.php` (PV/EN/PA, heridas, estados) | Éter, ventaja elemental, técnicas por arma |
+| **Combate** | `inc/gbe_rol_system.php` (PV/EN/PA, heridas, estados) | Éter, ventaja elemental, técnicas por arma |
 | **Tramas** | `rol_mv_*`, tags `--tag-trama/mision/viaje/fic` | "El Equilibrio del Cielo", Astrales/Primals |
 | **Misiones** | `tablon-misiones.php` | Órdenes de Gremio, tiers por Skydom |
 | **Social** | `rol_tripulaciones`, acompañantes, relaciones | Crews, aeronave, summons, renombre |
-| **Aventuras** | Skydoms/islas, `inc/ope_rol_viajes.php` | Rutas de aeronave, progresión geográfica |
+| **Aventuras** | Skydoms/islas, `inc/gbe_rol_viajes.php` | Rutas de aeronave, progresión geográfica |
 
 **Regla de oro:** el motor se conserva, el skin cambia.
 
@@ -100,13 +100,13 @@ Tema emocional: de *Libertad* (mar, OP) → **Horizonte** (cielo, GBF). La escen
 | **Nombre público** | Granblue Fantasy: Eternal |
 | **Codename técnico** | `gbe` |
 | **Prefijo CSS objetivo** | `gbe-*`, `body.gbe-pg-*` |
-| **Prefijo CSS actual (transición)** | `ope-*`, `body.ope-pg-*` — **no eliminar hasta F1** |
+| **Prefijo CSS actual (transición)** | `gbe-*`, `body.gbe-pg-*` — **no eliminar hasta F1** |
 | **Logo** | `images/gbe/crest-eternal.png` |
-| **Bot cronista** | Lyria (sustituye OP-Eternal) |
+| **Bot cronista** | Lyria (sustituye GBEternal) |
 | **Moneda** | Rupies |
 | **Disclaimer footer** | Foro no oficial; sin afiliación Cygames; personajes originales |
 
-> Durante F2b (portado visual) se editan `ope.css` y `ope-index.xml` **sin renombrar archivos**. La purga `ope`→`gbe` es F1 (`MIGRACION-GRANBLUE-TECNICA.md`). Hasta entonces, documentar y codificar pensando en `gbe` pero respetar selectores `ope-*` existentes donde el diff aún no llegue.
+> Durante F2b (portado visual) se editan `gbe.css` y `gbe-index.xml` **sin renombrar archivos**. La purga `ope`→`gbe` es F1 (`MIGRACION-GRANBLUE-TECNICA.md`). Hasta entonces, documentar y codificar pensando en `gbe` pero respetar selectores `gbe-*` existentes donde el diff aún no llegue.
 
 ---
 
@@ -114,11 +114,11 @@ Tema emocional: de *Libertad* (mar, OP) → **Horizonte** (cielo, GBF). La escen
 
 Conmutación vía `html[data-theme="cielo"|"noche"]`. **Por defecto: `cielo`** (claro/acuarela, dirección Relink). El botón de tema alterna entre ambos.
 
-Los prototipos usan tokens semánticos propios (`--bg`, `--card`, `--gold`…). En `ope.css` se **mapean a los nombres heredados** (`--iron`, `--paper`, `--ember`…) para no reescribir miles de reglas. Durante el portado, cambiar valores en `:root` y añadir el selector `[data-theme="noche"]`.
+Los prototipos usan tokens semánticos propios (`--bg`, `--card`, `--gold`…). En `gbe.css` se **mapean a los nombres heredados** (`--iron`, `--paper`, `--ember`…) para no reescribir miles de reglas. Durante el portado, cambiar valores en `:root` y añadir el selector `[data-theme="noche"]`.
 
 ### 3.1 Tema `cielo` (claro — default)
 
-| Token prototipo | Valor | Mapeo `ope.css` | Uso |
+| Token prototipo | Valor | Mapeo `gbe.css` | Uso |
 |---|---|---|---|
 | `--bg` | `#eef4f8` | `--iron` (fondo body) | Fondo base |
 | `--bg-2` | `#f6f3ea` | capa secundaria body | Gradiente cálido |
@@ -142,7 +142,7 @@ Los prototipos usan tokens semánticos propios (`--bg`, `--card`, `--gold`…). 
 
 ### 3.2 Tema `noche` (oscuro)
 
-| Token prototipo | Valor | Mapeo `ope.css` | Uso |
+| Token prototipo | Valor | Mapeo `gbe.css` | Uso |
 |---|---|---|---|
 | `--bg` | `#0e1730` | `--iron` | Cielo nocturno profundo |
 | `--bg-2` | `#0b1226` | capa secundaria | Gradiente base |
@@ -166,7 +166,7 @@ Los prototipos usan tokens semánticos propios (`--bg`, `--card`, `--gold`…). 
 
 ### 3.3 Tokens transversales (ambos temas)
 
-#### Superficies heredadas (`ope.css`)
+#### Superficies heredadas (`gbe.css`)
 
 Se conservan nombres legacy para compatibilidad durante transición:
 
@@ -231,7 +231,7 @@ Aura del PJ: `--aura` = color del elemento activo (borde avatar, chips, borde pa
 | `--fac-gremio` | Gremios |
 | `--fac-libre` | Independientes |
 
-Cada facción define `--fac-*`, `--fac-*-hi`, `--fac-*-ink` (mismo patrón que OP en `:root` de `ope.css` L37–47).
+Cada facción define `--fac-*`, `--fac-*-hi`, `--fac-*-ink` (mismo patrón que OP en `:root` de `gbe.css` L37–47).
 
 #### Tags de cronología (sin cambio estructural)
 
@@ -256,7 +256,7 @@ Cada facción define `--fac-*`, `--fac-*-hi`, `--fac-*-ink` (mismo patrón que O
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 ```
 
-Declaración en `:root` (`ope.css` / `ope-index.xml` → `headerinclude`):
+Declaración en `:root` (`gbe.css` / `gbe-index.xml` → `headerinclude`):
 
 ```css
 --disp:'Cinzel',Georgia,serif;
@@ -300,7 +300,7 @@ Prohibido en UI GBF: pills con glow exagerado, `#5865F2` sólido tipo app móvil
 
 ### 4.3 Sustitución respecto a OP
 
-| OP (`ope.css` actual) | GBF: Eternal |
+| OP (`gbe.css` actual) | GBF: Eternal |
 |---|---|
 | Big Shoulders Display → `--disp` | Cinzel |
 | Archivo → `--body` | Spectral |
@@ -311,7 +311,7 @@ Prohibido en UI GBF: pills con glow exagerado, `#5865F2` sólido tipo app móvil
 
 ## 5. §7.8 — Scoping de CSS en páginas PHP
 
-> Equivalente GBF del scaffolding de páginas PHP. Fuente única: `docs/themes/ope.css` → `cache/themes/theme13/ope.css`.
+> Equivalente GBF del scaffolding de páginas PHP. Fuente única: `docs/themes/gbe.css` → `cache/themes/theme13/gbe.css`.
 
 ### 5.1 Regla de oro
 
@@ -319,14 +319,14 @@ Prohibido en UI GBF: pills con glow exagerado, `#5865F2` sólido tipo app móvil
 
 ### 5.2 Scoping por página
 
-**Estado transición:** `body.ope-pg-<pagina>` (actual en `ficha.php`, `crear-personaje.php`, etc.).
+**Estado transición:** `body.gbe-pg-<pagina>` (actual en `ficha.php`, `crear-personaje.php`, etc.).
 
 **Estado objetivo (post-F1):** `body.gbe-pg-<pagina>`.
 
-Durante F2b se puede usar **doble clase** (`class="ope-pg-ficha gbe-pg-ficha"`) o mantener `ope-pg-*` hasta la purga; al renombrar, duplicar bloques scopeados o usar selector agrupado:
+Durante F2b se puede usar **doble clase** (`class="gbe-pg-ficha gbe-pg-ficha"`) o mantener `gbe-pg-*` hasta la purga; al renombrar, duplicar bloques scopeados o usar selector agrupado:
 
 ```css
-body.ope-pg-ficha .plate,
+body.gbe-pg-ficha .plate,
 body.gbe-pg-ficha .plate { /* … */ }
 ```
 
@@ -334,11 +334,11 @@ body.gbe-pg-ficha .plate { /* … */ }
 
 Las clases estructurales **`.shead` · `.plate` · `.plate-h` · `.plate-b` · `.reveal` · `.flash` · `.pj-empty` NO son globales**. Cada página las **re-declara** bajo su scope. Si estrenas `<body class="gbe-pg-nueva">` y usas esas clases **sin pegar el scaffolding**, la página sale sin borde/fondo/sombra → texto plano.
 
-**Sí son globales** (NO re-declarar): `.wrap`, `.breadcrumb` / `.breadcrumb-in`, `.btn` / `.btn-hot` / `.btn-ghost`, `.ope-prog-ppbar*`, `.ope-prog-hero-bar*`. Tras F1 renombrar prefijos globales progresivamente (`gbe-prog-*`).
+**Sí son globales** (NO re-declarar): `.wrap`, `.breadcrumb` / `.breadcrumb-in`, `.btn` / `.btn-hot` / `.btn-ghost`, `.gbe-prog-ppbar*`, `.gbe-prog-hero-bar*`. Tras F1 renombrar prefijos globales progresivamente (`gbe-prog-*`).
 
 ### 5.4 Scaffolding obligatorio (nueva página)
 
-Pegar en `ope.css` **antes** de reglas específicas. Sustituir `<pagina>` por el slug (`ficha`, `tramites`, `crear-personaje`, …):
+Pegar en `gbe.css` **antes** de reglas específicas. Sustituir `<pagina>` por el slug (`ficha`, `tramites`, `crear-personaje`, …):
 
 ```css
 body.gbe-pg-<pagina> .shead{display:flex;align-items:baseline;gap:14px;margin:8px 0 14px}
@@ -361,7 +361,7 @@ body.gbe-pg-<pagina> .reveal.vis{opacity:1;transform:none}
 
 > **Atajo:** si la página es visualmente idéntica a otra, reutiliza su scope en el `<body>` (`class="gbe-pg-tramites gbe-pg-nueva"`) y solo añade diferencias.
 
-> **Transición:** mientras persista `ope-pg-*`, el scaffolding OP (bordes 2px negro) sigue válido en `ope.css` L1042+. Al portar GBF, migrar a bordes `--line` y `border-radius` del prototipo.
+> **Transición:** mientras persista `gbe-pg-*`, el scaffolding OP (bordes 2px negro) sigue válido en `gbe.css` L1042+. Al portar GBF, migrar a bordes `--line` y `border-radius` del prototipo.
 
 ### 5.5 Variables
 
@@ -369,38 +369,38 @@ Usar **solo** tokens de `:root` (`--ember`, `--paper`, `--iron-plate`, `--crack`
 
 ### 5.6 Workflow sync-theme (OBLIGATORIO)
 
-1. Editar `docs/themes/ope.css` (fuente).
+1. Editar `docs/themes/gbe.css` (fuente).
 2. `php scripts/sync-theme.php import`
 3. `php scripts/sync-theme.php verify` → **`OK CSS: in sync`**
 4. `php scripts/check-inline-styles.php` → limpio
-5. Comprobación visual en navegador (el browser sirve `cache/themes/theme13/ope.css`, **no** el fuente)
+5. Comprobación visual en navegador (el browser sirve `cache/themes/theme13/gbe.css`, **no** el fuente)
 6. Tras cambios en PHP que afecten grafo: `py -m graphify update .`
 
 ---
 
-## 6. Portada (`index.php` / `ope-index.xml`)
+## 6. Portada (`index.php` / `gbe-index.xml`)
 
-Estructura objetivo según prototipo v3.2. Código de referencia actual: `index.php` L741–832 (`$isWorld` → `ope_render_region_cards` + `ope-world-bento`), plantilla `docs/themes/ope-index.xml`.
+Estructura objetivo según prototipo v3.2. Código de referencia actual: `index.php` L741–832 (`$isWorld` → `gbe_render_region_cards` + `gbe-world-bento`), plantilla `docs/themes/gbe-index.xml`.
 
 ### 6.1 Árbol de la portada
 
 ```
 PORTADA
-├── NAV (hook ope_rol — fija, 66px)
+├── NAV (hook gbe_rol — fija, 66px)
 ├── HERO CARRUSEL (100vh, 4 slides, nav lateral + dots)
 ├── GACETA / BITÁCORA (bento, inmediatamente debajo del hero)
 ├── EL CIELO (categoría)
-│     └── Skydoms → paneles-región bento (como ope-world-bento)
+│     └── Skydoms → paneles-región bento (como gbe-world-bento)
 │           └── [clic] → forumdisplay.php → islas (subforos)
 ├── OFF TOPIC (categoría, debajo de El Cielo)
-│     └── Filas ope-forum / gbe-forum en placa (ope-slab / gbe-slab)
-├── EL PUERTO (ope-harbor — censo, presencia, afiliados)
+│     └── Filas gbe-forum / gbe-forum en placa (gbe-slab / gbe-slab)
+├── EL PUERTO (gbe-harbor — censo, presencia, afiliados)
 └── FOOTER
 ```
 
 ### 6.2 Hero carrusel (4 slides)
 
-Reemplaza el `ope-hero` estático actual (`ope-index.xml` L76–86). Altura `100vh`, `min-height: 600px`.
+Reemplaza el `gbe-hero` estático actual (`gbe-index.xml` L76–86). Altura `100vh`, `min-height: 600px`.
 
 | Slide | Clase BG | Imagen sitio | Contenido |
 |---|---|---|---|
@@ -415,23 +415,23 @@ Reemplaza el `ope-hero` estático actual (`ope-index.xml` L76–86). Altura `100
 
 ### 6.3 Gaceta bento (debajo del hero)
 
-Grid equivalente a `ope-tablon` / `.bento` del prototipo:
+Grid equivalente a `gbe-tablon` / `.bento` del prototipo:
 
 | Área grid | Panel | Contenido PHP |
 |---|---|---|
-| `onrol` | Calendario on-rol | `$ope_rol_season`, día/año, barra progreso |
-| `lore` | El mundo ahora | `$ope_lore_title`, `$ope_lore_text` |
-| `feed` | Últimas historias | `$ope_latest_posts` |
+| `onrol` | Calendario on-rol | `$gbe_rol_season`, día/año, barra progreso |
+| `lore` | El mundo ahora | `$gbe_lore_title`, `$gbe_lore_text` |
+| `feed` | Últimas historias | `$gbe_latest_posts` |
 | `news` | Gaceta del Cielo | Mundo Vivo / noticias rotativas |
-| `staff` | El equipo | `$ope_staff_list` |
+| `staff` | El equipo | `$gbe_staff_list` |
 
-En OP el tablón comparte fila con el hero (`ope-top`); en GBF el tablón va **debajo** del carrusel full-viewport (un solo scroll vertical).
+En OP el tablón comparte fila con el hero (`gbe-top`); en GBF el tablón va **debajo** del carrusel full-viewport (un solo scroll vertical).
 
 ### 6.4 Skydoms — bento de regiones
 
-Misma mecánica que `ope-world-bento` (`ope.css` L719–756). Detección en `index.php`: categoría con islas hijas o nombre conteniendo "mundo"/"cielo" → `$isWorld`.
+Misma mecánica que `gbe-world-bento` (`gbe.css` L719–756). Detección en `index.php`: categoría con islas hijas o nombre conteniendo "mundo"/"cielo" → `$isWorld`.
 
-**Grid objetivo** (clases prototipo → portar como `gbe-regions` o renombrar `ope-world-bento`):
+**Grid objetivo** (clases prototipo → portar como `gbe-regions` o renombrar `gbe-world-bento`):
 
 ```
 grid-template-areas:
@@ -459,38 +459,38 @@ El portado a MyBB **no es copiar el carrusel**: el prototipo es un sistema visua
 
 | Componente | Prototipo (`index.html` v3.2) | Producción MyBB | Estado |
 |---|---|---|---|
-| Tokens `:root` cielo | `--gbe-*` claros | `ope.css` `:root` remapeado | ✅ |
+| Tokens `:root` cielo | `--gbe-*` claros | `gbe.css` `:root` remapeado | ✅ |
 | `body` scope | `body` + `html[data-theme]` | `body.gbe-index` en plantilla | ✅ |
 | Hero 100vh full-bleed | Sin contenedor estrecho | `.gbe-hero-wrap` + CSS scope | ✅ (verificar visual) |
-| Gaceta bento | Grid `"lore feed onrol" / "lore news staff"` | `gbe-bento` + overrides `.ope-panel` | ✅ (verificar visual) |
+| Gaceta bento | Grid `"lore feed onrol" / "lore news staff"` | `gbe-bento` + overrides `.gbe-panel` | ✅ (verificar visual) |
 | Secciones Skydom/OT | `.section` + `.wm` + `.stitle` | `index.php` → `.gbe-section` | ✅ |
-| Navbar | 66px, crest, Cormorant, sin bordes negros | `#ope-navbar` global `--gbe-nav-h` / `--gbe-wrap` | ✅ sitio completo |
-| Breadcrumb | Mismo GBF en foros y `.php` | `#ope-breadcrumb` + `.breadcrumb` global | ✅ |
-| Fuentes PHP | Cinzel/Cormorant/Spectral | `ope_rol_head_base()` actualizado | ✅ |
+| Navbar | 66px, crest, Cormorant, sin bordes negros | `#gbe-navbar` global `--gbe-nav-h` / `--gbe-wrap` | ✅ sitio completo |
+| Breadcrumb | Mismo GBF en foros y `.php` | `#gbe-breadcrumb` + `.breadcrumb` global | ✅ |
+| Fuentes PHP | Cinzel/Cormorant/Spectral | `gbe_rol_head_base()` actualizado | ✅ |
 | Tema cielo/noche | `html[data-theme]` | Selector OP `eternal/rojo/...` aún | ⏳ mapear a `cielo`/`noche` |
 | `forumdisplay` / `showthread` | Mismo lenguaje GBF | Estilo OP brutalista | ⏳ F2b+ |
-| Páginas PHP (`tramites`, etc.) | Tokens GBF | `body.ope-pg-*` scaffolding OP oscuro | ⏳ F2b+ |
+| Páginas PHP (`tramites`, etc.) | Tokens GBF | `body.gbe-pg-*` scaffolding OP oscuro | ⏳ F2b+ |
 | Assets Skydom | `skydom-zeephone.jpg`, `skydom-estalucia.jpg` | Gradientes CSS fallback | ⏳ |
 | Purga codename `ope`→`gbe` | — | Scripts listos, no aplicados | ⏳ F1 |
 
-**Causa raíz de la discrepancia:** F2b empezó por el carrusel y tokens, pero gran parte del índice seguía usando clases OP (`.ope-tablon`, `.ope-panel` con sombra negra, `.ope-block-cat`, navbar brutalista). El prototipo es **layout + overrides globales en portada**, no un componente aislado.
+**Causa raíz de la discrepancia:** F2b empezó por el carrusel y tokens, pero gran parte del índice seguía usando clases OP (`.gbe-tablon`, `.gbe-panel` con sombra negra, `.gbe-block-cat`, navbar brutalista). El prototipo es **layout + overrides globales en portada**, no un componente aislado.
 
 **Cierre F2b (checklist):** comparar lado a lado prototipo vs `index.php` tras `sync-theme verify`; hard refresh; corregir drift en harbor, botones slide, anchor `#cat_{fid}`.
 
 ### 6.5 Off Topic — slab
 
-Categorías sin islas hijas → `$isWorld = false` → filas `.ope-forum` dentro de `.ope-slab` (`index.php` L794–830). Misma estructura en prototipo: `.gbe-slab` + `.gbe-forum`.
+Categorías sin islas hijas → `$isWorld = false` → filas `.gbe-forum` dentro de `.gbe-slab` (`index.php` L794–830). Misma estructura en prototipo: `.gbe-slab` + `.gbe-forum`.
 
 ### 6.6 El Puerto (harbor / censo)
 
-Sección `ope-harbor` (`ope-index.xml` L160+). Cuatro contadores + último skyfarer:
+Sección `gbe-harbor` (`gbe-index.xml` L160+). Cuatro contadores + último skyfarer:
 
 | Métrica | Fuente |
 |---|---|
 | Skyfarers | `$stats['numusers']` |
 | Historias | `$stats['numthreads']` |
 | Mensajes | `$stats['numposts']` |
-| Último skyfarer | `$ope_last_char` (`index.php` L835–849) |
+| Último skyfarer | `$gbe_last_char` (`index.php` L835–849) |
 
 Prototipo: count-up animado con GSAP + `[data-count]` (ver §11).
 
@@ -516,7 +516,7 @@ Cada Skyfarer tiene **tres assets propios**. Configurables por el dueño en Gest
 
 ## 8. Ficha (`ficha.php`) — layout v4
 
-Prototipo: `docs/Prototypes/Granblue/ficha.html` v4. Scope CSS: `body.ope-pg-ficha` (→ `body.gbe-pg-ficha`).
+Prototipo: `docs/Prototypes/Granblue/ficha.html` v4. Scope CSS: `body.gbe-pg-ficha` (→ `body.gbe-pg-ficha`).
 
 ### 8.1 Estructura vertical
 
@@ -619,7 +619,7 @@ Ejemplo Skydom: *"Zeephone Skydom, frozen archipelago with ether crystal spires 
 
 ### 10.2 Terminología y sistemas
 
-| One Piece Eternal | Granblue Fantasy: Eternal |
+| Granblue Fantasy: Eternal | Granblue Fantasy: Eternal |
 |---|---|
 | Bounty / recompensa | Renombre de Skyfarer |
 | Berries | Rupies |
@@ -631,7 +631,7 @@ Ejemplo Skydom: *"Zeephone Skydom, frozen archipelago with ether crystal spires 
 | Mar / Grand Line | Cielo / Skydoms / Estalucia |
 | Islas (mares) | Islas (dentro de Skydom) |
 | Calor (heat) | Renombre / fama |
-| OP-Eternal (bot) | Lyria |
+| GBEternal (bot) | Lyria |
 | `images/ope/` | `images/gbe/` |
 | `--fac-pirata`, `--fac-marine`… | `--fac-skyfarer`, `--fac-imperio`… |
 
@@ -639,13 +639,13 @@ Ejemplo Skydom: *"Zeephone Skydom, frozen archipelago with ether crystal spires 
 
 | OP (actual) | GBF (objetivo) | Notas |
 |---|---|---|
-| `ope-hero` | `gbe-hero` + carrusel | Reestructura `ope-index.xml` |
-| `ope-world-bento` | `gbe-regions` | Misma grid, nuevos modifiers |
-| `ope-region--east-blue` | `gbe-region--phantagrande` | Por Skydom |
-| `ope-slab` / `ope-forum` | `gbe-slab` / `gbe-forum` | Off Topic |
-| `ope-harbor` / `ope-census-*` | conservar o alias `gbe-*` | Censo |
+| `gbe-hero` | `gbe-hero` + carrusel | Reestructura `gbe-index.xml` |
+| `gbe-world-bento` | `gbe-regions` | Misma grid, nuevos modifiers |
+| `gbe-region--east-blue` | `gbe-region--phantagrande` | Por Skydom |
+| `gbe-slab` / `gbe-forum` | `gbe-slab` / `gbe-forum` | Off Topic |
+| `gbe-harbor` / `gbe-census-*` | conservar o alias `gbe-*` | Censo |
 | `forge-banner` | `char-banner` | Alinear con prototipo v4 |
-| `ope-pg-ficha` | `gbe-pg-ficha` | Tras F1 |
+| `gbe-pg-ficha` | `gbe-pg-ficha` | Tras F1 |
 
 ---
 
@@ -655,7 +655,7 @@ Ejemplo Skydom: *"Zeephone Skydom, frozen archipelago with ether crystal spires 
 
 | Librería | Uso | Dónde |
 |---|---|---|
-| **GSAP 3** + **ScrollTrigger** | Reveals on scroll (`.reveal`), count-up censo (`[data-count]`) | Portada (`index.php` / inline post-`ope-index.xml`) |
+| **GSAP 3** + **ScrollTrigger** | Reveals on scroll (`.reveal`), count-up censo (`[data-count]`) | Portada (`index.php` / inline post-`gbe-index.xml`) |
 | **jQuery** | MyBB core | Heredado |
 | JS vanilla | Carrusel hero (slides, dots, teclado, swipe) | Portada |
 
@@ -689,7 +689,7 @@ Toggle en navbar: alterna `document.documentElement.dataset.theme` entre `cielo`
 
 ## Apéndice A — Checklist pre-ship (página o portada)
 
-- [ ] Clases HTML resuelven (global o `body.gbe-pg-*` / `body.ope-pg-*`)
+- [ ] Clases HTML resuelven (global o `body.gbe-pg-*` / `body.gbe-pg-*`)
 - [ ] Scaffolding pegado si página nueva
 - [ ] Sin `<style>` ni `style="..."` estáticos
 - [ ] `php scripts/check-inline-styles.php` limpio
@@ -711,11 +711,11 @@ Toggle en navbar: alterna `document.documentElement.dataset.theme` entre `cielo`
 | `AGENTS.md` | Resumen reglas raíz del repo |
 | `docs/Prototypes/Granblue/index.html` | Prototipo portada v3.2 |
 | `docs/Prototypes/Granblue/ficha.html` | Prototipo ficha v4 |
-| `docs/themes/ope.css` | Tema fuente (4215+ líneas) |
-| `docs/themes/ope-index.xml` | Plantilla MyBB portada |
+| `docs/themes/gbe.css` | Tema fuente (4215+ líneas) |
+| `docs/themes/gbe-index.xml` | Plantilla MyBB portada |
 | `index.php` | Lógica categorías Skydom/Off Topic |
 | `ficha.php` | Ficha personaje, tríada, tabs |
-| `inc/plugins/ope_rol.php` | Navbar, hooks, helpers región |
+| `inc/plugins/gbe_rol.php` | Navbar, hooks, helpers región |
 | `scripts/sync-theme.php` | Import/verify CSS → cache |
 | `scripts/check-inline-styles.php` | Linter estilos inline |
 | `images/gbe/` | Assets globales del sitio |

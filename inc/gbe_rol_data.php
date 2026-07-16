@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Catálogo del sistema de rol "One Piece Eternal"
+ * I-Forge · Catálogo del sistema de rol "Granblue Fantasy: Eternal"
  * -----------------------------------------------------------------
  * Fuente única de verdad para el wizard de creación de personaje
  * (crear-personaje.php) y su validación server-side. Transcrito de
@@ -15,9 +15,9 @@ if (!defined('IN_MYBB')) {
     die('Direct initialization of this file is not allowed.');
 }
 
-if (!function_exists('ope_rol_stats')) {
+if (!function_exists('gbe_rol_stats')) {
     /** Las 12 stats, agrupadas en 3 pilares. */
-    function ope_rol_stats()
+    function gbe_rol_stats()
     {
         return array(
             'cuerpo' => array(
@@ -51,10 +51,10 @@ if (!function_exists('ope_rol_stats')) {
     }
 
     /** Lista plana de las 12 siglas, en orden de presentación. */
-    function ope_rol_stat_keys()
+    function gbe_rol_stat_keys()
     {
         $keys = array();
-        foreach (ope_rol_stats() as $pilar) {
+        foreach (gbe_rol_stats() as $pilar) {
             foreach ($pilar['stats'] as $k => $v) {
                 $keys[] = $k;
             }
@@ -62,11 +62,11 @@ if (!function_exists('ope_rol_stats')) {
         return $keys;
     }
 
-    function ope_rol_nivel_from_sum($sum) {
+    function gbe_rol_nivel_from_sum($sum) {
         return (int) floor(((int)$sum) / 10);
     }
 
-    function ope_rol_nivel_label($nivel) {
+    function gbe_rol_nivel_label($nivel) {
         $n = (int)$nivel;
         if ($n >= 100) return 'Leyenda';
         if ($n >= 80)  return 'Emperador';
@@ -78,45 +78,45 @@ if (!function_exists('ope_rol_stats')) {
         return 'Civil';
     }
 
-if (!function_exists('ope_rol_stats_para_nivel')) {
+if (!function_exists('gbe_rol_stats_para_nivel')) {
     /** Puntos de stat acumulados necesarios para alcanzar un nivel. */
-    function ope_rol_stats_para_nivel($nivel_objetivo) {
+    function gbe_rol_stats_para_nivel($nivel_objetivo) {
         $n = max(1, (int)$nivel_objetivo);
         return $n * $n * 5;
     }
 }
 
-if (!function_exists('ope_rol_nivel_maximo_stats')) {
+if (!function_exists('gbe_rol_nivel_maximo_stats')) {
     /** Máximo nivel alcanzable con X puntos de stat ganados. */
-    function ope_rol_nivel_maximo_stats($stats_ganados) {
+    function gbe_rol_nivel_maximo_stats($stats_ganados) {
         $pts = (int)$stats_ganados;
         $nivel = 1;
-        while ($nivel < 100 && ope_rol_stats_para_nivel($nivel + 1) <= $pts) {
+        while ($nivel < 100 && gbe_rol_stats_para_nivel($nivel + 1) <= $pts) {
             $nivel++;
         }
         return $nivel;
     }
 }
 
-if (!function_exists('ope_rol_puede_subir_stats')) {
+if (!function_exists('gbe_rol_puede_subir_stats')) {
     /** ¿Puede este personaje seguir subiendo stats o necesita nivel antes? */
-    function ope_rol_puede_subir_stats($nivel_actual, $stats_ganados) {
+    function gbe_rol_puede_subir_stats($nivel_actual, $stats_ganados) {
         $n = max(1, (int)$nivel_actual);
-        $limite = ope_rol_stats_para_nivel($n + 1);
+        $limite = gbe_rol_stats_para_nivel($n + 1);
         return ((int)$stats_ganados) < $limite;
     }
 }
 
-if (!function_exists('ope_rol_puede_subir_nivel')) {
+if (!function_exists('gbe_rol_puede_subir_nivel')) {
     /** ¿Puede subir de nivel? */
-    function ope_rol_puede_subir_nivel($nivel_actual, $stats_ganados) {
+    function gbe_rol_puede_subir_nivel($nivel_actual, $stats_ganados) {
         $n = max(1, (int)$nivel_actual);
-        $necesario = ope_rol_stats_para_nivel($n + 1);
+        $necesario = gbe_rol_stats_para_nivel($n + 1);
         return ((int)$stats_ganados) >= $necesario;
     }
 }
 
-    function ope_rol_stat_num($stats, $key, $default = 5) {
+    function gbe_rol_stat_num($stats, $key, $default = 5) {
         if (!is_array($stats) || !array_key_exists($key, $stats)) {
             return max(0, (int)$default);
         }
@@ -124,16 +124,16 @@ if (!function_exists('ope_rol_puede_subir_nivel')) {
     }
 
     /** Suma de las 12 stats efectivas (INI-04 / INI-01). */
-    function ope_rol_stat_sum($stats)
+    function gbe_rol_stat_sum($stats)
     {
         $sum = 0;
-        foreach (ope_rol_stat_keys() as $sk) {
-            $sum += ope_rol_stat_num($stats, $sk);
+        foreach (gbe_rol_stat_keys() as $sk) {
+            $sum += gbe_rol_stat_num($stats, $sk);
         }
         return $sum;
     }
 
-    function ope_rol_stat_upgrade_cost($current_val) {
+    function gbe_rol_stat_upgrade_cost($current_val) {
         $v = (int)$current_val;
         if ($v >= 101) return 12;
         if ($v >= 81)  return 8;
@@ -143,7 +143,7 @@ if (!function_exists('ope_rol_puede_subir_nivel')) {
         return 1;
     }
 
-    function ope_rol_stat_label($val) {
+    function gbe_rol_stat_label($val) {
         $v = (int)$val;
         if ($v >= 100) return 'Trascendente';
         if ($v >= 80)  return 'Legendario';
@@ -156,8 +156,8 @@ if (!function_exists('ope_rol_puede_subir_nivel')) {
     }
 }
 
-if (!function_exists('ope_rol_razas')) {
-    function ope_rol_razas()
+if (!function_exists('gbe_rol_razas')) {
+    function gbe_rol_razas()
     {
         return array(
             'humano' => array(
@@ -244,46 +244,46 @@ if (!function_exists('ope_rol_razas')) {
     }
 }
 
-if (!function_exists('ope_rol_facciones')) {
-    function ope_rol_facciones()
+if (!function_exists('gbe_rol_facciones')) {
+    function gbe_rol_facciones()
     {
         return array(
             'marine' => array(
-                'nombre' => 'Marine',
-                'desc' => 'Soldado del Gobierno Mundial. Justicia, orden, jerarquía.',
-                'ventaja' => '+1 rango de facción (partes como Recluta en lugar de Aspirante). Acceso a recursos Marines.',
+                'nombre' => 'Ejército Imperial',
+                'desc' => 'Soldados y caballeros del Imperio de Erste. Justicia, orden, jerarquía.',
+                'ventaja' => '+1 rango de facción (partes como Recluta en lugar de Aspirante). Acceso a recursos Imperiales.',
             ),
             'pirata' => array(
-                'nombre' => 'Pirata',
-                'desc' => 'Libre en el mar. Tripulación, bandera, sueños.',
-                'ventaja' => 'Empiezas con un bote/barco pequeño. +10% ganancia de Wanted.',
+                'nombre' => 'Skyfarer',
+                'desc' => 'Navegantes libres del cielo. Tripulación, aeronave, sueños.',
+                'ventaja' => 'Empiezas con una aeronave pequeña. +10% ganancia de Renombre.',
             ),
             'revolucionario' => array(
-                'nombre' => 'Revolucionario',
-                'desc' => 'Miembro del Ejército Revolucionario. Lucha en las sombras.',
-                'ventaja' => 'Identidad secreta gratuita. Acceso a red de contactos revolucionarios.',
+                'nombre' => 'La Sociedad / Rebeldes',
+                'desc' => 'Luchadores que operan en las sombras contra el Imperio.',
+                'ventaja' => 'Identidad secreta gratuita. Acceso a red de contactos de La Sociedad.',
             ),
             'gobierno' => array(
-                'nombre' => 'Gobierno Mundial',
-                'desc' => 'Agente, burócrata o oficial gubernamental de baja escala: Cipher Pol, burocracia y operaciones encubiertas.',
-                'ventaja' => '+1 rango inicial de Gobierno. Empiezas con una Acreditación Gubernamental oficial que permite libre tránsito por reinos afiliados.',
+                'nombre' => 'Gobierno / Orden Celestial',
+                'desc' => 'Agente, burócrata u oficial del Gobierno Celestial. Burocracia y operaciones encubiertas.',
+                'ventaja' => '+1 rango inicial de Gobierno. Empiezas con una Acreditación Gubernamental oficial que permite libre tránsito por Skydoms afiliados.',
             ),
             'cazarrecompensas' => array(
-                'nombre' => 'Cazarrecompensas',
-                'desc' => 'Independiente. Caza piratas y forajidos por dinero.',
-                'ventaja' => '+1 nivel en el Gremio de Cazadores. +10% berries por capturas.',
+                'nombre' => 'Gremio de Cazadores',
+                'desc' => 'Independientes. Cazan bestias, monstruos y forajidos por dinero.',
+                'ventaja' => '+1 nivel en el Gremio de Cazadores. +10% rupies por capturas.',
             ),
             'civil' => array(
                 'nombre' => 'Civil',
                 'desc' => 'Comerciante, artesano, médico, erudito...',
-                'ventaja' => '+1 Oficio gratuito. Sin Wanted inicial. Sin enemigos declarados.',
+                'ventaja' => '+1 Oficio gratuito. Sin Renombre inicial. Sin enemigos declarados.',
             ),
         );
     }
 }
 
-if (!function_exists('ope_rol_armas')) {
-    function ope_rol_armas()
+if (!function_exists('gbe_rol_armas')) {
+    function gbe_rol_armas()
     {
         return array(
             'contundente' => array('nombre' => 'Arma contundente (palo, maza)', 'detalle' => '1d6 + FUE · cuerpo a cuerpo. Puede noquear.'),
@@ -295,14 +295,14 @@ if (!function_exists('ope_rol_armas')) {
     }
 }
 
-if (!function_exists('ope_rol_packs_equipo')) {
+if (!function_exists('gbe_rol_packs_equipo')) {
     /**
      * Packs de Equipo Inicial (INI-01, Paso 6). Sustituyen la vieja pareja
      * "arma a elección + objeto personal libre": ahora se elige UN pack
      * cerrado que se adapta al concepto del personaje.
      *
      * Todos incluyen vestimenta básica de viaje, raciones para 5 días y
-     * 50,000 berries iniciales (ver ope_rol_berries_iniciales()).
+     * 50,000 rupies iniciales (ver gbe_rol_rupies_iniciales()).
      *
      * NOTA: 'contenido' es solo texto descriptivo por ahora. Falta la
      * segunda fase (pendiente, fácil de añadir después): convertir cada
@@ -311,7 +311,7 @@ if (!function_exists('ope_rol_packs_equipo')) {
      * personaje. Por ahora el pack elegido solo queda registrado en el
      * inventario, para no perder la elección hasta que se implemente eso.
      */
-    function ope_rol_packs_equipo()
+    function gbe_rol_packs_equipo()
     {
         return array(
             'combatiente' => array(
@@ -361,12 +361,12 @@ if (!function_exists('ope_rol_packs_equipo')) {
     }
 }
 
-if (!function_exists('ope_rol_virtudes')) {
+if (!function_exists('gbe_rol_virtudes')) {
     /**
      * Catálogo de virtudes (coste en PC). 'spec' = true si el ítem requiere
      * que el jugador especifique algo en un campo de texto libre.
      */
-    function ope_rol_virtudes()
+    function gbe_rol_virtudes()
     {
         return array(
             'A) Linaje e Identidad' => array(
@@ -422,9 +422,9 @@ if (!function_exists('ope_rol_virtudes')) {
                 'V-PRO-06' => array('nombre' => 'Iron Heart', 'coste' => 2, 'desc' => '3 Huecos de Mejora adicionales para implantes.'),
             ),
             'F) Riqueza y Posesiones' => array(
-                'V-RIQ-01' => array('nombre' => 'Adinerado 1', 'coste' => 1, 'desc' => '+1,000,000 berries iniciales.'),
-                'V-RIQ-02' => array('nombre' => 'Adinerado 2', 'coste' => 2, 'desc' => '+3,000,000 berries iniciales. Requiere Adinerado 1.'),
-                'V-RIQ-03' => array('nombre' => 'Adinerado 3', 'coste' => 3, 'desc' => '+10,000,000 berries iniciales. Requiere Adinerado 2.'),
+                'V-RIQ-01' => array('nombre' => 'Adinerado 1', 'coste' => 1, 'desc' => '+1,000,000 rupies iniciales.'),
+                'V-RIQ-02' => array('nombre' => 'Adinerado 2', 'coste' => 2, 'desc' => '+3,000,000 rupies iniciales. Requiere Adinerado 1.'),
+                'V-RIQ-03' => array('nombre' => 'Adinerado 3', 'coste' => 3, 'desc' => '+10,000,000 rupies iniciales. Requiere Adinerado 2.'),
                 'V-RIQ-04' => array('nombre' => 'Reliquia Familiar', 'coste' => 2, 'desc' => 'Objeto especial heredado: Caja de Artefacto Tier 1 (contenido determinado por staff).'),
                 'V-RIQ-05' => array('nombre' => 'Mascota', 'coste' => 3, 'desc' => 'Animal de compañía Tier 2.', 'spec' => true),
             ),
@@ -437,9 +437,9 @@ if (!function_exists('ope_rol_virtudes')) {
     }
 }
 
-if (!function_exists('ope_rol_defectos')) {
+if (!function_exists('gbe_rol_defectos')) {
     /** Catálogo de defectos (PC que devuelven). */
-    function ope_rol_defectos()
+    function gbe_rol_defectos()
     {
         return array(
             'H) Salud y Cuerpo' => array(
@@ -519,15 +519,15 @@ if (!function_exists('ope_rol_defectos')) {
     }
 }
 
-if (!function_exists('ope_rol_ps_iniciales')) {
-    function ope_rol_ps_iniciales($raza = '') {
+if (!function_exists('gbe_rol_ps_iniciales')) {
+    function gbe_rol_ps_iniciales($raza = '') {
         if ($raza === 'humano') return 40;
         return 30;
     }
 }
 
-if (!function_exists('ope_rol_aplicar_pasivas')) {
-    function ope_rol_aplicar_pasivas($stats_base, $raza_data) {
+if (!function_exists('gbe_rol_aplicar_pasivas')) {
+    function gbe_rol_aplicar_pasivas($stats_base, $raza_data) {
         $efectivas = $stats_base;
         $mults = isset($raza_data['multiplicadores']) ? $raza_data['multiplicadores'] : array();
         foreach ($mults as $stat => $factor) {
@@ -539,38 +539,38 @@ if (!function_exists('ope_rol_aplicar_pasivas')) {
     }
 }
 
-if (!function_exists('ope_rol_stats_base')) {
-    function ope_rol_stats_base() {
+if (!function_exists('gbe_rol_stats_base')) {
+    function gbe_rol_stats_base() {
         $base = array();
-        foreach (ope_rol_stat_keys() as $sk) {
+        foreach (gbe_rol_stat_keys() as $sk) {
             $base[$sk] = 5;
         }
         return $base;
     }
 }
 
-if (!function_exists('ope_rol_pc_iniciales')) {
-    function ope_rol_pc_iniciales() { return 6; }
+if (!function_exists('gbe_rol_pc_iniciales')) {
+    function gbe_rol_pc_iniciales() { return 6; }
 }
 
-if (!function_exists('ope_rol_berries_iniciales')) {
-    function ope_rol_berries_iniciales() { return 50000; }
+if (!function_exists('gbe_rol_rupies_iniciales')) {
+    function gbe_rol_rupies_iniciales() { return 50000; }
 }
 
-if (!function_exists('ope_rol_find_virtud')) {
-    function ope_rol_find_virtud($id)
+if (!function_exists('gbe_rol_find_virtud')) {
+    function gbe_rol_find_virtud($id)
     {
-        foreach (ope_rol_virtudes() as $cat) {
+        foreach (gbe_rol_virtudes() as $cat) {
             if (isset($cat[$id])) return $cat[$id];
         }
         return null;
     }
 }
 
-if (!function_exists('ope_rol_find_defecto')) {
-    function ope_rol_find_defecto($id)
+if (!function_exists('gbe_rol_find_defecto')) {
+    function gbe_rol_find_defecto($id)
     {
-        foreach (ope_rol_defectos() as $cat) {
+        foreach (gbe_rol_defectos() as $cat) {
             if (isset($cat[$id])) return $cat[$id];
         }
         return null;
@@ -583,7 +583,7 @@ if (!function_exists('ope_rol_find_defecto')) {
 // (gestionar-cartas.php) y el render del deck en la ficha.
 // ─────────────────────────────────────────────────────────────
 
-if (!function_exists('ope_rol_tecnica_tags')) {
+if (!function_exists('gbe_rol_tecnica_tags')) {
     /**
      * Las 6 categorías de tags de una carta de técnica.
      *   key      → identificador de la categoría (se guarda en JSON)
@@ -594,7 +594,7 @@ if (!function_exists('ope_rol_tecnica_tags')) {
      *   accent   → variable CSS de color de acento
      *   tags     → id => etiqueta visible
      */
-    function ope_rol_tecnica_tags()
+    function gbe_rol_tecnica_tags()
     {
         return array(
             'estilo' => array(
@@ -706,12 +706,12 @@ if (!function_exists('ope_rol_tecnica_tags')) {
     }
 }
 
-if (!function_exists('ope_rol_tecnica_tiers')) {
+if (!function_exists('gbe_rol_tecnica_tiers')) {
     /**
      * Los 5 tiers de carta. Cada uno trae su presupuesto de poder
      * recomendado (para pistas y autocompletado en el creador).
      */
-    function ope_rol_tecnica_tiers()
+    function gbe_rol_tecnica_tiers()
     {
         return array(
             1 => array('romano' => 'I',   'rango' => 'F – D',    'pp' => 5,  'pa' => '1 – 2', 'en' => '5 – 10',  'reposo' => '0',            'dados' => '1d6 a 1d8 + stat', 'pa_def' => 1, 'en_def' => 8,  'reposo_def' => 0, 'dados_def' => '1d8 + FUE'),
@@ -723,15 +723,15 @@ if (!function_exists('ope_rol_tecnica_tiers')) {
     }
 }
 
-if (!function_exists('ope_rol_tecnica_valida_tags')) {
+if (!function_exists('gbe_rol_tecnica_valida_tags')) {
     /**
      * Normaliza y valida un conjunto de tags contra el catálogo.
      * Devuelve array('estilo'=>[...], 'tipo'=>'', ...) saneado y respetando
      * multi/single y los topes 'max'. Descarta ids desconocidos.
      */
-    function ope_rol_tecnica_valida_tags($in)
+    function gbe_rol_tecnica_valida_tags($in)
     {
-        $cat = ope_rol_tecnica_tags();
+        $cat = gbe_rol_tecnica_tags();
         $out = array();
         foreach ($cat as $ck => $c) {
             $valid = $c['tags'];
@@ -756,15 +756,15 @@ if (!function_exists('ope_rol_tecnica_valida_tags')) {
     }
 }
 
-if (!function_exists('ope_rol_tecnica_tags_flat')) {
+if (!function_exists('gbe_rol_tecnica_tags_flat')) {
     /**
      * Convierte la estructura de tags en una lista plana con formato
      * "[Categoría: Valor]" (como en la guía INI-03), lista para pintar chips.
      * Cada item: array('cat'=>ck, 'accent'=>css, 'texto'=>'[Estilo: Propio]', 'valor'=>'Propio').
      */
-    function ope_rol_tecnica_tags_flat($tags)
+    function gbe_rol_tecnica_tags_flat($tags)
     {
-        $cat = ope_rol_tecnica_tags();
+        $cat = gbe_rol_tecnica_tags();
         $flat = array();
         foreach ($cat as $ck => $c) {
             $etq = $c['nombre'];

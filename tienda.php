@@ -2,7 +2,7 @@
 /**
  * I-Forge · Tienda del foro — Bazar Pirata
  * Productos poblados desde BD (rol_tienda_items). Sin datos mockup.
- * Estilos en docs/themes/ope.css (scope: ope-pg-tienda).
+ * Estilos en docs/themes/gbe.css (scope: gbe-pg-tienda).
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'tienda.php');
@@ -11,9 +11,9 @@ require_once './global.php';
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 
-$tiendas    = ope_rol_cat_tiendas();
-$cat_labels = ope_rol_cat_categoria_labels();
-$items      = ope_rol_cat_tienda_items();
+$tiendas    = gbe_rol_cat_tiendas();
+$cat_labels = gbe_rol_cat_categoria_labels();
+$items      = gbe_rol_cat_tienda_items();
 
 $productos = array();
 foreach ($items as $p) {
@@ -42,11 +42,11 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Tienda</title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-tienda">
+<body class="gbe-pg-tienda">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb"><div class="breadcrumb-in"><a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span><a href="<?php echo $bburl; ?>/tramites.php">Trámites</a><span class="sep">›</span><b>Tienda</b></div></div>
 

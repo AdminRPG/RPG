@@ -20,14 +20,14 @@ $rol_seasons = array(
     array('Invierno',  'var(--h1)'),
 );
 
-$cal = ope_rol_onrol_calendar();
+$cal = gbe_rol_onrol_calendar();
 $rol_year       = (int) $cal['year'];
 $rol_day        = (int) $cal['day'];
 $rol_season     = (string) $cal['season'];
 $rol_season_idx = (int) $cal['season_idx'];
 $s_color        = $rol_seasons[$rol_season_idx][1];
 
-$year_label = function_exists('ope_rol_year_label') ? ope_rol_year_label($rol_year) : (string)$rol_year;
+$year_label = function_exists('gbe_rol_year_label') ? gbe_rol_year_label($rol_year) : (string)$rol_year;
 
 $notas = array();
 if ($db->table_exists('rol_calendario')) {
@@ -44,11 +44,11 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Calendario On-Rol</title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-calendario-onrol">
+<body class="gbe-pg-calendario-onrol">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

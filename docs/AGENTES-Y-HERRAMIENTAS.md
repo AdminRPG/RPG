@@ -9,7 +9,7 @@
 
 **Síntoma:** `localhost/iforge/` no se veía como `docs/Prototypes/Granblue/index.html` pese a “haber portado el index”.
 
-**Causa:** portado **parcial** — solo el carrusel GBF; el resto seguía con clases/reglas OP (tablón brutalista, navbar oscura, categorías `.ope-block-cat`, fuentes Archivo/Big Shoulders).
+**Causa:** portado **parcial** — solo el carrusel GBF; el resto seguía con clases/reglas OP (tablón brutalista, navbar oscura, categorías `.gbe-block-cat`, fuentes Archivo/Big Shoulders).
 
 **Regla de oro:**
 
@@ -34,21 +34,21 @@
 |---|---|---|
 | **A — Estructura** | HTML/XML/PHP: secciones, wrappers, `body` scope, grid areas | Hero suelto sin gaceta/skydoms |
 | **B — Tokens** | `:root`, `--gbe-*` / mapeo `--iron`, `--paper`… | Fondo claro pero paneles OP negros |
-| **C — Overrides legacy** | Reglas bajo `body.gbe-index` o `body.ope-pg-*` que **anulan** `.ope-panel`, `.ope-shead`, `#ope-navbar`… | Clases OP heredadas dominan |
-| **D — Head / fuentes** | `ope_rol_head_base()` **y** `headerinclude` del tema | Solo el tema tiene Cinzel; PHP no |
+| **C — Overrides legacy** | Reglas bajo `body.gbe-index` o `body.gbe-pg-*` que **anulan** `.gbe-panel`, `.gbe-shead`, `#gbe-navbar`… | Clases OP heredadas dominan |
+| **D — Head / fuentes** | `gbe_rol_head_base()` **y** `headerinclude` del tema | Solo el tema tiene Cinzel; PHP no |
 | **E — Datos / copy** | Lore, títulos de sección, slugs Skydom en `index.php` | Estructura GBF con textos OP |
 
 ### 2.3 Mapa archivo ↔ capa (portada)
 
 | Capa prototipo | Archivos producción |
 |---|---|
-| Hero 100vh + CTAs | `docs/themes/ope-index.xml`, `ope.css` → `body.gbe-index .gbe-hero*` |
-| Gaceta bento | `ope-index.xml`, `ope.css` → `.gbe-bento` + overrides `.ope-panel` |
-| Skydoms | `index.php` (HTML categorías), `ope.css` → `.gbe-world-bento` |
-| Off Topic | `index.php`, `ope.css` → `.gbe-slab` |
-| El Puerto | `ope-index.xml`, `ope.css` → `.gbe-harbor` |
-| Navbar | `inc/plugins/ope_rol.php` + `ope.css` scope portada (luego global) |
-| Fuentes | `ope_rol.php` + `ope-index.xml` `headerinclude` |
+| Hero 100vh + CTAs | `docs/themes/gbe-index.xml`, `gbe.css` → `body.gbe-index .gbe-hero*` |
+| Gaceta bento | `gbe-index.xml`, `gbe.css` → `.gbe-bento` + overrides `.gbe-panel` |
+| Skydoms | `index.php` (HTML categorías), `gbe.css` → `.gbe-world-bento` |
+| Off Topic | `index.php`, `gbe.css` → `.gbe-slab` |
+| El Puerto | `gbe-index.xml`, `gbe.css` → `.gbe-harbor` |
+| Navbar | `inc/plugins/gbe_rol.php` + `gbe.css` scope portada (luego global) |
+| Fuentes | `gbe_rol.php` + `gbe-index.xml` `headerinclude` |
 
 ### 2.4 Después de editar (siempre)
 
@@ -59,17 +59,17 @@ php scripts/check-inline-styles.php      # limpio
 py -m graphify update .
 ```
 
-- [ ] **Hard refresh** en navegador (`Ctrl+Shift+R`) — el navegador sirve `cache/themes/theme13/ope.css`, no `docs/themes/ope.css`.
+- [ ] **Hard refresh** en navegador (`Ctrl+Shift+R`) — el navegador sirve `cache/themes/theme13/gbe.css`, no `docs/themes/gbe.css`.
 - [ ] Comparación visual lado a lado con prototipo (§3).
 
 ### 2.5 Checklist mínimo — portada (`body.gbe-index`)
 
 - [ ] `body class="gbe-index"` en plantilla
 - [ ] Hero `min-height: 100vh`, full-bleed, sin `border-radius` en wrap
-- [ ] Gaceta en **sección aparte** bajo hero (no al lado en `ope-top`)
+- [ ] Gaceta en **sección aparte** bajo hero (no al lado en `gbe-top`)
 - [ ] Grid bento: `"lore feed onrol" / "lore news staff"`
-- [ ] Overrides de **todos** los `.ope-panel` en scope portada
-- [ ] Categorías en `.gbe-section` + `.gbe-wm` + `.gbe-stitle` (no `.ope-block-cat`)
+- [ ] Overrides de **todos** los `.gbe-panel` en scope portada
+- [ ] Categorías en `.gbe-section` + `.gbe-wm` + `.gbe-stitle` (no `.gbe-block-cat`)
 - [ ] Harbor / censo con tokens claros
 - [ ] Navbar 66px, crest, sin bordes negros 2px (en portada como mínimo)
 - [ ] Fuentes Cinzel/Cormorant/Spectral en plugin **y** tema
@@ -77,8 +77,8 @@ py -m graphify update .
 ### 2.6 Checklist mínimo — página PHP nueva
 
 - [ ] `DESIGN-GRANBLUE-ETERNAL.md` §5 leído
-- [ ] `body.ope-pg-<slug>` (o `gbe-pg-*` post-F1)
-- [ ] Scaffolding scopeado pegado en `ope.css` — **tokens GBF** (`--line`, `border-radius`), no brutalismo OP (`border:2px solid #000`)
+- [ ] `body.gbe-pg-<slug>` (o `gbe-pg-*` post-F1)
+- [ ] Scaffolding scopeado pegado en `gbe.css` — **tokens GBF** (`--line`, `border-radius`), no brutalismo OP (`border:2px solid #000`)
 - [ ] Sin `<style>` ni `style=""` estáticos
 - [ ] Verificación contra página hermana ya correcta (`ficha.php` como referencia GBF)
 
@@ -214,11 +214,11 @@ Una tarea de portado/rediseño solo está **Done** si:
 
 ```
 docs/Prototypes/Granblue/index.html     ← verdad visual portada
-docs/themes/ope-index.xml               ← plantilla MyBB portada
-docs/themes/ope.css                     ← fuente CSS (scope body.gbe-index)
+docs/themes/gbe-index.xml               ← plantilla MyBB portada
+docs/themes/gbe.css                     ← fuente CSS (scope body.gbe-index)
 index.php                               ← HTML categorías Skydom/OT
-inc/plugins/ope_rol.php                 ← navbar, head_base, fuentes
-cache/themes/theme13/ope.css            ← lo que sirve el navegador (post-import)
+inc/plugins/gbe_rol.php                 ← navbar, head_base, fuentes
+cache/themes/theme13/gbe.css            ← lo que sirve el navegador (post-import)
 ```
 
 ## 10. Prompt listo para OpenCode (copiar/pegar)
@@ -231,20 +231,20 @@ OBLIGATORIO: AGENTS.md + docs/AGENTES-Y-HERRAMIENTAS.md §2 + DESIGN-GRANBLUE-ET
 Reglas visuales cerradas:
 - Portado = 5 capas completas (nunca solo un componente)
 - Botones RECTANGULARES border-radius 8px — PROHIBIDO pill/cápsula (DESIGN §4.4)
-- Tokens GBF claros/acuarela; overrides bajo body.gbe-index o body.ope-pg-*
+- Tokens GBF claros/acuarela; overrides bajo body.gbe-index o body.gbe-pg-*
 - Tras CSS: php scripts/sync-theme.php import; verify; check-inline-styles
 - PowerShell: usar ; no &&
 
 Tarea actual — F2b cierre portada:
 1. Comparar localhost/iforge/index.php vs docs/Prototypes/Granblue/index.html (gaceta bento)
-2. ~~Navbar GBF global~~ ✅ — `--gbe-nav-h` / `--gbe-wrap` en ope.css
-3. ~~Breadcrumb GBF global~~ ✅ — `#ope-breadcrumb` + `.breadcrumb`
+2. ~~Navbar GBF global~~ ✅ — `--gbe-nav-h` / `--gbe-wrap` en gbe.css
+3. ~~Breadcrumb GBF global~~ ✅ — `#gbe-breadcrumb` + `.breadcrumb`
 4. Tema cielo/noche: html[data-theme] sincronizado con selector navbar
 5. forumdisplay + showthread: resto de pantallas foro con tokens GBF (headers, listas, posts)
-6. Páginas PHP: scaffolding GBF en body.ope-pg-* (sustituir brutalismo OP)
-7. Reseed copy OP en feed (Fuchsia Village, OP-Eternal en posts) — contenido BD
+6. Páginas PHP: scaffolding GBF en body.gbe-pg-* (sustituir brutalismo OP)
+7. Reseed copy OP en feed (Fuchsia Village, GBEternal en posts) — contenido BD
 
-Archivos clave: ope-index.xml, ope.css, index.php, inc/plugins/ope_rol.php
+Archivos clave: gbe-index.xml, gbe.css, index.php, inc/plugins/gbe_rol.php
 Prototipo: docs/Prototypes/Granblue/index.html
 ```
 

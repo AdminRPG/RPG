@@ -7,7 +7,7 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'revisar-personaje.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_data.php';
 
 $bburl     = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname    = htmlspecialchars_uni($mybb->settings['bbname']);
@@ -16,11 +16,11 @@ $uid       = (int)($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 $pid       = (int)($mybb->get_input('pid', MyBB::INPUT_INT));
 
-require_once MYBB_ROOT . 'inc/ope_user_init.php';
+require_once MYBB_ROOT . 'inc/gbe_user_init.php';
 
 // Staff del PERSONAJE ACTIVO. Aprobar/moderar/rechazar expedientes requiere
 // rol >= Colaborador (rank 1). El staff va por personaje, no por cuenta.
-$staff_level = ope_get_staff_level($uid);
+$staff_level = gbe_get_staff_level($uid);
 
 // Acceso: Colaborador o superior (con el personaje activo).
 if (!$loggedin || $staff_level < 1) {
@@ -210,7 +210,7 @@ if ($pj && $loggedin && $staff_level >= 1 && $mybb->request_method === 'post') {
 }
 
 // Función local para heat
-function ope_heat_var($rango) {
+function gbe_heat_var($rango) {
     $map = ['F'=>'--h1','E'=>'--h1','D'=>'--h2','C'=>'--h3','B'=>'--h4','A'=>'--h5','S'=>'--h6','SS'=>'--h7','M'=>'--h8','M+'=>'--h9'];
     return $map[$rango] ?? '--h1';
 }
@@ -233,12 +233,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · <?php echo $pj ? 'Revisar: ' . htmlspecialchars_uni($pj['nombre']) : 'Cola de revisión'; ?></title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-revisar-personaje) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-revisar-personaje) -->
 </head>
-<body class="ope-pg-revisar-personaje">
+<body class="gbe-pg-revisar-personaje">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -369,7 +369,7 @@ header('Content-Type: text/html; charset=utf-8');
                   <div class="rp-pilar-label fs-58 fw-700 ttu c-ash"><?php echo $pilarName; ?></div>
                   <?php foreach ($keys as $k):
                     $v = (int)($stats[$k] ?? 5);
-                    $lbl = ope_rol_stat_label($v);
+                    $lbl = gbe_rol_stat_label($v);
                   ?>
                     <div class="stat-row">
                       <span class="sn"><?php echo $k; ?></span>
@@ -423,7 +423,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div class="sheet-block-h">Equipo · <?php echo htmlspecialchars_uni(number_format((int)($economia['berries'] ?? 0))); ?> berries</div>
             <div class="sheet-block-b">
               <?php
-                $rp_packs   = ope_rol_packs_equipo();
+                $rp_packs   = gbe_rol_packs_equipo();
                 $rp_pack    = $rp_packs[$inventario['pack_equipo'] ?? ''] ?? null;
               ?>
               <?php if ($rp_pack !== null): ?>
@@ -511,7 +511,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 <footer class="foot">
   <div class="foot-in">
-    <div class="foot-b">One Piece Eternal</div>
+    <div class="foot-b">Granblue Fantasy: Eternal</div>
   </div>
 </footer>
 

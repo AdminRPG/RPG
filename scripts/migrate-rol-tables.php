@@ -156,7 +156,7 @@ if ($seed->execute()) {
 $seed->close();
 
 // ─────────────────────────────────────────────────────────────
-// Activar el plugin ope_rol en la caché de plugins de MyBB.
+// Activar el plugin gbe_rol en la caché de plugins de MyBB.
 // ─────────────────────────────────────────────────────────────
 $res = $db->query("SELECT cache FROM {$PREFIX}datacache WHERE title = 'plugins' LIMIT 1");
 $plugins = array('active' => array());
@@ -171,7 +171,7 @@ if ($res && ($row = $res->fetch_assoc())) {
 if (!isset($plugins['active']) || !is_array($plugins['active'])) {
     $plugins['active'] = array();
 }
-$plugins['active']['ope_rol'] = 'ope_rol';
+$plugins['active']['gbe_rol'] = 'gbe_rol';
 $serialized = serialize($plugins);
 
 if ($exists_row) {
@@ -185,7 +185,7 @@ if ($exists_row) {
     $stmt->execute();
     $stmt->close();
 }
-echo "  [OK] plugin ope_rol activado (datacache 'plugins')\n";
+echo "  [OK] plugin gbe_rol activado (datacache 'plugins')\n";
 
 // Verificación
 echo "\n--- Verificación ---\n";

@@ -9,7 +9,7 @@ if (!defined('IN_MYBB')) {
     die('Direct initialization of this file is not allowed.');
 }
 
-function ope_wanted_get($pid) {
+function gbe_wanted_get($pid) {
     global $db;
     $pid = (int)$pid;
     if ($pid < 1 || !$db->table_exists('rol_wanted')) return 0;
@@ -18,7 +18,7 @@ function ope_wanted_get($pid) {
     return 0;
 }
 
-function ope_wanted_set($pid, $amount) {
+function gbe_wanted_set($pid, $amount) {
     global $db;
     $pid = (int)$pid; $amount = (int)$amount;
     if ($pid < 1 || !$db->table_exists('rol_wanted')) return false;
@@ -31,7 +31,7 @@ function ope_wanted_set($pid, $amount) {
     return true;
 }
 
-function ope_wanted_formatear($bounty) {
+function gbe_wanted_formatear($bounty) {
     $b = (int)$bounty;
     if ($b >= 1000000000) return number_format($b / 1000000000, 1) . 'B';
     if ($b >= 1000000) return number_format($b / 1000000, 0) . 'M';
@@ -42,12 +42,12 @@ function ope_wanted_formatear($bounty) {
 /**
  * Inicializa el Wanted según la raza al crear personaje.
  */
-function ope_wanted_init_raza($pid, $raza) {
+function gbe_wanted_init_raza($pid, $raza) {
     $iniciales = array(
         'lunarian' => 100000000,
         'bucaneer' => 50000000,
     );
     $amount = isset($iniciales[$raza]) ? $iniciales[$raza] : 0;
-    if ($amount > 0) ope_wanted_set($pid, $amount);
+    if ($amount > 0) gbe_wanted_set($pid, $amount);
     return $amount;
 }

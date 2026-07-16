@@ -9,12 +9,12 @@
  */
 require __DIR__ . '/_theme-sync-lib.php';
 
-$db = ope_db_connect();
-$theme = ope_resolve_theme($db);
+$db = gbe_db_connect();
+$theme = gbe_resolve_theme($db);
 echo "Exporting from tid={$theme['tid']} templateset={$theme['templateset']}\n";
-ope_export_css($db, $theme['tid']);
-ope_export_templates($db, $theme['templateset']);
+gbe_export_css($db, $theme['tid']);
+gbe_export_templates($db, $theme['templateset']);
 $db->close();
 
-ope_build_child_theme_xml();
-echo "\nDone. Commit docs/themes/ope.css and docs/themes/ope-*.xml\n";
+gbe_build_child_theme_xml();
+echo "\nDone. Commit docs/themes/gbe.css and docs/themes/gbe-*.xml\n";

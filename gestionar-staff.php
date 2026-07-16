@@ -1,6 +1,6 @@
 <?php
 /**
- * One Piece Eternal · Gestión de staff (solo Web Master)
+ * Granblue Fantasy: Eternal · Gestión de staff (solo Web Master)
  * ------------------------------------------------------
  * Asignación de rol de staff (Colaborador < Moderador < Administrador <
  * Web Master) y del añadido opcional Narrador a cada PERSONAJE. El staff es por
@@ -20,7 +20,7 @@ $uid      = (int) ($mybb->user['uid'] ?? 0);
 
 // ── Staff del personaje activo ──
 $staff = $loggedin
-    ? ope_rol_active_staff($uid)
+    ? gbe_rol_active_staff($uid)
     : array('rank' => 0, 'is_staff' => false, 'nombre' => '');
 $rank      = (int) $staff['rank'];
 $char_name = htmlspecialchars_uni((string) $staff['nombre']);
@@ -112,12 +112,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Gesti&oacute;n de staff</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- reutiliza el scope ope-pg-zona-staff (fuente única de estilos) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- reutiliza el scope gbe-pg-zona-staff (fuente única de estilos) -->
 </head>
-<body class="ope-pg-zona-staff ope-pg-gestionar-staff">
+<body class="gbe-pg-zona-staff gbe-pg-gestionar-staff">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

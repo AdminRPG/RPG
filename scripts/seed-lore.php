@@ -222,7 +222,7 @@ if (is_file($file)) {
     $raw = file_get_contents($file);
     $html = seed_md_to_html($raw);
     seed_insert_lore($db, $TABLE, array(
-        'nombre' => 'One Piece Eternal: Sinopsis',
+        'nombre' => 'Granblue Fantasy: Eternal: Sinopsis',
         'slug' => 'sinopsis-one-piece-eternal',
         'categoria' => 'historia',
         'subcategoria' => 'sinopsis',

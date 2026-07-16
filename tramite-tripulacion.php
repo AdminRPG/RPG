@@ -12,17 +12,17 @@ $bburl    = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int) ($mybb->user['uid'] ?? 0);
-$pid      = $loggedin ? ope_rol_pid_activo($uid) : 0;
+$pid      = $loggedin ? gbe_rol_pid_activo($uid) : 0;
 
 $modo = $mybb->get_input('modo');
 if (!in_array($modo, array('fundar', 'unirse'), true)) {
     $modo = 'fundar';
 }
 
-$FACCIONES = ope_rol_facciones();
-$tripulaciones = ope_rol_cat_tripulaciones();
-$mi_crew = ($pid > 0) ? ope_rol_cat_tripulacion_de_personaje($pid) : null;
-$tramite_pendiente = ($pid > 0) ? ope_rol_cat_tripulacion_tramite_pendiente($pid) : null;
+$FACCIONES = gbe_rol_facciones();
+$tripulaciones = gbe_rol_cat_tripulaciones();
+$mi_crew = ($pid > 0) ? gbe_rol_cat_tripulacion_de_personaje($pid) : null;
+$tramite_pendiente = ($pid > 0) ? gbe_rol_cat_tripulacion_tramite_pendiente($pid) : null;
 
 $char_name = '';
 if ($pid > 0 && $db->table_exists('rol_personajes')) {
@@ -80,7 +80,7 @@ if ($loggedin && $pid > 0 && $mybb->request_method === 'post' && !$mi_crew && !$
                     'lastedit' => (int) TIME_NOW,
                 ));
                 $flash = 'Solicitud enviada. El staff revisará tu petición para fundar «' . htmlspecialchars_uni($nombre) . '».';
-                $tramite_pendiente = ope_rol_cat_tripulacion_tramite_pendiente($pid);
+                $tramite_pendiente = gbe_rol_cat_tripulacion_tramite_pendiente($pid);
             }
         } elseif ($post_modo === 'unirse') {
             $trip_id = (int) $mybb->get_input('tripulacion_id', MyBB::INPUT_INT);
@@ -111,7 +111,7 @@ if ($loggedin && $pid > 0 && $mybb->request_method === 'post' && !$mi_crew && !$
                     'lastedit' => (int) TIME_NOW,
                 ));
                 $flash = 'Solicitud enviada. El staff revisará tu petición de ingreso.';
-                $tramite_pendiente = ope_rol_cat_tripulacion_tramite_pendiente($pid);
+                $tramite_pendiente = gbe_rol_cat_tripulacion_tramite_pendiente($pid);
             }
         }
     }
@@ -124,11 +124,11 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · <?php echo htmlspecialchars_uni($titulo); ?></title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-tripulacion">
+<body class="gbe-pg-tripulacion">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

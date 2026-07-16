@@ -13,7 +13,7 @@ $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid = (int) ($mybb->user['uid'] ?? 0);
 
-$staff = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0, 'is_staff' => false);
+$staff = $loggedin ? gbe_rol_active_staff($uid) : array('rank' => 0, 'is_staff' => false);
 $is_staff = !empty($staff['is_staff']) && (int) $staff['rank'] >= 1;
 
 $flash = '';
@@ -30,19 +30,19 @@ if ($is_staff && $table_ok && $mybb->request_method === 'post') {
         $sid = (int) $mybb->get_input('sid', MyBB::INPUT_INT);
         $nota = (string) $mybb->get_input('nota');
         if ($sid > 0 && $action === 'aprobar') {
-            $res = ope_rol_acompanante_solicitud_aprobar($sid, $uid, $nota);
+            $res = gbe_rol_acompanante_solicitud_aprobar($sid, $uid, $nota);
             $flash = $res['msg'];
             $flash_kind = $res['ok'] ? 'ok' : 'warn';
         } elseif ($sid > 0 && $action === 'rechazar') {
-            $res = ope_rol_acompanante_solicitud_rechazar($sid, $uid, $nota);
+            $res = gbe_rol_acompanante_solicitud_rechazar($sid, $uid, $nota);
             $flash = $res['msg'];
             $flash_kind = $res['ok'] ? 'ok' : 'warn';
         }
     }
 }
 
-$pendientes = ($is_staff && $table_ok) ? ope_rol_acompanante_solicitudes_pendientes() : array();
-$max_slots  = function_exists('ope_rol_acompanantes_max') ? ope_rol_acompanantes_max() : 2;
+$pendientes = ($is_staff && $table_ok) ? gbe_rol_acompanante_solicitudes_pendientes() : array();
+$max_slots  = function_exists('gbe_rol_acompanantes_max') ? gbe_rol_acompanantes_max() : 2;
 
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
@@ -51,12 +51,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Solicitudes de acompa&ntilde;ante</title>
-<?php echo ope_rol_head_base(); ?>
-<?php echo ope_rol_npc_sec_card_css(); ?>
+<?php echo gbe_rol_head_base(); ?>
+<?php echo gbe_rol_npc_sec_card_css(); ?>
 </head>
-<body class="ope-pg-mundo-vivo ope-pg-gestionar-acomp">
+<body class="gbe-pg-mundo-vivo gbe-pg-gestionar-acomp">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -96,7 +96,7 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="ga-item">
           <div class="ga-card">
 <?php if ($npc): ?>
-            <?php echo ope_rol_npc_sec_card_html($npc); ?>
+            <?php echo gbe_rol_npc_sec_card_html($npc); ?>
 <?php else: ?>
             <div class="ga-npc-missing">NPC eliminado de la biblioteca (id <?php echo (int) $s['npc_id']; ?>).</div>
 <?php endif; ?>

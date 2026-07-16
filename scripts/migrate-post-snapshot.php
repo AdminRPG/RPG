@@ -11,7 +11,7 @@
  *
  * A partir de que este plugin esté activo, cada post nuevo se captura solo
  * (hooks datahandler_post_insert_thread_end / datahandler_post_insert_post_end
- * en inc/plugins/ope_rol.php, función ope_rol_snapshot_post). Este script
+ * en inc/plugins/gbe_rol.php, función gbe_rol_snapshot_post). Este script
  * hace además un BACKFILL best-effort para los posts que ya existían antes de
  * desplegar esta funcionalidad: como su histórico real no es recuperable, se
  * usa el estado ACTUAL del personaje como aproximación (queda anotado en el
@@ -62,20 +62,20 @@ if (table_exists($db, $table)) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Backfill best-effort: un snapshot por cada post con personaje (ope_pid>0)
+// Backfill best-effort: un snapshot por cada post con personaje (gbe_pid>0)
 // que todavía no tenga fila. APROXIMACIÓN: usa el estado ACTUAL del
 // personaje (datos.stats_efectivas + inventario.encima), porque el histórico
 // real de posts anteriores a esta funcionalidad no se puede reconstruir.
 // Los posts nuevos, a partir de ahora, sí capturan el estado exacto de ese
-// instante vía el hook ope_rol_snapshot_post().
+// instante vía el hook gbe_rol_snapshot_post().
 // ─────────────────────────────────────────────────────────────
 echo "\n--- Backfill (aproximado, estado actual del personaje) ---\n";
 
 $sql = "
-    SELECT p.pid, p.ope_pid, p.dateline
+    SELECT p.pid, p.gbe_pid, p.dateline
     FROM `{$PREFIX}posts` p
     LEFT JOIN `{$table}` s ON s.pid = p.pid
-    WHERE p.ope_pid > 0 AND s.pid IS NULL
+    WHERE p.gbe_pid > 0 AND s.pid IS NULL
 ";
 $res = $db->query($sql);
 if ($res === false) {
@@ -101,7 +101,7 @@ if (!$stmt) {
 
 foreach ($pendientes as $row) {
     $postPid  = (int) $row['pid'];
-    $charPid  = (int) $row['ope_pid'];
+    $charPid  = (int) $row['gbe_pid'];
     $dateline = (int) $row['dateline'];
 
     if (!array_key_exists($charPid, $charCache)) {

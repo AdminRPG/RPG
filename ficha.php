@@ -4,7 +4,7 @@
  * ----------------------------------------------
  * Muestra el expediente real de un personaje (mybb_rol_personajes), leyendo
  * los datos guardados por el wizard crear-personaje.php. Dirección visual
- * "One Piece Eternal", coherente con personajes.php.
+ * "Granblue Fantasy: Eternal", coherente con personajes.php.
  *
  * Acceso:
  *   ficha.php?pid=N   → ficha del personaje N
@@ -19,10 +19,10 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'ficha.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_data.php';
 
 // Capacidad del inventario que se lleva "encima" (nº de slots de la mochila).
-define('OPE_INV_CAP', 12);
+define('GBE_INV_CAP', 12);
 
 $bburl    = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
@@ -32,11 +32,11 @@ $username = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
 // Staff del PERSONAJE ACTIVO (el staff es por personaje). Un colaborador+ puede
 // ver expedientes no aprobados; con un personaje sin rol activo, no.
-$staff_arr   = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0);
+$staff_arr   = $loggedin ? gbe_rol_active_staff($uid) : array('rank' => 0);
 $staff_level = (int) $staff_arr['rank'];
 
 // Iniciales para el botón de usuario (navbar).
-$display_name = (string) ($mybb->user['ope_display_name'] ?? ($mybb->user['username'] ?? ''));
+$display_name = (string) ($mybb->user['gbe_display_name'] ?? ($mybb->user['username'] ?? ''));
 $display_name_e = htmlspecialchars_uni($display_name);
 
 // ── Resolver el personaje a mostrar ──
@@ -73,7 +73,7 @@ if ($pj) {
 // Gestión permitida SOLO si el visitante tiene ESTE personaje como ACTIVO
 // (el activo siempre es propio, así que esto ya implica propiedad). Gobierna
 // tanto el botón/modal de Gestión como la autorización de todos los POST.
-$puede_gestionar = $pj && $loggedin && (int) ($mybb->user['ope_active_pid'] ?? 0) === (int) $pj['pid'];
+$puede_gestionar = $pj && $loggedin && (int) ($mybb->user['gbe_active_pid'] ?? 0) === (int) $pj['pid'];
 
 // ── Gestión (propietario): guardar Avatar / Icono / Firma ──
 $gestion_ok = ($mybb->get_input('g') === '1');
@@ -143,7 +143,7 @@ if ($puede_gestionar && $mybb->request_method === 'post'
         // TIDs válidos: temas donde el personaje realmente participó.
         $valid = array();
         $vq = $db->query("SELECT DISTINCT tid FROM " . TABLE_PREFIX . "posts
-                          WHERE ope_pid = {$pid_c} AND visible = 1");
+                          WHERE gbe_pid = {$pid_c} AND visible = 1");
         while ($vr = $db->fetch_array($vq)) { $valid[(int) $vr['tid']] = true; }
 
         foreach ($descs as $tid_k => $txt) {
@@ -186,7 +186,7 @@ if ($puede_gestionar && $mybb->request_method === 'post'
 
     $pid_r    = (int) $pj['pid'];
     $gaccion  = $mybb->get_input('gaccion');
-    $tipos_ok = array_keys(ope_rel_tipos());
+    $tipos_ok = array_keys(gbe_rel_tipos());
 
     if ($gaccion === 'rel_add') {
         $destino = $mybb->get_input('destino_pid', MyBB::INPUT_INT);
@@ -347,7 +347,7 @@ if ($puede_gestionar && $mybb->request_method === 'post'
             $isz  = is_array($item) ? (int) ($item['size'] ?? 1) : 1;
             if ($isz < 1) $isz = 1;
             // Al pasar al inventario "encima" hay que respetar la capacidad de slots.
-            if ($to === 'encima' && $inv_used($inv['encima']) + $isz > OPE_INV_CAP) {
+            if ($to === 'encima' && $inv_used($inv['encima']) + $isz > GBE_INV_CAP) {
                 // No cabe: no se mueve (se queda en el almacén).
             } else {
                 array_splice($inv[$from], $idx, 1);
@@ -370,14 +370,14 @@ if ($puede_gestionar && $mybb->request_method === 'post'
 }
 
 // ── Datos de rol ──
-$STAT_GROUPS = ope_rol_stats();
-$RAZAS       = ope_rol_razas();
-$FACCIONES   = ope_rol_facciones();
-$ARMAS       = ope_rol_armas();
-$PACKS       = ope_rol_packs_equipo();
+$STAT_GROUPS = gbe_rol_stats();
+$RAZAS       = gbe_rol_razas();
+$FACCIONES   = gbe_rol_facciones();
+$ARMAS       = gbe_rol_armas();
+$PACKS       = gbe_rol_packs_equipo();
 
 /** Tipos de relación válidos (slug => etiqueta visible). */
-function ope_rel_tipos(): array
+function gbe_rel_tipos(): array
 {
     return array(
         'aliado'      => 'Aliado',
@@ -391,7 +391,7 @@ function ope_rel_tipos(): array
     );
 }
 
-function ope_heat_var(string $rango): string
+function gbe_heat_var(string $rango): string
 {
     $map = array(
         'F' => '--h1', 'E' => '--h1', 'D' => '--h2', 'C' => '--h3', 'B' => '--h4',
@@ -399,14 +399,14 @@ function ope_heat_var(string $rango): string
     );
     return $map[strtoupper(trim($rango))] ?? '--h1';
 }
-function ope_heat_val(int $v): string
+function gbe_heat_val(int $v): string
 {
     if ($v < 1) $v = 1;
     if ($v > 9) $v = 9;
     return '--h' . $v;
 }
 /** Convierte texto con \n\n en párrafos <p> HTML, escapando y respetando saltos simples. */
-function ope_nl2p(string $text): string
+function gbe_nl2p(string $text): string
 {
     $text = trim($text);
     if ($text === '') return '';
@@ -421,7 +421,7 @@ function ope_nl2p(string $text): string
     return $out;
 }
 /** Formato corto para cifras grandes de berries (4.850.000 → "4.9M"). */
-function ope_short_money(int $n): string
+function gbe_short_money(int $n): string
 {
     $abs = abs($n);
     if ($abs >= 1000000) {
@@ -439,8 +439,8 @@ $inventario = $pj ? (json_decode((string) $pj['inventario'], true) ?: array()) :
 $economia   = $pj ? (json_decode((string) $pj['economia'], true) ?: array()) : array();
 $bio        = $pj ? (json_decode((string) $pj['bio'], true) ?: array()) : array();
 
-// Color por facción: slug canónico para teñir el expediente (fuente: plugin ope_rol).
-$fac_slug  = $pj ? ope_rol_faccion_slug($datos['faccion'] ?? '') : '';
+// Color por facción: slug canónico para teñir el expediente (fuente: plugin gbe_rol).
+$fac_slug  = $pj ? gbe_rol_faccion_slug($datos['faccion'] ?? '') : '';
 $fac_class = $fac_slug !== '' ? ' fac-' . $fac_slug : '';
 
 header('Content-Type: text/html; charset=utf-8');
@@ -450,12 +450,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; <?php echo $pj ? htmlspecialchars_uni($pj['nombre']) : 'Ficha'; ?></title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-ficha) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-ficha) -->
 </head>
-<body class="ope-pg-ficha<?php echo $fac_class; ?>">
+<body class="gbe-pg-ficha<?php echo $fac_class; ?>">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -491,7 +491,7 @@ header('Content-Type: text/html; charset=utf-8');
     $nombre_e   = htmlspecialchars_uni($pj['nombre']);
     $rango      = (string) $pj['rango'];
     $rango_e    = htmlspecialchars_uni($rango);
-    $heat_rank  = ope_heat_var($rango);
+    $heat_rank  = gbe_heat_var($rango);
     $nivel      = (int) $pj['nivel'];
     $avatar     = trim((string) $pj['avatar']);
     $banner     = trim((string) ($datos['banner'] ?? ''));
@@ -519,7 +519,7 @@ header('Content-Type: text/html; charset=utf-8');
 
     // Rol en el foro (staff): solo se muestra si el personaje es staff.
     $staff_rol     = (string) ($pj['staff_rol'] ?? '');
-    $staff_rol_lbl = function_exists('ope_rol_staff_label') ? ope_rol_staff_label($staff_rol) : '';
+    $staff_rol_lbl = function_exists('gbe_rol_staff_label') ? gbe_rol_staff_label($staff_rol) : '';
 
     $edad   = $datos['edad'] ?? '';
     $genero = $datos['genero'] ?? '';
@@ -543,18 +543,18 @@ header('Content-Type: text/html; charset=utf-8');
     $arma_legacy_key = trim((string) ($inventario['arma'] ?? ''));
     $arma_legacy = isset($ARMAS[$arma_legacy_key]) ? $ARMAS[$arma_legacy_key]['nombre'] : $arma_legacy_key;
     $obj_legacy  = trim((string) ($inventario['objeto_personal'] ?? ''));
-    $berries     = (int) ($economia['berries'] ?? 0);
+    $berries     = (int) ($economia['rupies'] ?? $economia['berries'] ?? 0);
 
     $pp_disponible = 0;
-    if ($puede_gestionar && function_exists('ope_pp_saldo')) {
-        $pp_row = ope_pp_saldo((int) $pj['pid']);
+    if ($puede_gestionar && function_exists('gbe_pp_saldo')) {
+        $pp_row = gbe_pp_saldo((int) $pj['pid']);
         $pp_disponible = (int) ($pp_row['pp_disponible'] ?? 0);
     }
     $pv_max = (int) ($pj['pv_max'] ?? 0);
     $en_max = (int) ($pj['en_max'] ?? 0);
     $pa_turno = (int) ($pj['pa_por_turno'] ?? 0);
-    if ($pv_max < 1 && function_exists('ope_combat_recalc')) {
-        $vit = ope_combat_recalc((int) $pj['pid']);
+    if ($pv_max < 1 && function_exists('gbe_combat_recalc')) {
+        $vit = gbe_combat_recalc((int) $pj['pid']);
         if ($vit) {
             $pv_max = (int) $vit['pv_max'];
             $en_max = (int) $vit['en_max'];
@@ -578,7 +578,7 @@ header('Content-Type: text/html; charset=utf-8');
                     $d = '';
                     $s = 1;
                 }
-                if ($s < 1) $s = 1; if ($s > OPE_INV_CAP) $s = OPE_INV_CAP;
+                if ($s < 1) $s = 1; if ($s > GBE_INV_CAP) $s = GBE_INV_CAP;
                 if ($n !== '') $out[] = array('n' => $n, 'd' => $d, 'size' => $s);
             }
         }
@@ -628,15 +628,15 @@ header('Content-Type: text/html; charset=utf-8');
     }
 
     // Deck de cartas de técnica (INI-03) del personaje.
-    $deck_tecnicas = function_exists('ope_rol_char_tecnicas') ? ope_rol_char_tecnicas((int) $pj['pid']) : array();
+    $deck_tecnicas = function_exists('gbe_rol_char_tecnicas') ? gbe_rol_char_tecnicas((int) $pj['pid']) : array();
 
     // Acompañantes NPC secundarios (máx. 2).
-    $acompanantes = function_exists('ope_rol_char_acompanantes') ? ope_rol_char_acompanantes((int) $pj['pid']) : array();
+    $acompanantes = function_exists('gbe_rol_char_acompanantes') ? gbe_rol_char_acompanantes((int) $pj['pid']) : array();
 
     // Rasgos: virtudes y defectos combinados en una sola lista (.trait).
     $rasgos = array();
     foreach ($virtudes as $vid => $v) {
-        $vdef = ope_rol_find_virtud($vid);
+        $vdef = gbe_rol_find_virtud($vid);
         $rasgos[] = array(
             'tipo'  => 'v',
             'nombre' => $v['nombre'] ?? $vid,
@@ -646,7 +646,7 @@ header('Content-Type: text/html; charset=utf-8');
         );
     }
     foreach ($defectos as $did => $d) {
-        $ddef = ope_rol_find_defecto($did);
+        $ddef = gbe_rol_find_defecto($did);
         $rasgos[] = array(
             'tipo'  => 'x',
             'nombre' => $d['nombre'] ?? $did,
@@ -665,8 +665,8 @@ header('Content-Type: text/html; charset=utf-8');
     }
 
     // ── Línea de tiempo de ROL: temas donde participó el personaje ──
-    // (posts.ope_pid = pid), agrupados por AÑO in-rol, excluyendo Off Topic.
-    $TAG_LABELS   = function_exists('ope_rol_thread_tags') ? ope_rol_thread_tags() : array();
+    // (posts.gbe_pid = pid), agrupados por AÑO in-rol, excluyendo Off Topic.
+    $TAG_LABELS   = function_exists('gbe_rol_thread_tags') ? gbe_rol_thread_tags() : array();
     $cron_years   = array();   // año => [entradas]  (para la timeline pública)
     $cron_flat    = array();   // lista plana ordenada (para el modal de gestión)
     $pid_tl       = (int) $pj['pid'];
@@ -680,7 +680,7 @@ header('Content-Type: text/html; charset=utf-8');
     $from  = " FROM {$pref}posts p INNER JOIN {$pref}threads t ON t.tid = p.tid";
     if ($has_meta) $from .= " LEFT JOIN {$pref}rol_thread_meta m ON m.tid = t.tid";
     if ($has_cron) $from .= " LEFT JOIN {$pref}rol_cronologia c ON c.tid = t.tid AND c.pid = {$pid_tl}";
-    $where = " WHERE p.ope_pid = {$pid_tl} AND p.visible = 1 AND t.visible = 1";
+    $where = " WHERE p.gbe_pid = {$pid_tl} AND p.visible = 1 AND t.visible = 1";
     $grp   = " GROUP BY t.tid, t.subject, t.fid, t.dateline";
     if ($has_meta) $grp .= ", m.era, m.fecha_rol, m.tag";
     if ($has_cron) $grp .= ", c.descripcion";
@@ -688,7 +688,7 @@ header('Content-Type: text/html; charset=utf-8');
     $tq = $db->query($sel . $from . $where . $grp);
     while ($tr = $db->fetch_array($tq)) {
         $fid_t = (int) $tr['fid'];
-        if (function_exists('ope_rol_is_offtopic_fid') && ope_rol_is_offtopic_fid($fid_t)) {
+        if (function_exists('gbe_rol_is_offtopic_fid') && gbe_rol_is_offtopic_fid($fid_t)) {
             continue;
         }
         $era  = ($tr['era'] === 'pasado') ? 'pasado' : (($tr['era'] === 'presente') ? 'presente' : '');
@@ -696,8 +696,8 @@ header('Content-Type: text/html; charset=utf-8');
         if ($anio <= 0) {
             // Temas sin metadata guardada (legado): calcula el año on-rol a partir
             // de la fecha real del post, en vez de mostrar el año gregoriano (2026).
-            $anio = function_exists('ope_rol_onrol_calendar')
-                ? (int) ope_rol_onrol_calendar((int) $tr['tdate'])['year']
+            $anio = function_exists('gbe_rol_onrol_calendar')
+                ? (int) gbe_rol_onrol_calendar((int) $tr['tdate'])['year']
                 : (int) my_date('Y', (int) $tr['tdate']);
         }
         $entry = array(
@@ -725,13 +725,13 @@ header('Content-Type: text/html; charset=utf-8');
     });
 
     // ── Mapa de relaciones: vínculos dirigidos desde este personaje ──
-    $REL_TIPOS   = ope_rel_tipos();
+    $REL_TIPOS   = gbe_rel_tipos();
     $relaciones  = array();
     $rel_pid     = (int) $pj['pid'];
     if ($db->table_exists('rol_relaciones')) {
         $rq = $db->simple_select('rol_relaciones', '*', "pid = {$rel_pid}", array('order_by' => 'dateline', 'order_dir' => 'asc'));
         while ($rr = $db->fetch_array($rq)) {
-            $other = ope_rol_char((int) $rr['destino_pid']);
+            $other = gbe_rol_char((int) $rr['destino_pid']);
             if (!$other) continue; // destino borrado: se ignora
             $tipo = isset($REL_TIPOS[$rr['tipo']]) ? $rr['tipo'] : 'otro';
             // Mapa de relaciones: SIEMPRE el ICONO pequeño (fallback a inicial).
@@ -754,8 +754,8 @@ header('Content-Type: text/html; charset=utf-8');
     }
 
     // Plantillas de post del personaje (para el editor del modal, solo propietario).
-    $tpls_list = ($puede_gestionar && function_exists('ope_rol_char_templates'))
-        ? ope_rol_char_templates((int) $pj['pid'])
+    $tpls_list = ($puede_gestionar && function_exists('gbe_rol_char_templates'))
+        ? gbe_rol_char_templates((int) $pj['pid'])
         : array();
 
     // Personajes aprobados seleccionables como destino (excluye a sí mismo).
@@ -878,7 +878,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if ($puede_gestionar): ?>
         <div class="gbe-char-acts">
           <a href="<?php echo $bburl; ?>/progresion.php" class="btn btn-hot">Progresi&oacute;n</a>
-          <button type="button" class="btn btn-ghost" id="ope-gestion-open" aria-haspopup="dialog">Gesti&oacute;n</button>
+          <button type="button" class="btn btn-ghost" id="gbe-gestion-open" aria-haspopup="dialog">Gesti&oacute;n</button>
         </div>
 <?php endif; ?>
       </div>
@@ -934,7 +934,7 @@ header('Content-Type: text/html; charset=utf-8');
               <span class="bar"></span>
             </div>
 <?php foreach ($rows as $ab => $nm):
-              $v = ope_rol_stat_num($stats_ef, $ab);
+              $v = gbe_rol_stat_num($stats_ef, $ab);
               $base_v = (int) ($stats_base_d[$ab] ?? 5);
               $pct = min(100, max(0, (int) round(($v / 100) * 100)));
               $heat = $v >= 80 ? '--h9' : ($v >= 60 ? '--h8' : ($v >= 40 ? '--h6' : ($v >= 25 ? '--h4' : '--h2')));
@@ -964,10 +964,10 @@ header('Content-Type: text/html; charset=utf-8');
             <div class="plate-h"><span class="t">Descripci&oacute;n f&iacute;sica</span></div>
             <div class="plate-b prose">
 <?php if ($from_fisico !== ''): ?>
-              <p class="ope-from-line"><span class="l">From:</span> <?php echo htmlspecialchars_uni($from_fisico); ?></p>
+              <p class="gbe-from-line"><span class="l">From:</span> <?php echo htmlspecialchars_uni($from_fisico); ?></p>
 <?php endif; ?>
 <?php if ($desc_fisica !== ''): ?>
-              <?php echo ope_nl2p($desc_fisica); ?>
+              <?php echo gbe_nl2p($desc_fisica); ?>
 <?php else: ?>
               <p class="mono c-dim">Sin descripci&oacute;n f&iacute;sica todav&iacute;a.<?php echo $puede_gestionar ? ' Edítala desde Gesti&oacute;n.' : ''; ?></p>
 <?php endif; ?>
@@ -979,7 +979,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div class="plate-h"><span class="t">Personalidad</span></div>
             <div class="plate-b prose">
 <?php if ($personalidad !== ''): ?>
-              <?php echo ope_nl2p($personalidad); ?>
+              <?php echo gbe_nl2p($personalidad); ?>
 <?php else: ?>
               <p class="mono c-dim">Sin personalidad registrada todav&iacute;a.<?php echo $puede_gestionar ? ' Edítala desde Gesti&oacute;n.' : ''; ?></p>
 <?php endif; ?>
@@ -1005,7 +1005,7 @@ header('Content-Type: text/html; charset=utf-8');
                 if ($otxt === '') continue;
 ?>
               <p class="lead"><?php echo $ol; ?></p>
-              <?php echo ope_nl2p($otxt); ?>
+              <?php echo gbe_nl2p($otxt); ?>
 <?php endforeach; endif; ?>
             </div>
           </div>
@@ -1018,7 +1018,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php else: ?>
               <div class="tl-tabs" role="tablist">
 <?php $tl_first = true; foreach ($cron_years as $y => $arr): ?>
-                <button type="button" class="tl-tab" role="tab" aria-selected="<?php echo $tl_first ? 'true' : 'false'; ?>" data-year="<?php echo (int) $y; ?>">A&ntilde;o <?php echo htmlspecialchars_uni(ope_rol_year_label((int) $y)); ?></button>
+                <button type="button" class="tl-tab" role="tab" aria-selected="<?php echo $tl_first ? 'true' : 'false'; ?>" data-year="<?php echo (int) $y; ?>">A&ntilde;o <?php echo htmlspecialchars_uni(gbe_rol_year_label((int) $y)); ?></button>
 <?php $tl_first = false; endforeach; ?>
               </div>
 <?php $tl_first = true; foreach ($cron_years as $y => $arr): ?>
@@ -1053,22 +1053,22 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">Vitales</span><span class="c">// AV-01</span></div>
         <div class="plate-b">
-          <div class="ope-prog-vitals ope-ficha-vitals">
-            <div class="ope-prog-vital ope-prog-vital--pv">
-              <span class="ope-prog-vital-val"><?php echo (int) $pv_max; ?></span>
-              <span class="ope-prog-vital-label">PV m&aacute;x</span>
+          <div class="gbe-prog-vitals gbe-ficha-vitals">
+            <div class="gbe-prog-vital gbe-prog-vital--pv">
+              <span class="gbe-prog-vital-val"><?php echo (int) $pv_max; ?></span>
+              <span class="gbe-prog-vital-label">PV m&aacute;x</span>
             </div>
-            <div class="ope-prog-vital ope-prog-vital--en">
-              <span class="ope-prog-vital-val"><?php echo (int) $en_max; ?></span>
-              <span class="ope-prog-vital-label">EN m&aacute;x</span>
+            <div class="gbe-prog-vital gbe-prog-vital--en">
+              <span class="gbe-prog-vital-val"><?php echo (int) $en_max; ?></span>
+              <span class="gbe-prog-vital-label">EN m&aacute;x</span>
             </div>
-            <div class="ope-prog-vital ope-prog-vital--pa">
-              <span class="ope-prog-vital-val"><?php echo (int) $pa_turno; ?></span>
-              <span class="ope-prog-vital-label">PA / turno</span>
+            <div class="gbe-prog-vital gbe-prog-vital--pa">
+              <span class="gbe-prog-vital-val"><?php echo (int) $pa_turno; ?></span>
+              <span class="gbe-prog-vital-label">PA / turno</span>
             </div>
-            <div class="ope-prog-vital ope-prog-vital--rango">
-              <span class="ope-prog-vital-val"><?php echo $rango_e; ?></span>
-              <span class="ope-prog-vital-label">Rango</span>
+            <div class="gbe-prog-vital gbe-prog-vital--rango">
+              <span class="gbe-prog-vital-val"><?php echo $rango_e; ?></span>
+              <span class="gbe-prog-vital-label">Rango</span>
             </div>
           </div>
         </div>
@@ -1094,20 +1094,20 @@ header('Content-Type: text/html; charset=utf-8');
       <!-- Acompañantes NPC (hasta 2) -->
       <div class="plate" id="acomp-plate">
         <div class="plate-h">
-          <span class="t">Acompa&ntilde;antes</span><span class="c">// <?php echo count($acompanantes); ?>/<?php echo function_exists('ope_rol_acompanantes_max') ? ope_rol_acompanantes_max() : 2; ?></span>
+          <span class="t">Acompa&ntilde;antes</span><span class="c">// <?php echo count($acompanantes); ?>/<?php echo function_exists('gbe_rol_acompanantes_max') ? gbe_rol_acompanantes_max() : 2; ?></span>
         </div>
         <div class="plate-b">
 <?php if (empty($acompanantes)): ?>
           <p class="mono fs-76 c-dim">Sin acompa&ntilde;antes NPC. Puedes solicitarlos en <a href="<?php echo $bburl; ?>/solicitar-acompanante.php">Tr&aacute;mites &rsaquo; Acompa&ntilde;ante</a>.</p>
 <?php else:
-        echo ope_rol_npc_sec_card_css();
+        echo gbe_rol_npc_sec_card_css();
 ?>
           <div class="ons-deck">
 <?php foreach ($acompanantes as $acomp):
         $npc_ac = $acomp['npc'] ?? null;
         if (!$npc_ac) continue;
 ?>
-            <?php echo ope_rol_npc_sec_card_html($npc_ac); ?>
+            <?php echo gbe_rol_npc_sec_card_html($npc_ac); ?>
 <?php endforeach; ?>
           </div>
 <?php endif; ?>
@@ -1118,12 +1118,12 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate" id="deck-plate">
         <div class="plate-h">
           <span class="t">Deck</span><span class="c">// <?php echo count($deck_tecnicas); ?> carta(s)</span>
-          <button type="button" class="ope-deck-toggle" id="deck-toggle" aria-expanded="false">&#9660; Desplegar</button>
+          <button type="button" class="gbe-deck-toggle" id="deck-toggle" aria-expanded="false">&#9660; Desplegar</button>
         </div>
         <div class="plate-b tal" id="deck-body" hidden>
 <?php if (empty($deck_tecnicas)): ?>
-          <div class="ope-soon-box">
-            <span class="ope-soon-tag">Deck vac&iacute;o</span>
+          <div class="gbe-soon-box">
+            <span class="gbe-soon-tag">Deck vac&iacute;o</span>
             <p class="mono fs-76 c-dim mt-8">Este personaje a&uacute;n no ha aprendido ninguna carta de t&eacute;cnica.</p>
           </div>
 <?php else:
@@ -1138,24 +1138,24 @@ header('Content-Type: text/html; charset=utf-8');
         }
         arsort($all_tags);
 ?>
-          <div class="ope-deck-controls">
-            <input type="search" id="deck-search" class="ope-deck-search" placeholder="Buscar carta...">
-            <div class="ope-deck-tags" id="deck-tags">
+          <div class="gbe-deck-controls">
+            <input type="search" id="deck-search" class="gbe-deck-search" placeholder="Buscar carta...">
+            <div class="gbe-deck-tags" id="deck-tags">
 <?php foreach ($all_tags as $tag_name => $tag_count): ?>
-              <label class="ope-deck-tag" data-tag="<?php echo htmlspecialchars_uni($tag_name); ?>">
-                <input type="checkbox" class="ope-deck-tag-cb" value="<?php echo htmlspecialchars_uni($tag_name); ?>">
+              <label class="gbe-deck-tag" data-tag="<?php echo htmlspecialchars_uni($tag_name); ?>">
+                <input type="checkbox" class="gbe-deck-tag-cb" value="<?php echo htmlspecialchars_uni($tag_name); ?>">
                 <?php echo htmlspecialchars_uni($tag_name); ?> <small>(<?php echo $tag_count; ?>)</small>
               </label>
 <?php endforeach; ?>
             </div>
           </div>
-<?php echo ope_rol_tecnica_card_css(); ?>
-          <div class="ope-tk-deck" id="deck-grid">
+<?php echo gbe_rol_tecnica_card_css(); ?>
+          <div class="gbe-tk-deck" id="deck-grid">
 <?php foreach ($deck_tecnicas as $carta): ?>
-            <?php echo ope_rol_tecnica_card_html($carta); ?>
+            <?php echo gbe_rol_tecnica_card_html($carta); ?>
 <?php endforeach; ?>
           </div>
-          <div class="ope-deck-pag" id="deck-pagination"></div>
+          <div class="gbe-deck-pag" id="deck-pagination"></div>
 <?php endif; ?>
         </div>
       </div>
@@ -1164,7 +1164,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">Virtudes y defectos</span><span class="c">// <?php echo $pc_gas; ?> PC &middot; +<?php echo $pc_dev; ?> PC</span></div>
         <div class="plate-b">
-          <div class="ope-pcbalance">
+          <div class="gbe-pcbalance">
             <span class="l">Balance de PC</span>
             <span class="v"><?php echo $pc_bal; ?> <small>sin gastar</small></span>
           </div>
@@ -1189,7 +1189,7 @@ header('Content-Type: text/html; charset=utf-8');
       // Slots ocupados por lo que se lleva encima (respeta el tamaño de cada objeto).
       $slots_usados = 0;
       foreach ($inv_encima as $it) { $slots_usados += max(1, (int) $it['size']); }
-      $slots_libres = max(0, OPE_INV_CAP - $slots_usados);
+      $slots_libres = max(0, GBE_INV_CAP - $slots_usados);
       // En la VISTA de la ficha los objetos NO se mueven: al pulsarlos despliegan
       // su información. Mover entre inventario/almacén vive solo en el modal.
       $inv_data_attrs = static function (array $it): string {
@@ -1202,20 +1202,20 @@ header('Content-Type: text/html; charset=utf-8');
     <section class="panel" id="tab-equipo" role="tabpanel">
       <!-- Mochila: berries + capacidad de slots -->
       <div class="plate">
-        <div class="plate-h"><span class="t">Mochila</span><span class="c">// <?php echo $slots_usados; ?>/<?php echo OPE_INV_CAP; ?> slots</span></div>
+        <div class="plate-h"><span class="t">Mochila</span><span class="c">// <?php echo $slots_usados; ?>/<?php echo GBE_INV_CAP; ?> slots</span></div>
         <div class="plate-b">
-          <div class="ope-berries">
-            <span class="ope-berries-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8.5 9.5h5M8.5 12h5M11 7v10"/></svg></span>
-            <span class="ope-berries-l">Berries</span>
-            <b class="ope-berries-v"><?php echo number_format($berries, 0, ',', '.'); ?></b>
+          <div class="gbe-berries">
+            <span class="gbe-berries-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8.5 9.5h5M8.5 12h5M11 7v10"/></svg></span>
+            <span class="gbe-berries-l">Rupias</span>
+            <b class="gbe-berries-v"><?php echo number_format($berries, 0, ',', '.'); ?></b>
           </div>
 <?php if ($pack_def !== null): ?>
-          <div class="ope-pack-inicial mt-10 pt-10 bt-dash">
+          <div class="gbe-pack-inicial mt-10 pt-10 bt-dash">
             <span class="mono fs-62 fw-700 ttu ls-5 c-dim"><?php echo htmlspecialchars_uni($pack_def['nombre']); ?></span>
             <p class="mono fs-7 c-ash lh-15 mt-4"><?php echo implode(' &middot; ', array_map('htmlspecialchars_uni', $pack_def['contenido'])); ?></p>
           </div>
 <?php elseif ($arma_legacy !== '' || $obj_legacy !== ''): ?>
-          <div class="ope-pack-inicial mt-10 pt-10 bt-dash">
+          <div class="gbe-pack-inicial mt-10 pt-10 bt-dash">
             <span class="mono fs-62 fw-700 ttu ls-5 c-dim">Equipo inicial (ficha antigua)</span>
 <?php if ($arma_legacy !== ''): ?><p class="mono fs-7 c-ash mt-4"><b class="c-dim">Arma:</b> <?php echo htmlspecialchars_uni($arma_legacy); ?></p><?php endif; ?>
 <?php if ($obj_legacy !== ''): ?><p class="mono fs-7 c-ash"><b class="c-dim">Objeto:</b> <?php echo htmlspecialchars_uni($obj_legacy); ?></p><?php endif; ?>
@@ -1224,46 +1224,46 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
       </div>
 
-      <div class="ope-inv">
+      <div class="gbe-inv">
         <!-- Inventario (lo que llevas encima): cuadrícula de slots -->
-        <div class="plate ope-inv-side">
+        <div class="plate gbe-inv-side">
           <div class="plate-h"><span class="t">Inventario</span><span class="c">// encima &middot; <?php echo count($inv_encima); ?> obj.</span></div>
           <div class="plate-b">
-            <p class="ope-inv-hint">Pulsa un objeto para ver su informaci&oacute;n. Los objetos grandes ocupan varios slots.<?php echo $puede_gestionar ? ' Para mover objetos usa Gesti&oacute;n &rsaquo; Equipo.' : ''; ?></p>
+            <p class="gbe-inv-hint">Pulsa un objeto para ver su informaci&oacute;n. Los objetos grandes ocupan varios slots.<?php echo $puede_gestionar ? ' Para mover objetos usa Gesti&oacute;n &rsaquo; Equipo.' : ''; ?></p>
 <?php if (empty($inv_encima)): ?>
             <p class="mono fs-76 c-dim">No llevas nada encima.</p>
 <?php endif; ?>
-            <div class="ope-slotgrid">
+            <div class="gbe-slotgrid">
 <?php foreach ($inv_encima as $i => $it):
                 $sz = max(1, (int) $it['size']);
 ?>
-              <button type="button" class="ope-slot filled ope-invitem" style="grid-column:span <?php echo min($sz, 4); ?>"<?php echo $inv_data_attrs($it); ?>>
-                <span class="ope-slot-n"><?php echo htmlspecialchars_uni($it['n']); ?></span>
-<?php if ($sz > 1): ?><span class="ope-slot-sz"><?php echo $sz; ?></span><?php endif; ?>
+              <button type="button" class="gbe-slot filled gbe-invitem" style="grid-column:span <?php echo min($sz, 4); ?>"<?php echo $inv_data_attrs($it); ?>>
+                <span class="gbe-slot-n"><?php echo htmlspecialchars_uni($it['n']); ?></span>
+<?php if ($sz > 1): ?><span class="gbe-slot-sz"><?php echo $sz; ?></span><?php endif; ?>
               </button>
 <?php endforeach; ?>
 <?php for ($e = 0; $e < $slots_libres; $e++): ?>
-              <div class="ope-slot empty" aria-hidden="true"></div>
+              <div class="gbe-slot empty" aria-hidden="true"></div>
 <?php endfor; ?>
             </div>
           </div>
         </div>
 
         <!-- Almacén: lista de objetos guardados -->
-        <div class="plate ope-inv-side">
+        <div class="plate gbe-inv-side">
           <div class="plate-h"><span class="t">Almac&eacute;n</span><span class="c">// <?php echo count($inv_almacen); ?> obj.</span></div>
           <div class="plate-b">
-            <p class="ope-inv-hint">Pulsa un objeto para ver su informaci&oacute;n.</p>
+            <p class="gbe-inv-hint">Pulsa un objeto para ver su informaci&oacute;n.</p>
 <?php if (empty($inv_almacen)): ?>
             <p class="mono fs-76 c-dim">Almac&eacute;n vac&iacute;o.</p>
 <?php else: ?>
-            <div class="ope-store">
+            <div class="gbe-store">
 <?php foreach ($inv_almacen as $i => $it):
                 $sz = max(1, (int) $it['size']);
 ?>
-              <button type="button" class="ope-store-item ope-invitem"<?php echo $inv_data_attrs($it); ?>>
-                <span class="ope-store-n"><?php echo htmlspecialchars_uni($it['n']); ?></span>
-                <span class="ope-store-sz"><?php echo $sz; ?> slot<?php echo $sz > 1 ? 's' : ''; ?></span>
+              <button type="button" class="gbe-store-item gbe-invitem"<?php echo $inv_data_attrs($it); ?>>
+                <span class="gbe-store-n"><?php echo htmlspecialchars_uni($it['n']); ?></span>
+                <span class="gbe-store-sz"><?php echo $sz; ?> slot<?php echo $sz > 1 ? 's' : ''; ?></span>
               </button>
 <?php endforeach; ?>
             </div>
@@ -1273,9 +1273,9 @@ header('Content-Type: text/html; charset=utf-8');
       </div>
 
       <!-- Detalle del objeto pulsado (se rellena por JS; no mueve nada) -->
-      <div class="plate ope-inv-detail" id="ope-inv-detail" hidden>
-        <div class="plate-h"><span class="t" id="ope-inv-detail-name">&mdash;</span><span class="c" id="ope-inv-detail-size"></span></div>
-        <div class="plate-b prose"><p id="ope-inv-detail-desc" class="mono c-dim"></p></div>
+      <div class="plate gbe-inv-detail" id="gbe-inv-detail" hidden>
+        <div class="plate-h"><span class="t" id="gbe-inv-detail-name">&mdash;</span><span class="c" id="gbe-inv-detail-size"></span></div>
+        <div class="plate-b prose"><p id="gbe-inv-detail-desc" class="mono c-dim"></p></div>
       </div>
     </section>
 
@@ -1285,18 +1285,18 @@ header('Content-Type: text/html; charset=utf-8');
         <div class="plate-h">
           <span class="t">Relaciones</span><span class="c">// mapa de v&iacute;nculos</span>
 <?php if ($puede_gestionar): ?>
-          <button type="button" class="ope-rel-editbtn" id="ope-rel-edit-open">Editar relaciones</button>
+          <button type="button" class="gbe-rel-editbtn" id="gbe-rel-edit-open">Editar relaciones</button>
 <?php endif; ?>
         </div>
         <div class="plate-b">
 <?php if (empty($relaciones)): ?>
-          <div class="ope-rel-empty" id="relaciones-map">
-            <div class="ope-rel-empty-ic" aria-hidden="true">
+          <div class="gbe-rel-empty" id="relaciones-map">
+            <div class="gbe-rel-empty-ic" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="2.4"/><circle cx="5" cy="17" r="2.4"/><circle cx="19" cy="17" r="2.4"/><path d="M12 8.4l-5.6 6.7M12 8.4l5.6 6.7M7 17h10"/></svg>
             </div>
             <p>A&uacute;n no hay v&iacute;nculos registrados en este expediente.</p>
 <?php if ($puede_gestionar): ?>
-            <button type="button" class="btn btn-hot" id="ope-rel-edit-open2">A&ntilde;adir la primera relaci&oacute;n</button>
+            <button type="button" class="btn btn-hot" id="gbe-rel-edit-open2">A&ntilde;adir la primera relaci&oacute;n</button>
 <?php endif; ?>
           </div>
 <?php else:
@@ -1304,27 +1304,27 @@ header('Content-Type: text/html; charset=utf-8');
         // Nodo central: ICONO pequeño del personaje (fallback a inicial, no avatar).
         $c_ico = trim((string) ($pj['icono'] ?? ''));
 ?>
-          <div class="ope-relmap-wrap" id="relaciones-map">
+          <div class="gbe-relmap-wrap" id="relaciones-map">
 <?php if ($puede_gestionar): ?>
-          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" id="ope-relpos-form">
+          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" id="gbe-relpos-form">
             <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
             <input type="hidden" name="gaccion" value="rel_pos">
 <?php endif; ?>
-            <svg class="ope-relmap<?php echo $puede_gestionar ? ' is-editable' : ''; ?>" viewBox="0 0 1000 640" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Mapa de relaciones de <?php echo $nombre_e; ?>">
+            <svg class="gbe-relmap<?php echo $puede_gestionar ? ' is-editable' : ''; ?>" viewBox="0 0 1000 640" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Mapa de relaciones de <?php echo $nombre_e; ?>">
               <defs>
-                <clipPath id="ope-rel-clip-c"><circle cx="0" cy="0" r="46"/></clipPath>
-                <clipPath id="ope-rel-clip-n"><circle cx="0" cy="0" r="34"/></clipPath>
+                <clipPath id="gbe-rel-clip-c"><circle cx="0" cy="0" r="46"/></clipPath>
+                <clipPath id="gbe-rel-clip-n"><circle cx="0" cy="0" r="34"/></clipPath>
               </defs>
               <!-- Aristas centro -> nodo -->
 <?php foreach ($relaciones as $rl): ?>
-              <g class="ope-reledge rel-<?php echo $rl['tipo']; ?>">
+              <g class="gbe-reledge rel-<?php echo $rl['tipo']; ?>">
                 <line x1="<?php echo $rel_svg_cx; ?>" y1="<?php echo $rel_svg_cy; ?>" x2="<?php echo $rl['dx']; ?>" y2="<?php echo $rl['dy']; ?>"></line>
 <?php
             $mx = (int) round(($rel_svg_cx + $rl['dx']) / 2);
             $my = (int) round(($rel_svg_cy + $rl['dy']) / 2);
             $lbl = trim($rl['etiqueta']) !== '' ? $rl['etiqueta'] : $rl['tipo_lbl'];
 ?>
-                <g class="ope-rellabel" transform="translate(<?php echo $mx; ?>,<?php echo $my; ?>)">
+                <g class="gbe-rellabel" transform="translate(<?php echo $mx; ?>,<?php echo $my; ?>)">
                   <text text-anchor="middle" dy="4"><?php echo htmlspecialchars_uni($lbl); ?></text>
                 </g>
               </g>
@@ -1333,16 +1333,16 @@ header('Content-Type: text/html; charset=utf-8');
 <?php foreach ($relaciones as $rl):
             $fc = $rl['fac_slug'] !== '' ? ' fac-' . $rl['fac_slug'] : '';
 ?>
-              <g class="ope-relnode<?php echo $fc; ?>" data-rid="<?php echo $rl['rid']; ?>" transform="translate(<?php echo $rl['dx']; ?>,<?php echo $rl['dy']; ?>)"<?php if (!empty($rl['desc'])): ?> data-desc="<?php echo htmlspecialchars_uni($rl['desc']); ?>"<?php endif; ?>>
-                <circle class="ope-relnode-bg" cx="0" cy="0" r="34"></circle>
+              <g class="gbe-relnode<?php echo $fc; ?>" data-rid="<?php echo $rl['rid']; ?>" transform="translate(<?php echo $rl['dx']; ?>,<?php echo $rl['dy']; ?>)"<?php if (!empty($rl['desc'])): ?> data-desc="<?php echo htmlspecialchars_uni($rl['desc']); ?>"<?php endif; ?>>
+                <circle class="gbe-relnode-bg" cx="0" cy="0" r="34"></circle>
 <?php if ($rl['icono'] !== ''): ?>
-                <image href="<?php echo htmlspecialchars_uni($rl['icono']); ?>" x="-34" y="-34" width="68" height="68" clip-path="url(#ope-rel-clip-n)" preserveAspectRatio="xMidYMid slice"></image>
+                <image href="<?php echo htmlspecialchars_uni($rl['icono']); ?>" x="-34" y="-34" width="68" height="68" clip-path="url(#gbe-rel-clip-n)" preserveAspectRatio="xMidYMid slice"></image>
 <?php else: ?>
-                <text class="ope-relnode-ini" text-anchor="middle" dy="9"><?php echo htmlspecialchars_uni($rl['inicial']); ?></text>
+                <text class="gbe-relnode-ini" text-anchor="middle" dy="9"><?php echo htmlspecialchars_uni($rl['inicial']); ?></text>
 <?php endif; ?>
-                <circle class="ope-relnode-ring" cx="0" cy="0" r="34" fill="none"></circle>
-                <a href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo $rl['dest_pid']; ?>" class="ope-relnode-link">
-                  <text class="ope-relnode-name" text-anchor="middle" y="52"><?php echo htmlspecialchars_uni($rl['nombre']); ?></text>
+                <circle class="gbe-relnode-ring" cx="0" cy="0" r="34" fill="none"></circle>
+                <a href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo $rl['dest_pid']; ?>" class="gbe-relnode-link">
+                  <text class="gbe-relnode-name" text-anchor="middle" y="52"><?php echo htmlspecialchars_uni($rl['nombre']); ?></text>
                 </a>
 <?php if ($puede_gestionar): ?>
                 <input type="hidden" name="px[<?php echo $rl['rid']; ?>]" value="<?php echo $rl['dx']; ?>">
@@ -1351,28 +1351,28 @@ header('Content-Type: text/html; charset=utf-8');
               </g>
 <?php endforeach; ?>
               <!-- Nodo central: personaje actual -->
-              <g class="ope-relnode ope-relnode-center<?php echo $fac_class; ?>" transform="translate(<?php echo $rel_svg_cx; ?>,<?php echo $rel_svg_cy; ?>)">
-                <circle class="ope-relnode-bg" cx="0" cy="0" r="46"></circle>
+              <g class="gbe-relnode gbe-relnode-center<?php echo $fac_class; ?>" transform="translate(<?php echo $rel_svg_cx; ?>,<?php echo $rel_svg_cy; ?>)">
+                <circle class="gbe-relnode-bg" cx="0" cy="0" r="46"></circle>
 <?php if ($c_ico !== ''): ?>
-                <image href="<?php echo htmlspecialchars_uni($c_ico); ?>" x="-46" y="-46" width="92" height="92" clip-path="url(#ope-rel-clip-c)" preserveAspectRatio="xMidYMid slice"></image>
+                <image href="<?php echo htmlspecialchars_uni($c_ico); ?>" x="-46" y="-46" width="92" height="92" clip-path="url(#gbe-rel-clip-c)" preserveAspectRatio="xMidYMid slice"></image>
 <?php else: ?>
-                <text class="ope-relnode-ini big" text-anchor="middle" dy="11"><?php echo htmlspecialchars_uni($inicial ?? mb_substr($pj['nombre'], 0, 1)); ?></text>
+                <text class="gbe-relnode-ini big" text-anchor="middle" dy="11"><?php echo htmlspecialchars_uni($inicial ?? mb_substr($pj['nombre'], 0, 1)); ?></text>
 <?php endif; ?>
-                <circle class="ope-relnode-ring" cx="0" cy="0" r="46" fill="none"></circle>
-                <text class="ope-relnode-name center" text-anchor="middle" y="66"><?php echo $nombre_e; ?></text>
+                <circle class="gbe-relnode-ring" cx="0" cy="0" r="46" fill="none"></circle>
+                <text class="gbe-relnode-name center" text-anchor="middle" y="66"><?php echo $nombre_e; ?></text>
               </g>
             </svg>
 <?php if ($puede_gestionar): ?>
-            <div class="ope-relmap-actions">
-              <span class="ope-relmap-hint">Arrastra los nodos para recolocarlos y guarda.</span>
-              <button type="submit" class="btn btn-hot" id="ope-relpos-save" disabled>Guardar posiciones</button>
+            <div class="gbe-relmap-actions">
+              <span class="gbe-relmap-hint">Arrastra los nodos para recolocarlos y guarda.</span>
+              <button type="submit" class="btn btn-hot" id="gbe-relpos-save" disabled>Guardar posiciones</button>
             </div>
           </form>
 <?php endif; ?>
           </div>
-          <div class="ope-rel-legend">
+          <div class="gbe-rel-legend">
 <?php foreach ($REL_TIPOS as $ts => $tl): ?>
-            <span class="ope-rel-leg rel-<?php echo $ts; ?>"><i></i><?php echo $tl; ?></span>
+            <span class="gbe-rel-leg rel-<?php echo $ts; ?>"><i></i><?php echo $tl; ?></span>
 <?php endforeach; ?>
           </div>
 <?php endif; ?>
@@ -1389,158 +1389,158 @@ header('Content-Type: text/html; charset=utf-8');
     $g_firma  = htmlspecialchars_uni((string) ($pj['firma'] ?? ''));
 ?>
 <!-- ══ MODAL DE GESTIÓN ══ -->
-<div class="ope-modal-ov" id="ope-gestion" role="dialog" aria-modal="true" aria-labelledby="ope-gestion-title" hidden>
-  <div class="ope-modal">
-    <div class="ope-modal-h">
-      <div class="ope-modal-tt">
-        <span class="ope-modal-eye">// gesti&oacute;n de personaje</span>
-        <h2 id="ope-gestion-title"><?php echo $nombre_e; ?></h2>
+<div class="gbe-modal-ov" id="gbe-gestion" role="dialog" aria-modal="true" aria-labelledby="gbe-gestion-title" hidden>
+  <div class="gbe-modal">
+    <div class="gbe-modal-h">
+      <div class="gbe-modal-tt">
+        <span class="gbe-modal-eye">// gesti&oacute;n de personaje</span>
+        <h2 id="gbe-gestion-title"><?php echo $nombre_e; ?></h2>
       </div>
-      <button type="button" class="ope-modal-x" id="ope-gestion-close" aria-label="Cerrar">&times;</button>
+      <button type="button" class="gbe-modal-x" id="gbe-gestion-close" aria-label="Cerrar">&times;</button>
     </div>
-    <div class="ope-modal-body">
-      <nav class="ope-modal-rail" role="tablist" aria-label="Herramientas de gesti&oacute;n">
-        <button type="button" class="ope-mtab" role="tab" aria-selected="true" data-mtab="perfil">
+    <div class="gbe-modal-body">
+      <nav class="gbe-modal-rail" role="tablist" aria-label="Herramientas de gesti&oacute;n">
+        <button type="button" class="gbe-mtab" role="tab" aria-selected="true" data-mtab="perfil">
           <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/></svg></span>
           <span>Banner / Avatar / Icono / Firma</span>
         </button>
-        <button type="button" class="ope-mtab" role="tab" aria-selected="false" data-mtab="templates">
+        <button type="button" class="gbe-mtab" role="tab" aria-selected="false" data-mtab="templates">
           <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16"/><path d="M8 9h8M8 13h5"/></svg></span>
           <span>Templates de post</span>
         </button>
-        <button type="button" class="ope-mtab" role="tab" aria-selected="false" data-mtab="equipo">
+        <button type="button" class="gbe-mtab" role="tab" aria-selected="false" data-mtab="equipo">
           <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14h18V6l-3-4zM3 6h18M10 10a2 2 0 0 0 4 0"/></svg></span>
           <span>Equipo</span>
         </button>
-        <button type="button" class="ope-mtab" role="tab" aria-selected="false" data-mtab="cronologia">
+        <button type="button" class="gbe-mtab" role="tab" aria-selected="false" data-mtab="cronologia">
           <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
           <span>Cronolog&iacute;a</span>
         </button>
-        <button type="button" class="ope-mtab" role="tab" aria-selected="false" data-mtab="relaciones">
+        <button type="button" class="gbe-mtab" role="tab" aria-selected="false" data-mtab="relaciones">
           <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="6" r="2.4"/><circle cx="5" cy="17" r="2.4"/><circle cx="19" cy="17" r="2.4"/><path d="M12 8.4l-5.6 6.7M12 8.4l5.6 6.7"/></svg></span>
           <span>Relaciones</span>
         </button>
       </nav>
 
-      <div class="ope-modal-content">
+      <div class="gbe-modal-content">
 <?php if ($gestion_ok): ?>
-        <div class="ope-mflash">Cambios guardados correctamente.</div>
+        <div class="gbe-mflash">Cambios guardados correctamente.</div>
 <?php endif; ?>
 
         <!-- Panel: Avatar / Icono / Firma -->
-        <section class="ope-mpanel on" data-mpanel="perfil" role="tabpanel">
+        <section class="gbe-mpanel on" data-mpanel="perfil" role="tabpanel">
           <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">
             <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
             <input type="hidden" name="gaccion" value="perfil">
-            <div class="ope-field">
+            <div class="gbe-field">
               <label>Banner (imagen de cabecera 16:9)</label>
-              <div class="ope-field-help">URL de imagen. Se muestra como cabecera en la parte superior de la ficha.</div>
+              <div class="gbe-field-help">URL de imagen. Se muestra como cabecera en la parte superior de la ficha.</div>
               <input type="url" name="banner" value="<?php echo htmlspecialchars_uni((string) ($datos['banner'] ?? '')); ?>" placeholder="https://...">
             </div>
-            <div class="ope-mgrid">
-              <div class="ope-field">
+            <div class="gbe-mgrid">
+              <div class="gbe-field">
                 <label>Avatar (retrato de la ficha)</label>
-                <div class="ope-field-help">URL de imagen. Se muestra en la ficha y en tus mensajes.</div>
+                <div class="gbe-field-help">URL de imagen. Se muestra en la ficha y en tus mensajes.</div>
                 <input type="url" name="avatar" value="<?php echo $g_avatar; ?>" placeholder="https://...">
               </div>
-              <div class="ope-mprev">
+              <div class="gbe-mprev">
 <?php if ($g_avatar !== ''): ?>
-                <img src="<?php echo $g_avatar; ?>" alt="Avatar" id="ope-prev-avatar">
+                <img src="<?php echo $g_avatar; ?>" alt="Avatar" id="gbe-prev-avatar">
 <?php else: ?>
-                <div class="ope-mprev-empty" id="ope-prev-avatar-empty"><?php echo htmlspecialchars_uni($inicial ?? mb_substr($pj['nombre'], 0, 1)); ?></div>
+                <div class="gbe-mprev-empty" id="gbe-prev-avatar-empty"><?php echo htmlspecialchars_uni($inicial ?? mb_substr($pj['nombre'], 0, 1)); ?></div>
 <?php endif; ?>
               </div>
             </div>
-            <div class="ope-mgrid">
-              <div class="ope-field">
+            <div class="gbe-mgrid">
+              <div class="gbe-field">
                 <label>Icono de post</label>
-                <div class="ope-field-help">Imagen peque&ntilde;a opcional junto al nombre en cada mensaje.</div>
+                <div class="gbe-field-help">Imagen peque&ntilde;a opcional junto al nombre en cada mensaje.</div>
                 <input type="url" name="icono" value="<?php echo $g_icono; ?>" placeholder="https://...">
               </div>
-              <div class="ope-mprev">
+              <div class="gbe-mprev">
 <?php if ($g_icono !== ''): ?>
                 <img src="<?php echo $g_icono; ?>" alt="Icono">
 <?php else: ?>
-                <div class="ope-mprev-empty small">64&times;64</div>
+                <div class="gbe-mprev-empty small">64&times;64</div>
 <?php endif; ?>
               </div>
             </div>
-            <div class="ope-field">
+            <div class="gbe-field">
               <label>Firma</label>
-              <div class="ope-field-help">Admite BBCode: <code>[b]</code>, <code>[i]</code>, <code>[img]url[/img]</code>, <code>[color=#41A4E0]</code>&hellip; Aparecer&aacute; bajo cada mensaje de este personaje con un separador <b>One Piece Eternal</b>.</div>
+              <div class="gbe-field-help">Admite BBCode: <code>[b]</code>, <code>[i]</code>, <code>[img]url[/img]</code>, <code>[color=#41A4E0]</code>&hellip; Aparecer&aacute; bajo cada mensaje de este personaje con un separador <b>Granblue Fantasy: Eternal</b>.</div>
               <textarea name="firma" rows="6" placeholder="[b]Dorr Kaskan[/b] &mdash; herrero de Elbaf&#10;[img]https://...[/img]"><?php echo $g_firma; ?></textarea>
             </div>
 
-            <div class="ope-msep" aria-hidden="true"><span>One Piece Eternal</span></div>
-            <div class="ope-modal-actions">
+            <div class="gbe-msep" aria-hidden="true"><span>Granblue Fantasy: Eternal</span></div>
+            <div class="gbe-modal-actions">
               <button type="submit" class="btn btn-hot">Guardar cambios</button>
             </div>
           </form>
         </section>
 
         <!-- Panel: Templates -->
-        <section class="ope-mpanel" data-mpanel="templates" role="tabpanel">
-          <div class="ope-field-help mb-12">Crea plantillas reutilizables (BBCode y spoilers anidados). Aparecer&aacute;n como botones sobre el editor al crear temas o responder, y se insertan en la posici&oacute;n del cursor.</div>
+        <section class="gbe-mpanel" data-mpanel="templates" role="tabpanel">
+          <div class="gbe-field-help mb-12">Crea plantillas reutilizables (BBCode y spoilers anidados). Aparecer&aacute;n como botones sobre el editor al crear temas o responder, y se insertan en la posici&oacute;n del cursor.</div>
 
           <!-- Crear nueva plantilla -->
-          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" class="ope-tpl-form" data-tpl-form>
+          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" class="gbe-tpl-form" data-tpl-form>
             <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
             <input type="hidden" name="gaccion" value="tpl_add">
-            <div class="ope-field">
+            <div class="gbe-field">
               <label>Nombre de la plantilla</label>
               <input type="text" name="nombre" maxlength="120" placeholder="Ej.: Ficha de combate" required>
             </div>
-            <div class="ope-field">
+            <div class="gbe-field">
               <label>Cuerpo</label>
-              <div class="ope-tpl-tools">
-                <button type="button" class="ope-tpl-tool" data-ins="[spoiler=T&iacute;tulo][/spoiler]">+ Spoiler</button>
-                <button type="button" class="ope-tpl-tool" data-ins="[b][/b]">B</button>
-                <button type="button" class="ope-tpl-tool" data-ins="[i][/i]"><em>i</em></button>
-                <button type="button" class="ope-tpl-tool" data-ins="[img][/img]">Imagen</button>
+              <div class="gbe-tpl-tools">
+                <button type="button" class="gbe-tpl-tool" data-ins="[spoiler=T&iacute;tulo][/spoiler]">+ Spoiler</button>
+                <button type="button" class="gbe-tpl-tool" data-ins="[b][/b]">B</button>
+                <button type="button" class="gbe-tpl-tool" data-ins="[i][/i]"><em>i</em></button>
+                <button type="button" class="gbe-tpl-tool" data-ins="[img][/img]">Imagen</button>
               </div>
               <textarea name="cuerpo" rows="7" placeholder="[spoiler=Estado]HP: 100/100&#10;[spoiler=Detalles]...[/spoiler][/spoiler]"></textarea>
             </div>
-            <div class="ope-modal-actions"><button type="submit" class="btn btn-hot">A&ntilde;adir plantilla</button></div>
+            <div class="gbe-modal-actions"><button type="submit" class="btn btn-hot">A&ntilde;adir plantilla</button></div>
           </form>
 
-          <div class="ope-msep" aria-hidden="true"><span>Mis plantillas</span></div>
+          <div class="gbe-msep" aria-hidden="true"><span>Mis plantillas</span></div>
 <?php if (empty($tpls_list)): ?>
           <p class="mono fs-76 c-dim">A&uacute;n no tienes plantillas. Crea la primera arriba.</p>
 <?php else: foreach ($tpls_list as $tp): ?>
-          <div class="ope-tpl-item">
-            <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" class="ope-tpl-form" data-tpl-form>
+          <div class="gbe-tpl-item">
+            <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" class="gbe-tpl-form" data-tpl-form>
               <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
               <input type="hidden" name="gaccion" value="tpl_edit">
               <input type="hidden" name="tpl_id" value="<?php echo (int) $tp['tpl_id']; ?>">
-              <div class="ope-field">
+              <div class="gbe-field">
                 <label>Nombre</label>
                 <input type="text" name="nombre" maxlength="120" value="<?php echo htmlspecialchars_uni($tp['nombre']); ?>">
               </div>
-              <div class="ope-field">
+              <div class="gbe-field">
                 <label>Cuerpo</label>
-                <div class="ope-tpl-tools">
-                  <button type="button" class="ope-tpl-tool" data-ins="[spoiler=T&iacute;tulo][/spoiler]">+ Spoiler</button>
-                  <button type="button" class="ope-tpl-tool" data-ins="[b][/b]">B</button>
-                  <button type="button" class="ope-tpl-tool" data-ins="[i][/i]"><em>i</em></button>
-                  <button type="button" class="ope-tpl-tool" data-ins="[img][/img]">Imagen</button>
+                <div class="gbe-tpl-tools">
+                  <button type="button" class="gbe-tpl-tool" data-ins="[spoiler=T&iacute;tulo][/spoiler]">+ Spoiler</button>
+                  <button type="button" class="gbe-tpl-tool" data-ins="[b][/b]">B</button>
+                  <button type="button" class="gbe-tpl-tool" data-ins="[i][/i]"><em>i</em></button>
+                  <button type="button" class="gbe-tpl-tool" data-ins="[img][/img]">Imagen</button>
                 </div>
                 <textarea name="cuerpo" rows="6"><?php echo htmlspecialchars_uni($tp['cuerpo']); ?></textarea>
               </div>
-              <div class="ope-rel-item-acts"><button type="submit" class="btn btn-ghost">Guardar</button></div>
+              <div class="gbe-rel-item-acts"><button type="submit" class="btn btn-ghost">Guardar</button></div>
             </form>
             <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" onsubmit="return confirm('&iquest;Eliminar esta plantilla?');">
               <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
               <input type="hidden" name="gaccion" value="tpl_del">
               <input type="hidden" name="tpl_id" value="<?php echo (int) $tp['tpl_id']; ?>">
-              <button type="submit" class="ope-rel-del">Eliminar</button>
+              <button type="submit" class="gbe-rel-del">Eliminar</button>
             </form>
           </div>
 <?php endforeach; endif; ?>
         </section>
 
         <!-- Panel: Equipo -->
-        <section class="ope-mpanel" data-mpanel="equipo" role="tabpanel">
-          <div class="ope-field-help mb-12">Gestiona qu&eacute; objetos llevas <b>encima</b> y cu&aacute;les dejas en el <b>almac&eacute;n</b>. El l&iacute;mite de carga se definir&aacute; m&aacute;s adelante; por ahora no hay tope.</div>
+        <section class="gbe-mpanel" data-mpanel="equipo" role="tabpanel">
+          <div class="gbe-field-help mb-12">Gestiona qu&eacute; objetos llevas <b>encima</b> y cu&aacute;les dejas en el <b>almac&eacute;n</b>. El l&iacute;mite de carga se definir&aacute; m&aacute;s adelante; por ahora no hay tope.</div>
 
 <?php
           $equip_cols = array(
@@ -1550,16 +1550,16 @@ header('Content-Type: text/html; charset=utf-8');
           foreach ($equip_cols as $loc => $col):
               list($col_lbl, $col_items, $move_lbl) = $col;
 ?>
-          <div class="ope-msep" aria-hidden="true"><span><?php echo $col_lbl; ?></span></div>
+          <div class="gbe-msep" aria-hidden="true"><span><?php echo $col_lbl; ?></span></div>
 <?php if (empty($col_items)): ?>
           <p class="mono fs-76 c-dim">Vac&iacute;o.</p>
 <?php else: foreach ($col_items as $i => $it): ?>
-          <div class="ope-equip-item">
-            <div class="ope-equip-item-b">
-              <span class="ope-equip-n"><?php echo htmlspecialchars_uni($it['n']); ?></span>
-<?php if ($it['d'] !== ''): ?><span class="ope-equip-d"><?php echo htmlspecialchars_uni($it['d']); ?></span><?php endif; ?>
+          <div class="gbe-equip-item">
+            <div class="gbe-equip-item-b">
+              <span class="gbe-equip-n"><?php echo htmlspecialchars_uni($it['n']); ?></span>
+<?php if ($it['d'] !== ''): ?><span class="gbe-equip-d"><?php echo htmlspecialchars_uni($it['d']); ?></span><?php endif; ?>
             </div>
-            <div class="ope-equip-acts">
+            <div class="gbe-equip-acts">
               <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">
                 <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
                 <input type="hidden" name="gaccion" value="equip_move">
@@ -1574,9 +1574,9 @@ header('Content-Type: text/html; charset=utf-8');
         </section>
 
         <!-- Panel: Cronología -->
-        <section class="ope-mpanel" data-mpanel="cronologia" role="tabpanel">
+        <section class="gbe-mpanel" data-mpanel="cronologia" role="tabpanel">
 <?php if (empty($cron_flat)): ?>
-          <div class="ope-msoon">
+          <div class="gbe-msoon">
             <h3>Gestionar cronolog&iacute;a</h3>
             <p>Todav&iacute;a no has participado en ninguna historia. Cuando publiques o respondas temas (fuera de Off Topic), aparecer&aacute;n aqu&iacute; para que les pongas una descripci&oacute;n.</p>
           </div>
@@ -1584,16 +1584,16 @@ header('Content-Type: text/html; charset=utf-8');
           <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">
             <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
             <input type="hidden" name="gaccion" value="cronologia">
-            <div class="ope-field-help mb-12">A&ntilde;ade una nota personal a cada historia de tu l&iacute;nea de tiempo. Se mostrar&aacute; bajo el t&iacute;tulo del tema en la ficha.</div>
-            <div class="ope-cron-list">
+            <div class="gbe-field-help mb-12">A&ntilde;ade una nota personal a cada historia de tu l&iacute;nea de tiempo. Se mostrar&aacute; bajo el t&iacute;tulo del tema en la ficha.</div>
+            <div class="gbe-cron-list">
 <?php foreach ($cron_flat as $e):
     $tag_lbl2  = $e['tag'] !== '' ? ($TAG_LABELS[$e['tag']] ?? $e['tag']) : '';
     $tag_slug2 = $e['tag'] !== '' ? strtolower($e['tag']) : '';
 ?>
-              <div class="ope-cron-item">
-                <div class="ope-cron-head">
-                  <span class="ope-cron-t"><?php echo htmlspecialchars_uni($e['subject']); ?></span>
-                  <span class="ope-cron-y">A&ntilde;o <?php echo htmlspecialchars_uni(ope_rol_year_label((int) $e['anio'])); ?></span>
+              <div class="gbe-cron-item">
+                <div class="gbe-cron-head">
+                  <span class="gbe-cron-t"><?php echo htmlspecialchars_uni($e['subject']); ?></span>
+                  <span class="gbe-cron-y">A&ntilde;o <?php echo htmlspecialchars_uni(gbe_rol_year_label((int) $e['anio'])); ?></span>
 <?php if ($e['era'] !== ''): ?><span class="tl-era tl-era-<?php echo $e['era']; ?>"><?php echo $e['era'] === 'pasado' ? 'Pasado' : 'Presente'; ?></span><?php endif; ?>
 <?php if ($tag_lbl2 !== ''): ?><span class="tl-tag tl-tag-<?php echo $tag_slug2; ?>"><?php echo htmlspecialchars_uni($tag_lbl2); ?></span><?php endif; ?>
                 </div>
@@ -1601,7 +1601,7 @@ header('Content-Type: text/html; charset=utf-8');
               </div>
 <?php endforeach; ?>
             </div>
-            <div class="ope-modal-actions mt-14">
+            <div class="gbe-modal-actions mt-14">
               <button type="submit" class="btn btn-hot">Guardar cronolog&iacute;a</button>
             </div>
           </form>
@@ -1609,18 +1609,18 @@ header('Content-Type: text/html; charset=utf-8');
         </section>
 
         <!-- Panel: Relaciones -->
-        <section class="ope-mpanel" data-mpanel="relaciones" role="tabpanel">
-          <div class="ope-field-help mb-12">Vincula a este personaje con otros. El nodo se colorea con la facci&oacute;n del otro personaje y la l&iacute;nea con el tipo de v&iacute;nculo.</div>
+        <section class="gbe-mpanel" data-mpanel="relaciones" role="tabpanel">
+          <div class="gbe-field-help mb-12">Vincula a este personaje con otros. El nodo se colorea con la facci&oacute;n del otro personaje y la l&iacute;nea con el tipo de v&iacute;nculo.</div>
 
 <?php if (empty($rel_choices)): ?>
-          <div class="ope-msoon"><p>No hay otros personajes aprobados con los que crear v&iacute;nculos todav&iacute;a.</p></div>
+          <div class="gbe-msoon"><p>No hay otros personajes aprobados con los que crear v&iacute;nculos todav&iacute;a.</p></div>
 <?php else: ?>
           <!-- Añadir relación -->
-          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" class="ope-rel-addform">
+          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" class="gbe-rel-addform">
             <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
             <input type="hidden" name="gaccion" value="rel_add">
-            <div class="ope-mgrid">
-              <div class="ope-field">
+            <div class="gbe-mgrid">
+              <div class="gbe-field">
                 <label>Personaje</label>
                 <select name="destino_pid" required>
                   <option value="">&mdash; elige un personaje &mdash;</option>
@@ -1629,7 +1629,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endforeach; ?>
                 </select>
               </div>
-              <div class="ope-field">
+              <div class="gbe-field">
                 <label>Tipo de v&iacute;nculo</label>
                 <select name="tipo">
 <?php foreach ($REL_TIPOS as $ts => $tl): ?>
@@ -1638,39 +1638,39 @@ header('Content-Type: text/html; charset=utf-8');
                 </select>
               </div>
             </div>
-            <div class="ope-field">
+            <div class="gbe-field">
               <label>Nombre de la relaci&oacute;n</label>
-              <div class="ope-field-help">Ej.: &laquo;Capit&aacute;n&raquo;, &laquo;Hermano de sangre&raquo;, &laquo;Rival eterno&raquo;.</div>
+              <div class="gbe-field-help">Ej.: &laquo;Capit&aacute;n&raquo;, &laquo;Hermano de sangre&raquo;, &laquo;Rival eterno&raquo;.</div>
               <input type="text" name="etiqueta" maxlength="120" placeholder="Capit&aacute;n">
             </div>
-            <div class="ope-field">
+            <div class="gbe-field">
               <label>Descripci&oacute;n</label>
               <textarea name="descripcion" rows="3" placeholder="Historia o matiz de esta relaci&oacute;n..."></textarea>
             </div>
-            <div class="ope-modal-actions"><button type="submit" class="btn btn-hot">A&ntilde;adir relaci&oacute;n</button></div>
+            <div class="gbe-modal-actions"><button type="submit" class="btn btn-hot">A&ntilde;adir relaci&oacute;n</button></div>
           </form>
 <?php endif; ?>
 
           <!-- Relaciones existentes -->
-          <div class="ope-msep" aria-hidden="true"><span>V&iacute;nculos actuales</span></div>
+          <div class="gbe-msep" aria-hidden="true"><span>V&iacute;nculos actuales</span></div>
 <?php if (empty($relaciones)): ?>
           <p class="mono fs-76 c-dim">Sin v&iacute;nculos registrados todav&iacute;a.</p>
 <?php else: foreach ($relaciones as $rl): ?>
-          <div class="ope-rel-item rel-<?php echo $rl['tipo']; ?>">
+          <div class="gbe-rel-item rel-<?php echo $rl['tipo']; ?>">
             <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>">
               <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
               <input type="hidden" name="gaccion" value="rel_edit">
               <input type="hidden" name="rid" value="<?php echo $rl['rid']; ?>">
-              <div class="ope-rel-item-h">
-                <span class="ope-rel-item-node<?php echo $rl['fac_slug'] !== '' ? ' fac-' . $rl['fac_slug'] : ''; ?>"><?php echo htmlspecialchars_uni($rl['inicial']); ?></span>
-                <a class="ope-rel-item-name" href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo $rl['dest_pid']; ?>"><?php echo htmlspecialchars_uni($rl['nombre']); ?></a>
+              <div class="gbe-rel-item-h">
+                <span class="gbe-rel-item-node<?php echo $rl['fac_slug'] !== '' ? ' fac-' . $rl['fac_slug'] : ''; ?>"><?php echo htmlspecialchars_uni($rl['inicial']); ?></span>
+                <a class="gbe-rel-item-name" href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo $rl['dest_pid']; ?>"><?php echo htmlspecialchars_uni($rl['nombre']); ?></a>
               </div>
-              <div class="ope-mgrid">
-                <div class="ope-field">
+              <div class="gbe-mgrid">
+                <div class="gbe-field">
                   <label>Nombre de la relaci&oacute;n</label>
                   <input type="text" name="etiqueta" maxlength="120" value="<?php echo htmlspecialchars_uni($rl['etiqueta']); ?>">
                 </div>
-                <div class="ope-field">
+                <div class="gbe-field">
                   <label>Tipo</label>
                   <select name="tipo">
 <?php foreach ($REL_TIPOS as $ts => $tl): ?>
@@ -1679,11 +1679,11 @@ header('Content-Type: text/html; charset=utf-8');
                   </select>
                 </div>
               </div>
-              <div class="ope-field">
+              <div class="gbe-field">
                 <label>Descripci&oacute;n</label>
                 <textarea name="descripcion" rows="2"><?php echo htmlspecialchars_uni($rl['desc']); ?></textarea>
               </div>
-              <div class="ope-rel-item-acts">
+              <div class="gbe-rel-item-acts">
                 <button type="submit" class="btn btn-ghost">Guardar</button>
               </div>
             </form>
@@ -1691,7 +1691,7 @@ header('Content-Type: text/html; charset=utf-8');
               <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
               <input type="hidden" name="gaccion" value="rel_del">
               <input type="hidden" name="rid" value="<?php echo $rl['rid']; ?>">
-              <button type="submit" class="ope-rel-del">Eliminar</button>
+              <button type="submit" class="gbe-rel-del">Eliminar</button>
             </form>
           </div>
 <?php endforeach; endif; ?>
@@ -1732,15 +1732,15 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
 
 // ── Equipo (vista de ficha): pulsar un objeto despliega su info (no lo mueve) ──
 (function () {
-  var box = document.getElementById('ope-inv-detail');
+  var box = document.getElementById('gbe-inv-detail');
   if (!box) return;
-  var elName = document.getElementById('ope-inv-detail-name');
-  var elSize = document.getElementById('ope-inv-detail-size');
-  var elDesc = document.getElementById('ope-inv-detail-desc');
+  var elName = document.getElementById('gbe-inv-detail-name');
+  var elSize = document.getElementById('gbe-inv-detail-size');
+  var elDesc = document.getElementById('gbe-inv-detail-desc');
   var current = null;
-  document.querySelectorAll('.ope-invitem').forEach(function (it) {
+  document.querySelectorAll('.gbe-invitem').forEach(function (it) {
     it.addEventListener('click', function () {
-      document.querySelectorAll('.ope-invitem.is-open').forEach(function (x) { if (x !== it) x.classList.remove('is-open'); });
+      document.querySelectorAll('.gbe-invitem.is-open').forEach(function (x) { if (x !== it) x.classList.remove('is-open'); });
       if (current === it) { it.classList.remove('is-open'); box.hidden = true; current = null; return; }
       current = it;
       it.classList.add('is-open');
@@ -1758,10 +1758,10 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
 
 // ── Modal de gestión ──
 (function () {
-  var ov = document.getElementById('ope-gestion');
+  var ov = document.getElementById('gbe-gestion');
   if (!ov) return;
-  var openBtn = document.getElementById('ope-gestion-open');
-  var closeBtn = document.getElementById('ope-gestion-close');
+  var openBtn = document.getElementById('gbe-gestion-open');
+  var closeBtn = document.getElementById('gbe-gestion-close');
   function open() { ov.hidden = false; document.body.style.overflow = 'hidden'; }
   function close() { ov.hidden = true; document.body.style.overflow = ''; }
   if (openBtn) openBtn.addEventListener('click', open);
@@ -1770,11 +1770,11 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !ov.hidden) close(); });
 
   // Pestañas del modal.
-  ov.querySelectorAll('.ope-mtab').forEach(function (t) {
+  ov.querySelectorAll('.gbe-mtab').forEach(function (t) {
     t.addEventListener('click', function () {
-      ov.querySelectorAll('.ope-mtab').forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+      ov.querySelectorAll('.gbe-mtab').forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
       t.setAttribute('aria-selected', 'true');
-      ov.querySelectorAll('.ope-mpanel').forEach(function (p) {
+      ov.querySelectorAll('.gbe-mpanel').forEach(function (p) {
         p.classList.toggle('on', p.dataset.mpanel === t.dataset.mtab);
       });
     });
@@ -1782,30 +1782,30 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
 
   // Previsualización en vivo del avatar.
   var avIn = ov.querySelector('input[name="avatar"]');
-  var avImg = document.getElementById('ope-prev-avatar');
-  var avEmpty = document.getElementById('ope-prev-avatar-empty');
+  var avImg = document.getElementById('gbe-prev-avatar');
+  var avEmpty = document.getElementById('gbe-prev-avatar-empty');
   if (avIn) avIn.addEventListener('input', function () {
     var v = avIn.value.trim();
     if (!/^https?:\/\//i.test(v)) return;
-    if (!avImg && avEmpty) { avImg = document.createElement('img'); avImg.id = 'ope-prev-avatar'; avImg.alt = 'Avatar'; avEmpty.replaceWith(avImg); avEmpty = null; }
+    if (!avImg && avEmpty) { avImg = document.createElement('img'); avImg.id = 'gbe-prev-avatar'; avImg.alt = 'Avatar'; avEmpty.replaceWith(avImg); avEmpty = null; }
     if (avImg) avImg.src = v;
   });
 
   // Abre una pestaña concreta del modal.
   function openTab(name) {
-    var tab = ov.querySelector('.ope-mtab[data-mtab="' + name + '"]');
+    var tab = ov.querySelector('.gbe-mtab[data-mtab="' + name + '"]');
     if (tab) tab.click();
   }
 
   // Botones "Editar relaciones" (cabecera del mapa y estado vacío).
-  ['ope-rel-edit-open', 'ope-rel-edit-open2'].forEach(function (id) {
+  ['gbe-rel-edit-open', 'gbe-rel-edit-open2'].forEach(function (id) {
     var b = document.getElementById(id);
     if (b) b.addEventListener('click', function () { open(); openTab('relaciones'); });
   });
 
   // Herramientas de inserción BBCode/spoiler en los editores de plantillas.
   ov.addEventListener('click', function (e) {
-    var t = e.target.closest('.ope-tpl-tool');
+    var t = e.target.closest('.gbe-tpl-tool');
     if (!t) return;
     var form = t.closest('form');
     var ta = form && form.querySelector('textarea[name="cuerpo"]');
@@ -1839,7 +1839,7 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
 
 // ── Mapa de relaciones: activar pestaña + arrastre de nodos ──
 (function () {
-  var svg = document.querySelector('.ope-relmap');
+  var svg = document.querySelector('.gbe-relmap');
   if (!svg) return;
 
   // Si venimos de guardar posiciones, muestra la pestaña Relaciones.
@@ -1849,7 +1849,7 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
   }
 
   if (!svg.classList.contains('is-editable')) return;
-  var saveBtn = document.getElementById('ope-relpos-save');
+  var saveBtn = document.getElementById('gbe-relpos-save');
   var pt = svg.createSVGPoint();
   var dragging = null;
 
@@ -1862,10 +1862,10 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
   }
   function clamp(v, min, max) { return v < min ? min : (v > max ? max : v); }
 
-  svg.querySelectorAll('.ope-relnode[data-rid]').forEach(function (node) {
+  svg.querySelectorAll('.gbe-relnode[data-rid]').forEach(function (node) {
     node.addEventListener('pointerdown', function (e) {
       // No arrastres al pulsar el enlace del nombre.
-      if (e.target.closest('.ope-relnode-link')) return;
+      if (e.target.closest('.gbe-relnode-link')) return;
       e.preventDefault();
       dragging = node;
       node.classList.add('is-dragging');
@@ -1898,8 +1898,8 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
   // Recalcula posición de aristas/etiquetas a partir de los nodos.
   function updateEdges() {
     var cx = 500, cy = 320;
-    var nodes = svg.querySelectorAll('.ope-relnode[data-rid]');
-    var edges = svg.querySelectorAll('.ope-reledge');
+    var nodes = svg.querySelectorAll('.gbe-relnode[data-rid]');
+    var edges = svg.querySelectorAll('.gbe-reledge');
     nodes.forEach(function (node, i) {
       var t = node.getAttribute('transform') || '';
       var m = /translate\(\s*(-?\d+\.?\d*)[ ,]+(-?\d+\.?\d*)\)/.exec(t);
@@ -1909,7 +1909,7 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
       if (!edge) return;
       var ln = edge.querySelector('line');
       if (ln) { ln.setAttribute('x2', x); ln.setAttribute('y2', y); }
-      var lbl = edge.querySelector('.ope-rellabel');
+      var lbl = edge.querySelector('.gbe-rellabel');
       if (lbl) lbl.setAttribute('transform', 'translate(' + Math.round((cx + x) / 2) + ',' + Math.round((cy + y) / 2) + ')');
     });
   }
@@ -1932,7 +1932,7 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
   var grid = document.getElementById('deck-grid');
   var search = document.getElementById('deck-search');
   var pagDiv = document.getElementById('deck-pagination');
-  var cards = grid ? grid.querySelectorAll('.ope-tk') : [];
+  var cards = grid ? grid.querySelectorAll('.gbe-tk') : [];
   var perPage = 6;
   var currentPage = 1;
   var activeTag = '';
@@ -1940,7 +1940,7 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
   if (!grid || !cards.length) return;
 
   if (search) search.addEventListener('input', function () { doFilter(); });
-  var tagCbs = document.querySelectorAll('.ope-deck-tag-cb');
+  var tagCbs = document.querySelectorAll('.gbe-deck-tag-cb');
   tagCbs.forEach(function (cb) {
     cb.addEventListener('change', function () {
       if (cb.checked) {
@@ -1978,10 +1978,10 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
     if (pages <= 1) { pagDiv.innerHTML = ''; return; }
     var h = '';
     for (var p = 1; p <= pages; p++) {
-      h += '<button type="button" class="ope-deck-pg' + (p === currentPage ? ' on' : '') + '" data-p="' + p + '">' + p + '</button>';
+      h += '<button type="button" class="gbe-deck-pg' + (p === currentPage ? ' on' : '') + '" data-p="' + p + '">' + p + '</button>';
     }
     pagDiv.innerHTML = h;
-    pagDiv.querySelectorAll('.ope-deck-pg').forEach(function (b) {
+    pagDiv.querySelectorAll('.gbe-deck-pg').forEach(function (b) {
       b.addEventListener('click', function () {
         currentPage = parseInt(b.dataset.p, 10);
         renderPages(visible);

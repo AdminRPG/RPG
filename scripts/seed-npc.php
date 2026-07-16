@@ -1,7 +1,7 @@
 <?php
 /**
  * I-Forge · Seed de NPCs desde I-Forge-Sistema
- * Crea 15 NPCs en rol_personajes con la información de lore de One Piece Eternal.
+ * Crea 15 NPCs en rol_personajes con la información de lore de Granblue Fantasy: Eternal.
  * Idempotente: salta si el slug ya existe.
  *
  * Ejecutar: php scripts/seed-npc.php

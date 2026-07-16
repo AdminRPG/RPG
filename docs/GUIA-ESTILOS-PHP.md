@@ -4,7 +4,7 @@
 >
 > **Portada MyBB:** no uses esta guía — usa `body.gbe-index` y DESIGN §6.
 >
-> Regla de oro: **CERO `<style>` y CERO `style=""` estáticos en PHP.** Todo el CSS va en `docs/themes/ope.css`.
+> Regla de oro: **CERO `<style>` y CERO `style=""` estáticos en PHP.** Todo el CSS va en `docs/themes/gbe.css`.
 
 ---
 
@@ -25,7 +25,7 @@ define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'mi-pagina.php');
 require_once './global.php';
 // Añade SOLO los require_once que necesites
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_data.php';
 
 $bburl    = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname   = htmlspecialchars_uni($mybb->settings['bbname']);
@@ -56,12 +56,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Título</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-mi-pagina) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-mi-pagina) -->
 </head>
-<body class="ope-pg-mi-pagina">    <!-- ← scope CSS -->
+<body class="gbe-pg-mi-pagina">    <!-- ← scope CSS -->
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -92,7 +92,7 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:red
 </html>
 ```
 
-> ⚠️ **GOTCHA nº1** (causa de páginas rotas): las clases base **`.shead .plate .plate-h .plate-b .reveal .flash .pj-empty` NO son globales**. Cada página las **re-declara** bajo su scope. Scaffolding canónico GBF: **DESIGN §5.4** (no el brutalismo OP con `border:2px solid #000`). SÍ son globales: `.wrap .breadcrumb .btn* .ope-prog-*`.
+> ⚠️ **GOTCHA nº1** (causa de páginas rotas): las clases base **`.shead .plate .plate-h .plate-b .reveal .flash .pj-empty` NO son globales**. Cada página las **re-declara** bajo su scope. Scaffolding canónico GBF: **DESIGN §5.4** (no el brutalismo OP con `border:2px solid #000`). SÍ son globales: `.wrap .breadcrumb .btn* .gbe-prog-*`.
 
 ### 3. Componentes disponibles (CLASES CSS, no inventes nuevas)
 
@@ -104,15 +104,15 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:red
 | **Flash message** | `<div class="flash ok">Éxito</div>` o `<div class="flash error">Error</div>` |
 | **Botón primario** | `<button class="btn btn-hot">Acción</button>` |
 | **Botón secundario** | `<a class="btn btn-ghost">Cancelar</a>` |
-| **PP bar** | `<div class="ope-prog-ppbar"><div class="ope-prog-ppbar-total"><span class="ope-prog-ppbar-val">N</span><span class="ope-prog-ppbar-label">PP</span></div></div>` |
-| **Grid de stats** | `<div class="ope-prog-stats-grid">...</div>` |
-| **Tabla** | `<table class="ope-prog-log">...</table>` |
+| **PP bar** | `<div class="gbe-prog-ppbar"><div class="gbe-prog-ppbar-total"><span class="gbe-prog-ppbar-val">N</span><span class="gbe-prog-ppbar-label">PP</span></div></div>` |
+| **Grid de stats** | `<div class="gbe-prog-stats-grid">...</div>` |
+| **Tabla** | `<table class="gbe-prog-log">...</table>` |
 
-### 4. Reglas CSS en ope.css
+### 4. Reglas CSS en gbe.css
 
 **PASO 1 (OBLIGATORIO en scope nuevo)** — pega el scaffolding GBF de `DESIGN-GRANBLUE-ETERNAL.md` §5.4 (o `.cursor/rules/page-scaffold.mdc`). Sin esto, los componentes de §3 salen SIN estilo.
 
-**PASO 2** — tus reglas propias, **SIEMPRE** scopeadas bajo `body.ope-pg-mi-pagina`:
+**PASO 2** — tus reglas propias, **SIEMPRE** scopeadas bajo `body.gbe-pg-mi-pagina`:
 
 ```css
 /* ═══════════════════════════════════════════════
@@ -120,12 +120,12 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:red
    ═══════════════════════════════════════════════ */
 
 /* 1) scaffolding base (copiar de la regla page-scaffold, reemplazando <pagina>) */
-body.ope-pg-mi-pagina .shead{ ... }
-body.ope-pg-mi-pagina .plate{ ... }
+body.gbe-pg-mi-pagina .shead{ ... }
+body.gbe-pg-mi-pagina .plate{ ... }
 /* … resto del bloque scaffolding … */
 
 /* 2) reglas exclusivas de esta página */
-body.ope-pg-mi-pagina .mi-clase { ... }
+body.gbe-pg-mi-pagina .mi-clase { ... }
 ```
 
 ### 5. NO hacer NUNCA
@@ -133,8 +133,8 @@ body.ope-pg-mi-pagina .mi-clase { ... }
 - ❌ `<style>` en el head del PHP
 - ❌ `style="color: red"` con valores estáticos en HTML
 - ❌ `style="margin-top: 1rem"` → usa una clase CSS
-- ❌ Inventar clases nuevas si ya existe una en ope.css que hace lo mismo
-- ❌ Olvidar `ope-pg-<pagina>` en el `<body>`
+- ❌ Inventar clases nuevas si ya existe una en gbe.css que hace lo mismo
+- ❌ Olvidar `gbe-pg-<pagina>` en el `<body>`
 - ❌ Olvidar el IntersectionObserver al final
 - ❌ Olvidar `<?php include __DIR__ . '/inc/footer_custom.php'; ?>`
 
@@ -150,17 +150,17 @@ body.ope-pg-mi-pagina .mi-clase { ... }
 
 ```bash
 php scripts/check-inline-styles.php   # debe salir limpio
-php scripts/sync-theme.php import      # compila ope.css → cache/themes/theme13/ope.css
+php scripts/sync-theme.php import      # compila gbe.css → cache/themes/theme13/gbe.css
 php scripts/sync-theme.php verify      # debe decir: OK CSS: in sync
 ```
 
-El navegador carga `cache/themes/theme13/ope.css`, **NO** `docs/themes/ope.css`. Si no corres `import`, no verás tus cambios. Termina SIEMPRE con una verificación visual real en el navegador, comparando con una página hermana ya correcta.
+El navegador carga `cache/themes/theme13/gbe.css`, **NO** `docs/themes/gbe.css`. Si no corres `import`, no verás tus cambios. Termina SIEMPRE con una verificación visual real en el navegador, comparando con una página hermana ya correcta.
 
 ### 8. Auto-revisión de clases (evita el bug de haki.php)
 
 Antes de dar por terminada la página, revisa que **cada clase del HTML** resuelva:
 
-1. o es global (`.wrap .breadcrumb .btn* .ope-prog-*`), o
-2. tiene una regla `body.ope-pg-<tu-pagina> .esa-clase` en `ope.css`.
+1. o es global (`.wrap .breadcrumb .btn* .gbe-prog-*`), o
+2. tiene una regla `body.gbe-pg-<tu-pagina> .esa-clase` en `gbe.css`.
 
 Si estrenaste un scope, el scaffolding base del PASO 1 (§4) es innegociable.

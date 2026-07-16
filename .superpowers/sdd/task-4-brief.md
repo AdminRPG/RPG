@@ -7,12 +7,12 @@ Página visible por todos los usuarios. Muestra el estado del mundo: zonas, facc
 ## Cambios a hacer
 
 ### 1. Render de zonas — 10 métricas en modal
-Actualmente los modales de cada zona (`#zfull-{slug}`) iteran con `$zMetrics`. Como `ope_rol_mv_zona_metrics()` ahora devuelve 10 keys, el bucle ya renderiza todas automáticamente. **Verifica** que no haya hardcode de 7 métricas.
+Actualmente los modales de cada zona (`#zfull-{slug}`) iteran con `$zMetrics`. Como `gbe_rol_mv_zona_metrics()` ahora devuelve 10 keys, el bucle ya renderiza todas automáticamente. **Verifica** que no haya hardcode de 7 métricas.
 
 ```php
 // Buscar en el HTML dentro del div.store:
 foreach ($zMetrics as $k => $m):
-    echo mv_metric_bar($m['label'], $z[$k], ope_rol_mv_band5($z[$k], $m['bands']), $m['col']);
+    echo mv_metric_bar($m['label'], $z[$k], gbe_rol_mv_band5($z[$k], $m['bands']), $m['col']);
 endforeach;
 ```
 Si existe exactamente así, funciona automáticamente. Si hay algo hardcodeado (como una lista fija de keys), actualízalo para usar el array dinámico.
@@ -83,11 +83,11 @@ $zt_rest = array_slice($zt, 3, null, true);
 ```
 
 ### 5. Nueva sección: Hilos del mundo
-Añadir una sección después de "Arcos en marcha" que muestre los hilos narrativos activos. Usa `ope_rol_mv_threads_activos()`.
+Añadir una sección después de "Arcos en marcha" que muestre los hilos narrativos activos. Usa `gbe_rol_mv_threads_activos()`.
 
 ```php
 <?php
-$threadsPub = ope_rol_mv_threads_activos();
+$threadsPub = gbe_rol_mv_threads_activos();
 if (!empty($threadsPub)):
   $threadsActivos = array_filter($threadsPub, function($t) { return in_array($t['estado'] ?? '', ['activo', 'reabierto']); });
   if (!empty($threadsActivos)):
@@ -113,7 +113,7 @@ Ya existe `$ultimo` y se muestra en el hero "Última actualización". Verificar 
 ## Reglas
 - Mantener el estilo existente: clases em-*, estructura reveal, hero
 - NO romper funcionalidad actual
-- NO modificar CSS (clases ya existen en ope.css)
+- NO modificar CSS (clases ya existen en gbe.css)
 - Asegurar que los nuevos elementos usen clases existentes
 
 ## Archivo a modificar

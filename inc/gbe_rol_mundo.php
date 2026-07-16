@@ -2,8 +2,8 @@
 /**
  * I-Forge · Mundo Vivo (AV-13) — capa de datos y lógica.
  *
- * Incluido desde inc/plugins/ope_rol.php. Todas las funciones usan el prefijo
- * ope_rol_mv_ y trabajan con $db (MyBB) contra las tablas mybb_rol_mv_*.
+ * Incluido desde inc/plugins/gbe_rol.php. Todas las funciones usan el prefijo
+ * gbe_rol_mv_ y trabajan con $db (MyBB) contra las tablas mybb_rol_mv_*.
  *
  * IMPORTANTE: $db->insert_query / update_query NO escapan valores; hay que
  * escapar con $db->escape_string() antes de pasarlos.
@@ -18,7 +18,7 @@ if (!defined('IN_MYBB')) {
 // ─────────────────────────────────────────────────────────────────────────
 
 /** Nombres de las 8 regiones-foro que actúan como zonas del Tablero. */
-function ope_rol_mv_region_map()
+function gbe_rol_mv_region_map()
 {
     return array(
         'East Blue'  => 'east-blue',
@@ -34,7 +34,7 @@ function ope_rol_mv_region_map()
 }
 
 /** Orden canónico de facciones (para pares de tensión). */
-function ope_rol_mv_faccion_order()
+function gbe_rol_mv_faccion_order()
 {
     return array('marine', 'pirata', 'revolucionario', 'gobierno', 'cazarrecompensas', 'civil');
 }
@@ -44,7 +44,7 @@ function ope_rol_mv_faccion_order()
 // ─────────────────────────────────────────────────────────────────────────
 
 /** Zonas ordenadas: slug => fila. */
-function ope_rol_mv_zonas()
+function gbe_rol_mv_zonas()
 {
     global $db;
     $out = array();
@@ -59,7 +59,7 @@ function ope_rol_mv_zonas()
 }
 
 /** Facciones ordenadas: slug => fila. */
-function ope_rol_mv_facciones()
+function gbe_rol_mv_facciones()
 {
     global $db;
     $out = array();
@@ -77,7 +77,7 @@ function ope_rol_mv_facciones()
  * Tensión POR MAR. Devuelve: zona_slug => par "a|b" => ['valor'=>int,'notas'=>str].
  * Si se pasa $zona, devuelve solo el mapa par=>[...] de esa zona.
  */
-function ope_rol_mv_tension($zona = null)
+function gbe_rol_mv_tension($zona = null)
 {
     global $db;
     $out = array();
@@ -98,7 +98,7 @@ function ope_rol_mv_tension($zona = null)
 }
 
 /** Arcos abiertos (lista de filas). */
-function ope_rol_mv_arcos()
+function gbe_rol_mv_arcos()
 {
     global $db;
     $out = array();
@@ -113,13 +113,13 @@ function ope_rol_mv_arcos()
 }
 
 /** Snapshot completo del tablero (para prompt / almacenamiento). */
-function ope_rol_mv_tablero()
+function gbe_rol_mv_tablero()
 {
     return array(
-        'zonas'     => ope_rol_mv_zonas(),
-        'facciones' => ope_rol_mv_facciones(),
-        'tension'   => ope_rol_mv_tension(),
-        'arcos'     => ope_rol_mv_arcos(),
+        'zonas'     => gbe_rol_mv_zonas(),
+        'facciones' => gbe_rol_mv_facciones(),
+        'tension'   => gbe_rol_mv_tension(),
+        'arcos'     => gbe_rol_mv_arcos(),
     );
 }
 
@@ -133,7 +133,7 @@ function ope_rol_mv_tablero()
  * @todo Add UNIQUE INDEX on rol_mv_ciclos.periodo to prevent duplicate cycles:
  *       ALTER TABLE rol_mv_ciclos ADD UNIQUE INDEX idx_periodo (periodo);
  */
-function ope_rol_mv_ciclo_actual()
+function gbe_rol_mv_ciclo_actual()
 {
     global $db;
     if (!$db->table_exists('rol_mv_ciclos')) {
@@ -160,7 +160,7 @@ function ope_rol_mv_ciclo_actual()
     }
 }
 
-function ope_rol_mv_ciclo_by_id($ciclo_id)
+function gbe_rol_mv_ciclo_by_id($ciclo_id)
 {
     global $db;
     $ciclo_id = (int) $ciclo_id;
@@ -172,7 +172,7 @@ function ope_rol_mv_ciclo_by_id($ciclo_id)
 }
 
 /** Último ciclo publicado (para páginas públicas). */
-function ope_rol_mv_ultimo_publicado()
+function gbe_rol_mv_ultimo_publicado()
 {
     global $db;
     if (!$db->table_exists('rol_mv_ciclos')) {
@@ -183,7 +183,7 @@ function ope_rol_mv_ultimo_publicado()
 }
 
 /** Lista de periódicos publicados (más recientes primero). */
-function ope_rol_mv_periodicos($limit = 60)
+function gbe_rol_mv_periodicos($limit = 60)
 {
     global $db;
     $out = array();
@@ -201,7 +201,7 @@ function ope_rol_mv_periodicos($limit = 60)
 // Eventos, misiones, NPCs
 // ─────────────────────────────────────────────────────────────────────────
 
-function ope_rol_mv_eventos($ciclo_id, $estado = null)
+function gbe_rol_mv_eventos($ciclo_id, $estado = null)
 {
     global $db;
     $out = array();
@@ -219,7 +219,7 @@ function ope_rol_mv_eventos($ciclo_id, $estado = null)
     return $out;
 }
 
-function ope_rol_mv_misiones($ciclo_id)
+function gbe_rol_mv_misiones($ciclo_id)
 {
     global $db;
     $out = array();
@@ -234,7 +234,7 @@ function ope_rol_mv_misiones($ciclo_id)
 }
 
 /** NPCs mayores: personajes con ficha marcados es_npc. */
-function ope_rol_mv_npc_mayores()
+function gbe_rol_mv_npc_mayores()
 {
     global $db;
     $out = array();
@@ -262,7 +262,7 @@ function ope_rol_mv_npc_mayores()
     return $out;
 }
 
-function ope_rol_mv_npc_menores($ciclo_id = 0)
+function gbe_rol_mv_npc_menores($ciclo_id = 0)
 {
     global $db;
     $out = array();
@@ -281,16 +281,16 @@ function ope_rol_mv_npc_menores($ciclo_id = 0)
 // Hilos narrativos, periódicos y tracking (v3)
 // ─────────────────────────────────────────────────────────────────────────
 
-function ope_rol_mv_threads_activos() {
+function gbe_rol_mv_threads_activos() {
     global $db;
-    $ultimo = ope_rol_mv_ultimo_publicado();
+    $ultimo = gbe_rol_mv_ultimo_publicado();
     if (!$ultimo || empty($ultimo['estado_json'])) return array();
     $ej = json_decode($ultimo['estado_json'], true);
     if (!is_array($ej) || !isset($ej['threads']) || !is_array($ej['threads'])) return array();
     return $ej['threads'];
 }
 
-function ope_rol_mv_ultimos_periodicos($n = 3) {
+function gbe_rol_mv_ultimos_periodicos($n = 3) {
     global $db;
     $out = array();
     if (!$db->table_exists('rol_mv_ciclos')) return $out;
@@ -303,7 +303,7 @@ function ope_rol_mv_ultimos_periodicos($n = 3) {
     return $out;
 }
 
-function ope_rol_mv_npc_tracking_from_db() {
+function gbe_rol_mv_npc_tracking_from_db() {
     global $db;
     $out = array();
     $q = $db->simple_select('rol_personajes', 'pid, datos_internos', "es_npc = 1 AND estado <> 'eliminado'");
@@ -320,14 +320,14 @@ function ope_rol_mv_npc_tracking_from_db() {
 // ─────────────────────────────────────────────────────────────────────────
 
 /** Dado un fid, sube por su parentlist hasta encontrar una de las 8 regiones. */
-function ope_rol_mv_zona_from_fid($fid)
+function gbe_rol_mv_zona_from_fid($fid)
 {
     global $db;
     $fid = (int) $fid;
     if ($fid < 1 || !$db->table_exists('forums')) {
         return '';
     }
-    $map = ope_rol_mv_region_map();
+    $map = gbe_rol_mv_region_map();
     $q = $db->simple_select('forums', 'parentlist', 'fid = ' . $fid, array('limit' => 1));
     if (!$db->num_rows($q)) {
         return '';
@@ -350,7 +350,7 @@ function ope_rol_mv_zona_from_fid($fid)
 // Traducción de valores a lenguaje natural
 // ─────────────────────────────────────────────────────────────────────────
 
-function ope_rol_mv_est_label($v)
+function gbe_rol_mv_est_label($v)
 {
     $v = (int) $v;
     if ($v <= 10) return 'Colapso';
@@ -361,7 +361,7 @@ function ope_rol_mv_est_label($v)
     return 'Próspera';
 }
 
-function ope_rol_mv_mar_label($v)
+function gbe_rol_mv_mar_label($v)
 {
     $v = (int) $v;
     if ($v <= 15) return 'Nula';
@@ -371,7 +371,7 @@ function ope_rol_mv_mar_label($v)
     return 'Dominante';
 }
 
-function ope_rol_mv_pir_label($v)
+function gbe_rol_mv_pir_label($v)
 {
     $v = (int) $v;
     if ($v <= 15) return 'Insignificante';
@@ -381,7 +381,7 @@ function ope_rol_mv_pir_label($v)
     return 'Dominante';
 }
 
-function ope_rol_mv_rep_label($v)
+function gbe_rol_mv_rep_label($v)
 {
     $v = (int) $v;
     if ($v <= -61) return 'Odiada';
@@ -391,7 +391,7 @@ function ope_rol_mv_rep_label($v)
     return 'Admirada';
 }
 
-function ope_rol_mv_coh_label($v)
+function gbe_rol_mv_coh_label($v)
 {
     $v = (int) $v;
     if ($v <= 25) return 'Fracturada';
@@ -400,7 +400,7 @@ function ope_rol_mv_coh_label($v)
     return 'Monolítica';
 }
 
-function ope_rol_mv_tension_label($v)
+function gbe_rol_mv_tension_label($v)
 {
     $v = (int) $v;
     if ($v <= 20) return 'Paz';
@@ -412,7 +412,7 @@ function ope_rol_mv_tension_label($v)
 }
 
 /** Mapea 0-100 en 5 bandas (0-19,20-39,40-59,60-79,80-100). */
-function ope_rol_mv_band5($v, array $labels)
+function gbe_rol_mv_band5($v, array $labels)
 {
     $v = max(0, min(100, (int) $v));
     $i = (int) floor($v / 20);
@@ -424,7 +424,7 @@ function ope_rol_mv_band5($v, array $labels)
  * Metadatos de las métricas de ZONA (orden de render).
  * Cada una: label, icono (emoji), 5 etiquetas de banda, color base para la barra.
  */
-function ope_rol_mv_zona_metrics()
+function gbe_rol_mv_zona_metrics()
 {
     return array(
         'cli' => array('label'=>'Clima',              'bands'=>array('Tormentoso','Inestable','Variable','Bonancible','Calma'),              'col'=>'var(--h4)'),
@@ -443,7 +443,7 @@ function ope_rol_mv_zona_metrics()
 /**
  * Metadatos de las métricas de FACCIÓN. 'rep' es especial (-100..100).
  */
-function ope_rol_mv_faccion_metrics()
+function gbe_rol_mv_faccion_metrics()
 {
     return array(
         'rep' => array('label'=>'Reputación pública', 'special'=>'rep',                                                                           'col'=>'var(--patina)'),
@@ -457,19 +457,19 @@ function ope_rol_mv_faccion_metrics()
 }
 
 /** Etiqueta de una métrica de zona. */
-function ope_rol_mv_zona_metric_label($key, $v)
+function gbe_rol_mv_zona_metric_label($key, $v)
 {
-    $m = ope_rol_mv_zona_metrics();
-    return isset($m[$key]) ? ope_rol_mv_band5($v, $m[$key]['bands']) : (string) (int) $v;
+    $m = gbe_rol_mv_zona_metrics();
+    return isset($m[$key]) ? gbe_rol_mv_band5($v, $m[$key]['bands']) : (string) (int) $v;
 }
 
 /** Etiqueta de una métrica de facción (rep es especial). */
-function ope_rol_mv_faccion_metric_label($key, $v)
+function gbe_rol_mv_faccion_metric_label($key, $v)
 {
-    $m = ope_rol_mv_faccion_metrics();
+    $m = gbe_rol_mv_faccion_metrics();
     if (!isset($m[$key])) return (string) (int) $v;
-    if (!empty($m[$key]['special']) && $m[$key]['special'] === 'rep') return ope_rol_mv_rep_label($v);
-    return ope_rol_mv_band5($v, $m[$key]['bands']);
+    if (!empty($m[$key]['special']) && $m[$key]['special'] === 'rep') return gbe_rol_mv_rep_label($v);
+    return gbe_rol_mv_band5($v, $m[$key]['bands']);
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -486,7 +486,7 @@ function ope_rol_mv_faccion_metric_label($key, $v)
  * objetivas del propio texto (cuántas palabras clave coinciden, si aparecen términos
  * de escala grande/pequeña). Así, el mismo evento siempre produce el mismo resultado.
  *
- * IMPORTANTE: esto NO se envía a la IA en el prompt (ver ope_rol_mv_build_prompt) —
+ * IMPORTANTE: esto NO se envía a la IA en el prompt (ver gbe_rol_mv_build_prompt) —
  * un resumen de un jugador es demasiado variable para que un scoring por palabras
  * clave lo pondere de forma fiable. Solo se usa para persistir un valor de referencia
  * en `rol_mv_eventos` que el panel de staff muestra como pista visual orientativa. La
@@ -497,7 +497,7 @@ function ope_rol_mv_faccion_metric_label($key, $v)
  * @param string $resumen Resumen del evento.
  * @return array ['tipo_suceso' => 'S-XX', 'pe_estimado' => int]
  */
-function ope_rol_mv_auto_classify_evento($titulo, $resumen)
+function gbe_rol_mv_auto_classify_evento($titulo, $resumen)
 {
     $tituloN = mb_strtolower((string) ($titulo ?? ''), 'UTF-8');
     $resumenN = mb_strtolower((string) ($resumen ?? ''), 'UTF-8');
@@ -562,13 +562,13 @@ function ope_rol_mv_auto_classify_evento($titulo, $resumen)
  * Clasifica y persiste en DB todos los eventos sin clasificar de un ciclo.
  * @param int $ciclo_id
  */
-function ope_rol_mv_auto_classify_pendientes($ciclo_id)
+function gbe_rol_mv_auto_classify_pendientes($ciclo_id)
 {
     global $db;
     $PREFIX = TABLE_PREFIX;
     $q = $db->simple_select('rol_mv_eventos', 'evento_id, titulo, resumen', "ciclo_id=" . (int)$ciclo_id . " AND (tipo_suceso IS NULL OR tipo_suceso='')");
     while ($r = $db->fetch_array($q)) {
-        $cl = ope_rol_mv_auto_classify_evento($r['titulo'], $r['resumen']);
+        $cl = gbe_rol_mv_auto_classify_evento($r['titulo'], $r['resumen']);
         $db->update_query('rol_mv_eventos', array(
             'tipo_suceso' => $db->escape_string($cl['tipo_suceso']),
             'pe_estimado' => $cl['pe_estimado'],
@@ -582,12 +582,12 @@ function ope_rol_mv_auto_classify_pendientes($ciclo_id)
  * devuelve '' y NO se sobrescribe la zona actual del NPC (mejor no tocar que borrar
  * un dato bueno con uno irreconocible).
  */
-function ope_rol_mv_resolver_zona_slug($valor)
+function gbe_rol_mv_resolver_zona_slug($valor)
 {
     global $db;
     $valor = trim((string) $valor);
     if ($valor === '') return '';
-    $zonas = ope_rol_mv_zonas();
+    $zonas = gbe_rol_mv_zonas();
     if (isset($zonas[$valor])) return $valor; // ya es un slug válido
     $norm = mb_strtolower($valor, 'UTF-8');
     foreach ($zonas as $slug => $z) {
@@ -599,16 +599,16 @@ function ope_rol_mv_resolver_zona_slug($valor)
 /**
  * Sincroniza la ubicación/acción PÚBLICA de un NPC mayor (mundo_zona, mundo_accion,
  * mundo_estado_np) a partir del tracking devuelto por la IA. Sin esto, el panel de
- * "Estado del Mundo" y ope_rol_mv_auto_nav_resumen() muestran SIEMPRE la ubicación
+ * "Estado del Mundo" y gbe_rol_mv_auto_nav_resumen() muestran SIEMPRE la ubicación
  * con la que se creó el NPC, aunque la IA lo mueva por el mundo cada mes.
  */
-function ope_rol_mv_sync_npc_ubicacion($pid, array $tracking)
+function gbe_rol_mv_sync_npc_ubicacion($pid, array $tracking)
 {
     global $db;
     $pid = (int) $pid;
     if ($pid < 1) return;
     $upd = array();
-    $slug = ope_rol_mv_resolver_zona_slug($tracking['ubicacion_zona'] ?? '');
+    $slug = gbe_rol_mv_resolver_zona_slug($tracking['ubicacion_zona'] ?? '');
     if ($slug !== '') $upd['mundo_zona'] = $db->escape_string($slug);
     if (isset($tracking['plan_activo']) && trim((string) $tracking['plan_activo']) !== '') {
         $upd['mundo_accion'] = $db->escape_string(trim((string) $tracking['plan_activo']));
@@ -633,7 +633,7 @@ function ope_rol_mv_sync_npc_ubicacion($pid, array $tracking)
  * Genera automáticamente el resumen de navegación a partir de los NPCs mayores.
  * @return string
  */
-function ope_rol_mv_auto_nav_resumen()
+function gbe_rol_mv_auto_nav_resumen()
 {
     global $db;
     $navegantes = array();
@@ -656,35 +656,35 @@ function ope_rol_mv_auto_nav_resumen()
 // ─────────────────────────────────────────────────────────────────────────
 
 /** Construye el super-prompt autocontenido para la IA externa (v3). */
-function ope_rol_mv_build_prompt($ciclo)
+function gbe_rol_mv_build_prompt($ciclo)
 {
     global $db;
     if (!is_array($ciclo)) {
         return '';
     }
-    $tablero   = ope_rol_mv_tablero();
+    $tablero   = gbe_rol_mv_tablero();
     // v4: se incluyen TODOS los eventos notificados del ciclo, sin curación manual de
     // "incluir/descartar" ni preclasificación mecánica — la IA recibe solo título,
     // enlace y resumen de cada uno, y decide ella misma tipo/peso (ver instrucción
     // en la sección "EVENTOS NOTIFICADOS ESTE MES" más abajo).
-    $eventos   = ope_rol_mv_eventos((int) $ciclo['ciclo_id']);
-    $misiones  = ope_rol_mv_misiones((int) $ciclo['ciclo_id']);
+    $eventos   = gbe_rol_mv_eventos((int) $ciclo['ciclo_id']);
+    $misiones  = gbe_rol_mv_misiones((int) $ciclo['ciclo_id']);
     $misionesEnCurso = array_values(array_filter($misiones, function ($m) { return $m['estado'] === 'en_curso'; }));
-    $npcs      = ope_rol_mv_npc_mayores();
-    $menores   = ope_rol_mv_npc_menores((int) $ciclo['ciclo_id']);
-    $threads   = ope_rol_mv_threads_activos();
-    $periodicos = ope_rol_mv_ultimos_periodicos(3);
+    $npcs      = gbe_rol_mv_npc_mayores();
+    $menores   = gbe_rol_mv_npc_menores((int) $ciclo['ciclo_id']);
+    $threads   = gbe_rol_mv_threads_activos();
+    $periodicos = gbe_rol_mv_ultimos_periodicos(3);
 
     $L = array();
     $L[] = "###############################################################################";
-    $L[] = "#  MUNDO VIVO · \"LA BALANZA\" v3  —  MOTOR NARRATIVO DE ONE PIECE ETERNAL";
+    $L[] = "#  MUNDO VIVO · \"LA BALANZA\" v3  —  MOTOR NARRATIVO DE GRANBLUE FANTASY: ETERNAL";
     $L[] = "###############################################################################";
     $L[] = "";
     $L[] = "======================================================================";
     $L[] = " 1 · QUIÉN ERES Y QUÉ RECIBES";
     $L[] = "======================================================================";
     $L[] = "";
-    $L[] = "Eres el MOTOR NARRATIVO del foro de rol \"One Piece Eternal\". Trabajas sobre un mundo";
+    $L[] = "Eres el MOTOR NARRATIVO del foro de rol \"Granblue Fantasy: Eternal\". Trabajas sobre un mundo";
     $L[] = "persistente inspirado en One Piece pero con su propia continuidad (NO copies la trama";
     $L[] = "del manga; respeta el TONO: aventura, mar, libertad, Marines vs piratas, revolucionarios,";
     $L[] = "Gobierno Mundial, Reyes del Mar, islas peligrosas).";
@@ -1181,8 +1181,8 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "Mes que se cierra: " . $ciclo['periodo'];
     $L[] = "";
 
-    $zMetrics = ope_rol_mv_zona_metrics();
-    $fMetrics = ope_rol_mv_faccion_metrics();
+    $zMetrics = gbe_rol_mv_zona_metrics();
+    $fMetrics = gbe_rol_mv_faccion_metrics();
 
     // Estado actual
     $L[] = "== ESTADO ACTUAL DEL MUNDO ==";
@@ -1369,7 +1369,7 @@ function ope_rol_mv_build_prompt($ciclo)
     // Navegación del mes (auto-generada desde NPCs si vacía)
     $nav = trim((string) ($ciclo['nav_resumen'] ?? ''));
     if ($nav === '') {
-        $nav = ope_rol_mv_auto_nav_resumen();
+        $nav = gbe_rol_mv_auto_nav_resumen();
     }
     $L[] = "== NAVEGACIÓN DEL MES ==";
     $L[] = $nav;
@@ -1402,23 +1402,23 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "===FIN===";
     $L[] = "";
     $L[] = "-------------------------------------------------------------------------------";
-    $L[] = "BLOQUE 2 — PERIODICO_HTML. Solo el contenido interior (sin <html>, <head>, <style> ni <script>). Se inserta dentro de un contenedor .ope-per-body ya existente.";
+    $L[] = "BLOQUE 2 — PERIODICO_HTML. Solo el contenido interior (sin <html>, <head>, <style> ni <script>). Se inserta dentro de un contenedor .gbe-per-body ya existente.";
     $L[] = "CLASES DISPONIBLES (úsalas tal cual; COMBÍNALAS para dar VARIEDAD visual, que no todas las secciones se vean igual):";
-    $L[] = "  · <section class=\"ope-per-lead\"> ... </section>  → apertura/portada: un <h2> con el gran titular del mes y 1-2 <p> de entradilla.";
-    $L[] = "  · <section class=\"ope-per-sec\"> ... </section>   → una sección temática o por mar; empieza con <h3>TÍTULO</h3>.";
-    $L[] = "  · <div class=\"ope-per-cols\"> <p>..</p> <p>..</p> </div>  → cuerpo a DOS COLUMNAS dentro de una sección.";
-    $L[] = "  · <div class=\"ope-per-longread\"> <p>..</p> </div>  → reportaje/columna a UNA sola columna con texto grande (para piezas de mucho texto, entrevistas u opinión).";
-    $L[] = "  · <figure class=\"ope-per-fig\" data-img=\"ID\"><figcaption>PIE</figcaption></figure>  → imagen pequeña (encaja dentro de columnas).";
-    $L[] = "  · <figure class=\"ope-per-figwide\" data-img=\"ID\"><figcaption>PIE</figcaption></figure>  → imagen ANCHA CENTRADA, colócala EN MEDIO de una sección para romper el ritmo.";
-    $L[] = "  · <aside class=\"ope-per-aside\"><h4>RUMORES / SE DICE</h4><p>..</p></aside>  → recuadro de rumores, breves o cotizaciones.";
-    $L[] = "  · <blockquote class=\"ope-per-pull\">frase destacada</blockquote>  → cita grande para destacar una declaración.";
-    $L[] = "  · Anuncios/clasificados: <div class=\"ope-per-ads\"> con varias <div class=\"ope-per-ad\"><span class=\"ope-per-ad-tag\">ANUNCIO</span><h4>Título</h4><p>texto</p></div>. Para un cartel de recompensa usa <div class=\"ope-per-ad ope-per-ad--wanted\"><span class=\"ope-per-ad-tag\">SE BUSCA</span><h4>NOMBRE</h4><figure class=\"ope-per-fig\" data-img=\"ID\"></figure><p class=\"bounty\">Recompensa: ...</p></div>.";
+    $L[] = "  · <section class=\"gbe-per-lead\"> ... </section>  → apertura/portada: un <h2> con el gran titular del mes y 1-2 <p> de entradilla.";
+    $L[] = "  · <section class=\"gbe-per-sec\"> ... </section>   → una sección temática o por mar; empieza con <h3>TÍTULO</h3>.";
+    $L[] = "  · <div class=\"gbe-per-cols\"> <p>..</p> <p>..</p> </div>  → cuerpo a DOS COLUMNAS dentro de una sección.";
+    $L[] = "  · <div class=\"gbe-per-longread\"> <p>..</p> </div>  → reportaje/columna a UNA sola columna con texto grande (para piezas de mucho texto, entrevistas u opinión).";
+    $L[] = "  · <figure class=\"gbe-per-fig\" data-img=\"ID\"><figcaption>PIE</figcaption></figure>  → imagen pequeña (encaja dentro de columnas).";
+    $L[] = "  · <figure class=\"gbe-per-figwide\" data-img=\"ID\"><figcaption>PIE</figcaption></figure>  → imagen ANCHA CENTRADA, colócala EN MEDIO de una sección para romper el ritmo.";
+    $L[] = "  · <aside class=\"gbe-per-aside\"><h4>RUMORES / SE DICE</h4><p>..</p></aside>  → recuadro de rumores, breves o cotizaciones.";
+    $L[] = "  · <blockquote class=\"gbe-per-pull\">frase destacada</blockquote>  → cita grande para destacar una declaración.";
+    $L[] = "  · Anuncios/clasificados: <div class=\"gbe-per-ads\"> con varias <div class=\"gbe-per-ad\"><span class=\"gbe-per-ad-tag\">ANUNCIO</span><h4>Título</h4><p>texto</p></div>. Para un cartel de recompensa usa <div class=\"gbe-per-ad gbe-per-ad--wanted\"><span class=\"gbe-per-ad-tag\">SE BUSCA</span><h4>NOMBRE</h4><figure class=\"gbe-per-fig\" data-img=\"ID\"></figure><p class=\"bounty\">Recompensa: ...</p></div>.";
     $L[] = "ESTRUCTURA RECOMENDADA (adáptala a lo que pasó; ~600-900 palabras). BUSCA VARIEDAD, que parezca un periódico real y no una lista de secciones iguales:";
-    $L[] = "  1. .ope-per-lead con el titular del mes + figure data-img=\"portada\".";
-    $L[] = "  2. 2-4 .ope-per-sec sobre lo relevante del mes. Alterna formatos: alguna a dos columnas (.ope-per-cols), alguna a texto corrido (.ope-per-longread), con al menos una imagen ancha centrada (.ope-per-figwide) en medio de una sección.";
-    $L[] = "  3. Incluye SIEMPRE algo de color de mundo aunque haya paz: 'Economía y puertos', 'Vida en las islas', 'Ecos del mar', una entrevista o una columna de opinión firmada (usa .ope-per-longread + .ope-per-pull).";
-    $L[] = "  4. Incluye una tira de ANUNCIOS/CLASIFICADOS (.ope-per-ads) con 2-4 anuncios in-world (negocios, tabernas, barcos en venta, tripulaciones que reclutan) y, si procede, algún cartel de SE BUSCA.";
-    $L[] = "  5. Al menos un .ope-per-aside de rumores. Cita por su nombre a los personajes/NPCs de los eventos y dales protagonismo.";
+    $L[] = "  1. .gbe-per-lead con el titular del mes + figure data-img=\"portada\".";
+    $L[] = "  2. 2-4 .gbe-per-sec sobre lo relevante del mes. Alterna formatos: alguna a dos columnas (.gbe-per-cols), alguna a texto corrido (.gbe-per-longread), con al menos una imagen ancha centrada (.gbe-per-figwide) en medio de una sección.";
+    $L[] = "  3. Incluye SIEMPRE algo de color de mundo aunque haya paz: 'Economía y puertos', 'Vida en las islas', 'Ecos del mar', una entrevista o una columna de opinión firmada (usa .gbe-per-longread + .gbe-per-pull).";
+    $L[] = "  4. Incluye una tira de ANUNCIOS/CLASIFICADOS (.gbe-per-ads) con 2-4 anuncios in-world (negocios, tabernas, barcos en venta, tripulaciones que reclutan) y, si procede, algún cartel de SE BUSCA.";
+    $L[] = "  5. Al menos un .gbe-per-aside de rumores. Cita por su nombre a los personajes/NPCs de los eventos y dales protagonismo.";
     $L[] = "  6. TONO SEGÚN EL MUNDO: si el mundo está en paz (lo normal), el periódico es costumbrista, comercial y de sucesos menores; los grandes titulares de guerra SOLO cuando de verdad hay guerra.";
     $L[] = "===PERIODICO_HTML===";
     $L[] = "===FIN===";
@@ -1476,7 +1476,7 @@ function ope_rol_mv_build_prompt($ciclo)
 // ─────────────────────────────────────────────────────────────────────────
 
 /** Extrae el contenido entre ===MARCA=== y ===FIN===. */
-function ope_rol_mv_extract_block($raw, $mark)
+function gbe_rol_mv_extract_block($raw, $mark)
 {
     if (preg_match('/===' . preg_quote($mark, '/') . '===\s*(.*?)\s*===FIN===/s', $raw, $m)) {
         return trim($m[1]);
@@ -1489,7 +1489,7 @@ function ope_rol_mv_extract_block($raw, $mark)
  *   - titulo: ... | zona: east-blue | facciones: marine,pirata | dificultad: baja|media|alta | resumen: ...
  * Devuelve array de {titulo, zona, facciones, dificultad, resumen}.
  */
-function ope_rol_mv_parse_misiones($txt)
+function gbe_rol_mv_parse_misiones($txt)
 {
     $out = array();
     $txt = (string) $txt;
@@ -1530,7 +1530,7 @@ function ope_rol_mv_parse_misiones($txt)
  *   - id: 12 | estado: completada|fallida|en_curso | resumen: ...
  * Devuelve array de {id, estado, resumen}.
  */
-function ope_rol_mv_parse_misiones_resueltas($txt)
+function gbe_rol_mv_parse_misiones_resueltas($txt)
 {
     $out = array();
     $txt = (string) $txt;
@@ -1568,7 +1568,7 @@ function ope_rol_mv_parse_misiones_resueltas($txt)
  *   - id: portada | tamaño: 1200x675 | prompt: ...
  * Devuelve array de {id, tamano, prompt}.
  */
-function ope_rol_mv_parse_imagenes($txt)
+function gbe_rol_mv_parse_imagenes($txt)
 {
     $out = array();
     $txt = (string) $txt;
@@ -1601,7 +1601,7 @@ function ope_rol_mv_parse_imagenes($txt)
 }
 
 /** Parsea el resultado pegado. Devuelve array con estado/periodico/noticia/imagenes + errores. */
-function ope_rol_mv_parse_resultado($raw)
+function gbe_rol_mv_parse_resultado($raw)
 {
     $raw = (string) $raw;
     $res = array(
@@ -1615,7 +1615,7 @@ function ope_rol_mv_parse_resultado($raw)
         'errores'       => array(),
     );
 
-    $estadoRaw = ope_rol_mv_extract_block($raw, 'ESTADO_JSON');
+    $estadoRaw = gbe_rol_mv_extract_block($raw, 'ESTADO_JSON');
     if ($estadoRaw === '') {
         $res['errores'][] = 'No se encontró el bloque ===ESTADO_JSON===.';
     } else {
@@ -1627,12 +1627,12 @@ function ope_rol_mv_parse_resultado($raw)
         }
     }
 
-    $res['periodico'] = ope_rol_mv_extract_block($raw, 'PERIODICO_HTML');
+    $res['periodico'] = gbe_rol_mv_extract_block($raw, 'PERIODICO_HTML');
     if ($res['periodico'] === '') {
         $res['errores'][] = 'No se encontró el bloque ===PERIODICO_HTML===.';
     }
 
-    $noticiaRaw = ope_rol_mv_extract_block($raw, 'NOTICIA');
+    $noticiaRaw = gbe_rol_mv_extract_block($raw, 'NOTICIA');
     if ($noticiaRaw === '') {
         $res['errores'][] = 'No se encontró el bloque ===NOTICIA===.';
     } else {
@@ -1648,30 +1648,30 @@ function ope_rol_mv_parse_resultado($raw)
         }
     }
 
-    $res['imagenes'] = ope_rol_mv_extract_block($raw, 'IMAGENES');
-    $res['imagenes_list'] = ope_rol_mv_parse_imagenes($res['imagenes']);
+    $res['imagenes'] = gbe_rol_mv_extract_block($raw, 'IMAGENES');
+    $res['imagenes_list'] = gbe_rol_mv_parse_imagenes($res['imagenes']);
 
-    $res['misiones'] = ope_rol_mv_parse_misiones(ope_rol_mv_extract_block($raw, 'MISIONES'));
-    $res['misiones_resueltas'] = ope_rol_mv_parse_misiones_resueltas(ope_rol_mv_extract_block($raw, 'MISIONES_RESUELTAS'));
+    $res['misiones'] = gbe_rol_mv_parse_misiones(gbe_rol_mv_extract_block($raw, 'MISIONES'));
+    $res['misiones_resueltas'] = gbe_rol_mv_parse_misiones_resueltas(gbe_rol_mv_extract_block($raw, 'MISIONES_RESUELTAS'));
 
     return $res;
 }
 
 /**
  * Calcula un diff legible entre el tablero ACTUAL y el estado nuevo devuelto por la IA.
- * $actual: snapshot de ope_rol_mv_tablero(). $nuevo: $parsed['estado'].
+ * $actual: snapshot de gbe_rol_mv_tablero(). $nuevo: $parsed['estado'].
  * Devuelve array con claves 'zonas', 'facciones', 'tension' — cada una lista de cambios.
  * Cada cambio de métrica: {slug, nombre, metrica, label, antes, despues, antes_lbl, despues_lbl, dir}.
  * dir: 1 sube, -1 baja.
  */
-function ope_rol_mv_diff_estado($actual, $nuevo)
+function gbe_rol_mv_diff_estado($actual, $nuevo)
 {
     $out = array('zonas' => array(), 'facciones' => array(), 'tension' => array());
     if (!is_array($nuevo)) {
         return $out;
     }
-    $zMetrics = ope_rol_mv_zona_metrics();
-    $fMetrics = ope_rol_mv_faccion_metrics();
+    $zMetrics = gbe_rol_mv_zona_metrics();
+    $fMetrics = gbe_rol_mv_faccion_metrics();
 
     // ── Zonas ──
     $zonasActual = array();
@@ -1694,8 +1694,8 @@ function ope_rol_mv_diff_estado($actual, $nuevo)
                     'label'       => $meta['label'],
                     'antes'       => $antes,
                     'despues'     => $despues,
-                    'antes_lbl'   => ope_rol_mv_zona_metric_label($k, $antes),
-                    'despues_lbl' => ope_rol_mv_zona_metric_label($k, $despues),
+                    'antes_lbl'   => gbe_rol_mv_zona_metric_label($k, $antes),
+                    'despues_lbl' => gbe_rol_mv_zona_metric_label($k, $despues),
                     'dir'         => $despues > $antes ? 1 : -1,
                 );
             }
@@ -1726,8 +1726,8 @@ function ope_rol_mv_diff_estado($actual, $nuevo)
                     'label'       => $meta['label'],
                     'antes'       => $antes,
                     'despues'     => $despues,
-                    'antes_lbl'   => ope_rol_mv_faccion_metric_label($k, $antes),
-                    'despues_lbl' => ope_rol_mv_faccion_metric_label($k, $despues),
+                    'antes_lbl'   => gbe_rol_mv_faccion_metric_label($k, $antes),
+                    'despues_lbl' => gbe_rol_mv_faccion_metric_label($k, $despues),
                     'dir'         => $despues > $antes ? 1 : -1,
                 );
             }
@@ -1755,8 +1755,8 @@ function ope_rol_mv_diff_estado($actual, $nuevo)
                     'par'         => $par,
                     'antes'       => $antes,
                     'despues'     => $despues,
-                    'antes_lbl'   => ope_rol_mv_tension_label($antes),
-                    'despues_lbl' => ope_rol_mv_tension_label($despues),
+                    'antes_lbl'   => gbe_rol_mv_tension_label($antes),
+                    'despues_lbl' => gbe_rol_mv_tension_label($despues),
                     'dir'         => $despues > $antes ? 1 : -1,
                 );
             }
@@ -1772,7 +1772,7 @@ function ope_rol_mv_diff_estado($actual, $nuevo)
  * inserta tras la etiqueta de apertura un <img src="URL"> y renombra data-img a data-loaded
  * para que el placeholder CSS no se muestre. Si no hay URL, deja el figure intacto.
  */
-function ope_rol_mv_inject_imagenes($html, $urls)
+function gbe_rol_mv_inject_imagenes($html, $urls)
 {
     $html = (string) $html;
     if ($html === '' || empty($urls) || !is_array($urls)) {
@@ -1802,15 +1802,15 @@ function ope_rol_mv_inject_imagenes($html, $urls)
  * devuelva la IA. Es un guardarraíl de código, no una instrucción de texto: por eso
  * funciona igual aunque la IA se equivoque, alucine o el staff no revise los números.
  */
-if (!defined('OPE_MV_METRIC_MAX_DELTA')) {
-    define('OPE_MV_METRIC_MAX_DELTA', 15);
+if (!defined('GBE_MV_METRIC_MAX_DELTA')) {
+    define('GBE_MV_METRIC_MAX_DELTA', 15);
 }
 
 /**
  * Calcula el nuevo valor de una métrica aplicando el tope de variación por ciclo.
  * Devuelve array [nuevo_valor, delta_aplicado, delta_propuesto, capado(bool)].
  */
-function ope_rol_mv_clamp_metric($actual, $propuesto, $min, $max, $maxDelta = OPE_MV_METRIC_MAX_DELTA)
+function gbe_rol_mv_clamp_metric($actual, $propuesto, $min, $max, $maxDelta = GBE_MV_METRIC_MAX_DELTA)
 {
     $actual = (int) $actual;
     $propuesto = max($min, min($max, (int) $propuesto));
@@ -1824,17 +1824,17 @@ function ope_rol_mv_clamp_metric($actual, $propuesto, $min, $max, $maxDelta = OP
  * Calcula, SIN escribir nada en la base de datos, qué topes se aplicarían si se
  * publicara $estado tal cual. Se usa en la vista previa para que el staff vea ANTES
  * de publicar si la IA se ha salido de rango en algo (mismo cálculo que
- * ope_rol_mv_aplicar_estado(), pero de solo lectura).
+ * gbe_rol_mv_aplicar_estado(), pero de solo lectura).
  */
-function ope_rol_mv_calcular_caps_previstos($estado)
+function gbe_rol_mv_calcular_caps_previstos($estado)
 {
     global $db;
     $caps = array();
     if (!is_array($estado)) return $caps;
-    $zMetricKeys = array_keys(ope_rol_mv_zona_metrics());
-    $fMetricKeys = array_keys(ope_rol_mv_faccion_metrics());
-    $zActual = ope_rol_mv_zonas();
-    $fActual = ope_rol_mv_facciones();
+    $zMetricKeys = array_keys(gbe_rol_mv_zona_metrics());
+    $fMetricKeys = array_keys(gbe_rol_mv_faccion_metrics());
+    $zActual = gbe_rol_mv_zonas();
+    $fActual = gbe_rol_mv_facciones();
 
     if (!empty($estado['zonas']) && is_array($estado['zonas'])) {
         foreach ($estado['zonas'] as $slug => $z) {
@@ -1842,7 +1842,7 @@ function ope_rol_mv_calcular_caps_previstos($estado)
             $base = $zActual[$slug] ?? array();
             foreach ($zMetricKeys as $k) {
                 if (!isset($z[$k])) continue;
-                list(, $deltaApl, $deltaProp, $capado) = ope_rol_mv_clamp_metric($base[$k] ?? 0, $z[$k], 0, 100);
+                list(, $deltaApl, $deltaProp, $capado) = gbe_rol_mv_clamp_metric($base[$k] ?? 0, $z[$k], 0, 100);
                 if ($capado) $caps[] = array('ambito' => 'zona', 'slug' => $slug, 'metrica' => strtoupper($k), 'propuesto_delta' => $deltaProp, 'aplicado_delta' => $deltaApl);
             }
         }
@@ -1854,12 +1854,12 @@ function ope_rol_mv_calcular_caps_previstos($estado)
             foreach ($fMetricKeys as $k) {
                 if (!isset($f[$k])) continue;
                 $min = ($k === 'rep') ? -100 : 0;
-                list(, $deltaApl, $deltaProp, $capado) = ope_rol_mv_clamp_metric($base[$k] ?? 0, $f[$k], $min, 100);
+                list(, $deltaApl, $deltaProp, $capado) = gbe_rol_mv_clamp_metric($base[$k] ?? 0, $f[$k], $min, 100);
                 if ($capado) $caps[] = array('ambito' => 'faccion', 'slug' => $slug, 'metrica' => strtoupper($k), 'propuesto_delta' => $deltaProp, 'aplicado_delta' => $deltaApl);
             }
         }
     }
-    $capUp = defined('OPE_MV_TENSION_MAX_UP') ? (int) OPE_MV_TENSION_MAX_UP : 15;
+    $capUp = defined('GBE_MV_TENSION_MAX_UP') ? (int) GBE_MV_TENSION_MAX_UP : 15;
     if (!empty($estado['tension']) && is_array($estado['tension'])) {
         foreach ($estado['tension'] as $zslug => $pares) {
             if (!is_array($pares)) continue;
@@ -1886,17 +1886,17 @@ function ope_rol_mv_calcular_caps_previstos($estado)
  * referencia), se rellena con cada tope que haya recortado la propuesta de la IA,
  * para poder mostrarlo en la vista previa / auditoría.
  */
-function ope_rol_mv_aplicar_estado($estado, &$capsLog = null)
+function gbe_rol_mv_aplicar_estado($estado, &$capsLog = null)
 {
     global $db;
     if (!is_array($capsLog)) $capsLog = array();
     if (!is_array($estado)) {
         return;
     }
-    $zMetricKeys = array_keys(ope_rol_mv_zona_metrics());
-    $fMetricKeys = array_keys(ope_rol_mv_faccion_metrics());
-    $zActual = ope_rol_mv_zonas();
-    $fActual = ope_rol_mv_facciones();
+    $zMetricKeys = array_keys(gbe_rol_mv_zona_metrics());
+    $fMetricKeys = array_keys(gbe_rol_mv_faccion_metrics());
+    $zActual = gbe_rol_mv_zonas();
+    $fActual = gbe_rol_mv_facciones();
 
     // Zonas
     if (!empty($estado['zonas']) && is_array($estado['zonas'])) {
@@ -1906,7 +1906,7 @@ function ope_rol_mv_aplicar_estado($estado, &$capsLog = null)
             $upd = array();
             foreach ($zMetricKeys as $k) {
                 if (!isset($z[$k])) continue;
-                list($nuevo, $deltaApl, $deltaProp, $capado) = ope_rol_mv_clamp_metric($base[$k] ?? 0, $z[$k], 0, 100);
+                list($nuevo, $deltaApl, $deltaProp, $capado) = gbe_rol_mv_clamp_metric($base[$k] ?? 0, $z[$k], 0, 100);
                 $upd[$k] = $nuevo;
                 if ($capado) {
                     $capsLog[] = array('ambito' => 'zona', 'slug' => $slug, 'metrica' => strtoupper($k), 'propuesto_delta' => $deltaProp, 'aplicado_delta' => $deltaApl);
@@ -1927,7 +1927,7 @@ function ope_rol_mv_aplicar_estado($estado, &$capsLog = null)
             foreach ($fMetricKeys as $k) {
                 if (!isset($f[$k])) continue;
                 $min = ($k === 'rep') ? -100 : 0;
-                list($nuevo, $deltaApl, $deltaProp, $capado) = ope_rol_mv_clamp_metric($base[$k] ?? 0, $f[$k], $min, 100);
+                list($nuevo, $deltaApl, $deltaProp, $capado) = gbe_rol_mv_clamp_metric($base[$k] ?? 0, $f[$k], $min, 100);
                 $upd[$k] = $nuevo;
                 if ($capado) {
                     $capsLog[] = array('ambito' => 'faccion', 'slug' => $slug, 'metrica' => strtoupper($k), 'propuesto_delta' => $deltaProp, 'aplicado_delta' => $deltaApl);
@@ -1940,10 +1940,10 @@ function ope_rol_mv_aplicar_estado($estado, &$capsLog = null)
         }
     }
     // Tensión POR MAR: { zona: { par: {valor,notas} | valor } }
-    // Tope anti-escalada: la tensión no puede SUBIR más de OPE_MV_TENSION_MAX_UP en un
+    // Tope anti-escalada: la tensión no puede SUBIR más de GBE_MV_TENSION_MAX_UP en un
     // solo ciclo (la guerra no estalla de golpe), pero SÍ puede bajar sin límite (la paz
     // vuelve rápido). Así la guerra requiere varios meses de escalada sostenida.
-    $capUp = defined('OPE_MV_TENSION_MAX_UP') ? (int) OPE_MV_TENSION_MAX_UP : 15;
+    $capUp = defined('GBE_MV_TENSION_MAX_UP') ? (int) GBE_MV_TENSION_MAX_UP : 15;
     if (!empty($estado['tension']) && is_array($estado['tension'])) {
         foreach ($estado['tension'] as $zslug => $pares) {
             if (!is_array($pares)) continue;
@@ -1998,7 +1998,7 @@ function ope_rol_mv_aplicar_estado($estado, &$capsLog = null)
  * decide la IA leyendo los eventos del ciclo, y esto solo escribe su decisión.
  * Devuelve el número de misiones resueltas.
  */
-function ope_rol_mv_aplicar_misiones_resueltas(array $resoluciones)
+function gbe_rol_mv_aplicar_misiones_resueltas(array $resoluciones)
 {
     global $db;
     $n = 0;
@@ -2023,17 +2023,17 @@ function ope_rol_mv_aplicar_misiones_resueltas(array $resoluciones)
  * ahora se crean solas al publicar, sin que el staff tenga que redactarlas ni pegarlas.
  * Devuelve el número de misiones creadas.
  */
-function ope_rol_mv_crear_misiones_nuevas(array $misiones, $ciclo_id)
+function gbe_rol_mv_crear_misiones_nuevas(array $misiones, $ciclo_id)
 {
     global $db;
     $ciclo_id = (int) $ciclo_id;
     if ($ciclo_id < 1) return 0;
-    $zonas = ope_rol_mv_zonas();
+    $zonas = gbe_rol_mv_zonas();
     $n = 0;
     foreach ($misiones as $m) {
         $titulo = trim((string) ($m['titulo'] ?? ''));
         if ($titulo === '') continue;
-        $zonaSlug = ope_rol_mv_resolver_zona_slug((string) ($m['zona'] ?? ''));
+        $zonaSlug = gbe_rol_mv_resolver_zona_slug((string) ($m['zona'] ?? ''));
         if ($zonaSlug === '' && isset($zonas[(string) ($m['zona'] ?? '')])) {
             $zonaSlug = (string) $m['zona'];
         }
@@ -2064,10 +2064,10 @@ function ope_rol_mv_crear_misiones_nuevas(array $misiones, $ciclo_id)
  * Publica un ciclo: aplica el tablero, guarda periódico/noticia, crea la noticia
  * de portada, archiva el ciclo y abre el mes siguiente.
  */
-function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
+function gbe_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
 {
     global $db;
-    $ciclo = ope_rol_mv_ciclo_by_id($ciclo_id);
+    $ciclo = gbe_rol_mv_ciclo_by_id($ciclo_id);
     if (!$ciclo) {
         return array('ok' => false, 'error' => 'Ciclo no encontrado.');
     }
@@ -2078,14 +2078,14 @@ function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
     // 0) Inyectar los links de imagen pegados por el staff en el HTML antes de guardar,
     //    reemplazando los placeholders <figure data-img="ID"> por la imagen real.
     if (!empty($imgUrls) && is_array($imgUrls)) {
-        $parsed['periodico'] = ope_rol_mv_inject_imagenes($parsed['periodico'], $imgUrls);
-        $parsed['noticia']['cuerpo'] = ope_rol_mv_inject_imagenes($parsed['noticia']['cuerpo'], $imgUrls);
+        $parsed['periodico'] = gbe_rol_mv_inject_imagenes($parsed['periodico'], $imgUrls);
+        $parsed['noticia']['cuerpo'] = gbe_rol_mv_inject_imagenes($parsed['noticia']['cuerpo'], $imgUrls);
     }
 
     // 1) Aplicar estado al tablero (con topes anti-escalada server-side; $capsLog
     //    recoge cualquier valor que la IA haya propuesto y que se haya recortado).
     $capsLog = array();
-    ope_rol_mv_aplicar_estado($parsed['estado'], $capsLog);
+    gbe_rol_mv_aplicar_estado($parsed['estado'], $capsLog);
 
     // 1b) Threads y navegación (v3)
     $threads_json = '';
@@ -2112,15 +2112,15 @@ function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
             $di['tracking']['meta_actual'] = (string)($tracking['meta_actual'] ?? $di['tracking']['meta_actual'] ?? '');
             $di['tracking']['ultimo_ciclo'] = $ciclo['periodo'];
             $db->update_query('rol_personajes', array('datos_internos' => $db->escape_string(json_encode($di, JSON_UNESCAPED_UNICODE))), "pid = $pid");
-            ope_rol_mv_sync_npc_ubicacion($pid, $di['tracking']);
+            gbe_rol_mv_sync_npc_ubicacion($pid, $di['tracking']);
         }
     }
 
     // 2) Snapshot del tablero ya actualizado. IMPORTANTE: incluye 'threads' dentro del
-    //    propio snapshot, porque ope_rol_mv_threads_activos() los lee desde
+    //    propio snapshot, porque gbe_rol_mv_threads_activos() los lee desde
     //    estado_json['threads'] del último ciclo publicado. Guardarlos SOLO en la columna
     //    threads_json (aparte) los deja invisibles para el siguiente ciclo.
-    $snapshot = ope_rol_mv_tablero();
+    $snapshot = gbe_rol_mv_tablero();
     $snapshot['threads'] = is_array($parsed['estado']['threads'] ?? null) ? $parsed['estado']['threads'] : array();
     // También se archiva el npc_tracking devuelto este ciclo (aunque la fuente de verdad
     // "viva" es rol_personajes.datos_internos): así el histórico de un ciclo pasado es
@@ -2160,27 +2160,27 @@ function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
     ));
 
     // 5) Misiones: la IA resuelve las EN CURSO de este ciclo (===MISIONES_RESUELTAS===)...
-    $resueltas = ope_rol_mv_aplicar_misiones_resueltas($parsed['misiones_resueltas'] ?? array());
+    $resueltas = gbe_rol_mv_aplicar_misiones_resueltas($parsed['misiones_resueltas'] ?? array());
 
     // 6) Abrir el mes siguiente si no existe
-    $siguiente = ope_rol_mv_ciclo_actual();
+    $siguiente = gbe_rol_mv_ciclo_actual();
 
     // ...y las nuevas que propone (===MISIONES===) se crean solas para el mes que
     //    viene: ya no hace falta un botón de "Publicar misiones" ni que el staff las
     //    redacte o filtre a mano.
     $creadas = 0;
     if ($siguiente && !empty($parsed['misiones'])) {
-        $creadas = ope_rol_mv_crear_misiones_nuevas($parsed['misiones'], (int) $siguiente['ciclo_id']);
+        $creadas = gbe_rol_mv_crear_misiones_nuevas($parsed['misiones'], (int) $siguiente['ciclo_id']);
     }
 
     // 7) Auditoría: registrar qué se aplicó, qué se recortó por topes, y qué pasó con
     //    las misiones — para poder revisar cualquier publicación después sin tener que
     //    fiarse solo de la memoria del staff que la hizo.
-    ope_rol_mv_audit_log($ciclo_id, $capsLog, $resueltas, $creadas);
+    gbe_rol_mv_audit_log($ciclo_id, $capsLog, $resueltas, $creadas);
 
     // 8) Avisar a los Web Masters de que hay periódico nuevo (best-effort: si falla el
     //    envío de MP, la publicación ya se ha guardado igualmente).
-    ope_rol_mv_notificar_publicacion($ciclo, $capsLog);
+    gbe_rol_mv_notificar_publicacion($ciclo, $capsLog);
 
     return array('ok' => true, 'caps' => $capsLog, 'misiones_resueltas' => $resueltas, 'misiones_creadas' => $creadas);
 }
@@ -2195,7 +2195,7 @@ function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
  * que permite revisar cualquier ciclo pasado sin depender de que alguien se acuerde.
  * No lanza error si la tabla no existe todavía (instalaciones sin migrar a v4).
  */
-function ope_rol_mv_audit_log($ciclo_id, array $capsLog, $misionesResueltas = 0, $misionesCreadas = 0)
+function gbe_rol_mv_audit_log($ciclo_id, array $capsLog, $misionesResueltas = 0, $misionesCreadas = 0)
 {
     global $db, $mybb;
     if (!$db->table_exists('rol_mv_audit')) {
@@ -2213,7 +2213,7 @@ function ope_rol_mv_audit_log($ciclo_id, array $capsLog, $misionesResueltas = 0,
 }
 
 /** Lista de entradas de auditoría, más recientes primero. */
-function ope_rol_mv_audit_list($limit = 20)
+function gbe_rol_mv_audit_list($limit = 20)
 {
     global $db;
     $out = array();
@@ -2235,7 +2235,7 @@ function ope_rol_mv_audit_list($limit = 20)
  * cualquier fallo (datahandler no disponible, sin destinatarios, etc.) se ignora en
  * silencio porque la publicación en sí YA se ha guardado y no debe bloquearse por esto.
  */
-function ope_rol_mv_notificar_publicacion($ciclo, array $capsLog = array())
+function gbe_rol_mv_notificar_publicacion($ciclo, array $capsLog = array())
 {
     global $db, $mybb;
     if (!function_exists('is_moderator')) {
@@ -2264,7 +2264,7 @@ function ope_rol_mv_notificar_publicacion($ciclo, array $capsLog = array())
         return false;
     }
 
-    $periodo = ope_rol_mv_periodo_label($ciclo['periodo'] ?? '');
+    $periodo = gbe_rol_mv_periodo_label($ciclo['periodo'] ?? '');
     $subject = 'Mundo Vivo publicado — ' . $periodo;
     $msg = "Se ha publicado el periódico de {$periodo}.\n\n";
     if (!empty($capsLog)) {
@@ -2305,7 +2305,7 @@ function ope_rol_mv_notificar_publicacion($ciclo, array $capsLog = array())
 // ─────────────────────────────────────────────────────────────────────────
 
 /** Convierte "2026-07" en "Julio 2026" (etiqueta OOC / tiempo real). */
-function ope_rol_mv_periodo_label($periodo)
+function gbe_rol_mv_periodo_label($periodo)
 {
     $periodo = (string) $periodo;
     if (preg_match('/^(\d{4})-(\d{2})$/', $periodo, $m)) {
@@ -2323,17 +2323,17 @@ function ope_rol_mv_periodo_label($periodo)
  * on-rol del plugin (4 estaciones × 65 días; año en números romanos).
  * Ej.: "Día 12 · Verano · Año III".
  */
-function ope_rol_mv_fecha_onrol($ts = null)
+function gbe_rol_mv_fecha_onrol($ts = null)
 {
-    if (!function_exists('ope_rol_onrol_calendar')) {
+    if (!function_exists('gbe_rol_onrol_calendar')) {
         return '';
     }
-    $cal = ope_rol_onrol_calendar($ts ? (int) $ts : null);
-    $anio = function_exists('ope_rol_year_label') ? ope_rol_year_label($cal['year']) : (string) $cal['year'];
+    $cal = gbe_rol_onrol_calendar($ts ? (int) $ts : null);
+    $anio = function_exists('gbe_rol_year_label') ? gbe_rol_year_label($cal['year']) : (string) $cal['year'];
     return 'Día ' . (int) $cal['day'] . ' · ' . $cal['season'] . ' · Año ' . $anio;
 }
 
-function ope_rol_mv_noticias_activas($limit = 8)
+function gbe_rol_mv_noticias_activas($limit = 8)
 {
     global $db;
     $out = array();

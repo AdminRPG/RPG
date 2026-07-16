@@ -1,7 +1,7 @@
 <?php
 /**
  * I-Forge · Personajes ("Mi expediente" / roster)
- * Página de front-end MyBB (dirección "One Piece Eternal").
+ * Página de front-end MyBB (dirección "Granblue Fantasy: Eternal").
  *
  * El usuario autenticado ve sus personajes (mybb_rol_personajes) en tarjetas
  * y puede marcar cuál es el personaje ACTIVO (con el que publica). La selección
@@ -19,21 +19,21 @@ $loggedin  = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid       = (int) ($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
-require_once MYBB_ROOT . 'inc/ope_user_init.php';
+require_once MYBB_ROOT . 'inc/gbe_user_init.php';
 
-// ── Nivel de staff (lo expone el plugin ope_rol; con respaldo directo) ──
-$staff_level = ope_get_staff_level($uid);
+// ── Nivel de staff (lo expone el plugin gbe_rol; con respaldo directo) ──
+$staff_level = gbe_get_staff_level($uid);
 
 // Iniciales para el botón de usuario
-$initials   = ope_get_initials($mybb->user['username'] ?? '');
+$initials   = gbe_get_initials($mybb->user['username'] ?? '');
 $initials_e = htmlspecialchars_uni($initials);
 
 // Nombre a mostrar en la navbar: personaje activo o, en su defecto, la cuenta.
-$display_name   = ope_get_display_name();
+$display_name   = gbe_get_display_name();
 $display_name_e = htmlspecialchars_uni($display_name);
 
 // ── Mapa de rango → variable de calor ──
-function ope_heat_var(string $rango): string
+function gbe_heat_var(string $rango): string
 {
     $map = array(
         'F' => '--h1', 'E' => '--h1', 'D' => '--h2', 'C' => '--h3', 'B' => '--h4',
@@ -43,7 +43,7 @@ function ope_heat_var(string $rango): string
     return $map[$rango] ?? '--h1';
 }
 
-function ope_estado_label(string $estado): array
+function gbe_estado_label(string $estado): array
 {
     switch ($estado) {
         case 'aprobado':  return array('Aprobado', 'var(--patina-hi)');
@@ -214,12 +214,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Personaje</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-personajes) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-personajes) -->
 </head>
-<body class="ope-pg-personajes">
+<body class="gbe-pg-personajes">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -231,7 +231,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 <div class="wrap">
 
-  <?php echo ope_rol_deco_banner('ope/deco/personajes', 'Galería de personajes de la tripulación', 'Expediente de personajes'); ?>
+  <?php echo gbe_rol_deco_banner('ope/deco/personajes', 'Galería de personajes de la tripulación', 'Expediente de personajes'); ?>
 
 
   <section class="reveal">
@@ -277,8 +277,8 @@ header('Content-Type: text/html; charset=utf-8');
         $es_activo   = ((int) $pj['activo']) === 1;
         $rango       = (string) $pj['rango'];
         $rango_e     = htmlspecialchars_uni($rango);
-        $heat        = ope_heat_var($rango);
-        list($est_lbl, $est_col) = ope_estado_label((string) $pj['estado']);
+        $heat        = gbe_heat_var($rango);
+        list($est_lbl, $est_col) = gbe_estado_label((string) $pj['estado']);
         $nombre_e    = htmlspecialchars_uni($pj['nombre']);
         $nivel       = (int) $pj['nivel'];
         $es_npc_card = ($vista === 'npcs');

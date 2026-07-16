@@ -1,7 +1,7 @@
 <?php
 /**
  * I-Forge · Trámites del taller
- * Página de front-end MyBB (dirección "One Piece Eternal").
+ * Página de front-end MyBB (dirección "Granblue Fantasy: Eternal").
  * Estructura de servicios del taller. Sin datos de ejemplo ni saldos inventados.
  */
 
@@ -15,12 +15,12 @@ $loggedin  = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid       = (int)($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
-require_once MYBB_ROOT . 'inc/ope_user_init.php';
+require_once MYBB_ROOT . 'inc/gbe_user_init.php';
 
-// Nivel de staff (plugin ope_rol, con respaldo directo)
-$staff_level = ope_get_staff_level($uid);
+// Nivel de staff (plugin gbe_rol, con respaldo directo)
+$staff_level = gbe_get_staff_level($uid);
 
-$initials   = ope_get_initials($mybb->user['username'] ?? '');
+$initials   = gbe_get_initials($mybb->user['username'] ?? '');
 $initials_e = htmlspecialchars_uni($initials);
 
 // ── Catálogo de trámites (data-driven; los filtros se generan a partir de esto) ──
@@ -95,12 +95,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Trámites</title>
-<?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-tramites) -->
+<?php echo gbe_rol_head_base(); ?>
+<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-tramites) -->
 </head>
-<body class="ope-pg-tramites">
+<body class="gbe-pg-tramites">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -112,7 +112,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 <div class="wrap">
 
-  <?php echo ope_rol_deco_banner('ope/deco/tramites', 'Ventanillas de trámites oficiales del foro', 'Trámites oficiales'); ?>
+  <?php echo gbe_rol_deco_banner('ope/deco/tramites', 'Ventanillas de trámites oficiales del foro', 'Trámites oficiales'); ?>
 
 
   <section class="reveal">

@@ -105,7 +105,7 @@ if ($existente) {
 }
 
 // Obtener el ciclo actual (recien creado o reutilizado)
-$ciclo = ope_rol_mv_ciclo_actual();
+$ciclo = gbe_rol_mv_ciclo_actual();
 $cid = (int)($ciclo['ciclo_id'] ?? 0);
 echo "  Ciclo ID=$cid periodo={$ciclo['periodo']}\n";
 

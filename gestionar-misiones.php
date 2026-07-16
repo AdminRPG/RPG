@@ -12,17 +12,17 @@ $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid = (int)($mybb->user['uid'] ?? 0);
 
-$staff = $loggedin ? ope_rol_active_staff($uid) : array('rank' => 0);
+$staff = $loggedin ? gbe_rol_active_staff($uid) : array('rank' => 0);
 $rank  = (int)$staff['rank'];
 $is_admin = ($rank >= 3);
 
 $flash = ''; $flash_kind = 'ok';
 $edit = null;
 
-$zonas     = $db->table_exists('rol_mv_zonas') ? ope_rol_mv_zonas() : array();
-$facciones = $db->table_exists('rol_mv_facciones') ? ope_rol_mv_facciones() : array();
-$orden_fac = ope_rol_mv_faccion_order();
-$ciclo     = ope_rol_mv_ciclo_actual();
+$zonas     = $db->table_exists('rol_mv_zonas') ? gbe_rol_mv_zonas() : array();
+$facciones = $db->table_exists('rol_mv_facciones') ? gbe_rol_mv_facciones() : array();
+$orden_fac = gbe_rol_mv_faccion_order();
+$ciclo     = gbe_rol_mv_ciclo_actual();
 $ciclo_id  = $ciclo ? (int)$ciclo['ciclo_id'] : 0;
 
 if ($is_admin && $mybb->request_method === 'post') {
@@ -84,7 +84,7 @@ if ($is_admin && $db->table_exists('rol_mv_misiones')) {
     while ($r = $db->fetch_array($q)) $misiones[] = $r;
 }
 // Asignaciones (quién ha cogido cada misión) para marcar las "en proceso".
-$asignaciones = ope_rol_mv_asignaciones_map();
+$asignaciones = gbe_rol_mv_asignaciones_map();
 
 $pk = htmlspecialchars_uni($mybb->post_code);
 
@@ -99,11 +99,11 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Gestionar misiones</title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-gestionar-misiones ope-pg-mundo-vivo">
+<body class="gbe-pg-gestionar-misiones gbe-pg-mundo-vivo">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -225,9 +225,9 @@ header('Content-Type: text/html; charset=utf-8');
         $asig = $asignaciones[$mid] ?? null;
         $en_proceso = ($asig && $m['estado'] === 'en_curso');
         // Nombres del líder y compañeros que han cogido la misión.
-        $lider_n = $asig ? ope_rol_cat_nombre_pid((int)$asig['pid']) : '';
+        $lider_n = $asig ? gbe_rol_cat_nombre_pid((int)$asig['pid']) : '';
         $comp_names = array();
-        if ($asig) { foreach ($asig['companeros_arr'] as $cpid) { $n = ope_rol_cat_nombre_pid((int)$cpid); if ($n !== '') $comp_names[] = $n; } }
+        if ($asig) { foreach ($asig['companeros_arr'] as $cpid) { $n = gbe_rol_cat_nombre_pid((int)$cpid); if ($n !== '') $comp_names[] = $n; } }
         $estado_txt = $en_proceso ? 'En proceso' : ($estado_opts[$m['estado']] ?? htmlspecialchars_uni($m['estado']));
 ?>
         <div class="mv-row mv-mis-<?php echo $en_proceso ? 'en_proceso' : htmlspecialchars_uni($m['estado']); ?>">

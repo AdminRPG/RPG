@@ -7,7 +7,7 @@
  */
 require __DIR__ . '/_theme-sync-lib.php';
 
-$db = ope_db_connect();
+$db = gbe_db_connect();
 
 $result = $db->query("SELECT tid, properties FROM mybb_themes WHERE name = 'I-Forge RPG' OR name = 'RPG' ORDER BY tid DESC LIMIT 1");
 $theme = $result ? $result->fetch_assoc() : null;

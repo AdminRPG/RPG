@@ -6,10 +6,10 @@
  * que se repite en 15+ páginas de front-end.
  *
  * Uso:
- *   require_once MYBB_ROOT . 'inc/ope_user_init.php';
- *   $staff_level  = ope_get_staff_level($uid, $active_pid ?? 0);
- *   $initials     = ope_get_initials($mybb->user['username'] ?? '');
- *   $display_name = ope_get_display_name();
+ *   require_once MYBB_ROOT . 'inc/gbe_user_init.php';
+ *   $staff_level  = gbe_get_staff_level($uid, $active_pid ?? 0);
+ *   $initials     = gbe_get_initials($mybb->user['username'] ?? '');
+ *   $display_name = gbe_get_display_name();
  */
 
 /**
@@ -19,15 +19,15 @@
  * @param int $active_pid  Si > 0, además se requiere que rol_personajes exista.
  * @return int
  */
-function ope_get_staff_level($uid, $active_pid = 0) {
+function gbe_get_staff_level($uid, $active_pid = 0) {
     global $db, $mybb;
     $loggedin = (int)($mybb->user['uid'] ?? 0) > 0;
     if (!$loggedin) return 0;
 
     if ($active_pid > 0 && !$db->table_exists('rol_personajes')) return 0;
 
-    if (isset($mybb->user['ope_staff_level'])) {
-        return (int) $mybb->user['ope_staff_level'];
+    if (isset($mybb->user['gbe_staff_level'])) {
+        return (int) $mybb->user['gbe_staff_level'];
     }
     if ($db->table_exists('rol_cuentas')) {
         $cq = $db->simple_select('rol_cuentas', 'staff_level', 'uid = ' . (int)$uid, array('limit' => 1));
@@ -45,7 +45,7 @@ function ope_get_staff_level($uid, $active_pid = 0) {
  * @param string $name  Nombre del usuario o personaje.
  * @return string       Iniciales (máx. 2 caracteres, mayúsculas).
  */
-function ope_get_initials($name) {
+function gbe_get_initials($name) {
     if (empty($name)) return '';
     $parts = preg_split('/\s+/', trim((string)$name));
     $initials = '';
@@ -64,7 +64,7 @@ function ope_get_initials($name) {
  *
  * @return string
  */
-function ope_get_display_name() {
+function gbe_get_display_name() {
     global $mybb;
-    return (string) ($mybb->user['ope_display_name'] ?? ($mybb->user['username'] ?? ''));
+    return (string) ($mybb->user['gbe_display_name'] ?? ($mybb->user['username'] ?? ''));
 }

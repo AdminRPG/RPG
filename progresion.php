@@ -11,8 +11,8 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'progresion.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
-require_once MYBB_ROOT . 'inc/ope_rol_haki.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_data.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_haki.php';
 
 $bburl     = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname    = htmlspecialchars_uni($mybb->settings['bbname']);
@@ -23,8 +23,8 @@ $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 // Personaje activo
 $active_pid = 0;
 if ($loggedin) {
-    if (isset($mybb->user['ope_active_pid']) && (int) $mybb->user['ope_active_pid'] > 0) {
-        $active_pid = (int) $mybb->user['ope_active_pid'];
+    if (isset($mybb->user['gbe_active_pid']) && (int) $mybb->user['gbe_active_pid'] > 0) {
+        $active_pid = (int) $mybb->user['gbe_active_pid'];
     } elseif ($db->table_exists('rol_cuentas')) {
         $cq = $db->simple_select('rol_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
         if ($db->num_rows($cq)) {
@@ -33,13 +33,13 @@ if ($loggedin) {
     }
 }
 
-require_once MYBB_ROOT . 'inc/ope_user_init.php';
+require_once MYBB_ROOT . 'inc/gbe_user_init.php';
 
 // Staff level
-$staff_level = ope_get_staff_level($uid, $active_pid);
+$staff_level = gbe_get_staff_level($uid, $active_pid);
 
 // Nombre a mostrar en navbar
-$display_name   = ope_get_display_name();
+$display_name   = gbe_get_display_name();
 $display_name_e = htmlspecialchars_uni($display_name);
 
 // ── Cargar personaje ──
@@ -59,14 +59,14 @@ if ($active_pid > 0 && $db->table_exists('rol_personajes')) {
 }
 
 // ── Cargar PP ──
-$pp_data = function_exists('ope_pp_saldo') ? ope_pp_saldo($active_pid) : array('pp_total' => 0, 'pp_gastado' => 0, 'pp_disponible' => 0);
+$pp_data = function_exists('gbe_pp_saldo') ? gbe_pp_saldo($active_pid) : array('pp_total' => 0, 'pp_gastado' => 0, 'pp_disponible' => 0);
 
 // ── Procesar gasto de PP ──
 $flash = '';
 $flash_kind = 'ok';
 if ($mybb->get_input('up') !== '') {
     $up_stat = strtoupper(trim((string) $mybb->get_input('up')));
-    if (in_array($up_stat, ope_rol_stat_keys(), true)) {
+    if (in_array($up_stat, gbe_rol_stat_keys(), true)) {
         $flash = "¡{$up_stat} mejorada! Los PP se han descontado de tu saldo.";
     } else {
         $flash = 'Progresión actualizada.';
@@ -80,13 +80,13 @@ if ($loggedin && $active_pid > 0 && $mybb->request_method === 'post'
 
     $stats_ganados_n = (int)($pj['stats_ganados'] ?? 0);
     $nivel_actual_n = (int)($pj['nivel'] ?? 1);
-    $puede = function_exists('ope_rol_puede_subir_nivel') ? ope_rol_puede_subir_nivel($nivel_actual_n, $stats_ganados_n) : false;
+    $puede = function_exists('gbe_rol_puede_subir_nivel') ? gbe_rol_puede_subir_nivel($nivel_actual_n, $stats_ganados_n) : false;
 
     if ($puede) {
         $nuevo_nivel = $nivel_actual_n + 1;
         $db->update_query('rol_personajes', array('nivel' => $nuevo_nivel), "pid = {$active_pid}");
-        if (function_exists('ope_combat_recalc')) {
-            ope_combat_recalc($active_pid);
+        if (function_exists('gbe_combat_recalc')) {
+            gbe_combat_recalc($active_pid);
         }
         header('Location: ' . $bburl . '/progresion.php?subio_nivel=1');
         exit;
@@ -100,21 +100,21 @@ if ($loggedin && $active_pid > 0 && $pj && $mybb->request_method === 'post'
     // Verificar bloqueo por nivel antes de permitir subir stats
     $stats_ganados_check = (int)($pj['stats_ganados'] ?? 0);
     $nivel_check = (int)($pj['nivel'] ?? 1);
-    if (!function_exists('ope_rol_puede_subir_stats')) {
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
-require_once MYBB_ROOT . 'inc/ope_rol_haki.php';
+    if (!function_exists('gbe_rol_puede_subir_stats')) {
+require_once MYBB_ROOT . 'inc/gbe_rol_data.php';
+require_once MYBB_ROOT . 'inc/gbe_rol_haki.php';
     }
-    if (!ope_rol_puede_subir_stats($nivel_check, $stats_ganados_check)) {
+    if (!gbe_rol_puede_subir_stats($nivel_check, $stats_ganados_check)) {
         $flash = '¡Has alcanzado el límite de tu nivel! Sube de nivel para poder seguir mejorando tus stats.';
         $flash_kind = 'error';
         // No procesar el gasto
         $mybb->set_input('gastar', '0');
     } else {
         $stat_key = strtoupper(trim((string) $mybb->get_input('stat')));
-    $stat_keys = ope_rol_stat_keys();
+    $stat_keys = gbe_rol_stat_keys();
     if (in_array($stat_key, $stat_keys, true)) {
-        $current_val = ope_rol_stat_num($pj_stats, $stat_key);
-        $coste = ope_rol_stat_upgrade_cost($current_val);
+        $current_val = gbe_rol_stat_num($pj_stats, $stat_key);
+        $coste = gbe_rol_stat_upgrade_cost($current_val);
 
         if ($coste === false) {
             $flash = 'Esa stat ya está al máximo (M+).';
@@ -123,7 +123,7 @@ require_once MYBB_ROOT . 'inc/ope_rol_haki.php';
             $flash = "No tienes suficientes PP. Necesitas {$coste} PP pero solo tienes {$pp_data['pp_disponible']}.";
             $flash_kind = 'error';
         } else {
-            $ok = ope_pp_spend($active_pid, $coste, 'gasto_stat', 'Subir ' . $stat_key . ' de ' . $current_val . ' a ' . ($current_val + 1));
+            $ok = gbe_pp_spend($active_pid, $coste, 'gasto_stat', 'Subir ' . $stat_key . ' de ' . $current_val . ' a ' . ($current_val + 1));
             if ($ok) {
                 $pj_stats[$stat_key] = $current_val + 1;
                 $pj_datos['stats_efectivas'] = $pj_stats;
@@ -138,8 +138,8 @@ require_once MYBB_ROOT . 'inc/ope_rol_haki.php';
                     'lastedit' => TIME_NOW,
                 ), "pid = {$active_pid}");
 
-                if (function_exists('ope_combat_recalc')) {
-                    ope_combat_recalc($active_pid);
+                if (function_exists('gbe_combat_recalc')) {
+                    gbe_combat_recalc($active_pid);
                 }
 
                 header('Location: ' . $bburl . '/progresion.php?up=' . rawurlencode($stat_key));
@@ -160,7 +160,7 @@ if ($loggedin && $active_pid > 0 && $mybb->request_method === 'post'
     && verify_post_check($mybb->get_input('my_post_key'), true)
     && $mybb->get_input('haki_tipo')) {
     $tipo = $mybb->get_input('haki_tipo');
-    $resultado = function_exists('ope_haki_subir') ? ope_haki_subir($active_pid, $tipo) : 'Sistema Haki no disponible.';
+    $resultado = function_exists('gbe_haki_subir') ? gbe_haki_subir($active_pid, $tipo) : 'Sistema Haki no disponible.';
     if ($resultado === '') {
         $flash = '¡Haki mejorado!';
         $flash_kind = 'ok';
@@ -168,7 +168,7 @@ if ($loggedin && $active_pid > 0 && $mybb->request_method === 'post'
         $flash = $resultado;
         $flash_kind = 'error';
     }
-    $pp_data = function_exists('ope_pp_saldo') ? ope_pp_saldo($active_pid) : $pp_data;
+    $pp_data = function_exists('gbe_pp_saldo') ? gbe_pp_saldo($active_pid) : $pp_data;
 }
 
 // Refrescar personaje tras POST redirect o recalc lazy
@@ -181,7 +181,7 @@ if ($active_pid > 0 && $db->table_exists('rol_personajes')) {
         $pj_stats = is_array($pj_datos['stats_efectivas'] ?? null) ? $pj_datos['stats_efectivas'] : array();
         $stats_ganados = (int)($pj['stats_ganados'] ?? 0);
     }
-    $pp_data = function_exists('ope_pp_saldo') ? ope_pp_saldo($active_pid) : $pp_data;
+    $pp_data = function_exists('gbe_pp_saldo') ? gbe_pp_saldo($active_pid) : $pp_data;
 }
 
 // ── PP Log (últimos 20) ──
@@ -194,12 +194,12 @@ if ($active_pid > 0 && $db->table_exists('rol_pp_log')) {
 }
 
 // ── Haki ──
-$haki = function_exists('ope_haki_get') ? ope_haki_get($active_pid) : array();
-$haki_tipos = function_exists('ope_haki_tipos') ? ope_haki_tipos() : array();
-$haki_niveles = function_exists('ope_haki_niveles') ? ope_haki_niveles() : array();
+$haki = function_exists('gbe_haki_get') ? gbe_haki_get($active_pid) : array();
+$haki_tipos = function_exists('gbe_haki_tipos') ? gbe_haki_tipos() : array();
+$haki_niveles = function_exists('gbe_haki_niveles') ? gbe_haki_niveles() : array();
 
 // ── Función local para formatear stats ──
-// Ya no se usa RANK_LABELS; se usará ope_rol_stat_label() donde se necesite
+// Ya no se usa RANK_LABELS; se usará gbe_rol_stat_label() donde se necesite
 
 // Iniciales para navbar
 $initials = '';
@@ -222,11 +222,11 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Progresión</title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-progresion">
+<body class="gbe-pg-progresion">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -251,14 +251,14 @@ header('Content-Type: text/html; charset=utf-8');
 <?php else: ?>
 
   <?php
-    $suma_actual = ope_rol_stat_sum($pj_stats);
+    $suma_actual = gbe_rol_stat_sum($pj_stats);
     $nivel_actual = (int)($pj['nivel'] ?? 1);
-    $nivel_label = ope_rol_nivel_label($nivel_actual);
+    $nivel_label = gbe_rol_nivel_label($nivel_actual);
     $stats_ganados = (int)($pj['stats_ganados'] ?? 0);
 
-    $puede_subir_nivel = function_exists('ope_rol_puede_subir_nivel') ? ope_rol_puede_subir_nivel($nivel_actual, $stats_ganados) : false;
-    $puede_subir_stats = function_exists('ope_rol_puede_subir_stats') ? ope_rol_puede_subir_stats($nivel_actual, $stats_ganados) : true;
-    $pts_necesarios = function_exists('ope_rol_stats_para_nivel') ? ope_rol_stats_para_nivel($nivel_actual + 1) : 999;
+    $puede_subir_nivel = function_exists('gbe_rol_puede_subir_nivel') ? gbe_rol_puede_subir_nivel($nivel_actual, $stats_ganados) : false;
+    $puede_subir_stats = function_exists('gbe_rol_puede_subir_stats') ? gbe_rol_puede_subir_stats($nivel_actual, $stats_ganados) : true;
+    $pts_necesarios = function_exists('gbe_rol_stats_para_nivel') ? gbe_rol_stats_para_nivel($nivel_actual + 1) : 999;
 
     $meta_nivel = ($nivel_actual + 1) * 10;
     $base_nivel = $nivel_actual * 10;
@@ -272,22 +272,22 @@ header('Content-Type: text/html; charset=utf-8');
       <span class="code">// <?php echo htmlspecialchars_uni($pj['nombre']); ?></span>
       <span class="rule"></span>
     </div>
-    <div class="ope-prog-hero">
-      <div class="ope-prog-hero-rank">
-        <span class="ope-prog-hero-rank-val">Nv. <?php echo (int) $nivel_actual; ?></span>
-        <span class="ope-prog-hero-rank-lbl"><?php echo htmlspecialchars_uni($nivel_label); ?></span>
+    <div class="gbe-prog-hero">
+      <div class="gbe-prog-hero-rank">
+        <span class="gbe-prog-hero-rank-val">Nv. <?php echo (int) $nivel_actual; ?></span>
+        <span class="gbe-prog-hero-rank-lbl"><?php echo htmlspecialchars_uni($nivel_label); ?></span>
       </div>
-      <div class="ope-prog-hero-track">
-        <div class="ope-prog-hero-track-top">
+      <div class="gbe-prog-hero-track">
+        <div class="gbe-prog-hero-track-top">
           <span>Suma de stats: <b><?php echo (int) $suma_actual; ?></b></span>
           <span><b><?php echo (int) $faltan; ?></b> pts &rarr; Nivel <?php echo (int)($nivel_actual + 1); ?></span>
         </div>
-        <div class="ope-prog-hero-bar"><span style="width:<?php echo (int) $prog_pct; ?>%"></span></div>
-        <p class="ope-prog-hero-note">Gasta <b>PP</b> en tus atributos para hacerlos crecer. El coste sube por tramos &mdash; consulta la tabla de <b>costes</b> más abajo.</p>
+        <div class="gbe-prog-hero-bar"><span style="width:<?php echo (int) $prog_pct; ?>%"></span></div>
+        <p class="gbe-prog-hero-note">Gasta <b>PP</b> en tus atributos para hacerlos crecer. El coste sube por tramos &mdash; consulta la tabla de <b>costes</b> más abajo.</p>
       </div>
-      <div class="ope-prog-hero-pp">
-        <span class="ope-prog-hero-pp-val"><?php echo (int) $pp_data['pp_disponible']; ?></span>
-        <span class="ope-prog-hero-pp-lbl">PP disponibles</span>
+      <div class="gbe-prog-hero-pp">
+        <span class="gbe-prog-hero-pp-val"><?php echo (int) $pp_data['pp_disponible']; ?></span>
+        <span class="gbe-prog-hero-pp-lbl">PP disponibles</span>
       </div>
     </div>
   </section>
@@ -299,14 +299,14 @@ header('Content-Type: text/html; charset=utf-8');
   <!-- ── Subida de Nivel ── -->
   <?php if ($puede_subir_nivel): ?>
   <section class="reveal">
-    <div class="plate ope-lvl-plate">
+    <div class="plate gbe-lvl-plate">
       <div class="plate-h">
         <span class="t">¡Puedes subir de nivel!</span>
         <span class="c">// Nivel <?php echo $nivel_actual; ?> → <?php echo $nivel_actual + 1; ?></span>
       </div>
       <div class="plate-b">
         <p>Has acumulado <b><?php echo $stats_ganados; ?> puntos de stat</b> subidos con PP. ¡Desbloquea el siguiente tramo!</p>
-        <form method="post" action="progresion.php" class="ope-lvl-form">
+        <form method="post" action="progresion.php" class="gbe-lvl-form">
           <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
           <input type="hidden" name="subir_nivel" value="1">
           <button type="submit" class="btn btn-hot">Subir a Nivel <?php echo $nivel_actual + 1; ?></button>
@@ -316,15 +316,15 @@ header('Content-Type: text/html; charset=utf-8');
   </section>
   <?php elseif (!$puede_subir_stats): ?>
   <section class="reveal">
-    <div class="plate ope-lvl-plate ope-lvl-plate--warn">
+    <div class="plate gbe-lvl-plate gbe-lvl-plate--warn">
       <div class="plate-h">
         <span class="t">¡Límite de nivel alcanzado!</span>
         <span class="c">// Nivel <?php echo $nivel_actual; ?></span>
       </div>
       <div class="plate-b">
         <p>Has llegado al máximo de puntos de stat para tu nivel actual (<b><?php echo $pts_necesarios; ?> pts</b>). Sube de nivel para seguir mejorando.</p>
-        <p class="ope-prog-muted">Puntos acumulados: <b><?php echo $stats_ganados; ?></b> / <?php echo $pts_necesarios; ?></p>
-        <form method="post" action="progresion.php" class="ope-lvl-form">
+        <p class="gbe-prog-muted">Puntos acumulados: <b><?php echo $stats_ganados; ?></b> / <?php echo $pts_necesarios; ?></p>
+        <form method="post" action="progresion.php" class="gbe-lvl-form">
           <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
           <input type="hidden" name="subir_nivel" value="1">
           <button type="submit" class="btn btn-hot">Subir a Nivel <?php echo $nivel_actual + 1; ?></button>
@@ -334,10 +334,10 @@ header('Content-Type: text/html; charset=utf-8');
   </section>
   <?php else: ?>
   <section class="reveal">
-    <div class="ope-prog-ppbar">
-      <div class="ope-prog-ppbar-total ope-prog-ppbar-total--full">
-        <span class="ope-prog-ppbar-label">Progreso de nivel: <?php echo $stats_ganados; ?> / <?php echo $pts_necesarios; ?> pts para Nivel <?php echo $nivel_actual + 1; ?></span>
-        <div class="ope-prog-hero-bar ope-prog-hero-bar--mt"><span style="width:<?php echo min(100, (int)(($stats_ganados / max(1, $pts_necesarios)) * 100)); ?>%"></span></div>
+    <div class="gbe-prog-ppbar">
+      <div class="gbe-prog-ppbar-total gbe-prog-ppbar-total--full">
+        <span class="gbe-prog-ppbar-label">Progreso de nivel: <?php echo $stats_ganados; ?> / <?php echo $pts_necesarios; ?> pts para Nivel <?php echo $nivel_actual + 1; ?></span>
+        <div class="gbe-prog-hero-bar gbe-prog-hero-bar--mt"><span style="width:<?php echo min(100, (int)(($stats_ganados / max(1, $pts_necesarios)) * 100)); ?>%"></span></div>
       </div>
     </div>
   </section>
@@ -348,8 +348,8 @@ header('Content-Type: text/html; charset=utf-8');
     $pv = (int) ($pj['pv_max'] ?? 0);
     $en = (int) ($pj['en_max'] ?? 0);
     $pa = (int) ($pj['pa_por_turno'] ?? 0);
-    if ($pv < 1 && function_exists('ope_combat_recalc')) {
-        $recalc = ope_combat_recalc($active_pid);
+    if ($pv < 1 && function_exists('gbe_combat_recalc')) {
+        $recalc = gbe_combat_recalc($active_pid);
         if ($recalc) {
             $pv = $recalc['pv_max'];
             $en = $recalc['en_max'];
@@ -358,22 +358,22 @@ header('Content-Type: text/html; charset=utf-8');
     }
   ?>
   <section class="reveal">
-    <div class="ope-prog-vitals">
-      <div class="ope-prog-vital ope-prog-vital--pv">
-        <span class="ope-prog-vital-val"><?php echo $pv; ?></span>
-        <span class="ope-prog-vital-label">PV max</span>
+    <div class="gbe-prog-vitals">
+      <div class="gbe-prog-vital gbe-prog-vital--pv">
+        <span class="gbe-prog-vital-val"><?php echo $pv; ?></span>
+        <span class="gbe-prog-vital-label">PV max</span>
       </div>
-      <div class="ope-prog-vital ope-prog-vital--en">
-        <span class="ope-prog-vital-val"><?php echo $en; ?></span>
-        <span class="ope-prog-vital-label">EN max</span>
+      <div class="gbe-prog-vital gbe-prog-vital--en">
+        <span class="gbe-prog-vital-val"><?php echo $en; ?></span>
+        <span class="gbe-prog-vital-label">EN max</span>
       </div>
-      <div class="ope-prog-vital ope-prog-vital--pa">
-        <span class="ope-prog-vital-val"><?php echo $pa; ?></span>
-        <span class="ope-prog-vital-label">PA / turno</span>
+      <div class="gbe-prog-vital gbe-prog-vital--pa">
+        <span class="gbe-prog-vital-val"><?php echo $pa; ?></span>
+        <span class="gbe-prog-vital-label">PA / turno</span>
       </div>
-      <div class="ope-prog-vital ope-prog-vital--rango">
-        <span class="ope-prog-vital-val">Nv. <?php echo (int)($pj['nivel'] ?? $nivel_actual); ?></span>
-        <span class="ope-prog-vital-label">Nivel</span>
+      <div class="gbe-prog-vital gbe-prog-vital--rango">
+        <span class="gbe-prog-vital-val">Nv. <?php echo (int)($pj['nivel'] ?? $nivel_actual); ?></span>
+        <span class="gbe-prog-vital-label">Nivel</span>
       </div>
     </div>
   </section>
@@ -383,48 +383,48 @@ header('Content-Type: text/html; charset=utf-8');
     <div class="shead shead-sec"><h2>Atributos</h2><span class="code">// gasta PP para mejorar</span><span class="rule"></span></div>
 
     <?php
-    $stats_catalogo = ope_rol_stats();
+    $stats_catalogo = gbe_rol_stats();
     foreach ($stats_catalogo as $pilar_key => $pilar):
     ?>
-    <div class="ope-prog-pilar">
-      <h3 class="ope-prog-pilar-titulo"><?php echo htmlspecialchars_uni($pilar['label']); ?></h3>
-      <div class="ope-prog-stats-grid">
+    <div class="gbe-prog-pilar">
+      <h3 class="gbe-prog-pilar-titulo"><?php echo htmlspecialchars_uni($pilar['label']); ?></h3>
+      <div class="gbe-prog-stats-grid">
       <?php foreach ($pilar['stats'] as $sk => $sn):
-        $val = ope_rol_stat_num($pj_stats, $sk);
-        $label = ope_rol_stat_label($val);
-        $coste = ope_rol_stat_upgrade_cost($val);
+        $val = gbe_rol_stat_num($pj_stats, $sk);
+        $label = gbe_rol_stat_label($val);
+        $coste = gbe_rol_stat_upgrade_cost($val);
         $bloqueado_nivel = !$puede_subir_stats;
         $puede_subir = ($coste !== false) && $pp_data['pp_disponible'] >= $coste && !$bloqueado_nivel;
-        $stat_class = 'ope-prog-stat';
-        if ($puede_subir) $stat_class .= ' ope-prog-stat--up';
+        $stat_class = 'gbe-prog-stat';
+        if ($puede_subir) $stat_class .= ' gbe-prog-stat--up';
       ?>
         <div class="<?php echo $stat_class; ?>">
-          <div class="ope-prog-stat-head">
-            <span class="ope-prog-stat-key"><?php echo $sk; ?></span>
-            <span class="ope-prog-stat-name"><?php echo htmlspecialchars_uni($sn); ?></span>
+          <div class="gbe-prog-stat-head">
+            <span class="gbe-prog-stat-key"><?php echo $sk; ?></span>
+            <span class="gbe-prog-stat-name"><?php echo htmlspecialchars_uni($sn); ?></span>
           </div>
-          <div class="ope-prog-stat-body">
-            <div class="ope-prog-stat-rank">
-              <span class="ope-prog-stat-rangochar"><?php echo (int) $val; ?></span>
-              <span class="ope-prog-stat-rangolabel"><?php echo htmlspecialchars_uni($label); ?></span>
+          <div class="gbe-prog-stat-body">
+            <div class="gbe-prog-stat-rank">
+              <span class="gbe-prog-stat-rangochar"><?php echo (int) $val; ?></span>
+              <span class="gbe-prog-stat-rangolabel"><?php echo htmlspecialchars_uni($label); ?></span>
             </div>
-            <div class="ope-prog-stat-coste">
+            <div class="gbe-prog-stat-coste">
               <?php if ($coste === false): ?>
-                <span class="ope-prog-stat-max">MAX</span>
+                <span class="gbe-prog-stat-max">MAX</span>
               <?php else: ?>
-                <span class="ope-prog-stat-next">→ <?php echo (int)($val + 1); ?></span>
-                <span class="ope-prog-stat-pp"><?php echo (int) $coste; ?> PP</span>
+                <span class="gbe-prog-stat-next">→ <?php echo (int)($val + 1); ?></span>
+                <span class="gbe-prog-stat-pp"><?php echo (int) $coste; ?> PP</span>
                 <?php if ($bloqueado_nivel): ?>
-                <span class="ope-prog-stat-nopp ope-prog-stat-nopp--lvl">¡Necesitas subir de nivel!</span>
+                <span class="gbe-prog-stat-nopp gbe-prog-stat-nopp--lvl">¡Necesitas subir de nivel!</span>
                 <?php elseif ($puede_subir): ?>
-                <form method="post" action="progresion.php" class="ope-prog-form-inline">
+                <form method="post" action="progresion.php" class="gbe-prog-form-inline">
                   <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
                   <input type="hidden" name="stat" value="<?php echo $sk; ?>">
                   <input type="hidden" name="gastar" value="1">
-                  <button type="submit" class="ope-btn ope-btn-sm ope-btn-hot ope-prog-btn-up">Subir (+1)</button>
+                  <button type="submit" class="gbe-btn gbe-btn-sm gbe-btn-hot gbe-prog-btn-up">Subir (+1)</button>
                 </form>
                 <?php else: ?>
-                <span class="ope-prog-stat-nopp">(necesitas <?php echo $coste; ?> PP)</span>
+                <span class="gbe-prog-stat-nopp">(necesitas <?php echo $coste; ?> PP)</span>
                 <?php endif; ?>
               <?php endif; ?>
             </div>
@@ -438,18 +438,18 @@ header('Content-Type: text/html; charset=utf-8');
 
   <!-- ═══ COLUMNAS: HAKI | (RACHA + PP) ═══ -->
   <?php
-  if (function_exists('ope_racha_get')) {
-      require_once MYBB_ROOT . 'inc/ope_rol_rachas.php';
+  if (function_exists('gbe_racha_get')) {
+      require_once MYBB_ROOT . 'inc/gbe_rol_rachas.php';
   }
-  $racha_data = function_exists('ope_racha_get') ? ope_racha_get($active_pid) : array('racha_dias' => 0);
+  $racha_data = function_exists('gbe_racha_get') ? gbe_racha_get($active_pid) : array('racha_dias' => 0);
   $racha_dias = (int)($racha_data['racha_dias'] ?? 0);
   $racha_hitos = array(7, 14, 21, 30);
   ?>
   <section class="reveal">
-    <div class="ope-prog-cols">
+    <div class="gbe-prog-cols">
 
       <!-- Haki -->
-      <div class="ope-prog-col">
+      <div class="gbe-prog-col">
         <div class="shead shead-sec"><h2>Haki</h2><span class="code">// voluntad</span><span class="rule"></span></div>
         <?php if (!empty($haki_tipos)): ?>
         <?php foreach ($haki_tipos as $tipo_key => $tipo_info):
@@ -469,19 +469,19 @@ header('Content-Type: text/html; charset=utf-8');
           </div>
           <div class="plate-b">
             <p class="mb-8"><?php echo htmlspecialchars_uni($tipo_info['desc']); ?></p>
-            <div class="ope-haki-bar">
+            <div class="gbe-haki-bar">
               <?php for ($i = 1; $i <= 4; $i++): ?>
-              <span class="ope-haki-dot<?php echo $i <= $nivel ? ' ope-haki-dot--on' : ''; ?>">Nv.<?php echo $i; ?></span>
+              <span class="gbe-haki-dot<?php echo $i <= $nivel ? ' gbe-haki-dot--on' : ''; ?>">Nv.<?php echo $i; ?></span>
               <?php endfor; ?>
             </div>
             <?php if ($nivel >= 4): ?>
-              <p class="ope-haki-max">&#9733; Nivel Supremo alcanzado</p>
+              <p class="gbe-haki-max">&#9733; Nivel Supremo alcanzado</p>
             <?php elseif ($tipo_key === 'haoshoku' && $nivel >= 1): ?>
-              <p class="ope-haki-pl">Haoshoku se mejora con Puntos de Leyenda (PL), no con PP.</p>
+              <p class="gbe-haki-pl">Haoshoku se mejora con Puntos de Leyenda (PL), no con PP.</p>
             <?php elseif ($bloqueado): ?>
-              <p class="ope-haki-locked">Requiere nivel <?php echo $requiere; ?> (tienes <?php echo $nivel_actual; ?>)</p>
+              <p class="gbe-haki-locked">Requiere nivel <?php echo $requiere; ?> (tienes <?php echo $nivel_actual; ?>)</p>
             <?php elseif ($sin_pp): ?>
-              <p class="ope-haki-locked">Necesitas <?php echo $coste; ?> PP (tienes <?php echo (int)$pp_data['pp_disponible']; ?>)</p>
+              <p class="gbe-haki-locked">Necesitas <?php echo $coste; ?> PP (tienes <?php echo (int)$pp_data['pp_disponible']; ?>)</p>
             <?php else: ?>
               <form method="post" action="progresion.php">
                 <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
@@ -494,44 +494,44 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
         <?php endforeach; ?>
         <?php else: ?>
-        <div class="plate"><div class="plate-b"><p class="ope-prog-muted">El sistema de Haki no está disponible.</p></div></div>
+        <div class="plate"><div class="plate-b"><p class="gbe-prog-muted">El sistema de Haki no está disponible.</p></div></div>
         <?php endif; ?>
       </div>
 
       <!-- Racha diaria + Puntos de Progreso -->
-      <div class="ope-prog-col">
+      <div class="gbe-prog-col">
         <div class="shead shead-sec"><h2>Racha diaria</h2><span class="code">// <?php echo $racha_dias; ?> días</span><span class="rule"></span></div>
         <div class="plate"><div class="plate-b">
-          <div class="ope-racha-bar">
+          <div class="gbe-racha-bar">
             <?php foreach ($racha_hitos as $hito):
               $alcanzado = $racha_dias >= $hito;
               $flag = "recompensa_dia{$hito}";
               $cobrado = $racha_data[$flag] ?? 0;
-              $cls = $cobrado ? 'ope-racha-dot--cobrado' : ($alcanzado ? 'ope-racha-dot--on' : '');
+              $cls = $cobrado ? 'gbe-racha-dot--cobrado' : ($alcanzado ? 'gbe-racha-dot--on' : '');
             ?>
-            <div class="ope-racha-dot <?php echo $cls; ?>">
-              <span class="ope-racha-dot-dia">Día <?php echo $hito; ?></span>
-              <span class="ope-racha-dot-estado"><?php echo $cobrado ? '✓ Cobrado' : ($alcanzado ? 'Disponible' : ''); ?></span>
+            <div class="gbe-racha-dot <?php echo $cls; ?>">
+              <span class="gbe-racha-dot-dia">Día <?php echo $hito; ?></span>
+              <span class="gbe-racha-dot-estado"><?php echo $cobrado ? '✓ Cobrado' : ($alcanzado ? 'Disponible' : ''); ?></span>
             </div>
             <?php endforeach; ?>
           </div>
-          <p class="ope-racha-note">Postea al menos una vez cada 48h para mantener la racha. Si fallas, vuelve a 0.</p>
+          <p class="gbe-racha-note">Postea al menos una vez cada 48h para mantener la racha. Si fallas, vuelve a 0.</p>
         </div></div>
 
         <div class="shead shead-sec"><h2>Puntos de Progreso</h2><span class="code">// desglose</span><span class="rule"></span></div>
-        <div class="ope-prog-ppbar ope-prog-ppbar--stack">
-          <div class="ope-prog-ppbar-total">
-            <span class="ope-prog-ppbar-val"><?php echo $pp_data['pp_disponible']; ?></span>
-            <span class="ope-prog-ppbar-label">PP disponibles</span>
+        <div class="gbe-prog-ppbar gbe-prog-ppbar--stack">
+          <div class="gbe-prog-ppbar-total">
+            <span class="gbe-prog-ppbar-val"><?php echo $pp_data['pp_disponible']; ?></span>
+            <span class="gbe-prog-ppbar-label">PP disponibles</span>
           </div>
-          <div class="ope-prog-ppbar-detail">
-            <div class="ope-prog-ppbar-stat">
-              <span class="ope-prog-ppbar-num"><?php echo $pp_data['pp_total']; ?></span>
-              <span class="ope-prog-ppbar-lbl">Total ganados</span>
+          <div class="gbe-prog-ppbar-detail">
+            <div class="gbe-prog-ppbar-stat">
+              <span class="gbe-prog-ppbar-num"><?php echo $pp_data['pp_total']; ?></span>
+              <span class="gbe-prog-ppbar-lbl">Total ganados</span>
             </div>
-            <div class="ope-prog-ppbar-stat">
-              <span class="ope-prog-ppbar-num"><?php echo $pp_data['pp_gastado']; ?></span>
-              <span class="ope-prog-ppbar-lbl">Gastados</span>
+            <div class="gbe-prog-ppbar-stat">
+              <span class="gbe-prog-ppbar-num"><?php echo $pp_data['pp_gastado']; ?></span>
+              <span class="gbe-prog-ppbar-lbl">Gastados</span>
             </div>
           </div>
         </div>
@@ -542,15 +542,15 @@ header('Content-Type: text/html; charset=utf-8');
 
   <!-- ═══ COLUMNAS: HISTORIAL | COSTES ═══ -->
   <section class="reveal">
-    <div class="ope-prog-cols">
+    <div class="gbe-prog-cols">
 
       <!-- Historial -->
-      <div class="ope-prog-col">
+      <div class="gbe-prog-col">
         <div class="shead shead-sec"><h2>Historial</h2><span class="code">// últ. movimientos</span><span class="rule"></span></div>
         <?php if (!empty($pp_log)): ?>
         <div class="plate">
-          <div class="plate-b ope-prog-plate-nopad">
-            <table class="ope-prog-log">
+          <div class="plate-b gbe-prog-plate-nopad">
+            <table class="gbe-prog-log">
               <thead>
                 <tr><th>Fecha</th><th>Tipo</th><th>PP</th><th>Detalle</th></tr>
               </thead>
@@ -565,10 +565,10 @@ header('Content-Type: text/html; charset=utf-8');
                 $tipo_str = $tipo_label[$log['tipo']] ?? $log['tipo'];
                 $palabras_str = $log['palabras'] > 0 ? " ({$log['palabras']} palabras)" : '';
               ?>
-                <tr class="<?php echo $cambio > 0 ? 'ope-prog-log-gan' : 'ope-prog-log-gas'; ?>">
+                <tr class="<?php echo $cambio > 0 ? 'gbe-prog-log-gan' : 'gbe-prog-log-gas'; ?>">
                   <td><?php echo date('d/m/Y', (int) $log['dateline']); ?></td>
                   <td><?php echo htmlspecialchars_uni($tipo_str); ?></td>
-                  <td class="ope-prog-log-pp"><?php echo $cambio > 0 ? '+' . $cambio : $cambio; ?></td>
+                  <td class="gbe-prog-log-pp"><?php echo $cambio > 0 ? '+' . $cambio : $cambio; ?></td>
                   <td><?php echo htmlspecialchars_uni($log['notas'] . $palabras_str); ?></td>
                 </tr>
               <?php endforeach; ?>
@@ -577,26 +577,26 @@ header('Content-Type: text/html; charset=utf-8');
           </div>
         </div>
         <?php else: ?>
-        <div class="plate"><div class="plate-b"><p class="ope-prog-muted">Aún no hay movimientos de PP registrados.</p></div></div>
+        <div class="plate"><div class="plate-b"><p class="gbe-prog-muted">Aún no hay movimientos de PP registrados.</p></div></div>
         <?php endif; ?>
       </div>
 
       <!-- Costes de Stats -->
-      <div class="ope-prog-col">
+      <div class="gbe-prog-col">
         <div class="shead shead-sec"><h2>Costes de Stats</h2><span class="code">// referencia INI-04</span><span class="rule"></span></div>
         <div class="plate">
-          <div class="plate-b ope-prog-plate-nopad">
-            <table class="ope-prog-log">
+          <div class="plate-b gbe-prog-plate-nopad">
+            <table class="gbe-prog-log">
               <thead>
                 <tr><th>Tramo</th><th>Coste por punto</th><th>Ejemplo</th></tr>
               </thead>
               <tbody>
-                <tr><td>5 – 20</td><td class="ope-prog-log-pp">1 PP</td><td>Subir de 12 a 13 cuesta 1 PP</td></tr>
-                <tr><td>21 – 40</td><td class="ope-prog-log-pp">2 PP</td><td>Subir de 25 a 26 cuesta 2 PP</td></tr>
-                <tr><td>41 – 60</td><td class="ope-prog-log-pp">3 PP</td><td>Subir de 50 a 51 cuesta 3 PP</td></tr>
-                <tr><td>61 – 80</td><td class="ope-prog-log-pp">5 PP</td><td>Subir de 70 a 71 cuesta 5 PP</td></tr>
-                <tr><td>81 – 100</td><td class="ope-prog-log-pp">8 PP</td><td>Subir de 90 a 91 cuesta 8 PP</td></tr>
-                <tr><td>101+</td><td class="ope-prog-log-pp">12 PP</td><td>Subir de 105 a 106 cuesta 12 PP</td></tr>
+                <tr><td>5 – 20</td><td class="gbe-prog-log-pp">1 PP</td><td>Subir de 12 a 13 cuesta 1 PP</td></tr>
+                <tr><td>21 – 40</td><td class="gbe-prog-log-pp">2 PP</td><td>Subir de 25 a 26 cuesta 2 PP</td></tr>
+                <tr><td>41 – 60</td><td class="gbe-prog-log-pp">3 PP</td><td>Subir de 50 a 51 cuesta 3 PP</td></tr>
+                <tr><td>61 – 80</td><td class="gbe-prog-log-pp">5 PP</td><td>Subir de 70 a 71 cuesta 5 PP</td></tr>
+                <tr><td>81 – 100</td><td class="gbe-prog-log-pp">8 PP</td><td>Subir de 90 a 91 cuesta 8 PP</td></tr>
+                <tr><td>101+</td><td class="gbe-prog-log-pp">12 PP</td><td>Subir de 105 a 106 cuesta 12 PP</td></tr>
               </tbody>
             </table>
           </div>

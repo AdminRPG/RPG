@@ -1,14 +1,14 @@
-# Tarea 2: Core ope_rol_mundo.php — Mundo Vivo v3
+# Tarea 2: Core gbe_rol_mundo.php — Mundo Vivo v3
 
 ## Contexto
-Archivo: `inc/ope_rol_mundo.php` (1149 líneas actualmente)
+Archivo: `inc/gbe_rol_mundo.php` (1149 líneas actualmente)
 Este archivo contiene toda la lógica del sistema Mundo Vivo.
 La migración BD v3 ya se ejecutó (las columnas cli, riq, inf, ten, pol, alc, threads_json, nav_resumen, tipo_suceso, pe_estimado, datos_publicos, datos_internos existen).
 Tienes que leer el archivo actual y aplicar TODOS los cambios abajo.
 
 ## Cambios a hacer
 
-### 1. `ope_rol_mv_zona_metrics()` — 10 métricas
+### 1. `gbe_rol_mv_zona_metrics()` — 10 métricas
 Reemplazar el array actual (7 keys: est,mar,pir,rev,eco,civ,pel) por 10 keys en este orden:
 
 ```php
@@ -26,7 +26,7 @@ Reemplazar el array actual (7 keys: est,mar,pir,rev,eco,civ,pel) por 10 keys en 
 
 NOTA: `eco` desaparece del array (era prosperidad económica de zona, ahora reemplazada por `riq`).
 
-### 2. `ope_rol_mv_faccion_metrics()` — 7 métricas
+### 2. `gbe_rol_mv_faccion_metrics()` — 7 métricas
 Reemplazar el array actual (6 keys) por 7 keys:
 
 ```php
@@ -41,20 +41,20 @@ Reemplazar el array actual (6 keys) por 7 keys:
 
 NOTA: `inf` (vieja influencia política) desaparece, ahora es `pol`.
 
-### 3. `ope_rol_mv_npc_mayores()`
+### 3. `gbe_rol_mv_npc_mayores()`
 Añadir `datos_publicos` y `datos_internos` al SELECT. Actualizar el fetch para decodificar ambos JSON y añadirlos al array de retorno:
 ```php
 $q = $db->simple_select('rol_personajes', 'pid, nombre, rango, datos, mundo_zona, mundo_ubic, mundo_accion, mundo_estado_np, datos_publicos, datos_internos', "es_npc = 1 AND estado <> 'eliminado'", ...);
 ```
 Al construir el $out, decodificar datos_publicos y datos_internos con json_decode y añadirlos como sub-arrays.
 
-### 4. Nueva función: `ope_rol_mv_threads_activos()`
+### 4. Nueva función: `gbe_rol_mv_threads_activos()`
 Lee el `estado_json` del último ciclo publicado, extrae el array `threads` y lo devuelve.
 
 ```php
-function ope_rol_mv_threads_activos() {
+function gbe_rol_mv_threads_activos() {
     global $db;
-    $ultimo = ope_rol_mv_ultimo_publicado();
+    $ultimo = gbe_rol_mv_ultimo_publicado();
     if (!$ultimo || empty($ultimo['estado_json'])) return array();
     $ej = json_decode($ultimo['estado_json'], true);
     if (!is_array($ej) || !isset($ej['threads']) || !is_array($ej['threads'])) return array();
@@ -62,11 +62,11 @@ function ope_rol_mv_threads_activos() {
 }
 ```
 
-### 5. Nueva función: `ope_rol_mv_ultimos_periodicos($n = 3)`
+### 5. Nueva función: `gbe_rol_mv_ultimos_periodicos($n = 3)`
 Devuelve un array con los últimos N periódicos publicados (ciclo_id, periodo, noticia_titulo, periodico_html truncado a 500 chars).
 
 ```php
-function ope_rol_mv_ultimos_periodicos($n = 3) {
+function gbe_rol_mv_ultimos_periodicos($n = 3) {
     global $db;
     $out = array();
     if (!$db->table_exists('rol_mv_ciclos')) return $out;
@@ -80,11 +80,11 @@ function ope_rol_mv_ultimos_periodicos($n = 3) {
 }
 ```
 
-### 6. Nueva función: `ope_rol_mv_npc_tracking_from_db()`
+### 6. Nueva función: `gbe_rol_mv_npc_tracking_from_db()`
 Construye array clave-valor: `{pid => {salud, moral, plan_activo, ubicacion_zona, meta_actual}}` extrayendo de `datos_internos` de cada NPC mayor.
 
 ```php
-function ope_rol_mv_npc_tracking_from_db() {
+function gbe_rol_mv_npc_tracking_from_db() {
     global $db;
     $out = array();
     $q = $db->simple_select('rol_personajes', 'pid, datos_internos', "es_npc = 1 AND estado <> 'eliminado'");
@@ -97,7 +97,7 @@ function ope_rol_mv_npc_tracking_from_db() {
 }
 ```
 
-### 7. `ope_rol_mv_build_prompt()` — REEMPLAZAR COMPLETAMENTE
+### 7. `gbe_rol_mv_build_prompt()` — REEMPLAZAR COMPLETAMENTE
 Es la función más grande. Reemplazar TODO su contenido con la nueva versión v3.
 
 Lo que debe cambiar:
@@ -108,8 +108,8 @@ Lo que debe cambiar:
 - **Métricas**: describir las 10 de zona y 7 de facción
 - **Tensión**: 15 pares por mar, 0-100
 - **Estado actual**: igual que antes pero incluyendo las nuevas columnas
-- **Hilos narrativos**: añadir sección "HILOS NARRATIVOS ABIERTOS" usando `ope_rol_mv_threads_activos()`
-- **Últimos periódicos**: añadir sección "ÚLTIMOS PERIÓDICOS" usando `ope_rol_mv_ultimos_periodicos(3)`
+- **Hilos narrativos**: añadir sección "HILOS NARRATIVOS ABIERTOS" usando `gbe_rol_mv_threads_activos()`
+- **Últimos periódicos**: añadir sección "ÚLTIMOS PERIÓDICOS" usando `gbe_rol_mv_ultimos_periodicos(3)`
 - **NPCs mayores**: mostrar con formato de datos_internos (personalidad 6 ejes, metas, tracking actual) más datos_publicos (título, descripción)
 - **Contrato de salida**: 5 BLOQUES:
   1. ESTADO_JSON (incluye `threads` y `npc_tracking`)
@@ -130,18 +130,18 @@ Para el ESTADO_JSON, el formato ahora es:
 }
 ```
 
-IMPORTANTE: La función debe construir el prompt leyendo el estado actual con las nuevas 10 métricas. Asegúrate de que el bucle que itera sobre zonas use `ope_rol_mv_zona_metrics()` para obtener las 10 keys, y lo mismo para facciones.
+IMPORTANTE: La función debe construir el prompt leyendo el estado actual con las nuevas 10 métricas. Asegúrate de que el bucle que itera sobre zonas use `gbe_rol_mv_zona_metrics()` para obtener las 10 keys, y lo mismo para facciones.
 
-### 8. `ope_rol_mv_parse_resultado()`
+### 8. `gbe_rol_mv_parse_resultado()`
 - Al validar ESTADO_JSON, permitir que `threads` y `npc_tracking` sean null/opcionales (no son obligatorios para versiones de transición)
 - Si existen, almacenarlos en el resultado
 
-### 9. `ope_rol_mv_aplicar_estado()`
-- Los bucles de zona y facción usan `ope_rol_mv_zona_metrics()` y `ope_rol_mv_faccion_metrics()` — se actualizan automáticamente porque esas funciones devuelven las nuevas 10/7 keys
+### 9. `gbe_rol_mv_aplicar_estado()`
+- Los bucles de zona y facción usan `gbe_rol_mv_zona_metrics()` y `gbe_rol_mv_faccion_metrics()` — se actualizan automáticamente porque esas funciones devuelven las nuevas 10/7 keys
 - Asegurarse de que el clamp de `inf` y `ten` usa 0-100 (ya que son nuevas)
 - Para facciones: `pol` y `alc` son 0-100
 
-### 10. `ope_rol_mv_publicar()`
+### 10. `gbe_rol_mv_publicar()`
 Después de aplicar el estado (paso 1), añadir:
 
 **a) Guardar threads_json en el ciclo:**
@@ -188,11 +188,11 @@ if (isset($parsed['estado']['npc_tracking']) && is_array($parsed['estado']['npc_
 
 **e) NO tocar las columnas viejas** (mundo_zona, mundo_ubic, mundo_accion, mundo_estado_np) — se mantienen como legacy.
 
-### 11. Constante OPE_MV_TENSION_MAX_UP
+### 11. Constante GBE_MV_TENSION_MAX_UP
 Cambiar de 20 a 15 (según topes v3 §2.4):
-Buscar `defined('OPE_MV_TENSION_MAX_UP')` y cambiar el fallback:
+Buscar `defined('GBE_MV_TENSION_MAX_UP')` y cambiar el fallback:
 ```php
-$capUp = defined('OPE_MV_TENSION_MAX_UP') ? (int) OPE_MV_TENSION_MAX_UP : 15;
+$capUp = defined('GBE_MV_TENSION_MAX_UP') ? (int) GBE_MV_TENSION_MAX_UP : 15;
 ```
 
 ## Reglas generales
@@ -206,4 +206,4 @@ $capUp = defined('OPE_MV_TENSION_MAX_UP') ? (int) OPE_MV_TENSION_MAX_UP : 15;
 - Usar `JSON_UNESCAPED_UNICODE` en json_encode para caracteres UTF-8
 
 ## Archivo a modificar
-`C:\Users\Fgonz\Documents\Proyectos\I-Forge-RPG\inc\ope_rol_mundo.php`
+`C:\Users\Fgonz\Documents\Proyectos\I-Forge-RPG\inc\gbe_rol_mundo.php`

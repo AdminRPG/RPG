@@ -16,7 +16,7 @@ $loggedin = (int) ($mybb->user['uid'] ?? 0) > 0;
 $uid      = (int) ($mybb->user['uid'] ?? 0);
 
 $staff = $loggedin
-    ? ope_rol_active_staff($uid)
+    ? gbe_rol_active_staff($uid)
     : array('rank' => 0, 'narrador' => 0, 'is_staff' => false, 'nombre' => '');
 $rank = (int) $staff['rank'];
 
@@ -125,11 +125,11 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> &middot; Gestionar NPC</title>
-<?php echo ope_rol_head_base(); ?>
+<?php echo gbe_rol_head_base(); ?>
 </head>
-<body class="ope-pg-zona-staff ope-pg-gestionar-npc">
+<body class="gbe-pg-zona-staff gbe-pg-gestionar-npc">
 
-<?php echo ope_rol_navbar_html(); ?>
+<?php echo gbe_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">

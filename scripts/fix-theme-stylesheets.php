@@ -1,7 +1,7 @@
 <?php
 /**
  * Corrige la columna mybb_themes.stylesheets (mapa compilado) que MyBB usa para
- * reconstruir la caché default_theme. Renombra iforge.css -> ope.css de forma
+ * reconstruir la caché default_theme. Renombra iforge.css -> gbe.css de forma
  * segura para la serialización y limpia la caché para que se regenere.
  *   php scripts/fix-theme-stylesheets.php
  */
@@ -17,11 +17,11 @@ $res = $db->query("SELECT tid, stylesheets FROM mybb_themes WHERE stylesheets LI
 while ($row = $res->fetch_assoc()) {
     $map = @unserialize($row['stylesheets']);
     if (is_array($map)) {
-        $map = deep_replace($map, 'iforge.css', 'ope.css');
+        $map = deep_replace($map, 'iforge.css', 'gbe.css');
         $ser = $db->real_escape_string(serialize($map));
         $tid = (int)$row['tid'];
         $db->query("UPDATE mybb_themes SET stylesheets='{$ser}' WHERE tid={$tid}");
-        echo "THEME {$tid}: columna stylesheets iforge.css -> ope.css\n";
+        echo "THEME {$tid}: columna stylesheets iforge.css -> gbe.css\n";
     }
 }
 
