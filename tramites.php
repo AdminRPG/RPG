@@ -53,7 +53,7 @@ $tramites = array(
         'cat'      => 'mundo',
         'cat_lbl'  => 'Mundo Vivo',
         'icon'     => '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
-        'body'     => 'Compra objetos, consumibles, mejoras y artículos especiales para tu personaje. Usa tus berries para equiparte y prepararte para la aventura.',
+        'body'     => 'Compra objetos, consumibles, mejoras y artículos especiales para tu personaje. Usa tus rupias para equiparte y prepararte para la aventura.',
         'meta'     => '// tienda del foro',
         'link'     => 'tienda.php',
         'link_lbl' => 'Ir a la tienda',

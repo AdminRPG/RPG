@@ -190,15 +190,10 @@ header('Content-Type: text/html; charset=utf-8');
 
           <h3>Paso 1: Raza y Nombre</h3>
           <ul>
-            <li><strong>Humano</strong> — Equilibrado. Versátil en cualquier situación.</li>
-            <li><strong>Gyojin</strong> — Fuerza y velocidad en el agua. Respira bajo el mar.</li>
-            <li><strong>Skypiean</strong> — Agilidad y planeo. Acceso a tecnología Dial.</li>
-            <li><strong>Gigante</strong> — Fuerza colosal. Devastador en combate.</li>
-            <li><strong>Mink</strong> — Electro natural y agilidad felina. Lealtad absoluta.</li>
-            <li><strong>Lunarian</strong> — Fuego corporal y vuelo. Raza casi extinta.</li>
-            <li><strong>Sirena</strong> — Velocidad submarina extrema. Comunicación con peces.</li>
-            <li><strong>Bucaneer</strong> — Fuerza y resistencia. Estirpe marcada.</li>
-            <li><strong>Tontatta</strong> — Sigilo y agilidad. Diminuto y letal.</li>
+            <li><strong>Humano</strong> — Equilibrado. Versátil en cualquier situación y de gran fuerza de voluntad.</li>
+            <li><strong>Erune</strong> — Orejas de animal, ágiles y con gran afinidad para la magia y las artes del éter.</li>
+            <li><strong>Draph</strong> — Cuernos prominentes, fuerza física colosal y complexión robusta, ideales para el combate.</li>
+            <li><strong>Harvin</strong> — Estatura diminuta, gran intelecto y agilidad, maestros de la estrategia y la tecnología.</li>
           </ul>
 
           <h3>Paso 2: Stats por Arquetipo</h3>
@@ -1657,11 +1652,11 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="g-sub">// empieza en 2 minutos</div>
 
           <h3>Granblue Fantasy: Eternal en 2 Minutos</h3>
-          <p>La Reina Pirata ha sido capturada por el Gobierno Mundial y su ejecución es inminente. El trono del Rey de los Piratas está vacante. <strong>Tus acciones cambian el mundo.</strong> Cada 15 días publicamos una Crónica del Mundo. Tu personaje puede salir en ella.</p>
+          <p>Una gran tormenta de éter agita los Skydoms y el Imperio de Erste extiende su influencia por todo el cielo. <strong>Tus acciones cambian el cielo.</strong> Cada 15 días publicamos una Crónica del Mundo. Tu personaje puede salir en ella.</p>
 
           <h3>Crear tu Personaje (30 segundos)</h3>
-          <p><strong>Elige una raza:</strong> Humano, Gyojin, Mink, Skypiean, Gigante, Tontatta, Brazos Largos, Piernas Largas o Tres Ojos.</p>
-          <p><strong>Elige una facción:</strong> Pirata, Marine, Revolucionario, Cazarrecompensas, Civil o Agente Encubierto (Cipher Pol).</p>
+          <p><strong>Elige una raza:</strong> Humano, Erune, Draph o Harvin.</p>
+          <p><strong>Elige una facción:</strong> Skyfarer, Ejército Imperial, La Sociedad, Gremio de Cazadores o Civil.</p>
           <p><strong>Asigna stats:</strong> Elige un arquetipo (Guerrero→FUE+VIG, Tirador→DES+PUN, Espadachín→FUE+DES, etc.).</p>
           <p><strong>Dale un nombre y una frase de historia.</strong> ¡Ya tienes personaje!</p>
 
