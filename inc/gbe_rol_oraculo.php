@@ -67,9 +67,9 @@ function gbe_oraculo_mesa_encuentros()
 function gbe_oraculo_mesa_hallazgos()
 {
     return array(
-        array('max' => 12, 'key' => 'poneglyph',   'nombre' => 'Poneglyph fragmentado',       'icon' => '🗿', 'efecto' => 'Historia antigua. Requiere Arqueólogo/Navegante para descifrar.', 'tone' => 'great'),
+        array('max' => 12, 'key' => 'poneglyph',   'nombre' => 'Fragmento de ruina astral',    'icon' => '🗿', 'efecto' => 'Historia antigua. Requiere Arqueólogo/Navegante para descifrar.', 'tone' => 'great'),
         array('max' => 24, 'key' => 'isla_flot',   'nombre' => 'Isla flotante oculta',        'icon' => '🏝', 'efecto' => 'Parada opcional. Botín o NPC único.', 'tone' => 'great'),
-        array('max' => 36, 'key' => 'cofre',       'nombre' => 'Cofre flotante sellado',      'icon' => '💰', 'efecto' => 'Berries o objeto de tienda (tirada D100).', 'tone' => 'good'),
+        array('max' => 36, 'key' => 'cofre',       'nombre' => 'Cofre flotante sellado',      'icon' => '💰', 'efecto' => 'Rupias o objeto de tienda (tirada D100).', 'tone' => 'good'),
         array('max' => 48, 'key' => 'mapa',        'nombre' => 'Mapa náutico deteriorado',    'icon' => '🗺', 'efecto' => 'Ventaja en próximo viaje entre estas islas.', 'tone' => 'good'),
         array('max' => 58, 'key' => 'mensaje',     'nombre' => 'Mensaje en botella',          'icon' => '📜', 'efecto' => 'Pista de misión, tesoro o personaje.', 'tone' => 'good'),
         array('max' => 68, 'key' => 'recursos',    'nombre' => 'Banco de peces exóticos',     'icon' => '🐟', 'efecto' => 'Cocinero: comida premium. Suministros +15%.', 'tone' => 'good'),

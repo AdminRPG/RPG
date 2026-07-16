@@ -185,7 +185,9 @@ if ($pid > 0 && $mybb->request_method === 'post'
                 if (isset($PACKS[$pack_equipo])) {
                     $inventario['pack_equipo'] = $pack_equipo;
                 }
-                $economia['berries'] = max(0, (int) $mybb->get_input('berries', MyBB::INPUT_INT));
+                $rupies = max(0, (int) $mybb->get_input('rupies', MyBB::INPUT_INT));
+                $economia['rupies'] = $rupies;
+                $economia['berries'] = $rupies;
 
                 $bio['concepto']   = gp_clean($mybb->get_input('bio_concepto'), 4000);
                 $bio['pasado']     = gp_clean($mybb->get_input('bio_pasado'), 8000);
@@ -666,7 +668,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endforeach; ?>
           </select>
         </label>
-        <label class="gp-field"><span>Berries</span><input type="number" name="berries" min="0" value="<?php echo (int)($economia['berries'] ?? 0); ?>"></label>
+        <label class="gp-field"><span>Rupias</span><input type="number" name="rupies" min="0" value="<?php echo (int)($economia['rupies'] ?? $economia['berries'] ?? 0); ?>"></label>
       </div>
 <?php if (!empty($inventario['arma']) || !empty($inventario['objeto_personal'])): ?>
       <p class="mono fs-68 c-dim mt-8">Equipo heredado del sistema antiguo (solo lectura): <?php echo htmlspecialchars_uni(trim(($inventario['arma'] ?? '') . ' — ' . ($inventario['objeto_personal'] ?? ''), ' —')); ?></p>

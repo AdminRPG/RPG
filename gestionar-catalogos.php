@@ -2,7 +2,7 @@
 /**
  * I-Forge · Gestionar Catálogos (Zona Staff · Administrador)
  * CRUD unificado de todos los catálogos del foro en una sola página con
- * subsecciones: Tienda, Tripulaciones, Akuma no Mi, Bestiario y Estilos.
+ * subsecciones: Tienda, Tripulaciones, Pactos Primarios, Bestiario y Estilos.
  *
  * El comportamiento es genérico y está dirigido por $CATALOGOS: añadir un
  * catálogo nuevo es declarar su tabla y sus campos.
@@ -28,7 +28,7 @@ $cat_prod_opts = gbe_rol_cat_categoria_labels();
 $rareza_opts = array('Común' => 'Común', 'Raro' => 'Raro', 'Épico' => 'Épico', 'Legendario' => 'Legendario');
 $dif_opts = array('Baja' => 'Baja', 'Media' => 'Media', 'Alta' => 'Alta', 'Legendaria' => 'Legendaria');
 $peligro_opts = array('Bajo' => 'Bajo', 'Moderado' => 'Moderado', 'Alto' => 'Alto', 'Extremo' => 'Extremo');
-$tipo_akuma_opts = array('paramecia' => 'Paramecia', 'zoa' => 'Zoan', 'logia' => 'Logia');
+$tipo_akuma_opts = array('paramecia' => 'Conceptual (Paramecia)', 'zoa' => 'Bestia Primal (Zoan)', 'logia' => 'Elemental (Logia)');
 $est_cat_opts = array('Combate' => 'Combate', 'Defensa' => 'Defensa', 'Percepción' => 'Percepción', 'Apoyo' => 'Apoyo');
 
 // ── Definición de catálogos ──
@@ -65,15 +65,15 @@ $CATALOGOS = array(
         ),
     ),
     'akuma' => array(
-        'table' => 'rol_akuma', 'label' => 'Akuma no Mi', 'sing' => 'fruta',
+        'table' => 'rol_akuma', 'label' => 'Pactos Primarios', 'sing' => 'pacto',
         'sub' => array('tipo', 'usuario'),
         'fields' => array(
             'nombre'      => array('t' => 'text', 'l' => 'Nombre', 'req' => true, 'w' => 2),
             'tipo'        => array('t' => 'select', 'l' => 'Tipo', 'opts' => $tipo_akuma_opts),
             'rareza'      => array('t' => 'select', 'l' => 'Rareza', 'opts' => $rareza_opts),
             'usuario'     => array('t' => 'text', 'l' => 'Usuario actual', 'w' => 2),
-            'descripcion' => array('t' => 'textarea', 'l' => 'Poder / descripción', 'w' => 2),
-            'despertar'   => array('t' => 'textarea', 'l' => 'Despertar', 'w' => 2),
+            'descripcion' => array('t' => 'textarea', 'l' => 'Pacto / descripción', 'w' => 2),
+            'despertar'   => array('t' => 'textarea', 'l' => 'Trascendencia', 'w' => 2),
             'debilidad'   => array('t' => 'text', 'l' => 'Debilidad', 'w' => 2),
             'imagen'      => array('t' => 'text', 'l' => 'URL de imagen', 'w' => 2),
             'orden'       => array('t' => 'number', 'l' => 'Orden'),

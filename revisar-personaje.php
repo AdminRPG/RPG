@@ -420,7 +420,7 @@ header('Content-Type: text/html; charset=utf-8');
 
           <!-- EQUIPO -->
           <div class="sheet-block mb-14">
-            <div class="sheet-block-h">Equipo · <?php echo htmlspecialchars_uni(number_format((int)($economia['berries'] ?? 0))); ?> berries</div>
+            <div class="sheet-block-h">Equipo · <?php echo htmlspecialchars_uni(number_format((int)($economia['rupies'] ?? $economia['berries'] ?? 0))); ?> rupias</div>
             <div class="sheet-block-b">
               <?php
                 $rp_packs   = gbe_rol_packs_equipo();

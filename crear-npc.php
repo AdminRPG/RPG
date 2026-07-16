@@ -537,7 +537,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate">
         <div class="plate-h"><span class="t">6. Equipo inicial</span><span class="c">// elige el Pack</span></div>
         <div class="plate-b">
-          <p class="hint mb-12">Elige el Pack de Equipo Inicial que mejor se adapte al concepto del NPC. Todos incluyen vestimenta básica de viaje, raciones para 5 días y <b class="c-paper">50.000 berries</b> iniciales.</p>
+          <p class="hint mb-12">Elige el Pack de Equipo Inicial que mejor se adapte al concepto del NPC. Todos incluyen vestimenta básica de viaje, raciones para 5 días y <b class="c-paper">50.000 rupias</b> iniciales.</p>
           <div class="race-grid" id="packGrid">
 <?php foreach ($PACKS as $pid => $p): ?>
             <label class="race-card">
@@ -550,7 +550,7 @@ header('Content-Type: text/html; charset=utf-8');
             </label>
 <?php endforeach; ?>
           </div>
-          <div class="wiz-sum-bar">Berries iniciales: <b id="berriesOut">50.000</b></div>
+          <div class="wiz-sum-bar">Rupias iniciales: <b id="rupiesOut">50.000</b></div>
           <p class="hint">Sin Fruta del Diablo ni Haki al inicio (se obtienen en juego).</p>
         </div>
       </div>
@@ -836,13 +836,13 @@ header('Content-Type: text/html; charset=utf-8');
     if (r2c) r2c.disabled = !(r1c && r1c.checked) && !r2c.checked;
     if (r3c) r3c.disabled = !(r2c && r2c.checked) && !r3c.checked;
 
-    // berries live
-    var berries = 50000;
-    if (r1c && r1c.checked) berries += 1000000;
-    if (r2c && r2c.checked) berries += 3000000;
-    if (r3c && r3c.checked) berries += 10000000;
-    var out = document.getElementById('berriesOut');
-    if (out) out.textContent = berries.toLocaleString('es-ES');
+    // rupies live
+    var rupies = 50000;
+    if (r1c && r1c.checked) rupies += 1000000;
+    if (r2c && r2c.checked) rupies += 3000000;
+    if (r3c && r3c.checked) rupies += 10000000;
+    var out = document.getElementById('rupiesOut');
+    if (out) out.textContent = rupies.toLocaleString('es-ES');
   }
   document.querySelectorAll('input[data-coste],input[data-devuelve]').forEach(function(c){
     c.addEventListener('change', function(){
@@ -914,7 +914,7 @@ header('Content-Type: text/html; charset=utf-8');
       '<div class="line"><b>Nivel inicial</b>1 (el nivel se gana jugando)</div></div>' +
       '<div class="sum-block"><h4>Virtudes (' + virtudesNames.length + ')</h4><div class="line">' + (virtudesNames.join(', ') || 'Ninguna') + '</div></div>' +
       '<div class="sum-block"><h4>Defectos (' + defectosNames.length + ')</h4><div class="line">' + (defectosNames.join(', ') || 'Ninguno') + '</div></div>' +
-      '<div class="sum-block"><h4>Equipo</h4><div class="line"><b>Pack</b>' + packTxt + '</div><div class="line"><b>Berries</b>' + document.getElementById('berriesOut').textContent + '</div></div>';
+      '<div class="sum-block"><h4>Equipo</h4><div class="line"><b>Pack</b>' + packTxt + '</div><div class="line"><b>Rupias</b>' + document.getElementById('rupiesOut').textContent + '</div></div>';
   }
 
   showStep(1);

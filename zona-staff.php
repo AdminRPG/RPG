@@ -193,7 +193,7 @@ $zonas = array(
         'icon'  => '<path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6Z"/><path d="M12 8v4l2 2"/>'),
     array('grp' => 'administrador', 'code' => 'STF-11',
         'title' => 'Gestionar cat&aacute;logos',
-        'body'  => 'Administra en un solo sitio todos los cat&aacute;logos del foro: la <b>Tienda</b> (Bazar), las <b>Tripulaciones</b> y las bibliotecas de <b>Akuma no Mi</b>, <b>Bestiario</b> y <b>Estilos</b>. Crea, edita, muestra u oculta cada entrada.',
+        'body'  => 'Administra en un solo sitio todos los cat&aacute;logos del foro: la <b>Tienda</b> (Bazar), las <b>Tripulaciones</b> y las bibliotecas de <b>Pactos Primarios</b>, <b>Bestiario</b> y <b>Estilos</b>. Crea, edita, muestra u oculta cada entrada.',
         'meta'  => '', 'cta' => 'Gestionar', 'badge' => 0, 'href' => $bburl . '/gestionar-catalogos.php',
         'icon'  => '<path d="M4 4h7v7H4Z"/><path d="M13 4h7v7h-7Z"/><path d="M4 13h7v7H4Z"/><path d="M13 13h7v7h-7Z"/>'),
     array('grp' => 'administrador', 'code' => 'STF-12',

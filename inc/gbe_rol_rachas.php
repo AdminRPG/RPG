@@ -64,7 +64,9 @@ function gbe_racha_procesar_post($pid) {
                     if ($db->num_rows($pj_q)) {
                         $eco = json_decode((string)$db->fetch_field($pj_q, 'economia'), true);
                         if (!is_array($eco)) $eco = array();
-                        $eco['berries'] = ((int)($eco['berries'] ?? 0)) + $r['berries'];
+                        $total_rupies = ((int)($eco['rupies'] ?? $eco['berries'] ?? 0)) + $r['berries'];
+                        $eco['rupies'] = $total_rupies;
+                        $eco['berries'] = $total_rupies;
                         $db->update_query('rol_personajes', array('economia' => $db->escape_string(json_encode($eco, JSON_UNESCAPED_UNICODE))), "pid = {$pid}");
                     }
                     $update[$flag] = 1;
