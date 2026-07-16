@@ -30,15 +30,15 @@
 | Assets globales | `crest-eternal.png`, `hero-*.jpg`, `cloud-layer-1.png` | Decoración sitio, no PJs |
 | BD foros | El Cielo → Skydoms → islas + Off Topic GBF | `restructure-skydoms.php` |
 | Rebrand visible | `bbname`, lore portada | `rebrand-gbe.php` |
-| **F2b parcial** | Tokens GBF, carrusel, `body.gbe-index`, gaceta bento, secciones `.gbe-section`, ficha v4, fuentes GBF en head | Ver §6.7 DESIGN — aún no paridad 100% |
+| **F2b Portado visual MyBB** | Paridad de portada, gbe.css, gbe-index.xml, index.php, ficha.php, sync-theme. | Portada idéntica al prototipo, purga brutalista y scaffolding completo en páginas PHP RPG core (viajes, guías, trámites, personajes, revisión). |
+| **F1 Purga parcial** | Migración BD y activación plugin | Columnas MySQL rename a gbe_ y activación del plugin `gbe_rol` en datacache. |
 
 ### Pendiente ⏳
 
 | Área | Bloqueo / siguiente paso |
 |---|---|
-| **F2b cierre portada** | QA visual vs prototipo; tema `cielo`/`noche`; forumdisplay/showthread (resto foro) |
-| Páginas PHP RPG | `tramites`, `progresion`, `crear-personaje`, etc. — scaffolding GBF |
-| Purga `ope`/`iforge` | F1: `rename-gbe.php --apply` + renombrar archivos físicos + plugin |
+| **F2b Resto del Foro** | Estilizar forumdisplay.php (listado de hilos por isla) y showthread.php (posts/diario de vuelo) con tokens GBE. |
+| Purga `ope`/`iforge` | F1 completo: `rename-gbe.php --apply` + renombrar archivos físicos restantes. |
 | Assets Skydom | `skydom-zeephone.jpg`, `skydom-estalucia.jpg` |
 | Wizard GBF | F3 — razas, clases, elemento, arma en `crear-personaje.php` |
 | BD mecánicas | `rol_clases`, `rol_renombre`, `rol_pactos`, `elemento`, `nave_json` |
@@ -502,9 +502,9 @@ Detalle completo en `MIGRACION-GRANBLUE-TECNICA.md`. Resumen:
 |---|---|---|---|---|
 | **F0** | Decisiones | ✅ | Cuestionario §12 | §0.1 |
 | **F2a** | Prototipo HTML | ✅ | index v3.2 + ficha v4 + assets globales | `docs/Prototypes/Granblue/` |
-| **F2b** | Portado visual MyBB | ⏳ **EN CURSO** | `gbe.css`, `gbe-index.xml`, `index.php`, `ficha.php`, sync-theme | Paridad portada con prototipo |
+| **F2b** | Portado visual MyBB | ⏳ **PARCIAL** | `gbe.css`, `gbe-index.xml`, `index.php`, `ficha.php`, sync-theme | Portada en paridad, scaffolding de PHP core hecho. Queda forumdisplay/showthread. |
 | **F2c** | DESIGN + PRODUCT GBF | ✅ | `DESIGN-GRANBLUE-ETERNAL.md`, `PRODUCT.md` | Fuente de verdad §5 |
-| **F1** | Purga codename | ⏳ | `rename-gbe.php`, greps, bbname, Lyria bot | Cero `ope`/`iforge` |
+| **F1** | Purga codename | ⏳ **PARCIAL** | `rename-gbe.php`, rename DB tables, plugins | Columnas DB y plugin active migrados a gbe_. Pendiente script de purga global de archivos. |
 | **F3** | Datos y catálogos | ⏳ | razas, facciones, clases, elementos, Skydoms en wizard | `crear-personaje.php` GBF |
 | **F4** | Poder único + combate | ⏳ | `rol_pactos`, triángulo elemental en motor | Build GBF |
 | **F5** | Mundo y misiones | ⏳ | Mundo Vivo reskin, Órdenes de Gremio | Aventuras |
