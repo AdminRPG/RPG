@@ -24,6 +24,11 @@ if (!$is_staff && $uid !== 1) {
     exit;
 }
 
+// Auto-check: asegurar que la columna 'narrador' existe en rol_cuentas
+if ($db->table_exists('rol_cuentas') && !$db->field_exists('narrador', 'rol_cuentas')) {
+    $db->write_query("ALTER TABLE " . TABLE_PREFIX . "rol_cuentas ADD COLUMN narrador TINYINT(1) NOT NULL DEFAULT 0");
+}
+
 $flash = '';
 $flash_ok = false;
 

@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS {$PREFIX}rol_cuentas (
     staff_level TINYINT NOT NULL DEFAULT 0 COMMENT '0=ninguno,1=narrador,2=moderador,3=administrador',
     slots INT NOT NULL DEFAULT 1,
     personaje_activo INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'pid del personaje activo',
+    narrador TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1=Narrador oficial',
     datos JSON NULL,
     dateline INT UNSIGNED NOT NULL DEFAULT 0,
     PRIMARY KEY (uid),
