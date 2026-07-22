@@ -85,8 +85,11 @@ header('Content-Type: text/html; charset=utf-8');
     if (!items.length){ grid.innerHTML = '<div class="bib-empty">No se encontraron frutas.</div>'; return; }
     grid.innerHTML = items.map(function(p){
       var i = data.indexOf(p);
+      var ownerText = p.ocupada_pid > 0
+        ? '<a href="' + BB + '/ficha.php?pid=' + p.ocupada_pid + '" onclick="event.stopPropagation();" style="color:inherit;text-decoration:underline;"><b>' + esc(p.usuario || ('Personaje #' + p.ocupada_pid)) + '</b></a>'
+        : '<b>' + esc(p.usuario) + '</b>';
       var usuHtml = (p.ocupada_pid > 0 || p.usuario)
-        ? '<div class="bib-card-meta"><span class="ope-tag-usada">En uso · <b>'+esc(p.usuario||'Personaje #'+p.ocupada_pid)+'</b></span></div>'
+        ? '<div class="bib-card-meta"><span class="ope-tag-usada">En uso · ' + ownerText + '</span></div>'
         : '<div class="bib-card-meta"><span class="ope-tag-libre">Libre</span></div>';
       return '<article class="bib-card tipo-'+esc(p.tipo_base)+'" data-i="'+i+'" tabindex="0" role="button" aria-label="'+esc(p.nombre)+'">'
         + '<div class="bib-card-media">'+media(p)

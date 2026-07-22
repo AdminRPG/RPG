@@ -472,6 +472,17 @@ function ope_fruta_norm(array $r, $can_see_details = false)
         $usuario = '';
     }
 
+    $ocupada_pid = (int) ($r['ocupada_pid'] ?? 0);
+    if ($ocupada_pid > 0 && $usuario === '') {
+        global $db;
+        if (isset($db) && $db->table_exists('rol_personajes')) {
+            $pq = $db->simple_select('rol_personajes', 'nombre', "pid = {$ocupada_pid}", array('limit' => 1));
+            if ($pq && $db->num_rows($pq)) {
+                $usuario = (string) $db->fetch_field($pq, 'nombre');
+            }
+        }
+    }
+
     return array(
         'id'          => (int) ($r['id'] ?? 0),
         'nombre'      => (string) ($r['nombre'] ?? ''),
@@ -488,7 +499,7 @@ function ope_fruta_norm(array $r, $can_see_details = false)
         'despertar'   => (string) ($r['despertar'] ?? ''),
         'caps'        => $caps,
         'origen'      => $origen,
-        'ocupada_pid' => (int) ($r['ocupada_pid'] ?? 0),
+        'ocupada_pid' => $ocupada_pid,
         'usuario'     => $usuario,
         'imagen'      => (string) ($r['imagen'] ?? ''),
     );
@@ -545,7 +556,8 @@ JS;
         . $helpers . "\n"
         . 'function open(p){' . "\n"
         . 'var poss;if(p.ocupada_pid>0){poss=\'<a href="\'+BB+"/ficha.php?pid="+p.ocupada_pid+\'">\'+esc(p.usuario||("Personaje #"+p.ocupada_pid))+"</a>";}'
-        . 'else if(p.usuario){poss=esc(p.usuario);}else{poss=\'<span class="fruta-libre">Libre</span>\';}' . "\n"
+        . 'else if(p.usuario){poss=esc(p.usuario);}'
+        . 'else{poss=\'<span class="fruta-libre">Libre</span>\';}' . "\n"
         . 'var grid=row("Tipo",esc(p.tipo||LBL[p.tipo_base]||""))+row("Stat de Potencia","TEM + "+esc(p.secundario||"—"))+row("Poseedor",poss);' . "\n"
         . 'var blocks=block("Concepto",p.desc)+block("Efecto general",p.efecto)+block("Fórmula de Potencia",p.potencia,true)+block("Debilidades",p.debilidad)+block("Despertar",p.despertar)+(p.caps?capsHtml(p.caps):"");' . "\n"
         . 'detail.innerHTML=\'<button type="button" class="bib-d-close" aria-label="Cerrar">\\u2715</button>\''
