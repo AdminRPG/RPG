@@ -132,7 +132,7 @@ $stats_counts = array('total' => 0, 'aprobado' => 0, 'revision' => 0, 'rechazado
 
 if ($db->table_exists('rol_personajes')) {
     $pref = TABLE_PREFIX;
-    $sql = "SELECT p.*, u.username AS owner_name, f.nombre_id AS fruta_nombre, f.fruta_id, ak.imagen AS fruta_imagen, ak.tipo AS fruta_tipo
+    $sql = "SELECT p.*, u.username AS owner_name, ak.nombre AS fruta_nombre, f.fruta_id, ak.imagen AS fruta_imagen, ak.tipo AS fruta_tipo
             FROM {$pref}rol_personajes p
             LEFT JOIN {$pref}users u ON u.uid = p.uid
             LEFT JOIN {$pref}rol_pj_fruta f ON f.pid = p.pid
@@ -232,6 +232,14 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
 
     <div class="zs-pj-grid" id="pjGrid">
+<?php if (empty($personajes)): ?>
+      <div style="grid-column:1/-1;text-align:center;padding:40px 20px;background:var(--iron-hi);border:1px dashed var(--rivet);border-radius:12px;">
+        <div style="font-size:2.5rem;margin-bottom:8px;">🏴‍☠️</div>
+        <div style="font-family:var(--disp);font-size:1.1rem;color:var(--paper);font-weight:bold;margin-bottom:6px;">No hay personajes registrados en la base de datos</div>
+        <p style="color:var(--paper-dim);font-size:.88rem;margin-bottom:16px;">Acabas de limpiar los personajes de prueba o aún no se ha creado ninguna ficha.</p>
+        <a href="<?php echo $bburl; ?>/crear-personaje.php" class="btn btn-hot btn-sm">+ Crear nuevo personaje</a>
+      </div>
+<?php endif; ?>
 <?php foreach ($personajes as $pj):
     $st = (string) ($pj['estado'] ?? 'borrador');
     $initial = function_exists('mb_substr') ? mb_strtoupper(mb_substr($pj['nombre'], 0, 1)) : strtoupper(substr($pj['nombre'], 0, 1));
