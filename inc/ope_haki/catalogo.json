@@ -1,0 +1,161 @@
+{
+  "version": "1.0",
+  "cartas": {
+    "haki.ken.mantener": {
+      "id": "haki.ken.mantener",
+      "tipo": "ken",
+      "nombre": "Mantener Observación",
+      "nivel_min": 1,
+      "pa": 0,
+      "en_base": 8,
+      "en_pot": 1,
+      "fuente": "haki"
+    },
+    "haki.ken.anticipar": {
+      "id": "haki.ken.anticipar",
+      "tipo": "ken",
+      "nombre": "Anticipar",
+      "nivel_min": 4,
+      "pa": 1,
+      "en_base": 15,
+      "en_pot": 2,
+      "fuente": "haki"
+    },
+    "haki.ken.flash": {
+      "id": "haki.ken.flash",
+      "tipo": "ken",
+      "nombre": "Flash de Futuro",
+      "nivel_min": 5,
+      "pa": 1,
+      "en_base": 25,
+      "en_pot": 3,
+      "fuente": "haki"
+    },
+    "haki.buso.imbuir": {
+      "id": "haki.buso.imbuir",
+      "tipo": "buso",
+      "nombre": "Imbuir",
+      "nivel_min": 1,
+      "pa": 0,
+      "en_base": 12,
+      "en_pot": 1,
+      "fuente": "haki"
+    },
+    "haki.buso.blindar": {
+      "id": "haki.buso.blindar",
+      "tipo": "buso",
+      "nombre": "Blindar",
+      "nivel_min": 1,
+      "pa": 0,
+      "en_base": 10,
+      "en_pot": 1,
+      "fuente": "haki"
+    },
+    "haki.buso.emision": {
+      "id": "haki.buso.emision",
+      "tipo": "buso",
+      "nombre": "Emisión",
+      "nivel_min": 4,
+      "pa": 1,
+      "en_base": 20,
+      "en_pot": 2,
+      "fuente": "haki"
+    },
+    "haki.buso.flujo": {
+      "id": "haki.buso.flujo",
+      "tipo": "buso",
+      "nombre": "Flujo Interno",
+      "nivel_min": 5,
+      "pa": 0,
+      "en_base": 10,
+      "en_pot": 0,
+      "fuente": "haki"
+    },
+    "haki.hao.presencia": {
+      "id": "haki.hao.presencia",
+      "tipo": "hao",
+      "nombre": "Presencia del Rey",
+      "nivel_min": 1,
+      "pa": 2,
+      "en_base": 40,
+      "en_pot": 3,
+      "fuente": "haki"
+    },
+    "haki.hao.imposicion": {
+      "id": "haki.hao.imposicion",
+      "tipo": "hao",
+      "nombre": "Imposición",
+      "nivel_min": 2,
+      "pa": 1,
+      "en_base": 25,
+      "en_pot": 2,
+      "fuente": "haki"
+    },
+    "haki.hao.choque": {
+      "id": "haki.hao.choque",
+      "tipo": "hao",
+      "nombre": "Choque de Voluntades",
+      "nivel_min": 3,
+      "pa": 1,
+      "en_base": 30,
+      "en_pot": 2,
+      "fuente": "haki"
+    },
+    "haki.hao.infusion": {
+      "id": "haki.hao.infusion",
+      "tipo": "hao",
+      "nombre": "Infusión de Objetos",
+      "nivel_min": 4,
+      "pa": 1,
+      "en_base": 35,
+      "en_pot": 2,
+      "fuente": "haki"
+    },
+    "haki.hao.rayo": {
+      "id": "haki.hao.rayo",
+      "tipo": "hao",
+      "nombre": "Rayo del Conquistador",
+      "nivel_min": 5,
+      "pa": 2,
+      "en_base": 50,
+      "en_pot": 4,
+      "fuente": "haki"
+    },
+    "haki.hao.manto": {
+      "id": "haki.hao.manto",
+      "tipo": "hao",
+      "nombre": "Manto del Soberano",
+      "nivel_min": 6,
+      "pa": 1,
+      "en_base": 20,
+      "en_pot": 2,
+      "fuente": "haki"
+    }
+  },
+  "niveles": {
+    "ken": {
+      "1": {"nombre": "Latido", "pp": 80, "tramo": 1, "nivel_pj": 8, "cu": 0, "excepcion_t1": true},
+      "2": {"nombre": "Premonición", "pp": 120, "tramo": 2, "nivel_pj": 11, "cu": 15},
+      "3": {"nombre": "Eco Emocional", "pp": 180, "tramo": 3, "nivel_pj": 21, "cu": 40},
+      "4": {"nombre": "Mirada Clara", "pp": 240, "tramo": 4, "nivel_pj": 31, "cu": 80},
+      "5": {"nombre": "Visión del Futuro", "pp": 320, "tramo": 5, "nivel_pj": 41, "cu": 140}
+    },
+    "buso": {
+      "1": {"nombre": "Piel de Voluntad", "pp": 100, "tramo": 2, "nivel_pj": 11, "cu": 0},
+      "2": {"nombre": "Golpe Verdadero", "pp": 150, "tramo": 2, "nivel_pj": 15, "cu": 20},
+      "3": {"nombre": "Manto Invisible", "pp": 200, "tramo": 3, "nivel_pj": 21, "cu": 50},
+      "4": {"nombre": "Emisión", "pp": 280, "tramo": 4, "nivel_pj": 31, "cu": 100},
+      "5": {"nombre": "Penetración Interna", "pp": 360, "tramo": 5, "nivel_pj": 41, "cu": 160}
+    },
+    "hao": {
+      "1": {"nombre": "Presencia del Rey", "pp": 150, "tramo": 3, "nivel_pj": 21, "cu": 0},
+      "2": {"nombre": "Imposición", "pp": 200, "tramo": 3, "nivel_pj": 25, "cu": 10},
+      "3": {"nombre": "Choque de Voluntades", "pp": 260, "tramo": 4, "nivel_pj": 31, "cu": 25},
+      "4": {"nombre": "Infusión de Objetos", "pp": 320, "tramo": 4, "nivel_pj": 35, "cu": 45},
+      "5": {"nombre": "Rayo del Conquistador", "pp": 400, "tramo": 5, "nivel_pj": 41, "cu": 70},
+      "6": {"nombre": "Manto del Soberano", "pp": 500, "tramo": 5, "nivel_pj": 45, "cu": 100, "requiere_d": true}
+    }
+  },
+  "secundario": {"ken": "PER", "buso": "RES", "hao": "CAR"},
+  "labels": {"ken": "Kenbunshoku", "buso": "Busoshoku", "hao": "Haoshoku"}
+}

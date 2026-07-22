@@ -1,0 +1,135 @@
+{
+  "id": "identidad-fantasma",
+  "nombre": "Fantasma",
+  "tipo": "identidad",
+  "version": "3.0",
+  "recurso_secundario": "Impulso",
+  "recurso_base": "Generas 1 Impulso al completar tu movimiento libre en un turno, 1 Impulso al esquivar un ataque con éxito, y 1 Impulso al terminar un turno enemigo sin haber recibido daño (máx. 1 por turno enemigo). Tope base 6; si en un turno no generas Impulso (ni te mueves ni esquivas) y además encajas daño, pierde 1 carga. Se gasta a través de nodos y técnicas.",
+  "resumen_arquetipo": "Fantasma es la filosofía de que si no pueden alcanzarte, no pueden vencerte: movilidad, evasión, golpear y desaparecer, y sembrar el caos para que el rival nunca sepa dónde estás, sin importar qué Arma empuñe el personaje.",
+  "rol_mecanico": "Movilidad y evasión. Acumula Impulso esquivando y moviéndose, y lo libera en golpes sorpresa, reposicionamiento y desorientación.",
+  "corrientes": [
+    { "clave": "Sombra", "simbolo": "α", "filosofia": "Evadir. Generar Impulso esquivando y desaparecer de la vista; romper la línea de visión para que no puedas ser objetivo." },
+    { "clave": "Sorpresa", "simbolo": "β", "filosofia": "Golpear. Gastar Impulso en golpes letales desde posición oculta o por el flanco, donde el rival no puede defenderse." },
+    { "clave": "Humo", "simbolo": "γ", "filosofia": "Desorientar. Cegar, crear caos y negar información; el rival ataca a ciegas mientras tú controlas lo que sabe." }
+  ],
+  "focos": ["Sombra", "Sorpresa", "Humo"],
+  "nodos": [
+    {
+      "id": "fantasma-sombra-t1", "codigo": "Fa-α1", "nombre": "Paso Evasivo",
+      "tier": 1, "foco": "Sombra", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cada vez que esquivas un ataque con éxito, generas +1 Impulso adicional (además del base). Además, la primera esquiva de cada combate genera 2 Impulso en vez de 1 (tu instinto se afila en cuanto empieza el peligro).",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-sorpresa-t1", "codigo": "Fa-β1", "nombre": "Golpe Oportuno",
+      "tier": 1, "foco": "Sorpresa", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus ataques contra un objetivo que no te tiene como objetivo actual (lo golpeas por el flanco, o mientras estás fuera de su línea de visión) ignoran un 20% de su mitigación física y generan +1 Impulso.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-humo-t1", "codigo": "Fa-γ1", "nombre": "Estela de Humo",
+      "tier": 1, "foco": "Humo", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cuando realizas tu movimiento libre, dejas una cortina de confusión en tu punto de origen: el próximo enemigo que ataque desde o a través de esa zona este turno lo hace como si su Gap fuera un tramo inferior (COMBATE §2.3). Si terminas el desplazamiento rompiendo la línea de visión de un enemigo, generas +1 Impulso.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-sombra-t2", "codigo": "Fa-α2", "nombre": "Velo de Sombra",
+      "tier": 2, "foco": "Sombra", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas que consuman Impulso para romper la línea de visión y desaparecer del campo visual del rival: mientras estés oculto no puedes ser objetivo de ataques dirigidos hasta que actúes o el enemigo te localice (Gap PER, NUMEROS-Y-BALANCE §7).",
+      "profundidad": "Si ya tienes Paso Evasivo (α1), al desaparecer de este modo generas +1 Impulso.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-sorpresa-t2", "codigo": "Fa-β2", "nombre": "Emboscada",
+      "tier": 2, "foco": "Sorpresa", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas que consuman Impulso para asestar un golpe sorpresa desde posición oculta o por el flanco, añadiendo daño puro que ignora mitigación física, escalando con el Impulso gastado (presupuesto según NUMEROS-Y-BALANCE §7).",
+      "profundidad": "Si ya tienes Golpe Oportuno (β1), estas técnicas, al consumir ≥4 Impulso, aplican Marcado además de su efecto.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-humo-t2", "codigo": "Fa-γ2", "nombre": "Bruma Cegadora",
+      "tier": 2, "foco": "Humo", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas que consuman Impulso para lanzar cegadoras de área (humo, arena, destellos, polvo) que aplican el estado Cegado a los enemigos alcanzados y les niegan información mientras dure.",
+      "profundidad": "Si ya tienes Estela de Humo (γ1), estas técnicas generan +1 Impulso por cada enemigo Cegado.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-sombra-t3", "codigo": "Fa-α3", "nombre": "Cuerpo de Niebla",
+      "tier": 3, "foco": "Sombra", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu tope de Impulso sube de 6 a 9 y el Impulso ya no decae por inacción durante el combate: persiste hasta que lo gastes.",
+      "profundidad": "Si ya tienes Velo de Sombra (α2), permanecer oculto (fuera de la línea de visión enemiga) al final de un turno genera +1 Impulso.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-sorpresa-t3", "codigo": "Fa-β3", "nombre": "Depredador Silencioso",
+      "tier": 3, "foco": "Sorpresa", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Mientras no seas objetivo de un ataque desde tu último turno (permaneces oculto o no detectado), tu ventaja se acumula: tras 1 turno sin ser detectado, tu próximo golpe sorpresa no puede ser esquivado; tras 2+ turnos, además ignora reacciones defensivas (Defender/parry). El contador se reinicia al ser golpeado o detectado.",
+      "profundidad": "Si ya tienes Emboscada (β2), mientras estés oculto tus técnicas de emboscada cuestan la mitad de Impulso.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-humo-t3", "codigo": "Fa-γ3", "nombre": "Desorientación",
+      "tier": 3, "foco": "Humo", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus ataques contra objetivos Cegados (o que no te tienen en su línea de visión) ignoran un 30% de su mitigación y generan +1 Impulso.",
+      "profundidad": "Si ya tienes Bruma Cegadora (γ2), tus cegadoras prolongan el Cegado 1 turno adicional sobre objetivos que ya estaban Cegados.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-sombra-t4", "codigo": "Fa-α4", "nombre": "Evasión Perfecta",
+      "tier": 4, "foco": "Sombra", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de reacción evasiva (declaradas fuera de tu turno, al ser atacado) que consuman Impulso para anular por completo un ataque entrante (esquiva garantizada, tratada como Gap ≥ 0); el número de ataques evadibles en la reacción escala con el Impulso gastado.",
+      "profundidad": "Si ya tienes Cuerpo de Niebla (α3), tras una evasión perfecta quedas oculto (rompes la línea de visión) hasta que actúes.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-sorpresa-t4", "codigo": "Fa-β4", "nombre": "Asalto Fantasma",
+      "tier": 4, "foco": "Sorpresa", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Cuando asestas un golpe desde posición oculta o por el flanco, el objetivo no puede reaccionar contra él (ni Defender, ni parry, ni esquiva declarada). Además, si ese golpe deja al objetivo por debajo del 25% de sus PV, recuperas el Impulso que hubieras gastado en él.",
+      "profundidad": "Si ya tienes Depredador Silencioso (β3), tus golpes sorpresa contra un objetivo que aún no te ha detectado aplican Marcado.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-humo-t4", "codigo": "Fa-γ4", "nombre": "Caos Total",
+      "tier": 4, "foco": "Humo", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cada vez que aplicas Cegado a un enemigo o rompes su línea de visión hacia ti, tu siguiente golpe contra él ignora un 25% de mitigación y no puede ser esquivado (no puede verte venir).",
+      "profundidad": "Si ya tienes Desorientación (γ3), golpear a un enemigo Cegado mantiene además su Cegado 1 turno adicional.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-pinaculo-sombra", "codigo": "Fa-★α", "nombre": "Fantasma Absoluto",
+      "tier": 5, "foco": "Sombra", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus técnicas de evasión perfecta ya no tienen tope de ataques evadibles por Impulso gastado, y cuando anulas por completo un ataque de este modo, conservas el Impulso que ibas a gastar.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Sombra",
+      "afinidad_bonus": "la primera vez cada ronda que serías golpeado, esquivas automáticamente sin gastar Impulso ni acción.",
+      "prereq": [], "excluye": ["fantasma-pinaculo-sorpresa", "fantasma-pinaculo-humo"], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-pinaculo-sorpresa", "codigo": "Fa-★β", "nombre": "Golpe del Vacío",
+      "tier": 5, "foco": "Sorpresa", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus golpes sorpresa ya no tienen tope de escalado por Impulso. Además, cuando un golpe sorpresa reduce a un objetivo a 0 PV, conservas todo el Impulso que ibas a consumir y quedas oculto de inmediato (rompes la línea de visión).",
+      "profundidad": "", "pinaculo": true, "afinidad": "Sorpresa",
+      "afinidad_bonus": "todos tus golpes sorpresa aplican Marcado.",
+      "prereq": [], "excluye": ["fantasma-pinaculo-sombra", "fantasma-pinaculo-humo"], "decision": false, "terminal": false
+    },
+    {
+      "id": "fantasma-pinaculo-humo", "codigo": "Fa-★γ", "nombre": "Niebla Eterna",
+      "tier": 5, "foco": "Humo", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Envuelves el campo en bruma perpetua: mientras estés en combate, cualquier enemigo que no te tenga en línea de visión directa te trata como oculto, y tus técnicas de cegadora afectan a cualquier número de enemigos en el área.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Humo",
+      "afinidad_bonus": "cada enemigo Cegado te genera +1 Impulso al inicio de tu turno, y tus cegadoras aplican Cegado con +1 turno de duración.",
+      "prereq": [], "excluye": ["fantasma-pinaculo-sombra", "fantasma-pinaculo-sorpresa"], "decision": false, "terminal": false
+    }
+  ]
+}

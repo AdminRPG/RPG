@@ -1,4 +1,4 @@
-# Antigravity (Gemini IDE) — I-Forge-RPG
+# Antigravity (Gemini IDE) — One Piece: Eternal
 
 Antigravity **no** carga automáticamente las reglas de Cursor. Usa este documento para configurar sesiones de trabajo en el mismo repo.
 
@@ -20,7 +20,7 @@ Adjunta o fija en cada sesión de UI/RPG:
 ## Prompt de arranque (copiar al iniciar chat)
 
 ```
-Proyecto Granblue Fantasy: Eternal — foro MyBB + PHP en C:\Users\Fgonz\Documents\Proyectos\I-Forge-RPG
+Proyecto One Piece: Eternal — foro MyBB + PHP en C:\Users\Fgonz\Documents\Proyectos\One Piece: Eternal
 
 OBLIGATORIO antes de código UI:
 - Leer AGENTS.md y docs/AGENTES-Y-HERRAMIENTAS.md
@@ -37,7 +37,7 @@ Explorar código: py -m graphify query "pregunta"  (grafo en graphify-out/)
 
 PowerShell: separar comandos con ; no &&
 
-No estilo One Piece brutalista. Tokens GBF claros/acuarela (Relink).
+No estilo One Piece brutalista. Tokens OPE claros/acuarela (Relink).
 ```
 
 ---
@@ -49,7 +49,7 @@ No estilo One Piece brutalista. Tokens GBF claros/acuarela (Relink).
 ```
 Sigue docs/AGENTES-Y-HERRAMIENTAS.md §2.
 Prototipo: docs/Prototypes/Granblue/[archivo].html
-Producción: [gbe-index.xml | ficha.php | gbe.css | index.php]
+Producción: [ope-index.xml | ficha.php | ope.css | index.php]
 No marcar hecho sin comparación visual lado a lado y sync-theme verify OK.
 ```
 
@@ -57,7 +57,7 @@ No marcar hecho sin comparación visual lado a lado y sync-theme verify OK.
 
 ```
 Sigue DESIGN-GRANBLUE-ETERNAL.md §5 y docs/GUIA-ESTILOS-PHP.md.
-body.gbe-pg-<slug> + scaffolding GBF en gbe.css (sin bordes negros 2px OP).
+body.ope-pg-<slug> + scaffolding OPE en ope.css (sin bordes negros 2px OP).
 ```
 
 ### Solo backend / BD

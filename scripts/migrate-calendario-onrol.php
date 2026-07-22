@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Migración del Calendario On-Rol (mybb_rol_calendario)
+ * One Piece: Eternal · Migración del Calendario On-Rol (mybb_rol_calendario)
  * ---------------------------------------------------------------
  * Crea la tabla que almacena las anotaciones del staff sobre los días
  * del calendario on-rol (4 estaciones × 65 días = 260 días/año).

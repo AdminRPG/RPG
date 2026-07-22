@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Seed: NPCs Civiles y Neutros de la Era 4
+ * One Piece: Eternal · Seed: NPCs Civiles y Neutros de la Era 4
  *
  * Tres NPCs secundarios con roles clave durante el arco de Marineford.
  * Idempotente (INSERT o UPDATE segun slug).
@@ -120,7 +120,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/gils_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/gils_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/gils_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/gils_personalidad.txt'),
     'mundo_zona' => 'paraiso',
     'mundo_ubic' => 'Archipielago Sabaody -- Mercado Negro, Grove 23',
@@ -145,7 +145,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/varg_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/varg_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/varg_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/varg_personalidad.txt'),
     'mundo_zona' => 'paraiso',
     'mundo_ubic' => 'Sabaody -- Taberna del Cazador',
@@ -170,7 +170,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/oakhaven_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/oakhaven_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/oakhaven_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/oakhaven_personalidad.txt'),
     'mundo_zona' => 'paraiso',
     'mundo_ubic' => 'Mary Geoise -- Palacio de la Familia Oakhaven',

@@ -1,0 +1,135 @@
+{
+  "id": "arma-cuerpo",
+  "nombre": "Cuerpo",
+  "tipo": "arma",
+  "version": "3.0",
+  "recurso_secundario": "Combo",
+  "recurso_base": "Cada golpe de Cuerpo consecutivo que conecta sin interrupción genera una cadena de Combo que escala el daño (+5% daño base por golpe en la cadena, máx. +25% al 5.º golpe). Si el personaje recibe daño o falla un ataque, el combo se rompe y reinicia.",
+  "resumen_arquetipo": "Cuerpo cubre artes marciales, puñetazos, patadas, codos, rodillas y cualquier forma de combate sin arma (o con el propio cuerpo como arma, incluyendo escudo si se usa como extensión del cuerpo). Su efecto inherente base son los Combos: cada golpe consecutivo que conecta alarga la cadena y aumenta el daño.",
+  "rol_mecanico": "Combos: encadenar golpes en ráfaga, concentrar toda la fuerza en un impacto o agarrar y someter con el cuerpo.",
+  "corrientes": [
+    { "clave": "Ráfaga", "simbolo": "α", "filosofia": "Más golpes, más rápido. Encadenar sin parar, alargar el combo al máximo." },
+    { "clave": "Impacto marcial", "simbolo": "β", "filosofia": "Un solo golpe con todo el cuerpo. Artes internas, concentrar fuerza en un punto." },
+    { "clave": "Presa", "simbolo": "γ", "filosofia": "Agarrar con el cuerpo. Sometimiento, inmovilización, lucha en el suelo." }
+  ],
+  "focos": ["Ráfaga", "Impacto marcial", "Presa"],
+  "nodos": [
+    {
+      "id": "cuerpo-rafaga-t1", "codigo": "U-α1", "nombre": "Tren de Golpes",
+      "tier": 1, "foco": "Ráfaga", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu combo no se rompe si fallas 1 ataque (solo se rompe al fallar 2 consecutivos o al recibir daño). Además, al alcanzar el 5.º golpe del combo, el siguiente golpe aplica automáticamente Ralentizado 1 turno al objetivo.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-impacto-marcial-t1", "codigo": "U-β1", "nombre": "Golpe Concentrado",
+      "tier": 1, "foco": "Impacto marcial", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Si gastas tu turno completo en un solo ataque de Cuerpo (no encadenas, solo 1 golpe con todo tu PA disponible), ese golpe gana +50% de daño base y ignora 15% de mitigación física. El combo no avanza (no es un combo, es un impacto único).",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-presa-t1", "codigo": "U-γ1", "nombre": "Agarre",
+      "tier": 1, "foco": "Presa", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus ataques de Cuerpo contra un objetivo adyacente (a menos de 1m) pueden intentar un agarre: si tu Gap FUE FUE ≥ 0 contra el objetivo, queda Enraizado y no puede alejarse de ti hasta romper el agarre (Gap FUE del agarrado ≥ Gap del agarrador). Mientras agarras, no puedes atacar a otros objetivos.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-rafaga-t2", "codigo": "U-α2", "nombre": "Ráfaga Imparable",
+      "tier": 2, "foco": "Ráfaga", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de Cuerpo que permitan atacar múltiples veces en una sola acción (combo empaquetado). Cada golpe de la ráfaga avanza el combo normalmente. El número de golpes por acción depende del presupuesto de la técnica.",
+      "profundidad": "Si ya tienes Tren de Golpes (α1), las técnicas de ráfaga no rompen el combo aunque uno de los golpes falle.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-impacto-marcial-t2", "codigo": "U-β2", "nombre": "Impacto Interior",
+      "tier": 2, "foco": "Impacto marcial", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de Cuerpo de golpe único devastador que ignoren toda la mitigación física de armadura (solo cuenta la mitigación natural del stat de Resistencia). Estas técnicas no avanzan el combo.",
+      "profundidad": "Si ya tienes Golpe Concentrado (β1), estas técnicas también aplican Rotura de Guardia (1 carga) al impactar, como si fueran un arma Contundente.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-presa-t2", "codigo": "U-γ2", "nombre": "Llave",
+      "tier": 2, "foco": "Presa", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de Cuerpo que, estando en agarre, inflijan daño por turno al objetivo agarrado (presión de la llave). El daño por turno ignora mitigación de armadura. El agarrado solo puede intentar romper el agarre o rendirse.",
+      "profundidad": "Si ya tienes Agarre (γ1), las técnicas de llave también reducen la Agilidad efectiva del agarrado en −3 mientras dure la llave (la posición del agarre le impide reaccionar).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-rafaga-t3", "codigo": "U-α3", "nombre": "Combo Infinito",
+      "tier": 3, "foco": "Ráfaga", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "El tope de tu combo pasa de +25% (5 golpes) a sin tope: cada golpe consecutivo sigue sumando +5% de daño base indefinidamente. Además, a partir del 8.º golpe del combo, cada golpe aplica Ralentizado 1 turno al objetivo (acumulable en duración).",
+      "profundidad": "Si ya tienes Ráfaga Imparable (α2), las técnicas de ráfaga cuentan cada golpe individual para el avance del combo (una ráfaga de 3 golpes avanza el combo en 3, no en 1).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-impacto-marcial-t3", "codigo": "U-β3", "nombre": "Punto Vital",
+      "tier": 3, "foco": "Impacto marcial", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Al usar un golpe único concentrado (por Golpe Concentrado, Impacto Interior o cualquier técnica de un solo golpe), puedes declarar un Punto Vital del objetivo. Si tu Gap PER ≥ +3 contra el objetivo, el golpe aplica un estado específico según el punto vital declarado: cabeza → Aturdimiento 1 turno, brazo → −2 Gap FUE 2 turnos, pierna → Ralentizado 2 turnos.",
+      "profundidad": "Si ya tienes Impacto Interior (β2), la condición de Gap PER baja a ≥ 0 en vez de ≥ +3.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-presa-t3", "codigo": "U-γ3", "nombre": "Sometimiento",
+      "tier": 3, "foco": "Presa", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Mientras tengas a un objetivo en agarre, puedes cambiar la posición de la llave una vez por turno (sin gastar PA): de pie (limita movimiento), en el suelo (limita ataques), o estrangulación (limita todo, pero tú tampoco puedes hacer nada más). Cada posición tiene un efecto mecánico distinto: pie = Enraizado, suelo = −2 PA, estrangulación = ambos efectos pero tú también pierdes −1 PA.",
+      "profundidad": "Si ya tienes Llave (γ2), cambiar de posición de llave inflige automáticamente 1 turno de daño de llave al objetivo (como acción gratuita).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-rafaga-t4", "codigo": "U-α4", "nombre": "Huracán",
+      "tier": 4, "foco": "Ráfaga", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de Cuerpo de ráfaga final: consumen todo tu combo acumulado. El daño de la técnica se multiplica por 1 + (eslabones del combo × 0,1) (10 eslabones = ×2,0). Tras la ráfaga final, el combo se reinicia.",
+      "profundidad": "Si ya tienes Combo Infinito (α3), la ráfaga final no reinicia el combo: conservas los eslabones y puedes seguir encadenando.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-impacto-marcial-t4", "codigo": "U-β4", "nombre": "Golpe Prohibido",
+      "tier": 4, "foco": "Impacto marcial", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu golpe único concentrado ahora puede declararse como Golpe Prohibido: hace daño normal ×2 pero tú recibes el 25% de ese daño como retroceso (el cuerpo no está hecho para canalizar tanta fuerza). Si el objetivo queda a 0 PV, el retroceso se reduce a 0.",
+      "profundidad": "Si ya tienes Punto Vital (β3), el Golpe Prohibido aplica todos los estados de Punto Vital simultáneamente (Aturdimiento + reducción de FUE + Ralentizado), sin necesidad de declararlos por separado.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-presa-t4", "codigo": "U-γ4", "nombre": "Prisión Corporal",
+      "tier": 4, "foco": "Presa", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Mientras tengas a un objetivo en agarre/llave, tu mitigación contra ataques de terceros aumenta en +10 (usas al agarrado como escudo parcial). Además, si un tercero te ataca mientras agarras, puedes elegir que el agarrado reciba el 50% del daño en tu lugar (escudo humano).",
+      "profundidad": "Si ya tienes Sometimiento (γ3), en posición de estrangulación puedes forzar la rendición mecánica del objetivo si su PV está por debajo del 20% (el staff la resuelve como rendición, no como muerte).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-pinaculo-rafaga", "codigo": "U-★α", "nombre": "Puño del Rey",
+      "tier": 5, "foco": "Ráfaga", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu combo ya no se rompe nunca (ni por recibir daño, ni por fallar, ni por cambiar de objetivo). Cada 5 eslabones del combo, tu siguiente golpe aplica automáticamente Aturdimiento 1 turno.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Ráfaga",
+      "afinidad_bonus": "A 10+ eslabones, cada golpe aplica Aturdimiento permanente (cada golpe renueva la duración).",
+      "prereq": [], "excluye": ["cuerpo-pinaculo-impacto-marcial", "cuerpo-pinaculo-presa"], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-pinaculo-impacto-marcial", "codigo": "U-★β", "nombre": "Puño de Dios",
+      "tier": 5, "foco": "Impacto marcial", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu Golpe Concentrado ya no requiere gastar todo el PA en un solo golpe: puedes usarlo como acción normal (1 PA). Mantiene el +50% de daño y la penetración de mitigación. Puedes usar 1 Golpe Concentrado por turno sin retroceso.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Impacto marcial",
+      "afinidad_bonus": "Si un Golpe Concentrado reduce a un objetivo a 0 PV, la onda del impacto aplica Ralentizado y Rotura de Guardia ×2 a todos los enemigos a 3m.",
+      "prereq": [], "excluye": ["cuerpo-pinaculo-rafaga", "cuerpo-pinaculo-presa"], "decision": false, "terminal": false
+    },
+    {
+      "id": "cuerpo-pinaculo-presa", "codigo": "U-★γ", "nombre": "Maestro de la Presa",
+      "tier": 5, "foco": "Presa", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Puedes mantener hasta 2 objetivos en agarre simultáneamente (uno en cada brazo). Además, iniciar un agarre ya no requiere Gap FUE ≥ 0: siempre puedes intentar agarrar, y el agarrado necesita Gap FUE ≥ +3 para romper (en vez de ≥ 0).",
+      "profundidad": "", "pinaculo": true, "afinidad": "Presa",
+      "afinidad_bonus": "Puedes usar técnicas de llave en ambos agarrados simultáneamente con una sola acción.",
+      "prereq": [], "excluye": ["cuerpo-pinaculo-rafaga", "cuerpo-pinaculo-impacto-marcial"], "decision": false, "terminal": false
+    }
+  ]
+}

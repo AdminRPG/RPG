@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Migración de Catálogos (mybb_rol_*)
+ * One Piece: Eternal · Migración de Catálogos (mybb_rol_*)
  * ---------------------------------------------------------------
  * Crea las tablas de los catálogos gestionables por staff que antes vivían
  * como datos mockup dentro de los .php públicos:

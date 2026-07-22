@@ -1,0 +1,135 @@
+{
+  "id": "identidad-duelista",
+  "nombre": "Duelista",
+  "tipo": "identidad",
+  "version": "3.0",
+  "recurso_secundario": "Apertura",
+  "recurso_base": "Generas 1 Apertura al parar (parry) o esquivar un ataque con éxito, cada vez que un enemigo falla un ataque contra ti, y al estudiar a un rival sin recibir daño (acción de Estudio, 0 PA). Tope base 6; si en un turno no generas Apertura, pierde 1 carga. Se gasta a través de los nodos y técnicas de este árbol.",
+  "resumen_arquetipo": "Duelista es la filosofía de que el combate es un intercambio de errores, y el que menos comete decide cuándo termina: precisión que atraviesa defensas, contragolpes que castigan cada fallo y control del tempo del enfrentamiento, sin importar qué Arma empuñe el personaje.",
+  "rol_mecanico": "Precisión / contragolpe reactivo. Acumula Apertura castigando errores y la libera en penetración, remates y control del tempo (Ralentizado).",
+  "corrientes": [
+    { "clave": "Réplica", "simbolo": "α", "filosofia": "Castigar. Generar Apertura explotando cada error del rival y devolver el golpe con contraataques reactivos." },
+    { "clave": "Precisión", "simbolo": "β", "filosofia": "Perforar. Gastar Apertura para ignorar defensas y llevar cortes o golpes quirúrgicos al punto débil." },
+    { "clave": "Presencia", "simbolo": "γ", "filosofia": "Dominar. Imponer tu ritmo, forzar el error ajeno y quebrar el tempo del rival por pura voluntad." }
+  ],
+  "focos": ["Réplica", "Precisión", "Presencia"],
+  "nodos": [
+    {
+      "id": "duelista-replica-t1", "codigo": "Du-α1", "nombre": "Lectura de Combate",
+      "tier": 1, "foco": "Réplica", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cuando paras o esquivas un ataque de un enemigo que ya te atacó antes en este combate (ya leíste su patrón), generas +1 Apertura adicional. Además, tu primera parada o esquiva de cada combate genera 2 Apertura en vez de 1.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-precision-t1", "codigo": "Du-β1", "nombre": "Ojo Quirúrgico",
+      "tier": 1, "foco": "Precisión", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cuando conectas un golpe, tu puntería encuentra la brecha: ese golpe ignora un 5% de mitigación física por cada 2 Apertura acumulada (máx. 15%). La Apertura no se consume al hacerlo.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-presencia-t1", "codigo": "Du-γ1", "nombre": "Duelo de Miradas",
+      "tier": 1, "foco": "Presencia", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Puedes designar a un enemigo como tu rival de duelo (movimiento libre, 0 PA, un solo objetivo a la vez). Mientras lo mantengas como rival, cada turno en el que no recibas daño de él generas +1 Apertura (lo estás leyendo). Cambiar de rival reinicia el foco.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-replica-t2", "codigo": "Du-α2", "nombre": "Contragolpe Calculado",
+      "tier": 2, "foco": "Réplica", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de contraataque de reacción (declaradas fuera de tu turno, tras parar o esquivar un ataque) que consuman Apertura para infligir daño que escala con la Apertura gastada (presupuesto según NUMEROS-Y-BALANCE §7).",
+      "profundidad": "Si ya tienes Lectura de Combate (α1), estos contraataques, al consumir ≥4 Apertura, aplican Marcado 1 turno.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-precision-t2", "codigo": "Du-β2", "nombre": "Estocada Precisa",
+      "tier": 2, "foco": "Precisión", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas que consuman Apertura para ignorar mitigación física en proporción a la Apertura gastada, apuntando a un punto débil (presupuesto según NUMEROS-Y-BALANCE §7).",
+      "profundidad": "Si ya tienes Ojo Quirúrgico (β1), cuando una de estas técnicas consume ≥6 Apertura, ignora toda la mitigación física de ese golpe.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-presencia-t2", "codigo": "Du-γ2", "nombre": "Ruptura de Compás",
+      "tier": 2, "foco": "Presencia", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas que consuman Apertura para alterar el tempo del rival: aplican Ralentizado (lo mueven al final de la ronda) con fuerza que escala con la Apertura gastada (Gap AGI vs AGI, COMBATE §2).",
+      "profundidad": "Si ya tienes Duelo de Miradas (γ1), usar una de estas técnicas contra tu rival de duelo genera +2 Apertura.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-replica-t3", "codigo": "Du-α3", "nombre": "Instinto Afilado",
+      "tier": 3, "foco": "Réplica", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu tope de Apertura sube de 6 a 9 y la Apertura ya no decae durante el combate: persiste hasta que la gastes.",
+      "profundidad": "Si ya tienes Contragolpe Calculado (α2), tus contraataques que consuman ≥6 Apertura aplican Marcado 1 turno (o lo extienden a 2 si ya lo aplicaban).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-precision-t3", "codigo": "Du-β3", "nombre": "Foco Absoluto",
+      "tier": 3, "foco": "Precisión", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Mientras no te desplaces durante un turno, tu concentración se afila: tus golpes ignoran +5% de mitigación física por turno (máx. +15%, acumulativo) y eres inmune a Cegado. El contador se reinicia si te mueves.",
+      "profundidad": "Si ya tienes Estocada Precisa (β2), mientras estés concentrado tus técnicas de precisión cuestan la mitad de Apertura.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-presencia-t3", "codigo": "Du-γ3", "nombre": "Dominar el Duelo",
+      "tier": 3, "foco": "Presencia", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus golpes contra objetivos que estén Ralentizados, Marcados o que hayan fallado un ataque en su último turno ignoran un 20% de su mitigación y generan +1 Apertura (has roto su ritmo).",
+      "profundidad": "Si ya tienes Ruptura de Compás (γ2), golpear a un objetivo cuyo ritmo has roto genera +1 Apertura adicional (total +2).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-replica-t4", "codigo": "Du-α4", "nombre": "Sentencia del Duelista",
+      "tier": 4, "foco": "Réplica", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de remate que consuman toda tu Apertura; el daño de la técnica se multiplica por ⌊Apertura consumida ÷ 3⌋ (9 Apertura = ×3). Tras un remate no puedes generar Apertura durante 1 turno.",
+      "profundidad": "Si ya tienes Instinto Afilado (α3), el remate conserva la mitad de la Apertura consumida, eliminando la restricción de 1 turno.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-precision-t4", "codigo": "Du-β4", "nombre": "Brecha Perpetua",
+      "tier": 4, "foco": "Precisión", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Al inicio de cada turno tuyo, tu Apertura acumulada se traduce en penetración: tu primer golpe del turno ignora 1% de mitigación física por cada 1 Apertura, sin consumirse.",
+      "profundidad": "Si ya tienes Foco Absoluto (β3), mientras estés concentrado (sin desplazarte) esa penetración se aplica a todos tus golpes del turno, no solo al primero.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-presencia-t4", "codigo": "Du-γ4", "nombre": "Iniciativa Robada",
+      "tier": 4, "foco": "Presencia", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cada vez que fuerzas un error en un enemigo (falla un ataque contra ti, o le aplicas Ralentizado o Marcado), tu siguiente golpe contra él ignora un 25% de mitigación y no puede ser esquivado.",
+      "profundidad": "Si ya tienes Dominar el Duelo (γ3), forzar un error también genera +1 Apertura.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-pinaculo-replica", "codigo": "Du-★α", "nombre": "Duelo Eterno",
+      "tier": 5, "foco": "Réplica", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus técnicas de remate ya no tienen tope de multiplicador por Apertura. Además, cuando un remate reduce a un objetivo a 0 PV, conservas toda la Apertura que ibas a consumir.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Réplica",
+      "afinidad_bonus": "Cada vez que un enemigo falla un ataque contra ti, generas +1 Apertura adicional siempre.",
+      "prereq": [], "excluye": ["duelista-pinaculo-precision", "duelista-pinaculo-presencia"], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-pinaculo-precision", "codigo": "Du-★β", "nombre": "Punto Mortal",
+      "tier": 5, "foco": "Precisión", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus técnicas de precisión que consuman Apertura ignoran toda la mitigación física del objetivo (defensa, armadura y bonos de guardia); ningún efecto defensivo reduce su daño por debajo del bruto, salvo inmunidad Logia sin Buso Nv.2+ (COMBATE §2).",
+      "profundidad": "", "pinaculo": true, "afinidad": "Precisión",
+      "afinidad_bonus": "Además, estas técnicas no pueden ser esquivadas ni bloqueadas.",
+      "prereq": [], "excluye": ["duelista-pinaculo-replica", "duelista-pinaculo-presencia"], "decision": false, "terminal": false
+    },
+    {
+      "id": "duelista-pinaculo-presencia", "codigo": "Du-★γ", "nombre": "Amo del Tempo",
+      "tier": 5, "foco": "Presencia", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Dictas el compás del combate: siempre que fuerzas un error o rompes el tempo de un enemigo (esquiva o parry con éxito, o le aplicas Ralentizado/Marcado), le aplicas Ralentizado de forma irresistible (entra ignorando el Gap). Un mismo enemigo solo puede sufrir esto una vez por ronda.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Presencia",
+      "afinidad_bonus": "Además, ese enemigo queda Marcado 1 turno y te genera +1 Apertura.",
+      "prereq": [], "excluye": ["duelista-pinaculo-replica", "duelista-pinaculo-precision"], "decision": false, "terminal": false
+    }
+  ]
+}

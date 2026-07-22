@@ -10,7 +10,7 @@
  *
  * Ejecutar:
  *   & "C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe" ^
- *     "C:\Users\Fgonz\Documents\Proyectos\I-Forge-RPG\scripts\migrate-oleada2.php"
+ *     "C:\Users\Fgonz\Documents\Proyectos\One Piece: Eternal\scripts\migrate-oleada2.php"
  */
 
 error_reporting(E_ALL);

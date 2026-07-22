@@ -1,8 +1,8 @@
 <?php
 /**
- * I-Forge · Biblioteca de Akuma no Mi (Frutas del Diablo)
+ * One Piece: Eternal · Biblioteca de Akuma no Mi (Frutas del Diablo)
  * Catálogo poblado desde BD (rol_akuma). Sin datos mockup.
- * Estilos en docs/themes/gbe.css (scope: gbe-pg-biblioteca).
+ * Estilos en docs/themes/ope.css (scope: ope-pg-biblioteca).
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'biblioteca-akuma.php');
@@ -11,9 +11,13 @@ require_once './global.php';
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 
-$data = gbe_rol_cat_akuma();
-foreach ($data as &$d) { $d['tier'] = gbe_rol_cat_rareza_tier($d['rareza']); }
-unset($d);
+$is_staff = !empty($mybb->user['ope_is_staff']) || (int) ($mybb->user['ope_staff_level'] ?? 0) >= 1;
+$data = array();
+foreach (ope_rol_cat_akuma() as $row) {
+    $data[] = function_exists('ope_fruta_norm')
+        ? ope_fruta_norm((array) $row, $is_staff)
+        : (array) $row;
+}
 $data_json = json_encode($data, JSON_UNESCAPED_UNICODE);
 
 header('Content-Type: text/html; charset=utf-8');
@@ -22,10 +26,10 @@ header('Content-Type: text/html; charset=utf-8');
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Biblioteca de Akuma no Mi</title>
-<?php echo gbe_rol_head_base(); ?>
+<?php echo ope_rol_head_base(); ?>
 </head>
-<body class="gbe-pg-biblioteca bib-akuma">
-<?php echo gbe_rol_navbar_html(); ?>
+<body class="ope-pg-biblioteca bib-akuma">
+<?php echo ope_rol_navbar_html(); ?>
 <div class="breadcrumb"><div class="breadcrumb-in"><a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span><b>Biblioteca de Akuma no Mi</b></div></div>
 <div class="wrap">
 <section class="reveal"><div class="shead"><h1>Akuma no Mi</h1><span class="code">// catálogo de frutas del diablo · <?php echo count($data); ?> registradas</span><span class="rule"></span></div></section>
@@ -38,15 +42,15 @@ header('Content-Type: text/html; charset=utf-8');
       <button class="bib-filter" data-filt="tipo:paramecia">Paramecia</button>
       <button class="bib-filter" data-filt="tipo:zoa">Zoan</button>
       <button class="bib-filter" data-filt="tipo:logia">Logia</button>
-      <button class="bib-filter" data-filt="rar:Legendario">Legendario</button>
-      <button class="bib-filter" data-filt="rar:Épico">Épico</button>
+      <button class="bib-filter" data-filt="estado:libre">Libres</button>
+      <button class="bib-filter" data-filt="estado:ocupada">En uso</button>
     </div>
   </div>
   <div class="bib-grid" id="bibGrid"></div>
 </section>
 </div>
 
-<div class="bib-overlay" id="bibOverlay" hidden><div class="bib-detail" id="bibDetail"></div></div>
+<?php echo ope_fruta_modal_assets($bburl); ?>
 
 <?php include __DIR__ . '/inc/footer_custom.php'; ?>
 
@@ -55,8 +59,6 @@ header('Content-Type: text/html; charset=utf-8');
   var data = <?php echo $data_json; ?>;
   var filtro = 'todas';
   var grid = document.getElementById('bibGrid');
-  var overlay = document.getElementById('bibOverlay');
-  var detail = document.getElementById('bibDetail');
   var tipoLbl = { paramecia:'Paramecia', zoa:'Zoan', logia:'Logia' };
 
   function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -67,8 +69,10 @@ header('Content-Type: text/html; charset=utf-8');
 
   function match(p){
     if (filtro === 'todas') return true;
-    if (filtro.indexOf('tipo:') === 0) return p.tipo === filtro.slice(5);
-    if (filtro.indexOf('rar:') === 0) return p.rareza === filtro.slice(4);
+    if (filtro.indexOf('tipo:') === 0) return p.tipo_base === filtro.slice(5);
+    if (filtro.indexOf('tier:') === 0) return String(p.tier) === filtro.slice(5);
+    if (filtro === 'estado:libre') return !(p.ocupada_pid > 0);
+    if (filtro === 'estado:ocupada') return p.ocupada_pid > 0;
     return true;
   }
   function render(){
@@ -81,47 +85,25 @@ header('Content-Type: text/html; charset=utf-8');
     if (!items.length){ grid.innerHTML = '<div class="bib-empty">No se encontraron frutas.</div>'; return; }
     grid.innerHTML = items.map(function(p){
       var i = data.indexOf(p);
-      return '<article class="bib-card tipo-'+esc(p.tipo)+'" data-i="'+i+'">'
+      var usuHtml = (p.ocupada_pid > 0 || p.usuario)
+        ? '<div class="bib-card-meta"><span class="ope-tag-usada">En uso · <b>'+esc(p.usuario||'Personaje #'+p.ocupada_pid)+'</b></span></div>'
+        : '<div class="bib-card-meta"><span class="ope-tag-libre">Libre</span></div>';
+      return '<article class="bib-card tipo-'+esc(p.tipo_base)+'" data-i="'+i+'" tabindex="0" role="button" aria-label="'+esc(p.nombre)+'">'
         + '<div class="bib-card-media">'+media(p)
-          + '<span class="bib-card-badge '+esc(p.tier)+'">'+esc(p.rareza)+'</span>'
+          + '<span class="bib-card-badge t'+esc(p.tier)+'">Tier '+esc(p.tier_roman)+'</span>'
         + '</div>'
         + '<div class="bib-card-body">'
-          + '<span class="bib-card-kicker">'+esc(tipoLbl[p.tipo]||p.tipo)+'</span>'
+          + '<span class="bib-card-kicker">'+esc(tipoLbl[p.tipo_base]||p.tipo)+' · TEM+<b>'+esc(p.secundario||'—')+'</b></span>'
           + '<h3 class="bib-card-nom">'+esc(p.nombre)+'</h3>'
-          + '<p class="bib-card-desc">'+esc(p.descripcion||'')+'</p>'
-          + (p.usuario?'<div class="bib-card-meta"><span>Usuario: <b>'+esc(p.usuario)+'</b></span></div>':'')
+          + '<p class="bib-card-desc">'+esc(p.desc||'')+'</p>'
+          + usuHtml
         + '</div></article>';
     }).join('');
   }
 
-  function openDetail(p){
-    var rows = '';
-    function row(l,v){ if(v) rows += '<div class="bib-d-row"><span class="bib-d-l">'+esc(l)+'</span><span class="bib-d-v">'+esc(v)+'</span></div>'; }
-    row('Tipo', tipoLbl[p.tipo]||p.tipo);
-    row('Rareza', p.rareza);
-    row('Usuario actual', p.usuario);
-    var blocks = '';
-    function block(l,v){ if(v && v.trim()) blocks += '<div class="bib-d-block"><span class="bib-d-h">'+esc(l)+'</span><p>'+esc(v)+'</p></div>'; }
-    block('Poder', p.descripcion);
-    block('Despertar', p.despertar);
-    block('Debilidad', p.debilidad);
-    detail.innerHTML =
-      '<button type="button" class="bib-d-close" aria-label="Cerrar">✕</button>'
-      + '<div class="bib-d-head tipo-'+esc(p.tipo)+'">'
-        + '<div class="bib-d-media">'+media(p)+'</div>'
-        + '<div class="bib-d-title"><h2>'+esc(p.nombre)+'</h2>'
-        + '<span class="gbe-tag">'+esc(tipoLbl[p.tipo]||p.tipo)+'</span> <span class="bib-card-badge '+esc(p.tier)+'">'+esc(p.rareza)+'</span></div>'
-      + '</div>'
-      + '<div class="bib-d-grid">'+rows+'</div>'
-      + blocks;
-    overlay.hidden = false; document.body.classList.add('bib-no-scroll');
-    requestAnimationFrame(function(){ detail.classList.add('in'); });
-  }
-  function closeDetail(){ detail.classList.remove('in'); overlay.hidden = true; document.body.classList.remove('bib-no-scroll'); }
-
-  grid.addEventListener('click', function(e){ var c = e.target.closest('.bib-card'); if(!c) return; openDetail(data[+c.getAttribute('data-i')]); });
-  overlay.addEventListener('click', function(e){ if(e.target===overlay || e.target.closest('.bib-d-close')) closeDetail(); });
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !overlay.hidden) closeDetail(); });
+  function openCard(c){ if(window.OPEFruta){ OPEFruta.open(data[+c.getAttribute('data-i')]); } }
+  grid.addEventListener('click', function(e){ var c = e.target.closest('.bib-card'); if(c) openCard(c); });
+  grid.addEventListener('keydown', function(e){ if(e.key!=='Enter'&&e.key!==' ')return; var c=e.target.closest('.bib-card'); if(c){ e.preventDefault(); openCard(c);} });
   document.getElementById('bibSearch').addEventListener('input', render);
   document.getElementById('bibFilters').addEventListener('click', function(e){
     var b = e.target.closest('.bib-filter'); if(!b) return;

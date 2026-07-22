@@ -1,0 +1,202 @@
+[
+ {
+  "slug": "fruta.mera_mera",
+  "nombre": "Mera Mera no Mi",
+  "tipo": "Logia",
+  "tipo_base": "logia",
+  "tier": "IV",
+  "secundario": "VOL",
+  "desc": "La Logia del fuego y las llamas incandescentes. Transforma la sustancia biológica del usuario en fuego puro de brillante resplandor. Otorga una intangibilidad fluida que disipa los impactos físicos y disparos de artillería, evaporando el metal de los proyectiles al acercarse. El usuario domina la emisión de columnas de fuego a presión (Hiken), muros de llama defensivos y la propulsión pirotécnica para volar por el aire. Su técnica suprema (Entei) condensa una esfera de fuego de dimensiones solares capaz de devastar ciudades y consumir flotas completas. En su Despertar, eleva la temperatura de sus llamas a tonos azulados incandescentes que abrasan la roca y destruyen las defensas.",
+  "efecto": "Logia de fuego puro, intangibilidad de llama, propulsión aérea, Hiken y esfera solar colosal Gran Entei."
+ },
+ {
+  "slug": "fruta.susu_susu",
+  "nombre": "Susu Susu no Mi",
+  "tipo": "Logia",
+  "tipo_base": "logia",
+  "tier": "III",
+  "secundario": "AGI",
+  "desc": "La Logia del hollín y las cenizas de combustión. Transforma la masa corporal del consumidor en partículas de hollín y ceniza volátil. Otorga intangibilidad de ceniza fluida que dispersa los ataques físicos en cortinas de polvo negro que ciegan y sofocan a los atacantes. El usuario puede controlar la densidad del hollín para crear clones de ceniza, puños de carbonilla sólida o sofocar la respiración enemiga. Sus cenizas pueden ser calentadas al rojo vivo para provocar quemaduras e incendios sobre las velas de las embarcaciones enemigas. En su Despertar, cubre islas enteras bajo mantos de hollín que anulan la visibilidad e incendian las coberturas de madera.",
+  "efecto": "Logia de hollín volátil y ceniza de combustión, cortinas de humo sofocante y cenizas incandescente."
+ },
+ {
+  "slug": "fruta.baku_baku",
+  "nombre": "Baku Baku no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "FUE",
+  "desc": "La fruta de la masticación y la síntesis siderúrgica. Convierte las mandíbulas y el estómago del usuario en una caldera capaz de ingerir cualquier sustancia, desde metales raros hasta artillería sin sufrir daño biológico. Una vez ingeridos los materiales, el consumidor puede integrarlos directamente en su anatomía o fusionarlos entre sí, manifestando cañones y fusiles en sus brazos o forjando aleaciones metálicas inéditas. Permite devorar armamento enemigo en pleno combate para desarmar a los rivales e incorporar la dureza del acero o la pólvora a su propia masa corporal. El usuario puede además ingerir a sus propios aliados o combatientes para fusionarlos temporalmente en guerreros híbridos de fuerza combinada. En su fase avanzada, transforma su cuerpo en una fortaleza caminante reforzada con todas las armas y minerales ingeridos a lo largo de su carrera.",
+  "efecto": "Devoración de metales y armas, integración de artillería en el cuerpo y síntesis de aleaciones metálicas compuestas."
+ },
+ {
+  "slug": "fruta.beta_beta",
+  "nombre": "Beta Beta no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "III",
+  "secundario": "RES",
+  "desc": "La fruta de la mucosidad pegajosa e inflamable. Otorga al usuario la capacidad de segregar masivas cantidades de viscosidad altamente adhesiva desde su cuerpo. La secreción es tan pegajosa que aprisiona instantáneamente las armas, pies y manos de los combatientes enemigos al menor contacto físico. Además de su adhesión extrema, la mucosidad es altamente inflamable: una sola chispa o ataque de fuego desencadena detonaciones en cadena de gran radio. El consumidor puede envolverse en un grueso abrigo de mucosidad para ocultar su verdadera anatomía y hacer que los ataques físicos queden atrapados en la masa. En su Despertar, anega campos de batalla enteros en pantanos de resina pegajosa listos para ser incinerados.",
+  "efecto": "Secreción de mucosidad altamente adhesiva e inflamable, aprisionamiento de armas y explosiones en cadena."
+ },
+ {
+  "slug": "fruta.choki_choki",
+  "nombre": "Choki Choki no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "FUE",
+  "desc": "La fruta de las tijeras corporales. Concede la habilidad de transformar las manos del consumidor en grandes tijeras capaces de cortar cualquier estructura. Corta piedra, granito, acero o madera con la misma facilidad con la que se recortaría una hoja de papel liviano, sin perder filo en el proceso. El material recortado conserva propiedades de maleabilidad temporales, permitiendo doblarlo, enrollarlo o esculpir muros de piedra para cobertura. En combate cerrado, permite desarticular las armaduras y espadas enemigas recortando las empuñaduras y articulaciones metálicas. En su Despertar, permite recortar la superficie del suelo como si fuera una alfombra para levantarla y aplastar las formaciones de combate rivales.",
+  "efecto": "Tijeras corporales que recortan piedra y acero como papel, maleabilidad de coberturas recortadas y desarticulación."
+ },
+ {
+  "slug": "fruta.fuku_fuku",
+  "nombre": "Fuku Fuku no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "I",
+  "secundario": "CAR",
+  "desc": "La fruta de la vestimenta y el disfraz. Concede la habilidad de transformar pequeñas hojas de árbol o piedras colocadas sobre la cabeza en ropas completas. Permite vestir a ejércitos enteros con uniformes de camuflaje, trajes de alta resistencia térmica o pesadas armaduras de combate al instante. Los atuendos generados desaparecen en cuanto son quitados o destruidos en combate, volviendo a convertirse en simples hojas secas o guijarros. Ofrece una enorme utilidad en misiones de infiltración urbana o espionaje, alterando la apariencia de la tripulación en segundos. En su Despertar, puede confeccionar trajes de combate imbuidos en fibras densas que otorgan resistencia física incrementada a los aliados.",
+  "efecto": "Transformación de hojas y piedras en atuendos, vestimentas de protección térmica e infiltración de camuflaje."
+ },
+ {
+  "slug": "fruta.hana_hana",
+  "nombre": "Hana Hana no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "III",
+  "secundario": "AGI",
+  "desc": "La fruta de la floración anatómica. Permite al consumidor hacer brotar copias de sus extremidades u órganos en cualquier superficie visible o cuerpo distante. El usuario puede hacer brotar brazos en la espalda de sus enemigos para aplicar llaves de sumisión, romper cuellos o desarmarlos a distancia. Permite ensamblar cientos de brazos brotados para formar manos gigantes de aplastamiento, alas de plumas de manos para volar o muros defensivos. Aunque el usuario siente el dolor si una de sus extremidades brotadas es dañada, la velocidad de sustitución le permite mantener el control del campo. En su Despertar, puede crear un clon gigante completo de sí mismo que combate con la fuerza multiplicada de miles de extremidades unidas.",
+  "efecto": "Brotación de extremidades en superficies lejanas, llaves de sumisión a distancia, manos gigantes e inmunidad de reemplazo."
+ },
+ {
+  "slug": "fruta.iku_iku",
+  "nombre": "Iku Iku no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "CAR",
+  "desc": "La fruta del estímulo agrícola e hipertrofia vegetal. Permite al usuario acelerar exponencialmente el crecimiento de plantas, árboles y cultivos. Al tocar la tierra o semillas, hace brotar bosques tupidos en segundos que pueden ser utilizados como coberturas o trampa para las tropas enemigas. Permite cultivar plantas carnívoras gigantes, enredaderas de alta resistencia o vegetales curativos en pleno combate náutico o terrestre. Aporta un valor incalculable para el abastecimiento de suministros y alimentos de la tripulación en viajes largos a través de mares desérticos. En su Despertar, transmutará desiertos áridos en selvas frondosas que capturan y absorben la energía de los combatientes rivales.",
+  "efecto": "Estímulo de crecimiento agrícola e hipertrofia vegetal, cultivo de selvas defensivas y plantas de combate."
+ },
+ {
+  "slug": "fruta.kage_kage",
+  "nombre": "Kage Kage no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "IV",
+  "secundario": "VOL",
+  "desc": "La fruta de las sombras y el ejército de la noche. Permite extraer y manipular las sombras corporales de las personas mediante tijeras especiales. El consumidor puede separar su propia sombra para combatir de forma independiente como un guardián indestructible de materia oscura (Doppelgänger). Las sombras robadas a enemigos pueden ser implantadas en cadáveres para reanimarlos como sirvientes obedientes con las habilidades del dueño original. El usuario puede ingerir decenas de sombras en su propio cuerpo (Shadows' Asgard) para multiplicar su masa muscular y fuerza a niveles colosales. En su Despertar, puede hacer que las sombras del terreno cobren vida propia y aprisionen a los combatientes rivales por sus pies.",
+  "efecto": "Robo de sombras con tijeras, creación del Doppelgänger sombra, reanimación de zombis e ingestión de almas."
+ },
+ {
+  "slug": "fruta.maki_maki",
+  "nombre": "Maki Maki no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "INT",
+  "desc": "La fruta de los pergaminos de sellado. Permite al consumidor manipular pergaminos mágicos capaces de sellar y liberar ataques, fluidos y elementos. Al desplegar un pergamino frente a una llamarada, descarga eléctrica o tsunami, absorbe el ataque en su lienzo manteniéndolo almacenado. Posteriormente, el usuario puede desenrollar el pergamino para devolver el ataque capturado contra los propios enemigos con la misma fuerza original. Permite almacenar grandes volúmenes de agua de mar, fuego o armamento para desplegarlos como trampas tácticas en medio del combate. En su Despertar, puede envolver a los combatientes enemigos en pergaminos gigantes cosidos que restringen el uso de sus habilidades.",
+  "efecto": "Pergaminos mágicos de sellado capaz de capturar ataques de fuego/agua y liberarlos de vuelta con la misma fuerza."
+ },
+ {
+  "slug": "fruta.mochi_mochi",
+  "nombre": "Mochi Mochi no Mi",
+  "tipo": "Paramecia (Especial)",
+  "tipo_base": "paramecia",
+  "tier": "IV",
+  "secundario": "AGI",
+  "desc": "Una Paramecia Especial que comparte propiedades idénticas a una Logia. Transforma la anatomía del consumidor en mochi dulce viscoso y altamente maleable. El usuario puede estirar, deformar y abrir huecos en su cuerpo de mochi para esquivar ataques físicos y estocadas imbuidas en Haki antes del impacto. La alta densidad y viscosidad de su mochi le permite atrapar armas y extremidades enemigas en una masa pegajosa imposible de soltar. Permite condensar su masa de mochi con Haki de Armadura para disparar puños gigantescos de densidad metálica (Peerless Donuts). En su Despertar, transmutará el suelo y las estructuras del escenario en marejadas de mochi viscoso que aplastan a las tropas enemigas.",
+  "efecto": "Paramecia Especial de mochi viscoso maleable, deformación evasiva tipo Logia y disparos de puños Peerless Donuts."
+ },
+ {
+  "slug": "fruta.nui_nui",
+  "nombre": "Nui Nui no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "AGI",
+  "desc": "La fruta de la costura irrompible. Concede la capacidad de coser cualquier objeto, superficie o persona utilizando hilo y aguja invisibles. Permite coser a las tropas enemigas directamente al suelo de piedra o entre sí, inmovilizándolas sin provocarles heridas desangrantes. Los hilos de costura son prácticamente irrompibles frente a la fuerza física convencional, requiriendo destrozar el suelo para liberarse. Permite remendar de inmediato velas de barcos desgarradas, armaduras de cuero o cerrar heridas abiertas de sus compañeros en combate. En su Despertar, puede coser las sombras o extremidades de los capitanes enemigos impidiéndoles ejecutar sus técnicas principales.",
+  "efecto": "Costura irrompible de personas y objetos a superficies sólidas mediante aguja e hilo invisible sin desangrado."
+ },
+ {
+  "slug": "fruta.pero_pero",
+  "nombre": "Pero Pero no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "III",
+  "secundario": "INT",
+  "desc": "La fruta del caramelo duro y las estructuras dulces. Concede la capacidad de generar y manipular caramelo artesanal de alta densidad. El caramelo puede ser derretido en estado viscoso caliente o solidificado instantáneamente en estructuras de dureza cercana al acero. El consumidor puede construir puentes de caramelo sobre el mar, muros defensivos, babosas de transporte o envolver enemigos en caramelo. Aunque el calor extremo derrite el caramelo y el agua lo ablanda, su versatilidad para forjar utensilios y prótesis es inigualable. En su Despertar, convierte paisajes enteros en bosques de caramelo crujiente que aprisionan a los intrusos en una trampa dulce.",
+  "efecto": "Caramelo artesanal sólido de dureza cercana al acero, construcciones dulces, puentes marítimos y prótesis."
+ },
+ {
+  "slug": "fruta.soru_soru",
+  "nombre": "Soru Soru no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "V",
+  "secundario": "VOL",
+  "desc": "La fruta del dominio de las almas humanas y los Homies. Permite extraer la esperanza de vida de quienes sientan temor ante el usuario. Las porciones de alma arrebatadas pueden ser infundidas en objetos inanimados o elementos climáticos creando sirvientes vivos (Homies). El consumidor combate escoltado por Homies primordiales como soles incandescentes (Prometheus), nubes de tormenta (Zeus/Hera) o espadas parlantes. Permite devorar porciones de su propia alma para gigantizarse y multiplicar su masa muscular y fuerza física en momentos de crisis. En su Despertar, puede animar el terreno entero convirtiendo la tierra y el mar en Homies colosales que obedecen sus órdenes.",
+  "efecto": "Extracción de almas humanas (Soul Pocus), animación de objetos e infusión vital a soles, nubes y espadas (Homies)."
+ },
+ {
+  "slug": "fruta.toge_toge",
+  "nombre": "Toge Toge no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "FUE",
+  "desc": "La fruta de las espinas de acero corporales. Permite al consumidor hacer brotar púas y espinas filosas desde cualquier parte de su piel. Sus espinas pueden crecer con la dureza y filo del acero, atravesando armaduras metálicas y escudos de madera de un solo golpe. Al brotar espinas en las plantas de sus pies, adquiere una tracción perfecta para correr por paredes verticales y techos de fortalezas. Puede inflar sus músculos clavándose espinas en puntos de acupuntura corporales para multiplicar su fuerza física en combate cerrado. En su Despertar, convierte su cuerpo en una masa de espinas gigantes giratorias que arrollan las formaciones enemigas como un erizo de hierro.",
+  "efecto": "Espinas corporales de acero que brotan desde la piel, tracción vertical en murallas y acupuntura de fuerza."
+ },
+ {
+  "slug": "fruta.wara_wara",
+  "nombre": "Wara Wara no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "III",
+  "secundario": "CAR",
+  "desc": "La fruta de la paja mística y la transferencia de daño Vudú. Permite manipular paja con propiedades espirituales de hechicería Vudú. El usuario alberga muñecos de paja (Wara Ningyo) en su organismo vinculados a personas: todo daño recibido es transferido a los rehenes. Permite invocar un Espantapájaros de Paja Gigante (Demonio de Paja) que combate en vanguardia armado con clavos de acero gigantes. Utiliza cartas de tarot de la suerte para predecir eventos de combate o potenciar las estadísticas de sus aliados mediante bendiciones. En su Despertar, puede crear marionetas de paja gigantes que absorben los ataques de Logias elementales sin transmitir el calor al usuario.",
+  "efecto": "Paja mística Vudú, transferencia de daño a rehenes mediante muñecos Wara Ningyo y Espantapájaros Gigante."
+ },
+ {
+  "slug": "fruta.hebi_orochi",
+  "nombre": "Hebi Hebi no Mi, Modelo: Yamata-no-Orochi",
+  "tipo": "Zoan (Mitológica)",
+  "tipo_base": "zoa",
+  "tier": "V",
+  "secundario": "RES",
+  "desc": "La Zoan Mitológica de la serpiente de ocho cabezas (Yamata-no-Orochi). Transforma al usuario en una criatura serpentina gigante de múltiples testas. Otorga ocho vidas independientes: el usuario puede sufrir la decapitación de varias de sus cabezas en combate y continuar luchando sin perecer. Sus fauces múltiples pueden morder y devorar enemigos simultáneamente, inyectando venenos ancestrales y emitiendo rugidos de presión de aire. En su forma híbrida, conserva escamas impenetrables que repelen hojas de acero y proyectiles de plomo de artillería pesada. En su Despertar, las ocho cabezas pueden lanzar alientos de fuego, toxinas y ácido de forma coordinada devastando batallones enteros.",
+  "efecto": "Zoan Mitológica de serpiente de 8 cabezas, 8 vidas independientes, mordiscos síncronos y alientos venenosos."
+ },
+ {
+  "slug": "fruta.kumo_rosamygale",
+  "nombre": "Kumo Kumo no Mi, Modelo: Rosamygale",
+  "tipo": "Zoan (Antigua)",
+  "tipo_base": "zoa",
+  "tier": "IV",
+  "secundario": "AGI",
+  "desc": "La Zoan Antigua de la araña prehistórica (Rosamygale). Transforma al usuario en un arácnido ancestral de gran tamaño y abdomen acorazado. Otorga la capacidad de escalar paredes verticales y techos a gran velocidad, además de segregar hilos de seda de tenacidad superior a la del acero. Sus telas de araña pueden ser desplegadas como mallas trampa afiladas que cortan la carne de quienes intenten atravesarlas a la fuerza. En su forma híbrida, despliega múltiples extremidades arácnidas equipadas con aguijones venenosos de impacto rápido. En su Despertar, envuelve zonas del campo de batalla en nidos de seda reforzada que inmovilizan a las vanguardias enemigas.",
+  "efecto": "Zoan Antigua de araña Rosamygale con escalada vertical, telas de seda afilada e inyección de neurotoxinas."
+ },
+ {
+  "slug": "fruta.ryu_brachio",
+  "nombre": "Ryu Ryu no Mi, Modelo: Brachiosaurus",
+  "tipo": "Zoan (Antigua)",
+  "tipo_base": "zoa",
+  "tier": "IV",
+  "secundario": "RES",
+  "desc": "La Zoan Antigua del Brachiosaurus gigante. Transforma al usuario en un saurópodo de cuello colosal y peso de cientos de toneladas. Su masa corporal y espesor de piel proporcionan una durabilidad física imponente que absorbe bombardeos navales sin inmutarse. Permite aplastar a batallones enemigos dejándose caer con su peso titánico o golpear con su cuello como una maza de demolición. Posee la habilidad insólita de eyectar su cuello y cola fuera del torso como una serpiente constrictora que estrangula a sus rivales (Brachio-Snake). En su Despertar, su densidad física se multiplica permitiéndole resistir estocadas de espadas legendarias sin sufrir cortes.",
+  "efecto": "Zoan Antigua de Brachiosaurus de cientos de toneladas, masa de aplastamiento y estrangulamiento Brachio-Snake."
+ },
+ {
+  "slug": "fruta.ushi_jirafa",
+  "nombre": "Ushi Ushi no Mi, Modelo: Jirafa",
+  "tipo": "Zoan (Estándar)",
+  "tipo_base": "zoa",
+  "tier": "III",
+  "secundario": "FUE",
+  "desc": "La Zoan Estándar de la jirafa. Convierte al consumidor en una jirafa de cuello extensible y patas largas de gran potencia de corte. En su forma híbrida, su cuello flexible puede ser retraído dentro de su torso para dispararlo como un cañón de muelle de alta presión (Kaku-gun). Utiliza sus cuatro patas largas como espadas gigantes para ejecutar cortes con la técnica de cuatro sables (Yontoryu) impulsados por Rokushiki. Su masa muscular de jirafa le permite lanzar tajos de viento cortante (Rankyaku) de forma cúbica que atraviesan murallas de piedra. En su Despertar, incrementa la resistencia ósea de su cuello y extremidades convirtiéndose en una maza de corte impenetrable.",
+  "efecto": "Zoan Estándar de jirafa con cuello extensible tipo cañón muelle, 4 patas cortantes Yontoryu y Rankyaku cúbico."
+ }
+]

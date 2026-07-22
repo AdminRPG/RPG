@@ -1,0 +1,135 @@
+{
+  "id": "arma-distancia",
+  "nombre": "Distancia",
+  "tipo": "arma",
+  "version": "3.0",
+  "recurso_secundario": "Puntería",
+  "recurso_base": "Cada turno que pases sin recibir daño cuerpo a cuerpo y con línea de visión al objetivo, acumulas 1 carga de Puntería (máx. 3). Las cargas se consumen automáticamente en el siguiente ataque de Distancia para ignorar 10% de mitigación por carga; si recibes daño cuerpo a cuerpo, todas las cargas de Puntería se pierden.",
+  "resumen_arquetipo": "Distancia cubre arcos, armas de fuego y arrojadizas. Su efecto inherente base es Puntería/Cobertura: el arma premia la posición, la distancia y el tiempo de apuntado. Un personaje de Distancia que se mantiene lejos y en cobertura acumula ventaja posicional; si le cierran la distancia, pierde esa ventaja.",
+  "rol_mecanico": "Puntería/Cobertura: disparo calculado, zonas de negación y emboscada desde lo oculto.",
+  "corrientes": [
+    { "clave": "Precisión", "simbolo": "α", "filosofia": "El disparo calculado. Un tiro, una bala. Marcado y explotación de debilidades." },
+    { "clave": "Supresión", "simbolo": "β", "filosofia": "Fuego de cobertura. Zona de negación, controlar líneas de tiro, presión constante." },
+    { "clave": "Emboscada", "simbolo": "γ", "filosofia": "Disparo desde lo oculto. Primer tiro letal, reposición post-disparo." }
+  ],
+  "focos": ["Precisión", "Supresión", "Emboscada"],
+  "nodos": [
+    {
+      "id": "distancia-precision-t1", "codigo": "D-α1", "nombre": "Ojo de Halcón",
+      "tier": 1, "foco": "Precisión", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus cargas de Puntería persisten 1 turno extra antes de consumirse. Además, al consumir 3 cargas simultáneamente, tu ataque también aplica el estado Marcado (1 turno) al objetivo.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-supresion-t1", "codigo": "D-β1", "nombre": "Fuego de Supresión",
+      "tier": 1, "foco": "Supresión", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus ataques de Distancia contra un objetivo que se ha movido este turno aplican Ralentizado (1 turno). Si el objetivo no se movió, tu ataque gana +10% de daño en su lugar (castigas tanto al que se mueve como al que no).",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-emboscada-t1", "codigo": "D-γ1", "nombre": "Primer Disparo",
+      "tier": 1, "foco": "Emboscada", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Si atacas a un objetivo que no te ha visto o que no ha sido atacado por ti en este combate, tu primer ataque de Distancia ignora 30% de mitigación física y no revela tu posición hasta el final de tu turno.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-precision-t2", "codigo": "D-α2", "nombre": "Tiro Perforante",
+      "tier": 2, "foco": "Precisión", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de Distancia de disparo único que consuman todas tus cargas de Puntería para un daño masivo: el daño base de la técnica se multiplica por 1 + (cargas × 0,25) (3 cargas = ×1,75).",
+      "profundidad": "Si ya tienes Ojo de Halcón (α1), estas técnicas también aplican Cegado 1 turno al objetivo (el impacto desorienta).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-supresion-t2", "codigo": "D-β2", "nombre": "Zona de Fuego",
+      "tier": 2, "foco": "Supresión", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de Distancia que establezcan una zona de negación: un área de 4m de radio donde cualquier enemigo que entre o comience su turno dentro recibe daño automático y Ralentizado 1 turno. La zona dura 2 turnos.",
+      "profundidad": "Si ya tienes Fuego de Supresión (β1), los enemigos dentro de la zona no pueden generar cargas de Puntería ni beneficiarse de cobertura.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-emboscada-t2", "codigo": "D-γ2", "nombre": "Reposición",
+      "tier": 2, "foco": "Emboscada", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de Distancia que, tras disparar, te permitan reposicionarte hasta 4m sin gastar movimiento libre (dispara y cúbrete). La nueva posición te otorga cobertura temporal (+5 mitigación) hasta tu próximo turno.",
+      "profundidad": "Si ya tienes Primer Disparo (γ1), si la reposición te lleva a una posición desde la que el enemigo no tiene línea de visión, tu siguiente ataque cuenta como \"primer disparo\" (vuelve a ignorar 30% mitigación).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-precision-t3", "codigo": "D-α3", "nombre": "Ojo Inmutable",
+      "tier": 3, "foco": "Precisión", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus cargas de Puntería ya no se pierden al recibir daño cuerpo a cuerpo. Además, el tope de cargas sube de 3 a 5, y cada carga ahora ignora 15% de mitigación (en vez de 10%).",
+      "profundidad": "Si ya tienes Tiro Perforante (α2), las técnicas de disparo único con 5 cargas también aplican Paralizado 1 turno (el impacto es tan certero que corta la acción).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-supresion-t3", "codigo": "D-β3", "nombre": "Cobertura Cruzada",
+      "tier": 3, "foco": "Supresión", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Mientras tengas 1+ zona de fuego activa, tus ataques de Distancia desde fuera de la zona ganan +15% de daño contra objetivos dentro de ella (fuego cruzado).",
+      "profundidad": "Si ya tienes Zona de Fuego (β2), puedes tener 2 zonas activas simultáneamente (en vez de 1).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-emboscada-t3", "codigo": "D-γ3", "nombre": "Fantasma del Campo",
+      "tier": 3, "foco": "Emboscada", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Si no has recibido daño en tu turno anterior, eres invisible a efectos de detección pasiva (el enemigo sabe que estás en el campo, pero no puede apuntar técnicas a tu posición exacta sin usar una acción de búsqueda primero).",
+      "profundidad": "Si ya tienes Reposición (γ2), mientras estés invisible, tus técnicas de reposición no consumen PA.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-precision-t4", "codigo": "D-α4", "nombre": "Disparo Definitivo",
+      "tier": 4, "foco": "Precisión", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de Distancia de remate: requieren 3+ cargas de Puntería y que el objetivo esté Marcado o Ralentizado. El daño ignora toda la mitigación física del objetivo. Después de un remate, pierdes todas tus cargas de Puntería y no puedes generar más durante 1 turno.",
+      "profundidad": "Si ya tienes Ojo Inmutable (α3), el remate no consume las cargas de Puntería y la restricción de 1 turno desaparece.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-supresion-t4", "codigo": "D-β4", "nombre": "Artillería",
+      "tier": 4, "foco": "Supresión", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Tus técnicas de Distancia ahora pueden declararse con alcance ilimitado dentro de línea de visión (sin penalización por distancia). Además, las zonas de fuego que crees aplican Enraizado 1 turno a los enemigos que intenten salir de ellas.",
+      "profundidad": "Si ya tienes Cobertura Cruzada (β3), los ataques con alcance ilimitado desde fuera de una zona activa ganan +25% de daño contra objetivos dentro (en vez de +15%).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-emboscada-t4", "codigo": "D-γ4", "nombre": "Asesino Silencioso",
+      "tier": 4, "foco": "Emboscada", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cuando atacas desde la invisibilidad (por Fantasma del Campo o cualquier fuente), el primer golpe no solo ignora 30% de mitigación sino que aplica Aturdimiento 1 turno (el objetivo no esperaba el ataque). Si el objetivo cae a 0 PV con este golpe, no hay ruido ni alerta: los demás enemigos no saben de dónde vino el disparo.",
+      "profundidad": "Si ya tienes Fantasma del Campo (γ3), tras un ataque desde la invisibilidad, vuelves a ser invisible automáticamente al final de tu turno si te reposicionas.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-pinaculo-precision", "codigo": "D-★α", "nombre": "Bala de Oro",
+      "tier": 5, "foco": "Precisión", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus cargas de Puntería ya no tienen tope máximo. Por cada 2 turnos de apuntado continuo (sin recibir daño cc), ganas 1 carga extra. Una técnica de remate con 5+ cargas aplica todos los estados negativos que hayas desbloqueado (Marcado, Cegado, Paralizado) simultáneamente.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Precisión",
+      "afinidad_bonus": "A 7+ cargas, el remate ignora también mitigación especial (escudos, barreras, Buso Haki nv.1).",
+      "prereq": [], "excluye": ["distancia-pinaculo-supresion", "distancia-pinaculo-emboscada"], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-pinaculo-supresion", "codigo": "D-★β", "nombre": "Lluvia de Acero",
+      "tier": 5, "foco": "Supresión", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Puedes tener hasta 3 zonas de fuego activas simultáneamente. Los enemigos dentro de cualquier zona no pueden usar movimiento libre (solo Esprintar). El daño automático de las zonas se duplica.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Supresión",
+      "afinidad_bonus": "Las zonas de fuego duran indefinidamente hasta que te muevas de tu posición o seas forzado a moverte.",
+      "prereq": [], "excluye": ["distancia-pinaculo-precision", "distancia-pinaculo-emboscada"], "decision": false, "terminal": false
+    },
+    {
+      "id": "distancia-pinaculo-emboscada", "codigo": "D-★γ", "nombre": "Espectro",
+      "tier": 5, "foco": "Emboscada", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Mientras no hayas recibido daño en los últimos 2 turnos, eres permanentemente invisible. Cada ataque desde la invisibilidad ignora un 50% de mitigación física en vez de 30%.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Emboscada",
+      "afinidad_bonus": "Tras cada ataque desde invisibilidad, si el objetivo no te localiza, tu siguiente ataque gana un multiplicador de daño acumulativo de ×1,25 (apilable hasta ×2,0 tras 4 ataques sin ser visto).",
+      "prereq": [], "excluye": ["distancia-pinaculo-precision", "distancia-pinaculo-supresion"], "decision": false, "terminal": false
+    }
+  ]
+}

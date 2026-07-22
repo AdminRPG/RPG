@@ -8,7 +8,7 @@ alwaysApply: false
 
 Fuente de verdad: **`docs/DESIGN-GRANBLUE-ETERNAL.md` §5** y **`docs/AGENTES-Y-HERRAMIENTAS.md`** (portado visual). Léelos antes de crear o rediseñar una página `.php` del RPG.
 
-> **Portada MyBB** no usa este scaffold — usa `body.gbe-index` (DESIGN §6). Ver `.cursor/rules/visual-port-gbe.mdc`.
+> **Portada MyBB** no usa este scaffold — usa `body.ope-index` (DESIGN §6). Ver `.cursor/rules/visual-port-gbe.mdc`.
 
 ## Obligatorio en cada página nueva
 
@@ -35,7 +35,7 @@ Fuente de verdad: **`docs/DESIGN-GRANBLUE-ETERNAL.md` §5** y **`docs/AGENTES-Y-
 
 **Globales:** `.wrap`, `.breadcrumb`, `.btn*`, `.ope-prog-*`.
 
-## Scaffolding GBF (nueva página — usar esto, no OP brutalista)
+## Scaffolding OPE (nueva página — usar esto, no OP brutalista)
 
 Pega en `ope.css` adaptando `<pagina>`. Fuente canónica: **DESIGN §5.4** (tokens `--line`, `border-radius`, sin `border:2px solid #000`):
 
@@ -58,7 +58,7 @@ body.ope-pg-<pagina> .reveal.vis{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){body.ope-pg-<pagina> .reveal{opacity:1;transform:none}}
 ```
 
-> Atajo: reutiliza scope de página hermana GBF (`ficha.php` → `ope-pg-ficha`).
+> Atajo: reutiliza scope de página hermana OPE (`ficha.php` → `ope-pg-ficha`).
 
 ## CSS — qué NO hacer
 
@@ -70,8 +70,8 @@ body.ope-pg-<pagina> .reveal.vis{opacity:1;transform:none}
 
 ## Checklist antes de dar por hecha
 
-- [ ] Scaffolding GBF pegado si scope nuevo
+- [ ] Scaffolding OPE pegado si scope nuevo
 - [ ] `check-inline-styles.php` limpio
 - [ ] `sync-theme verify` → `OK CSS: in sync`
-- [ ] Comparación visual con `ficha.php` u otra página GBF ya correcta
+- [ ] Comparación visual con `ficha.php` u otra página OPE ya correcta
 - [ ] Si es portado desde prototipo: checklist `docs/AGENTES-Y-HERRAMIENTAS.md` §2

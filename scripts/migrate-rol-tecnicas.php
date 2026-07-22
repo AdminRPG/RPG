@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Migración "Cartas de Técnica" (INI-03)
+ * One Piece: Eternal · Migración "Cartas de Técnica" (INI-03)
  * -------------------------------------------------
  * Dos conceptos separados:
  *   - `mybb_rol_cartas`   → BIBLIOTECA de cartas creadas (sin personaje).

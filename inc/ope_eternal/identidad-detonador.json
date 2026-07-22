@@ -1,0 +1,135 @@
+{
+  "id": "identidad-detonador",
+  "nombre": "Detonador",
+  "tipo": "identidad",
+  "version": "3.0",
+  "recurso_secundario": "Carga",
+  "recurso_base": "Generas 1 Carga cada vez que recibes daño (máx. 1 por turno enemigo) y 1 Carga cada turno que terminas sin haber realizado un ataque; también puedes autolesionarte deliberadamente para generar Carga adicional. Tope base 6; si en un turno atacas con normalidad y no generas Carga por ninguna vía, la Carga pierde 1. Se gasta a través de los nodos y técnicas de este árbol, típicamente toda de golpe en una Detonación.",
+  "resumen_arquetipo": "Detonador es la filosofía de que todo lo que soy cabe en un solo instante decisivo: no amplifica golpe a golpe ni aguanta indefinidamente, sino que absorbe castigo, se contiene, se sangra a sí mismo si hace falta y lo convierte todo en un estallido que decide el combate.",
+  "rol_mecanico": "Burst extremo de un solo golpe. Acumula un recurso lento y volátil y lo gasta entero de golpe en una Detonación; riesgo extremo, recompensa catastrófica.",
+  "corrientes": [
+    { "clave": "Acumulación", "simbolo": "α", "filosofia": "Contener. Generar y retener Carga, maximizar el tope, no perderla jamás; cada instante de espera es poder que se comprime." },
+    { "clave": "Sacrificio", "simbolo": "β", "filosofia": "Ofrendar. Convertir tu propia carne y energía en Carga masiva; cuanto más cerca del abismo, más poder disponible." },
+    { "clave": "Detonación", "simbolo": "γ", "filosofia": "Liberar. Soltar toda la Carga de golpe: en área, concentrada en un blanco, o como represalia al ser golpeado." }
+  ],
+  "focos": ["Acumulación", "Sacrificio", "Detonación"],
+  "nodos": [
+    {
+      "id": "detonador-acumulacion-t1", "codigo": "De-α1", "nombre": "Paciencia Explosiva",
+      "tier": 1, "foco": "Acumulación", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cada turno que terminas sin haber atacado generas 2 Carga en vez de 1. Además, la Carga que ganas al recibir daño ya no está limitada a 1 por turno enemigo: acumulas 1 por cada golpe que encajes. Cuanto más te golpean y más esperas, más te comprimes.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-sacrificio-t1", "codigo": "De-β1", "nombre": "Sangre por Poder",
+      "tier": 1, "foco": "Sacrificio", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Como acción de riesgo (movimiento libre, 0 PA, 1 vez por turno), puedes autolesionarte: sacrificas 5 % de tu PV máx. para generar 2 Carga de inmediato. El dolor es combustible.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-detonacion-t1", "codigo": "De-γ1", "nombre": "Chispa Reactiva",
+      "tier": 1, "foco": "Detonación", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cuando recibes daño teniendo ≥3 Carga, puedes liberar una descarga parcial como reacción (0 PA, fuera de tu turno): gastas 3 Carga para infligir al atacante daño puro que escala con la Carga gastada. Es una liberación pequeña, no una Detonación completa.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-acumulacion-t2", "codigo": "De-α2", "nombre": "Canalización",
+      "tier": 2, "foco": "Acumulación", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de canalización: pasas el turno concentrándote (no atacas) y generas Carga muy por encima del ritmo normal, escalando con el nivel de la técnica (presupuesto según NUMEROS-Y-BALANCE §7). Mientras canalizas quedas vulnerable: no puedes esquivar ni defender ese turno.",
+      "profundidad": "Si ya tienes Paciencia Explosiva (α1), la canalización no se interrumpe aunque recibas daño y, si te golpean mientras canalizas, sumas también la Carga por daño encajado.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-sacrificio-t2", "codigo": "De-β2", "nombre": "Pacto de Sangre",
+      "tier": 2, "foco": "Sacrificio", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de sacrificio que consuman PV y/o EN propios para generar Carga masiva de golpe, escalando con lo sacrificado. La ofrenda es inmediata; la Carga, tuya.",
+      "profundidad": "Si ya tienes Sangre por Poder (β1), todo PV/EN que sacrifiques por estas técnicas rinde +50 % de Carga.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-detonacion-t2", "codigo": "De-γ2", "nombre": "Detonación",
+      "tier": 2, "foco": "Detonación", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de Detonación: consumen Carga para infligir daño puro que ignora mitigación física, escalando con la Carga gastada (presupuesto según NUMEROS-Y-BALANCE §7). Una Detonación puede gastar desde una porción hasta toda tu Carga: cuanta más gastes, mayor el estallido.",
+      "profundidad": "Si ya tienes Chispa Reactiva (γ1), las Detonaciones que consuman ≥6 Carga aplican Marcado (1 turno) a los alcanzados.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-acumulacion-t3", "codigo": "De-α3", "nombre": "Reserva Profunda",
+      "tier": 3, "foco": "Acumulación", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu tope de Carga sube de 6 a 12 y la Carga ya no decae durante el combate: persiste hasta que la gastes. El Detonador respira para llenarse.",
+      "profundidad": "Si ya tienes Canalización (α2), mientras canalizas eres además inmune a movimiento forzado (empuje, Enraizado): nada rompe tu concentración.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-sacrificio-t3", "codigo": "De-β3", "nombre": "Umbral de Sangre",
+      "tier": 3, "foco": "Sacrificio", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Mientras tu PV esté por debajo del 50 %, toda la Carga que generes se duplica y tus autolesiones y técnicas de Sacrificio rinden +1 Carga adicional. Cuanto más cerca del abismo, más poder brota. El contador se ajusta dinámicamente según tu PV actual.",
+      "profundidad": "Si ya tienes Pacto de Sangre (β2), por debajo del 25 % de PV la multiplicación pasa a ×3.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-detonacion-t3", "codigo": "De-γ3", "nombre": "Radio de Destrucción",
+      "tier": 3, "foco": "Detonación", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Todas tus liberaciones de Carga (Detonaciones, Chispa Reactiva, remates) afectan además a todos los enemigos a 3 m del objetivo principal, repartiendo el efecto de la onda. Tu estallido nunca es limpio.",
+      "profundidad": "Si ya tienes Detonación (γ2), los enemigos alcanzados por esa onda expansiva quedan Ralentizados 1 turno.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-acumulacion-t4", "codigo": "De-α4", "nombre": "Masa Crítica",
+      "tier": 4, "foco": "Acumulación", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de remate que solo puedes ejecutar con tu Carga al máximo: consumen toda tu Carga y su daño se multiplica por ⌊Carga consumida ÷ 3⌋ (12 Carga = ×4). Tras ejecutarlas no puedes generar Carga durante 1 turno (el vacío tras el estallido).",
+      "profundidad": "Si ya tienes Reserva Profunda (α3), el retroceso de la explosión te recarga: eliminas la restricción de 1 turno sin generar Carga.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-sacrificio-t4", "codigo": "De-β4", "nombre": "Al Filo del Abismo",
+      "tier": 4, "foco": "Sacrificio", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Cuando una autolesión o técnica de Sacrificio fuera a reducirte por debajo de 1 PV, en su lugar quedas a 1 PV y generas Carga hasta tu tope de golpe (ofrenda total). Puedes hacerlo 1 vez por combate.",
+      "profundidad": "Si ya tienes Umbral de Sangre (β3), tras usarlo tu siguiente Detonación este combate no puede ser esquivada ni reducida por ningún medio.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-detonacion-t4", "codigo": "De-γ4", "nombre": "Detonación de Represalia",
+      "tier": 4, "foco": "Detonación", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu Chispa Reactiva ya no está limitada a 3 Carga: cuando recibes daño puedes detonar como reacción (0 PA) gastando cualquier cantidad de Carga contra el atacante, con el estallido escalando según lo gastado. Además, si el golpe recibido te deja por debajo del 25 % de PV, esa represalia no consume tu reacción del turno.",
+      "profundidad": "Si ya tienes Radio de Destrucción (γ3), estas represalias alcanzan también a todos los enemigos a 3 m del atacante.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-pinaculo-acumulacion", "codigo": "De-★α", "nombre": "Reserva Sin Fondo",
+      "tier": 5, "foco": "Acumulación", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu tope de Carga desaparece: puedes acumular sin límite, y la Carga nunca decae por ningún motivo. Toda una vida comprimida en un instante.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Acumulación",
+      "afinidad_bonus": "generas +1 Carga adicional en cada evento de generación (daño encajado, turno de contención, autolesión).",
+      "prereq": [], "excluye": ["detonador-pinaculo-sacrificio", "detonador-pinaculo-detonacion"], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-pinaculo-sacrificio", "codigo": "De-★β", "nombre": "Todo o Nada",
+      "tier": 5, "foco": "Sacrificio", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Una vez por combate puedes declarar un Sacrificio Absoluto: reduces tu PV a 1, conviertes todo el PV perdido en Carga y tu próxima Detonación este turno no puede ser mitigada, esquivada ni reducida por ningún medio. Es tu vida a cambio de un solo golpe imparable.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Sacrificio",
+      "afinidad_bonus": "puedes usar Sacrificio Absoluto dos veces por combate.",
+      "prereq": [], "excluye": ["detonador-pinaculo-acumulacion", "detonador-pinaculo-detonacion"], "decision": false, "terminal": false
+    },
+    {
+      "id": "detonador-pinaculo-detonacion", "codigo": "De-★γ", "nombre": "Cataclismo",
+      "tier": 5, "foco": "Detonación", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus Detonaciones ya no tienen tope de multiplicador por Carga, y toda Detonación que gaste ≥9 Carga golpea a todos los enemigos en un área amplia alrededor del punto de impacto.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Detonación",
+      "afinidad_bonus": "cada enemigo alcanzado por una Detonación de esta magnitud queda Aturdido 1 turno.",
+      "prereq": [], "excluye": ["detonador-pinaculo-acumulacion", "detonador-pinaculo-sacrificio"], "decision": false, "terminal": false
+    }
+  ]
+}

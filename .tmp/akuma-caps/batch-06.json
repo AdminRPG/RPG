@@ -1,0 +1,192 @@
+[
+ {
+  "slug": "fruta.moku_moku",
+  "nombre": "Moku Moku no Mi",
+  "tipo": "Logia",
+  "tipo_base": "logia",
+  "tier": "III",
+  "secundario": "AGI",
+  "desc": "La Logia del humo y el apresamiento aéreo. Transforma la estructura biológica del usuario en humo denso de propagación rápida e intangibilidad total. Permite proyectar corrientes de humo para envolver, sofocar y apresar a escuadrones enteros de combatientes sin causarles la muerte inmediata. El usuario puede utilizar la densidad del humo como propulsor de vuelo, desplazándose a gran velocidad por los cielos y mares. En combate cerrado, permite transformar los puños en lanzas de humo concentrado reforzadas con jitte de Kairoseki para neutralizar a otros usuarios. En su Despertar, expande una cortina de humo de denso espesor que anula la visibilidad y desorienta el Haki de Observación enemigo.",
+  "efecto": "Logia de humo denso, apresamiento aéreo de escuadrones sin sangrado, propulsión y combate con jitte de Kairoseki."
+ },
+ {
+  "slug": "fruta.yami_yami",
+  "nombre": "Yami Yami no Mi",
+  "tipo": "Logia (Especial)",
+  "tipo_base": "logia",
+  "tier": "V",
+  "secundario": "VOL",
+  "desc": "La Logia de la oscuridad y la gravedad abismal. Transforma el cuerpo del consumidor en la esencia de un agujero negro de oscuridad viva. A diferencia de otras Logias, **no otorga intangibilidad física**: la oscuridad atrae el daño obligando al usuario a absorber el dolor incrementado. A cambio, ejerce un control gravitacional letal (Black Hole) que succiona pueblos y fortalezas enteras en su oscuridad para aplastarlas. Su habilidad más temida es la anulación de fruta: al sujetar a cualquier usuario (Kurouzu), anula por completo sus poderes mientras dure el contacto. En su Despertar, desata marejadas de oscuridad que tragan la luz y deshabilitan el uso de Haki de Observación en archipiélagos enteros.",
+  "efecto": "Logia Especial de oscuridad (absorbe daño con dolor), gravedad Black Hole, Kurouzu y anulación de frutas por toque."
+ },
+ {
+  "slug": "fruta.bane_bane",
+  "nombre": "Bane Bane no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "AGI",
+  "desc": "La fruta de los muelles e impulsos mecánicos. Otorga la capacidad de transformar las extremidades del consumidor en potentes resortes helicoidales de acero de alta tensión. Al comprimir sus piernas de muelle contra el suelo o paredes de granito, el usuario acumula una energía elástica descomunal que se libera en saltos a velocidades cegadoras y embestidas de impacto brutal. Sus puños y brazos de muelle pueden ser retraídos para disparar puñetazos de aceleración telescópica capaces de atravesar coberturas y cascos de buques. En el plano defensivo, la estructura en espiral de sus extremidades absorbe golpes contundentes rebotando la fuerza motriz del enemigo. Su Despertar permite convertir las superficies del escenario en muelles gigantes, transformando el terreno en una trampa de rebotes ininterrumpidos.",
+  "efecto": "Transformación de piernas en muelles mecánicos, saltos de alta aceleración y puñetazos telescópicos de absorción."
+ },
+ {
+  "slug": "fruta.bisu_bisu",
+  "nombre": "Bisu Bisu no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "IV",
+  "secundario": "FUE",
+  "desc": "La fruta de las galletas infinitas. Concede el poder de generar y manipular galletas de dureza extrema capaces de resistir impactos de alta potencia. Al dar palmas con las manos, el consumidor puede moldear galletas en forma de escudos, proyectiles o construir complejos guerreros de galleta de tamaño gigante. Los soldados de galleta pueden ser manipulados desde el interior como armaduras impenetrables o enviados a combatir de forma independiente como un ejército leal. Aunque el agua o los fluidos reducen la dureza de las galletas ablandándolas, la capacidad de producción del usuario es prácticamente inagotable. En su Despertar, transforma las estructuras inorgánicas del escenario en bosques de galleta gigante con los que aplasta las divisiones enemigas.",
+  "efecto": "Generación de galletas infinitas de alta dureza, escudos de galleta y creación de un ejército de soldados guerreros."
+ },
+ {
+  "slug": "fruta.dero_dero",
+  "nombre": "Dero Dero no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "RES",
+  "desc": "La fruta de la licuación orgánica. Permite al usuario generar y segregar fluidos viscosos capaces de disolver y licuar la materia inorgánica que toca. Al proyectar sus secreciones sobre barreras de piedra o escudos de metal, los convierte en un lodo líquido perdiendo toda densidad defensiva. El combatiente puede deslizarse sobre sus propios fluidos para adquirir una velocidad de desplazamiento superior y esquivar embestidas. Permite ablandar el terreno bajo las tropas enemigas para hundirlas en ciénagas sintéticas que dificultan el uso de Haki de desplazamiento. En su Despertar, transmutará fortalezas completas en piscinas de lodo corrosivo inhabilitando la artillería enemiga.",
+  "efecto": "Licuación de materia inorgánica en fluidos viscosos, erosión de escudos de metal y creación de lodos resbaladizos."
+ },
+ {
+  "slug": "fruta.fuwa_fuwa",
+  "nombre": "Fuwa Fuwa no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "V",
+  "secundario": "INT",
+  "desc": "La fruta de la levitación inercial. Otorga el control sobre la gravedad propia y de cualquier objeto inorgánico que el usuario haya tocado previamente. Una vez tocado un objeto, el consumidor puede hacerlo flotar libremente en el aire sin importar su tonelaje, manipulando buques o islas enteras. Permite moldear masas de tierra, nieve o agua levitada en forma de leones o dragones gigantescos que se abalanzan sobre las tropas enemigas. El usuario no puede hacer levitar a otros seres vivos directamente, pero sí la tierra y las estructuras sobre las que se encuentran parados. En su Despertar, puede mantener flotas completas volando a miles de metros de altura como base de operaciones móvil.",
+  "efecto": "Levitación de objetos inorgánicos e islas enteras, modelado de masas terrestres voladoras e inercia gravitacional."
+ },
+ {
+  "slug": "fruta.hira_hira",
+  "nombre": "Hira Hira no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "AGI",
+  "desc": "La fruta de las banderas y la maleabilidad textil. Otorga el poder de transformar cualquier objeto rígido o el propio cuerpo en telas ondeantes y blandas. Al tocar escudos de acero, espadas o murallas de granito, los vuelve tan flexibles como banderas, anulando su capacidad de corte y resistencia. El usuario puede moldear su propia capa de acero ondeante para cubrirse de impactos antes de devolverle su dureza metálica original para contraatacar. Permite plegar objetos colosales en pequeños paquetes de tela para transportarlos y desplegarlos en medio del combate de forma sorpresiva. En su Despertar, hace que el propio suelo de piedra ondee como un océano de tela desestabilizando las bases de las fortalezas enemigas.",
+  "efecto": "Transformación de objetos rígidos en banderas maleables, capas defensivas de acero ondeante y plegado de equipo."
+ },
+ {
+  "slug": "fruta.ishi_ishi",
+  "nombre": "Ishi Ishi no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "IV",
+  "secundario": "FUE",
+  "desc": "La fruta del dominio de la piedra. Permite al consumidor asimilar y fusionarse con cualquier estructura o masa de piedra presente en la isla o fortaleza. Al sumergirse en la roca, el usuario se convierte en la piedra misma, pudiendo emerger en forma de un coloso de granito de cientos de metros de altura. Puede alterar el relieve del terreno, crear laberintos de piedra, erigir espías de granito y manipular el suelo para aplastar a las tropas enemigas. Mientras su cuerpo principal permanezca oculto en las profundidades de la piedra, el coloso exterior puede ser destruido y reconstituido sin sufrir daño. En su Despertar, toma el control de toda la piedra inorgánica de un archipiélago completo convirtiéndolo en un organismo viviente a su servicio.",
+  "efecto": "Asimilación y fusión con la piedra de islas completas, cuerpo de coloso de granito e inmune al daño exterior."
+ },
+ {
+  "slug": "fruta.kibi_kibi",
+  "nombre": "Kibi Kibi no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "III",
+  "secundario": "CAR",
+  "desc": "La fruta de los dangos de la domesticación. Permite al consumidor pellizcar y extraer pequeños dango comestibles desde sus propias mejillas. Al alimentar a animales salvajes o a consumidores de frutas Zoan de origen animal (como los Smile), estos quedan domesticados al instante. Las criaturas domesticadas sirven con lealtad absoluta al usuario durante un mes completo, obedeciendo cualquier orden táctica en combate. Los dango no tienen efecto sobre seres humanos convencionales ni sobre consumidores de frutas Paramecia o Logia. En su Despertar, puede lanzar dango a distancia directamente a las fauces de bestias gigantescas en medio del caos del combate.",
+  "efecto": "Dangos de las mejillas que domestican a animales salvajes y usuarios Zoan tipo Smile durante un mes completo."
+ },
+ {
+  "slug": "fruta.mane_mane",
+  "nombre": "Mane Mane no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "CAR",
+  "desc": "La fruta de la suplantación de identidad. Otorga al usuario la facultad de copiar con exactitud perfecta el rostro, cuerpo y voz de quien toque. Al tocar la cara de una persona con la mano derecha, memoriza su apariencia física; al tocarse su propio rostro con la izquierda, vuelve a su estado original. Puede almacenar una memoria fotográfica de decenas de rostros de reyes, almirantes y capitanes copiando su complexión y altura al instante. Permite sembrar el caos e infiltrarse en las cúpulas de mando enemigas dando órdenes falsas a las tropas y desactivando defensas. Aunque no copia la fuerza física o las habilidades de fruta del objetivo, la perfección de la réplica visual y vocal resulta indetectable.",
+  "efecto": "Copia fotográfica idéntica de rostro, cuerpo y voz por toque de mano derecha, ideal para infiltración y engaño."
+ },
+ {
+  "slug": "fruta.nagi_nagi",
+  "nombre": "Nagi Nagi no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "INT",
+  "desc": "La fruta de la insonorización y el silencio absoluto. Otorga al usuario el poder de crear zonas de silencio inaccesibles al sonido ambiente. Al desplegar un campo de silencio alrededor de sí mismo o de un área, ningún ruido, explosión o grito generado dentro podrá ser escuchado fuera. Permite anular por completo los ataques basados en ondas sonoras o música destructiva, neutralizando las frutas y armas de sonido. Es la herramienta de infiltración y asesinato sigiloso perfecta para neutralizar centinelas y volar fortalezas en absoluto silencio. En su Despertar, puede borrar el sonido del latido cardíaco y respiración de toda su tripulación haciéndolos imperceptibles a la detección.",
+  "efecto": "Insonorización y despliegue de zonas de silencio absoluto que anulan ataques sonoros e infiltración sigilosa."
+ },
+ {
+  "slug": "fruta.ope_ope",
+  "nombre": "Ope Ope no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "V",
+  "secundario": "INT",
+  "desc": "La fruta del cirujano espacial omnipotente. Permite desplegar un dominio esférico transparente denominado ROOM dentro del cual controla el espacio. El usuario actúa como un cirujano espacial: amputa cuerpos sin causar sangrado ni muerte, permuta posiciones (Shambles) y descarga electricidad (Scan/Electro). Atraviesa defensas de granito y armaduras pesadas para cortar órganos internos mediante bisturíes de energía espacial (Shock Wille). Su secreto supremo es la Cirugía de Juventud Eterna, que concede inmortalidad biológica a un objetivo a costa de la vida del consumidor. En su Despertar (KROOM/ANESTHESIA), imbuye sus hojas en energía espacial para atravesar la corteza terrestre desatando explosiones internas.",
+  "efecto": "Geometría espacial ROOM, amputación limpia, intercambio Shambles, bisturí de electrochoque y Cirugía Eterna."
+ },
+ {
+  "slug": "fruta.poke_poke",
+  "nombre": "Poke Poke no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "INT",
+  "desc": "La fruta de los bolsillos infinitos de la piel. Concede la capacidad de crear bolsillos de almacenamiento en cualquier parte de su cuerpo. Los bolsillos corporales poseen un espacio de almacenamiento interdimensional ilimitado donde guarda armas, cañones y suministros grandes. Permite al usuario extraer martillos gigantes, lanzas o artillería de sus bolsillos de forma sorpresiva en medio del combate cerrado. Los objetos guardados en los bolsillos no aportan peso a la anatomía del usuario, manteniéndolo ligero y ágil para el desplazamiento. En su Despertar, puede crear bolsillos en el entorno para ocultar a sus compañeros de tripulación durante emboscadas enemigas.",
+  "efecto": "Bolsillos corporales de almacenamiento interdimensional ilimitado para ocultar armas y cañones sin peso extra."
+ },
+ {
+  "slug": "fruta.sube_sube",
+  "nombre": "Sube Sube no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "I",
+  "secundario": "AGI",
+  "desc": "La fruta de la piel resbaladiza e inatrapable. Vuelve la superficie cutánea del usuario tan suave y resbaladiza que nada puede sujetarlo. Los golpes contundentes, cortes de espada, proyectiles de plomo y agarres resbalan directamente sobre su piel sin transmitir el impacto. Permite deslizarse sobre el suelo a gran velocidad como si patinara sobre hielo de fricción cero, esquivando embestidas enemigas. Como efecto secundario estético, elimina cualquier imperfección o peso innecesario del cuerpo del usuario volviéndolo estilizado. En su Despertar, transmite la propiedad resbaladiza al suelo haciendo caer e inmovilizando a las formaciones de infantería rivales.",
+  "efecto": "Piel resbaladiza de fricción cero de la cual rebotan los golpes y agarres, deslice veloz y refinamiento estético."
+ },
+ {
+  "slug": "fruta.toki_toki",
+  "nombre": "Toki Toki no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "V",
+  "secundario": "INT",
+  "desc": "La fruta de los saltos temporales exclusivamente hacia el futuro. Permite al usuario y a sus acompañantes viajar adelante en el tiempo. El consumidor puede enviar a personas, objetos o a sí mismo minutos, días, meses o décadas hacia el futuro de forma instantánea. **Es una ley inviolable de la física de esta fruta que es absolutamente imposible viajar hacia el pasado bajo ninguna circunstancia.** Permite salvar a aliados de explosiones cataclísmicas o inundaciones enviándolos segundos al futuro donde el peligro ha desaparecido. En su Despertar, puede proyectar burbujas temporales que envían a proyectiles o tropas enemigas horas al futuro sacándolas del combate.",
+  "efecto": "Saltos temporales exclusivamente hacia el futuro, salvaguarda de aliados y regla inviolable de NO retorno al pasado."
+ },
+ {
+  "slug": "fruta.woshu_woshu",
+  "nombre": "Woshu Woshu no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "III",
+  "secundario": "CAR",
+  "desc": "La fruta del lavado y la purificación del corazón. Concede la capacidad de lavar y tender a los enemigos como si fueran prendas de ropa. Al tocar a los combatientes hostiles, los lava y estira en cuerdas de tender ropa, dejándolos secar inofensivos e incapaces de combatir. Además de la alteración física textil, el lavado purifica parcialmente el corazón de los malvados, reduciendo su deseo de agresión y violencia. Permite lavar armas y espadas enemigas removiendo su filo y dejándolas blandas como trapos limpios sin capacidad de corte. En su Despertar, proyecta espumas purificadoras que pacifi can batallones enteros de piratas restaurando el orden en la zona.",
+  "efecto": "Lavado y tendido purificador de enemigos y armas, reduciendo su malevolencia y dejándolos blandos como trapos."
+ },
+ {
+  "slug": "fruta.hito_daibutsu",
+  "nombre": "Hito Hito no Mi, Modelo: Daibutsu",
+  "tipo": "Zoan (Mitológica)",
+  "tipo_base": "zoa",
+  "tier": "V",
+  "secundario": "VOL",
+  "desc": "La Zoan Mitológica de la estatua de Buda gigante de oro macizo. Transforma la anatomía del consumidor en un coloso dorado de aura divina. En esta forma, la masa muscular, la durabilidad física y el tamaño del usuario aumentan a escala titánica, volviéndose impenetrable ante la artillería. Al golpear con las palmas de sus manos doradas extendidas, proyecta ondas de choque de energía dorada capaces de arrasar divisiones enteras. Posee una fortaleza mental e inmunidad ante estados alterados provocados por venenos o ilusiones gracias a su serenidad espiritual de Buda. En su Despertar, desata impactos de ondas de choque de 360 grados que pulverizan el terreno circundante e inmovilizan a los rivales.",
+  "efecto": "Zoan Mitológica de Buda gigante dorado, durabilidad de oro macizo y palmazos de ondas de choque divinas."
+ },
+ {
+  "slug": "fruta.mogu_mogu",
+  "nombre": "Mogu Mogu no Mi",
+  "tipo": "Zoan (Estándar)",
+  "tipo_base": "zoa",
+  "tier": "II",
+  "secundario": "FUE",
+  "desc": "La Zoan Estándar del topo. Otorga al consumidor la capacidad de transformarse en un topo gigante dotado de garras de excavación de alta resistencia. Permite cavar y desplazarse por el subterráneo a gran velocidad, creando túneles y galerías subterráneas para emboscadas tácticas. Sus garras de acero prehistórico pueden destrozar defensas de piedra y cortar la carne de los enemigos en embestidas desde el subsuelo. Excelente para misiones de sabotaje bajo fortalezas militares, haciendo colapsar los cimientos de los baluartes enemigos desde abajo. En su Despertar, incrementa la velocidad de excavación permitiendo provocar hundimientos de tierra masivos en el campo de batalla.",
+  "efecto": "Zoan Estándar de topo con excavación subterránea veloz, emboscadas desde el subsuelo y desprendimientos de tierra."
+ },
+ {
+  "slug": "fruta.ryu_pteranodon",
+  "nombre": "Ryu Ryu no Mi, Modelo: Pteranodon",
+  "tipo": "Zoan (Antigua)",
+  "tipo_base": "zoa",
+  "tier": "IV",
+  "secundario": "FUE",
+  "desc": "La Zoan Antigua del pteranodón prehistórico. Transforma al usuario en un reptil volador ancestral de piel acorazada y cresta elástica. Otorga un vuelo supersónico a velocidades Mach 3, realizando embestidas aéreas y tajos de ala cortantes que dividen barcos de guerra. Su cresta elástica puede ser jalada hacia atrás para dispararla como un proyectil perforante de alta presión capable de perforar granito. Sus garras y pico prehistórico desgarran la carne y las armaduras metálicas con la contundencia de las bestias de la era primaria. En su Despertar, adquiere una velocidad de maniobra aérea que le permite bombardear fortalezas enemigas desde los cielos sin ser visto.",
+  "efecto": "Zoan Antigua de Pteranodón con vuelo Mach 3, embestidas aéreas y disparos de cresta elástica de alta presión."
+ }
+]

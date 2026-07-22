@@ -1,18 +1,18 @@
 <?php
 /**
- * Migración Oleada 1 — Sistema GBEternal + Motor de PP (Puntos de Progreso).
+ * Migración Oleada 1 — Sistema OPE Eternal + Motor de PP (Puntos de Progreso).
  *
  * Idempotente: comprueba existencia antes de insertar/crear.
  *
  * Qué hace:
- *   1. Crea el usuario MyBB `GBEternal` (uid reservado).
+ *   1. Crea el usuario MyBB `OPE Eternal` (uid reservado).
  *   2. Crea la cuenta rol `rol_cuentas` y el personaje `rol_personajes` del sistema.
  *   3. Crea tablas `rol_pp_log` y `rol_pp_saldo`.
  *   4. Añade columna `pp_gastado` a `rol_pp_saldo` si no existe.
  *
  * Ejecutar:
  *   & "C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe" ^
- *     "C:\Users\Fgonz\Documents\Proyectos\I-Forge-RPG\scripts\migrate-oleada1.php"
+ *     "C:\Users\Fgonz\Documents\Proyectos\One Piece: Eternal\scripts\migrate-oleada1.php"
  */
 
 error_reporting(E_ALL);
@@ -35,21 +35,21 @@ function oleada1_run(mysqli $db, string $sql, string $label): void
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 1. USUARIO SISTEMA GBEternal
+// 1. USUARIO SISTEMA OPE Eternal
 // ═══════════════════════════════════════════════════════════════════════════
 
-echo "\n=== 1. USUARIO SISTEMA GBEternal ===\n";
+echo "\n=== 1. USUARIO SISTEMA OPE Eternal ===\n";
 
 // 1a. Buscar un uid pequeño libre (intentamos uid=2 primero, si no, el siguiente).
 $sys_uid = 0;
 $res = $db->query("SELECT uid FROM `{$PREFIX}users` WHERE uid = 2 LIMIT 1");
 if ($res && $res->num_rows > 0) {
-    // uid=2 ya existe. Ver si es GBEternal.
+    // uid=2 ya existe. Ver si es OPE Eternal.
     $row = $res->fetch_assoc();
-    $check = $db->query("SELECT uid FROM `{$PREFIX}users` WHERE uid = 2 AND username = 'GBEternal' LIMIT 1");
+    $check = $db->query("SELECT uid FROM `{$PREFIX}users` WHERE uid = 2 AND username = 'OPE Eternal' LIMIT 1");
     if ($check && $check->num_rows > 0) {
         $sys_uid = 2;
-        echo "  [skip] GBEternal ya existe como uid=2\n";
+        echo "  [skip] OPE Eternal ya existe como uid=2\n";
     } else {
         // uid=2 ocupado por otro. Buscar siguiente libre.
         $res3 = $db->query("SELECT MAX(uid)+1 AS nxt FROM `{$PREFIX}users`");
@@ -62,11 +62,11 @@ if ($res && $res->num_rows > 0) {
 
 // 1b. Crear usuario MyBB si no existe.
 if ($sys_uid > 0) {
-    $exists = $db->query("SELECT uid FROM `{$PREFIX}users` WHERE username = 'GBEternal' LIMIT 1");
+    $exists = $db->query("SELECT uid FROM `{$PREFIX}users` WHERE username = 'OPE Eternal' LIMIT 1");
     if ($exists && $exists->num_rows > 0) {
         $row = $exists->fetch_assoc();
         $sys_uid = (int) $row['uid'];
-        echo "  [skip] usuario GBEternal ya existe (uid={$sys_uid})\n";
+        echo "  [skip] usuario OPE Eternal ya existe (uid={$sys_uid})\n";
     } else {
         $now = time();
         $salt = substr(bin2hex(random_bytes(4)), 0, 8);
@@ -77,13 +77,13 @@ if ($sys_uid > 0) {
                 (uid, username, password, salt, loginkey, email,
                  usergroup, displaygroup, regdate, lastactive, lastvisit,
                  signature, buddylist, ignorelist, pmfolders, notepad, usernotes)
-            VALUES (?, 'GBEternal', ?, ?, ?, 'system@ope.local',
+            VALUES (?, 'OPE Eternal', ?, ?, ?, 'system@ope.local',
                     4, 4, ?, ?, ?,
                     '', '', '', '', '', '')
         ");
         $stmt->bind_param('isssiii', $sys_uid, $pass, $salt, $loginkey, $now, $now, $now);
         if ($stmt->execute()) {
-            echo "  [OK] usuario GBEternal creado (uid={$sys_uid})\n";
+            echo "  [OK] usuario OPE Eternal creado (uid={$sys_uid})\n";
         } else {
             fwrite(STDERR, "  [ERROR] crear usuario: " . $stmt->error . "\n");
             exit(1);
@@ -96,28 +96,28 @@ if ($sys_uid > 0) {
 if ($sys_uid > 0 && table_exists($db, "{$PREFIX}rol_cuentas")) {
     $r = $db->query("SELECT uid FROM `{$PREFIX}rol_cuentas` WHERE uid = {$sys_uid} LIMIT 1");
     if ($r && $r->num_rows > 0) {
-        echo "  [skip] cuenta rol GBEternal ya existe\n";
+        echo "  [skip] cuenta rol OPE Eternal ya existe\n";
     } else {
         $now = time();
         $stmt = $db->prepare("INSERT INTO `{$PREFIX}rol_cuentas` (uid, staff_level, slots, personaje_activo, dateline) VALUES (?, 3, 3, 0, ?)");
         $stmt->bind_param('ii', $sys_uid, $now);
         $stmt->execute();
         $stmt->close();
-        echo "  [OK] cuenta rol GBEternal creada\n";
+        echo "  [OK] cuenta rol OPE Eternal creada\n";
     }
 }
 
 // 1d. Crear personaje sistema (rol_personajes).
 $sys_pid = 0;
 if ($sys_uid > 0 && table_exists($db, "{$PREFIX}rol_personajes")) {
-    $r = $db->query("SELECT pid FROM `{$PREFIX}rol_personajes` WHERE uid = {$sys_uid} AND nombre = 'GBEternal' LIMIT 1");
+    $r = $db->query("SELECT pid FROM `{$PREFIX}rol_personajes` WHERE uid = {$sys_uid} AND nombre = 'OPE Eternal' LIMIT 1");
     if ($r && $r->num_rows > 0) {
         $sys_pid = (int) $r->fetch_assoc()['pid'];
-        echo "  [skip] personaje GBEternal ya existe (pid={$sys_pid})\n";
+        echo "  [skip] personaje OPE Eternal ya existe (pid={$sys_pid})\n";
     } else {
         $now = time();
         $datos = json_encode(array(
-            'concepto' => 'Sistema automático de Granblue Fantasy: Eternal',
+            'concepto' => 'Sistema automático de One Piece: Eternal',
             'faccion' => '',
             'raza' => array('principal' => 'Humano'),
             'puro' => true,
@@ -128,7 +128,7 @@ if ($sys_uid > 0 && table_exists($db, "{$PREFIX}rol_personajes")) {
             'pc_gastados' => 0,
         ), JSON_UNESCAPED_UNICODE);
         $bio = json_encode(array(
-            'historia' => 'GBEternal es el sistema automático que gestiona viajes, misiones y eventos del mundo de Granblue Fantasy: Eternal.',
+            'historia' => 'OPE Eternal es el sistema automático que gestiona viajes, misiones y eventos del mundo de One Piece: Eternal.',
             'apariencia' => '',
             'personalidad' => '',
         ), JSON_UNESCAPED_UNICODE);
@@ -138,7 +138,7 @@ if ($sys_uid > 0 && table_exists($db, "{$PREFIX}rol_personajes")) {
                  avatar, datos, inventario, economia, bio,
                  staff_rol, staff_narrador, es_npc,
                  dateline, lastedit)
-            VALUES (?, 'GBEternal', 'op-eternal', 'aprobado', 1, 'SS', 1,
+            VALUES (?, 'OPE Eternal', 'op-eternal', 'aprobado', 1, 'SS', 1,
                     '', ?, '[]', '[]', ?,
                     'webmaster', 1, 1,
                     ?, ?)
@@ -146,7 +146,7 @@ if ($sys_uid > 0 && table_exists($db, "{$PREFIX}rol_personajes")) {
         $stmt->bind_param('issii', $sys_uid, $datos, $bio, $now, $now);
         if ($stmt->execute()) {
             $sys_pid = (int) $db->insert_id;
-            echo "  [OK] personaje GBEternal creado (pid={$sys_pid})\n";
+            echo "  [OK] personaje OPE Eternal creado (pid={$sys_pid})\n";
         } else {
             fwrite(STDERR, "  [ERROR] crear personaje: " . $stmt->error . "\n");
             exit(1);
@@ -199,6 +199,6 @@ oleada1_run($db, "
 ", 'rol_pp_log');
 
 echo "\n=== DONE ===\n";
-echo "GBEternal: uid={$sys_uid}, pid={$sys_pid}\n";
+echo "OPE Eternal: uid={$sys_uid}, pid={$sys_pid}\n";
 
 $db->close();

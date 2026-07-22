@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Migración acompañantes (NPCs secundarios ↔ personaje)
+ * One Piece: Eternal · Migración acompañantes (NPCs secundarios ↔ personaje)
  * ----------------------------------------------------------------
  * Vincula NPCs de mybb_rol_npcs_secundarios a personajes (máx. 2 por pid).
  *

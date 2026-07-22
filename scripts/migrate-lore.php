@@ -1,8 +1,8 @@
 <?php
 /**
- * I-Forge · Migración de Biblioteca de Lore (mybb_rol_lore)
+ * One Piece: Eternal · Migración de Biblioteca de Lore (mybb_rol_lore)
  * ---------------------------------------------------------------
- * Crea la tabla del lore del mundo de Granblue Fantasy: Eternal.
+ * Crea la tabla del lore del mundo de One Piece: Eternal.
  * No siembra datos; el seed se ejecuta con scripts/seed-lore.php.
  *
  * Ejecutar:  php scripts/migrate-lore.php

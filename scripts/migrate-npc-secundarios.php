@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Migración "NPCs Secundarios" (STF-14)
+ * One Piece: Eternal · Migración "NPCs Secundarios" (STF-14)
  * -------------------------------------------------
  * Tabla para almacenar fichas simplificadas de NPCs secundarios (no-jugadores
  * de apoyo, sin ficha completa de personaje). Cada entrada tiene nombre,

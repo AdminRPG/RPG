@@ -1,0 +1,202 @@
+[
+ {
+  "slug": "fruta.goro_goro",
+  "nombre": "Goro Goro no Mi",
+  "tipo": "Logia",
+  "tipo_base": "logia",
+  "tier": "V",
+  "secundario": "VOL",
+  "desc": "La Logia del rayo y la intangibilidad eléctrica. Convierte la sustancia corporal del consumidor en electricidad pura de hasta 200 millones de voltios. Otorga una intangibilidad de plasma incandescente que disipa ataques físicos, permitiendo viajar a velocidad relámpago a través de materiales conductores. Sus descargas eléctricas pueden carbonizar flotas navales desde millas de distancia o derretir metales para moldearlos con electromagnetismo. Permite escuchar las ondas de radio y vibraciones del aire a través del electromagnetismo, vigilando islas enteras como una deidad ominosa. Si el corazón del usuario se detiene en combate, puede aplicar desfibrilación eléctrica reaccionaria interna para volver a la vida.",
+  "efecto": "Logia de rayo, 200M voltios, intangibilidad de plasma, velocidad de conducción y desfibrilación reaccionaria."
+ },
+ {
+  "slug": "fruta.numa_numa",
+  "nombre": "Numa Numa no Mi",
+  "tipo": "Logia",
+  "tipo_base": "logia",
+  "tier": "III",
+  "secundario": "RES",
+  "desc": "La Logia del pantano y el fango devorador. Transforma la masa corporal del usuario en un barro viscoso de profundidad sin fondo. Otorga una intangibilidad de fango que absorbe los golpes físicos y disparos de artillería tragándolos en su interior sin sufrir daño. Su cuerpo de pantano actúa como un almacén infinito capaz de tragar y guardar suministros, cañones, tesoros o cautivos en su fango interno. Puede extender marejadas de barro sobre el terreno para ahogar y asfixiar a las vanguardias enemigas atrapándolas en arenas movedizas. En su Despertar, convierte puertos enteros en ciénagas pantanosas que devoran los buques de guerra de las flotas enemigas.",
+  "efecto": "Logia de pantano viscoso, intangibilidad de fango devorador y almacén infinito de cañones y suministros."
+ },
+ {
+  "slug": "fruta.aro_aro",
+  "nombre": "Aro Aro no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "AGI",
+  "desc": "La fruta de los aros y vectores cinéticos. Otorga al consumidor la capacidad mística de manifestar aros luminosos sobre superficies sólidas o en el aire que actúan como aceleradores o deflectores direccionales. Cualquier cuerpo, proyectil o combatiente que atraviese o toque uno de estos aros es impulsado instantáneamente con una aceleración cinematográfica ineludible en la trayectoria prefijada. Los estrategas de combate convierten el campo de batalla en un complejo sistema de rebotes cinéticos, permitiendo redirigir ataques enemigos a quemarropa o lanzar proyectiles con potencia triplicada. Permite además proyectar barreras de aros reaccionarios de 0 PA para desviar estocadas físicas y cañonazos hacia los propios atacantes. En su Despertar, los aros pueden manifestarse en dimensiones gigantescas, atrapando escuadrones enteros en bucles de aceleración continua.",
+  "efecto": "Manifestación de vectores cinéticos de aceleración, empuje direccional de proyectiles y barreras reaccionarias desvíadoras."
+ },
+ {
+  "slug": "fruta.bari_bari",
+  "nombre": "Bari Bari no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "IV",
+  "secundario": "RES",
+  "desc": "Una Paramecia defensiva inexpugnable que permite al usuario erigir barreras de fuerza invisibles e indestructibles cruzando simplemente los dedos de sus manos. Dichas superficies transparentes repelen cualquier clase de ataque físico, cortes de espada de gran maestría, explosiones pirotécnicas o descargas elementales sin sufrir una sola fisura. El combatiente puede modelar sus barreras como muros frontales, cúpulas protectoras para aliados o proyectarlas hacia adelante a gran velocidad como un ariete aplastante. Permite erigir escaleras de fuerza invisibles para caminar por los cielos o aplastar a los enemigos aprisionándolos entre dos barreras convergentes. En su Despertar, despliega fortalezas de barrera insulares capaces de resistir bombardeos de flotas completas sin ceder un milímetro.",
+  "efecto": "Despliegue de barreras invisibles e indestructibles de fuerza, cúpulas protectoras y arietes de empuje aplastante."
+ },
+ {
+  "slug": "fruta.buki_buki",
+  "nombre": "Buki Buki no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "III",
+  "secundario": "FUE",
+  "desc": "La fruta de las armas humanas. Otorga la capacidad de transformar cualquier parte del cuerpo del consumidor en cualquier arma blanca o de fuego conocida. El usuario puede convertir sus brazos en espadas de gran filo, hachas de combate, cañones de artillería, ametralladoras o incluso misiles de detonación masiva. Incluso si su cuerpo es destruido en una auto-detonación en forma de misil, la fruta le permite reensamblarse a partir de los fragmentos metálicos resultantes. Ofrece una versatilidad táctica inigualable para adaptarse a cualquier distancia de combate cambiando de armamento en fracciones de segundo. En su Despertar, puede manifestar complejas baterías de artillería pesada e influir en el metal del entorno para forjar armas gigantescas.",
+  "efecto": "Transformación de extremidades en cualquier arma blanca o de fuego, metralla de autodetonación y reensamblaje."
+ },
+ {
+  "slug": "fruta.doku_doku",
+  "nombre": "Doku Doku no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "IV",
+  "secundario": "RES",
+  "desc": "La fruta del veneno y la toxicidad corrosiva. Convierte al consumidor en una caldera biológica de toxinas, gases sofocantes y ácidos corrosivos. Exuda masivas cantidades de veneno líquido que abrasan la piel y los pulmones de quienes se acerquen, formando una capa impenetrable de veneno sobre su torso. Su técnica más temida es el Veneno Kinjite (Demonio Rojo), una toxina ácida y contagiosa que destruye la materia orgánica y el terreno a su paso. El usuario posee inmunidad natural ante cualquier veneno ingerido o inhalado, aunque su consumo diario le provoca malestares digestivos continuos. En su Despertar, satura islas enteras de miasmas letales que impiden la respiración y destruyen las reservas de suministro enemigo.",
+  "efecto": "Generación de venenos masivos corrosivos, vapores paralisantes, armadura de toxinas y veneno rojo Kinjite."
+ },
+ {
+  "slug": "fruta.gocha_gocha",
+  "nombre": "Gocha Gocha no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "III",
+  "secundario": "FUE",
+  "desc": "La fruta de la fusión corporal masiva. Permite al usuario fusionar su cuerpo con múltiples personas para formar un gigante compuesto de gran potencia. Al sujetar a varios combatientes o aliados, integra su masa muscular y fuerza en un solo organismo colosal que actúa bajo su mando. El gigante resultante conserva la resistencia combinada de todos sus integrantes, convirtiéndose en un baluarte de demolición frontal. La fusión puede ser disuelta a voluntad cuando la batalla concluye o cuando se requiere dispersar a las tropas para maniobras evasivas. En su Despertar, permite integrar armas y armaduras de los fusionados en una sola estructura metálica de guerra impenetrable.",
+  "efecto": "Fusión corporal masiva con múltiples aliados para formar un gigante compuesto de fuerza muscular multiplicada."
+ },
+ {
+  "slug": "fruta.horo_horo",
+  "nombre": "Horo Horo no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "III",
+  "secundario": "CAR",
+  "desc": "La fruta de los fantasmas y la depresión espiritual. Permite al usuario generar y controlar espectros ectoplásmicos de propiedades espirituales únicas. Sus fantasmas atraviesan defensas físicas; al pasar a través del pecho de un enemigo, le inyectan una falta de autoestima que lo hace caer de rodillas. Permite proyectar la propia alma del consumidor como un fantasma gigante e intangible para espiar campamentos enemigos o provocar detonaciones espirituales. Los espectros pueden unirse para formar bombas de ectoplasma que explotan con ráfagas de presión contra las tropas rivales. En su Despertar, genera una red de fantasmas negativos que abarca campos de batalla completos inhabilitando la voluntad de combate de ejércitos.",
+  "efecto": "Generación de fantasmas negativos ectoplásmicos, anulación de la voluntad de combate por depresión y bombas de alma."
+ },
+ {
+  "slug": "fruta.jake_jake",
+  "nombre": "Jake Jake no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "I",
+  "secundario": "FUE",
+  "desc": "La fruta de la chaqueta humana. Otorga al usuario la capacidad de transformar su cuerpo en una chaqueta con cremallera y mangas adaptables. Al ser vestida por otra persona o criatura salvaje, el consumidor toma el control total de la mente, fuerza física y habilidades del portador. Permite a un combatiente astuto vestir el cuerpo de un monstruo o de un guerrero de fuerza sobrehumana para combatir con sus atributos multiplicados. La cremallera asegura un agarre irrompible sobre el cuerpo poseído hasta que el usuario decida quitársela o liberarlo voluntariamente. En su Despertar, puede extender sus mangas de chaqueta a distancia para envolver y poseer a líderes enemigos en pleno combate.",
+  "efecto": "Chaqueta humana adaptable para vestir y controlar la mente y fuerza de criaturas y guerreros sobrehumanos."
+ },
+ {
+  "slug": "fruta.kiro_kiro",
+  "nombre": "Kiro Kiro no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "FUE",
+  "desc": "La fruta del control de masa de 1 a 10.000 kilos. Permite alterarle el peso corporal al usuario desde 1 kilogramo hasta 10 toneladas a voluntad. Al aligerar su peso a 1 kg, el usuario puede flotar en el aire impulsado por la brisa o sombrillas como si fuera una pluma liviana. Una vez posicionado sobre un oponente, multiplica instantáneamente su peso a 10.000 kg cayendo en un aplastamiento devastador (10 Ton Press). Le permite ejecutar saltos de gran altura y modificar la inercia de sus puñetazos en pleno vuelo para sorprender a los defensores enemigos. En su Despertar, puede transmitir la variación de peso a las armas que sostiene o al terreno que pisa para hundir estructuras.",
+  "efecto": "Alteración de peso corporal de 1 kg a 10.000 kg (10 Ton Press), flotación con brisa e impactos de aplastamiento."
+ },
+ {
+  "slug": "fruta.memo_memo",
+  "nombre": "Memo Memo no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "III",
+  "secundario": "INT",
+  "desc": "La fruta del montaje de memoria. Permite extraer los recuerdos de las personas en forma de tiras de película fotográfica saliendo de sus cabezas. El usuario puede tijeretear y recortar fragmentos de memoria indeseados o pegar nuevos fotogramas falsos para alterar el pasado de una persona. Permite hacer que un enemigo olvide la existencia del usuario, borrar el recuerdo de sus técnicas de combate o implantar falsas lealtades. Es la herramienta de manipulación e inteligencia definitiva para interrogar cautivos o pacificar combatientes hostiles sin derramar sangre. En su Despertar, proyecta destellos de fotogramas ilusorios que aturden y desorientan a las tropas rivales en combate masivo.",
+  "efecto": "Extracción y montaje de recuerdos en cinta de película fotográfica, borrado de memorias e implantación de recuerdos."
+ },
+ {
+  "slug": "fruta.nikyu_nikyu",
+  "nombre": "Nikyu Nikyu no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "V",
+  "secundario": "FUE",
+  "desc": "La fruta de las zarpas y la repulsión absoluta. Almacena almohadillas felinas en las palmas del usuario capaces de repeler cualquier materia o energía. Repele ataques físicos, disparos de cañón, llamaradas elementales y aire a velocidad luz, así como la fatiga muscular y el dolor biológico. Permite repeler el propio cuerpo del usuario para viajar por los cielos durante días o comprimir el aire en bombas destructivas (Ursus Shock). Puede extraer el sufrimiento y heridas de un aliado condensándolos en una burbuja roja que puede ser transferida a un enemigo. En su Despertar, genera campos de repulsión orbitales que desvían meteoros y bombardeos navales masivos fuera del archipiélago.",
+  "efecto": "Zarpas de repulsión a velocidad luz de materia, ataques, dolor y fatiga muscular e impulsos Ursus Shock."
+ },
+ {
+  "slug": "fruta.oshi_oshi",
+  "nombre": "Oshi Oshi no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "III",
+  "secundario": "FUE",
+  "desc": "La fruta del moldeado de la tierra y la roca. Otorga la capacidad de manipular el suelo de piedra como si fuera plastilina o arcilla suave. El usuario puede meterse bajo tierra abriendo túneles con los puños, empujar murallas de granito y crear rampas o trampas de roca. Permite moldear coberturas de piedra en segundos, deformar el terreno bajo los pies de las tropas rivales y levantar trincheras defensivas. La piedra conservará su dureza original una vez moldeada, permitiendo forjar estructuras de granito duraderas para la tripulación. En su Despertar, puede remodelar la arquitectura de ciudades enteras desplazando edificios y fortalezas a su conveniencia táctica.",
+  "efecto": "Moldeado de la piedra y roca terrestre como si fuera arcilla o plastilina, creando túneles y coberturas duraderas."
+ },
+ {
+  "slug": "fruta.sabi_sabi",
+  "nombre": "Sabi Sabi no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "II",
+  "secundario": "AGI",
+  "desc": "La fruta del óxido instantáneo y la corrosión metálica. Permite al consumidor oxidar y desintegrar cualquier metal al contacto físico. Al tocar espadas de gran maestría, armaduras de hierro o cañones de bronce, los convierte en herrumbre desmoronada en milisegundos. Otorga una defensa absoluta frente a espadachines y combatientes armados, neutralizando su arsenal con solo sujetar sus hojas. Permite oxidar las estructuras óseas y articulaciones de los enemigos al contacto directo, provocando rigidez y dolor agudo en sus cuerpos. En su Despertar, proyecta auras de corrosión que desintegran la artillería naval y los vehículos blindados enemiga en un amplio radio.",
+  "efecto": "Óxido instantáneo de espadas y metales al contacto, corrosión de herrumbre e inhabilitación de artillería."
+ },
+ {
+  "slug": "fruta.suke_suke",
+  "nombre": "Suke Suke no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "III",
+  "secundario": "AGI",
+  "desc": "La fruta de la invisibilidad total. Concede la capacidad de volver invisible su propio cuerpo, ropas y cualquier objeto que toque. Permite infiltrarse en instalaciones enemigas, esquivar la guardia de los centinelas y posicionarse en retaguardia sin ser detectado. Al tocar armas pesadas, cañones o embarcaciones pequeñas, las vuelve invisibles para lanzar ataques sorpresa que desconciertan al rival. Aunque no oculta la presencia a los usuarios avanzados de Haki de Observación, su invisibilidad física resulta devastadora contra la tropa. En su Despertar, puede volver invisible a tripulaciones completas o a buques de guerra para ejecutar abordajes fantasma.",
+  "efecto": "Invisibilidad total propia y de objetos/embarcaciones tocadas, ideal para infiltración y abordajes fantasma."
+ },
+ {
+  "slug": "fruta.toshi_toshi",
+  "nombre": "Toshi Toshi no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "IV",
+  "secundario": "CAR",
+  "desc": "La fruta de la alteración de la edad biológica. Permite al usuario modificar libremente su propia edad y la de cualquier persona que toque. Puede rejuvenecer a sus enemigos convirtiéndolos en niños inofensivos o envejecerlos hasta volverlos ancianos débiles e incapaces de combatir. El usuario puede modificar su propia edad para adaptarse a diversas situaciones tácticas, alcanzando su plenitud física o distrayendo rivales. Sus ataques de alteración de edad alteran temporalmente la musculatura y resistencia de las tropas enemigas desarticulando su vanguardia. En su Despertar, proyecta distorsiones de edad en área que convierten a escuadrones enteros de soldados en niños o ancianos.",
+  "efecto": "Alteración libre de la edad biológica propia y de enemigos, convirtiéndolos en niños o ancianos inofensivos."
+ },
+ {
+  "slug": "fruta.zushi_zushi",
+  "nombre": "Zushi Zushi no Mi",
+  "tipo": "Paramecia",
+  "tipo_base": "paramecia",
+  "tier": "V",
+  "secundario": "VOL",
+  "desc": "La fruta de las fuerzas gravitacionales cataclísmicas. Otorga el control sobre la gravedad de atracción y repulsión en un amplio radio de acción. El consumidor puede incrementar la gravedad sobre los enemigos para aplastarlos contra el suelo hasta fracturar la piedra (Gravito). Invierte la gravedad de superficies completas para hacer levitar escombros y buques de guerra, utilizándolos como plataformas o proyectiles. Extiende su alcance gravitacional hacia el espacio exterior para atraer meteoros incandescentes que caen sobre el campo de batalla. En su Despertar, genera pozos de gravedad tan intensos que distorsionan los ataques de luz y energía proyectados en su contra.",
+  "efecto": "Control de fuerzas gravitacionales, aplastamiento terrestre Gravito, inversión de gravedad y atracción de meteoros."
+ },
+ {
+  "slug": "fruta.inu_kyubi",
+  "nombre": "Inu Inu no Mi, Modelo: Kyubi no Kitsune",
+  "tipo": "Zoan (Mitológica)",
+  "tipo_base": "zoa",
+  "tier": "V",
+  "secundario": "CAR",
+  "desc": "La Zoan Mitológica del zorro de nueve colas (Kyubi no Kitsune). Otorga la transformación en un zorro místico de múltiples colas con poder de ilusión. Su habilidad más temida es la suplantación perfecta: al transformarse en otra persona, copia con exactitud absoluta su rostro, cuerpo, ropa y voz. Permite infiltrarse en las filas de las tripulaciones enemigas o fortalezas militares sin despertar la menor sospecha entre sus capitanes. En combate, sus nueve colas actúan como látigos de fuerza sobrehumana capaces de bloquear estocadas y aplastar unidades de infantería. En su Despertar, puede proyectar ilusiones de niebla que confunden la orientación espacial y los sentidos de batallones enteros.",
+  "efecto": "Zoan Mitológica de zorro de 9 colas con suplantación idéntica perfecta de rostro/cuerpo y golpes de cola."
+ },
+ {
+  "slug": "fruta.neko_sable",
+  "nombre": "Neko Neko no Mi, Modelo: Dientes de Sable",
+  "tipo": "Zoan (Antigua)",
+  "tipo_base": "zoa",
+  "tier": "IV",
+  "secundario": "FUE",
+  "desc": "La Zoan Antigua del tigre dientes de sable (Smilodon). Transforma al usuario en un depredador prehistórico de colmillos colosales. Otorga una masa muscular y fuerza bruta prehistórica capaz de romper coberturas de piedra y aplastar a los campeones de la infantería enemiga. Sus dos colmillos principales actúan como dagas de marfil de durabilidad antigua capaces de perforar cascos de acero de barcos de guerra. Su piel acorazada prehistórica ofrece una resistencia nativa superior frente a cañonazos y cortes de espada convencionales. En su Despertar, desata embestidas de cazador ancestral que aterrorizan a las bestias y soldados enemigos mediante rugidos de conmoción.",
+  "efecto": "Zoan Antigua de tigre dientes de sable con colmillos colosales, fuerza bruta prehistórica y piel acorazada."
+ },
+ {
+  "slug": "fruta.tori_fenix",
+  "nombre": "Tori Tori no Mi, Modelo: Fénix",
+  "tipo": "Zoan (Mitológica)",
+  "tipo_base": "zoa",
+  "tier": "V",
+  "secundario": "RES",
+  "desc": "La Zoan Mitológica del ave fénix místico. Transforma al usuario en un ave legendaria envuelta en vibrantes llamas azules de escarcha. A diferencia del fuego común, sus Llamas Azules de la Resurrección no queman ni destruyen, sino que poseen un poder sanador ilimitado. Cualquier herida física, amputación o corte sufrido en combate se regenera al instante al brotar las llamas azules de su torso de ave. Puede extender sus llamas curativas a sus aliados para cerrar sus lesiones y devolverles la vitalidad en plena batalla naval o terrestre. En su Despertar, despliega alas de fénix de gran envergadura que repelen bombardeos masivos mientras sanan a toda su tripulación.",
+  "efecto": "Zoan Mitológica de Ave Fénix con Llamas Azules de Regeneración mística que sanan cualquier herida o amputación."
+ }
+]

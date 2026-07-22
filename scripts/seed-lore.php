@@ -1,8 +1,8 @@
 <?php
 /**
- * I-Forge · Seed de Biblioteca de Lore
+ * One Piece: Eternal · Seed de Biblioteca de Lore
  * ---------------------------------------------------------------
- * Lee todos los archivos .md de I-Forge-Sistema y los inserta
+ * Lee todos los archivos .md de One Piece: Eternal-Sistema y los inserta
  * en la tabla mybb_rol_lore con categorías y subcategorías.
  *
  * Requisito previo: ejecutar php scripts/migrate-lore.php
@@ -15,9 +15,9 @@ ini_set('display_errors', '1');
 require __DIR__ . '/_db-config.php';
 
 $PREFIX = 'mybb_';
-$SISTEMA_ROOT = realpath(__DIR__ . '/../../I-Forge-Sistema');
+$SISTEMA_ROOT = realpath(__DIR__ . '/../../One Piece: Eternal-Sistema');
 if (!$SISTEMA_ROOT || !is_dir($SISTEMA_ROOT)) {
-    die("Error: I-Forge-Sistema directory not found at expected location.\n");
+    die("Error: One Piece: Eternal-Sistema directory not found at expected location.\n");
 }
 $TABLE = "{$PREFIX}rol_lore";
 
@@ -222,7 +222,7 @@ if (is_file($file)) {
     $raw = file_get_contents($file);
     $html = seed_md_to_html($raw);
     seed_insert_lore($db, $TABLE, array(
-        'nombre' => 'Granblue Fantasy: Eternal: Sinopsis',
+        'nombre' => 'One Piece: Eternal: Sinopsis',
         'slug' => 'sinopsis-one-piece-eternal',
         'categoria' => 'historia',
         'subcategoria' => 'sinopsis',

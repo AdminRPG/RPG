@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Mensajes Directos
+ * One Piece: Eternal · Mensajes Directos
  * Bandeja de mensajes por personaje: lista de hilos, lectura, envío y respuesta.
  */
 
@@ -13,7 +13,7 @@ $bbname    = htmlspecialchars_uni($mybb->settings['bbname']);
 $loggedin  = (int)($mybb->user['uid'] ?? 0) > 0;
 $uid       = (int)($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
-$activePid = (int)($mybb->user['gbe_active_pid'] ?? 0);
+$activePid = (int)($mybb->user['ope_active_pid'] ?? 0);
 
 // Fallback: buscar personaje activo
 if ($activePid <= 0 && $loggedin && $db->table_exists('rol_personajes')) {
@@ -22,8 +22,8 @@ if ($activePid <= 0 && $loggedin && $db->table_exists('rol_personajes')) {
 }
 
 $staff_level = 0;
-if ($loggedin && isset($mybb->user['gbe_staff_level'])) {
-    $staff_level = (int)$mybb->user['gbe_staff_level'];
+if ($loggedin && isset($mybb->user['ope_staff_level'])) {
+    $staff_level = (int)$mybb->user['ope_staff_level'];
 }
 
 // POST: enviar mensaje
@@ -134,12 +134,12 @@ header('Content-Type: text/html; charset=utf-8');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Mensajes</title>
-<?php echo gbe_rol_head_base(); ?>
-<!-- estilos en docs/themes/gbe.css (scope: gbe-pg-mensajes) -->
+<?php echo ope_rol_head_base(); ?>
+<!-- estilos en docs/themes/ope.css (scope: ope-pg-mensajes) -->
 </head>
-<body class="gbe-pg-mensajes">
+<body class="ope-pg-mensajes">
 
-<?php echo gbe_rol_navbar_html(); ?>
+<?php echo ope_rol_navbar_html(); ?>
 
 <div class="breadcrumb">
   <div class="breadcrumb-in">
@@ -256,11 +256,7 @@ header('Content-Type: text/html; charset=utf-8');
   <?php endif; ?>
 </div>
 
-<footer class="foot">
-  <div class="foot-in">
-    <div class="foot-b">Granblue Fantasy: Eternal</div>
-  </div>
-</footer>
+<?php include __DIR__ . '/inc/footer_custom.php'; ?>
 
 </body>
 </html>

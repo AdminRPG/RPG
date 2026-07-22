@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Migración del sistema de rol (tablas mybb_rol_*)
+ * One Piece: Eternal · Migración del sistema de rol (tablas mybb_rol_*)
  * ----------------------------------------------------------
  * Crea el esquema del sistema de personajes como tablas con prefijo MyBB
  * (mybb_rol_*). Es idempotente: usa CREATE TABLE IF NOT EXISTS y se puede
@@ -11,7 +11,7 @@
  *
  * Ejecutar:
  *   & "C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe" \
- *     "C:\Users\Fgonz\Documents\Proyectos\I-Forge-RPG\scripts\migrate-rol-tables.php"
+ *     "C:\Users\Fgonz\Documents\Proyectos\One Piece: Eternal\scripts\migrate-rol-tables.php"
  *
  * NOTA: MyBB antepone siempre el prefijo `mybb_`. Estas tablas conviven sin
  * colisión con las tablas normalizadas del backend Slim (rol_cuentas, etc.,
@@ -156,7 +156,7 @@ if ($seed->execute()) {
 $seed->close();
 
 // ─────────────────────────────────────────────────────────────
-// Activar el plugin gbe_rol en la caché de plugins de MyBB.
+// Activar el plugin ope_rol en la caché de plugins de MyBB.
 // ─────────────────────────────────────────────────────────────
 $res = $db->query("SELECT cache FROM {$PREFIX}datacache WHERE title = 'plugins' LIMIT 1");
 $plugins = array('active' => array());
@@ -171,7 +171,7 @@ if ($res && ($row = $res->fetch_assoc())) {
 if (!isset($plugins['active']) || !is_array($plugins['active'])) {
     $plugins['active'] = array();
 }
-$plugins['active']['gbe_rol'] = 'gbe_rol';
+$plugins['active']['ope_rol'] = 'ope_rol';
 $serialized = serialize($plugins);
 
 if ($exists_row) {
@@ -185,7 +185,7 @@ if ($exists_row) {
     $stmt->execute();
     $stmt->close();
 }
-echo "  [OK] plugin gbe_rol activado (datacache 'plugins')\n";
+echo "  [OK] plugin ope_rol activado (datacache 'plugins')\n";
 
 // Verificación
 echo "\n--- Verificación ---\n";

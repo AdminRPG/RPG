@@ -1,8 +1,8 @@
 <?php
 /**
- * I-Forge · Biblioteca del Bestiario
+ * One Piece: Eternal · Biblioteca del Bestiario
  * Catálogo poblado desde BD (rol_bestiario). Sin datos mockup.
- * Estilos en docs/themes/gbe.css (scope: gbe-pg-biblioteca).
+ * Estilos en docs/themes/ope.css (scope: ope-pg-biblioteca).
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'biblioteca-bestiario.php');
@@ -11,8 +11,8 @@ require_once './global.php';
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 
-$data = gbe_rol_cat_bestiario();
-foreach ($data as &$d) { $d['tier'] = gbe_rol_cat_rareza_tier($d['rareza']); }
+$data = ope_rol_cat_bestiario();
+foreach ($data as &$d) { $d['tier'] = ope_rol_cat_rareza_tier($d['rareza']); }
 unset($d);
 $data_json = json_encode($data, JSON_UNESCAPED_UNICODE);
 
@@ -22,10 +22,10 @@ header('Content-Type: text/html; charset=utf-8');
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Bestiario</title>
-<?php echo gbe_rol_head_base(); ?>
+<?php echo ope_rol_head_base(); ?>
 </head>
-<body class="gbe-pg-biblioteca bib-bestiario">
-<?php echo gbe_rol_navbar_html(); ?>
+<body class="ope-pg-biblioteca bib-bestiario">
+<?php echo ope_rol_navbar_html(); ?>
 <div class="breadcrumb"><div class="breadcrumb-in"><a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span><b>Bestiario</b></div></div>
 <div class="wrap">
 <section class="reveal"><div class="shead"><h1>Bestiario</h1><span class="code">// criaturas y monstruos · <?php echo count($data); ?> catalogadas</span><span class="rule"></span></div></section>

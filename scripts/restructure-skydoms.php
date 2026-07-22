@@ -1,11 +1,11 @@
 <?php
 /**
- * Granblue Fantasy: Eternal · Reestructuración El Cielo (Skydoms)
+ * One Piece: Eternal · Reestructuración El Cielo (Skydoms)
  * ---------------------------------------------------------------
  * - Renombra categoría "El Mundo" → "El Cielo" (o la crea)
  * - Desactiva foros OP legacy bajo esa categoría
  * - Crea Skydoms canónicos con islas originales
- * - Actualiza Off Topic con foros GBF
+ * - Actualiza Off Topic con foros OPE
  *
  * Idempotente. Ejecutar:
  *   php scripts/restructure-skydoms.php
@@ -159,7 +159,7 @@ if ($offTopic === null) {
 
 $otForos = [
     ['Cafetería del Puerto', 'Presentaciones y charla libre fuera de rol.'],
-    ['Arte y fanworks', 'Dibujos, música y fanart del universo GBF Eternal.'],
+    ['Arte y fanworks', 'Dibujos, música y fanart del universo One Piece: Eternal.'],
     ['Sugerencias', 'Ideas de mecánicas, ambientación y mejoras del foro.'],
 ];
 $oto = 1;

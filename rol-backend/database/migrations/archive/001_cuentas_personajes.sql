@@ -1,3 +1,0 @@
--- ARCHIVED: Replaced by 002_sistema_creacion.sql which includes all tables.
--- This file kept for reference of the original schema.
--- See 002_sistema_creacion.sql for current schema.

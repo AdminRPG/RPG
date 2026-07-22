@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Seed: Los Cuatro Almirantes de la Marina — Era 4
+ * One Piece: Eternal · Seed: Los Cuatro Almirantes de la Marina — Era 4
  *
  * NPCs Mayores completos siguiendo docs/guia-npcs-mayores-completa.md.
  * Idempotente (INSERT o UPDATE segun slug).
@@ -120,7 +120,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/valyria_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/valyria_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/valyria_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/valyria_personalidad.txt'),
     'mundo_zona' => 'paraiso',
     'mundo_ubic' => 'Marineford -- Cuartel General de la Marina',
@@ -145,7 +145,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/ken_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/ken_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/ken_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/ken_personalidad.txt'),
     'mundo_zona' => 'paraiso',
     'mundo_ubic' => 'Marineford -- Torre del Dragon',
@@ -170,7 +170,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/flint_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/flint_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/flint_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/flint_personalidad.txt'),
     'mundo_zona' => 'paraiso',
     'mundo_ubic' => 'Marineford -- Barracon del Francotirador',
@@ -195,7 +195,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/nereida_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/nereida_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/nereida_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/nereida_personalidad.txt'),
     'mundo_zona' => 'paraiso',
     'mundo_ubic' => 'Marineford -- Acuario de Contencion Maxima',

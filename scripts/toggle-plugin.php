@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Activar/desactivar un plugin de MyBB desde CLI
+ * One Piece: Eternal · Activar/desactivar un plugin de MyBB desde CLI
  * --------------------------------------------------------
  * Edita la caché de plugins (mybb_datacache 'plugins') sin pasar por el ACP.
  *

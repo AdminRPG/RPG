@@ -1,6 +1,6 @@
 <?php
 /**
- * Granblue Fantasy: Eternal · Migración "staff por personaje + firma/icono + tablas de rol"
+ * One Piece: Eternal · Migración "staff por personaje + firma/icono + tablas de rol"
  * --------------------------------------------------------------------------------
  * 1) Añade a rol_personajes las columnas que convierten al PERSONAJE (no la cuenta)
  *    en la unidad de staff, más su icono y firma propios:
@@ -19,7 +19,7 @@
  *
  * Ejecutar:
  *   & "C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe" \
- *     "C:\Users\Fgonz\Documents\Proyectos\I-Forge-RPG\scripts\migrate-staff-firma.php"
+ *     "C:\Users\Fgonz\Documents\Proyectos\One Piece: Eternal\scripts\migrate-staff-firma.php"
  */
 
 error_reporting(E_ALL);

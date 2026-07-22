@@ -2,7 +2,7 @@
 /**
  * Corrige mybb_rol_thread_meta.fecha_rol para hilos de era "presente" que
  * quedaron con el año gregoriano (p.ej. 2026) en vez del año on-rol (I, II, III...),
- * bug introducido antes de que gbe_rol_present_year() usara el calendario on-rol.
+ * bug introducido antes de que ope_rol_present_year() usara el calendario on-rol.
  *
  * Recalcula fecha_rol (y fecha_dia/estacion si faltan) a partir de la fecha real
  * del post, usando la misma lógica de calendario on-rol que index.php / ficha.php.
@@ -29,7 +29,7 @@ $q = $db->query("
 
 $fixed = 0;
 while ($row = $db->fetch_array($q)) {
-    $cal = gbe_rol_onrol_calendar((int) $row['dateline']);
+    $cal = ope_rol_onrol_calendar((int) $row['dateline']);
     $db->update_query('rol_thread_meta', array(
         'fecha_rol' => (int) $cal['year'],
         'fecha_dia' => (int) $cal['day'],

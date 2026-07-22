@@ -1,4 +1,4 @@
-# Product — Granblue Fantasy: Eternal
+# Product — One Piece: Eternal
 
 ## Register
 
@@ -10,9 +10,9 @@ Roleplayers hispanos 18+, comunidad adulta que busca un foro de rol play-by-post
 
 ## Product Purpose
 
-**Granblue Fantasy: Eternal** es un foro de rol play-by-post ambientado en un cielo de islas flotantes inspirado en Granblue Fantasy, con historia y personajes propios. Combina MyBB (foro, autenticación, narrativa) con un backend propio de mecánicas RPG (fichas, inventario, economía en rupies, técnicas, combate por turnos, crews, misiones).
+**One Piece: Eternal** es un foro de rol play-by-post ambientado en un cielo de islas flotantes inspirado en Granblue Fantasy, con historia y personajes propios. Combina MyBB (foro, autenticación, narrativa) con un backend propio de mecánicas RPG (fichas, inventario, economía en rupies, técnicas, combate por turnos, crews, misiones).
 
-El objetivo es ofrecer la profundidad mecánica que tenía Granblue Fantasy: Eternal (combate, tripulación/crew, progresión, mundo vivo) con una identidad visual y narrativa nueva: cielo, éter, Gremio, Skydoms.
+El objetivo es ofrecer la profundidad mecánica que tenía One Piece: Eternal (combate, tripulación/crew, progresión, mundo vivo) con una identidad visual y narrativa nueva: cielo, éter, Gremio, Skydoms.
 
 ## Brand Personality
 
@@ -35,7 +35,7 @@ Luminoso, épico, acuarela-sobre-nubes. Nunca infantil saturado ni corporativo g
 1. **Relink, no plantilla:** paleta cielo claro + oro + acuarela; tipografía Cinzel / Cormorant / Spectral (ver `DESIGN-GRANBLUE-ETERNAL.md`).
 2. **Un elemento firma por pantalla:** hero carrusel en portada, banner 16:9 en ficha, bento de Skydoms en índice.
 3. **Tríada visual del personaje:** avatar + banner 16:9 + icono por skyfarer (no reutilizar `hero-*.jpg` del sitio como banner de PJ).
-4. **Cohesión por scope CSS:** cada página PHP usa `body.gbe-pg-<slug>`; portada usa `body.gbe-index`.
+4. **Cohesión por scope CSS:** cada página PHP usa `body.ope-pg-<slug>`; portada usa `body.ope-index`.
 5. **Botones rectangulares:** sin pills/cápsulas — `border-radius: 8px` en CTAs (DESIGN §4.4).
 6. **Degradación elegante:** si falla una API de juego, el foro sigue legible.
 
@@ -59,6 +59,7 @@ Selector visual en navbar (migración pendiente de `eternal/rojo/...` OP a `ciel
 
 | Doc | Contenido |
 |---|---|
+| `docs/DIRECCION-LORE-Y-SISTEMAS.md` | Dirección de lore + sistemas (alto nivel, para IA de contenido) |
 | `docs/AGENTES-Y-HERRAMIENTAS.md` | Protocolo anti-portado parcial (Cursor, OpenCode, Antigravity) |
 | `docs/ANTIGRAVITY.md` | Prompt de arranque para Gemini IDE |
 | `docs/DESIGN-GRANBLUE-ETERNAL.md` | Fuente de verdad visual + §5 scaffolding PHP |

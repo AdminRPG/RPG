@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme name="One Piece: Eternal" version="1839">
+  <templates>
+    <template name="newthread" version="1839"><![CDATA[
+<html><head>{$headerinclude}</head><body>
+<div id="ope-breadcrumb"><div class="ope-breadcrumb-in"><a href="{$mybb->settings['bburl']}/index.php">Inicio</a><span class="sep">›</span>{$breadcrumb}</div></div>
+{$header}
+<div class="ope-wrap ope-wrap-form">
+  <div class="ope-shead"><h1>Nueva historia</h1><span class="ope-shead-code">// nuevo tema</span><span class="ope-shead-rule"></span></div>
+  {$preview}
+  <div class="ope-plate">
+    <div class="ope-plate-h"><span class="ope-plate-h-t">{$forum['name']}</span><span class="ope-plate-h-c">// comienza tu historia</span></div>
+    <div class="ope-plate-b">
+      <form action="newthread.php?fid={$fid}&amp;processed=1" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+        <input type="hidden" name="action" value="do_newthread" />
+        <div class="ope-form-field">
+          <label>Prefijo</label>
+          {$prefixselect}
+        </div>
+        <div class="ope-form-field">
+          <label>Asunto</label>
+          <input type="text" name="subject" class="ope-form-input-full" value="{$subject}" maxlength="85" />
+        </div>
+        <div class="ope-meta-fields">
+          <div class="ope-meta-field">
+            <label>Época</label>
+            <select name="ope_era" id="ope_era" class="ope-meta-sel">
+              <option value="presente">Presente &middot; fecha actual (inalterable)</option>
+              <option value="pasado">Pasado</option>
+            </select>
+          </div>
+          <div id="ope-fecha-wrap" class="ope-fecha-wrap">
+            <div class="ope-meta-field">
+              <label>Año in-rol</label>
+              <input type="number" name="ope_fecha_rol" id="ope_fecha_rol" class="ope-meta-sel" min="0" max="9999" step="1" placeholder="p. ej. 1518" />
+            </div>
+            <div class="ope-meta-field">
+              <label>Día</label>
+              <input type="number" name="ope_fecha_dia" class="ope-meta-sel" min="1" max="65" step="1" placeholder="1&ndash;65" />
+            </div>
+            <div class="ope-meta-field">
+              <label>Estación</label>
+              <select name="ope_estacion" class="ope-meta-sel">
+                <option value="">Automática (por día)</option>
+                <option value="Primavera">Primavera</option>
+                <option value="Verano">Verano</option>
+                <option value="Otoño">Otoño</option>
+                <option value="Invierno">Invierno</option>
+              </select>
+            </div>
+          </div>
+          <div class="ope-meta-field">
+            <label>Etiqueta</label>
+            <select name="ope_tag" class="ope-meta-sel">
+              <option value="">Sin etiqueta</option>
+              <option value="Mision">Misión</option>
+              <option value="Trama">Trama</option>
+              <option value="Viaje">Viaje</option>
+              <option value="Fic">Fic</option>
+            </select>
+          </div>
+        </div>
+        <script>
+        (function(){
+          var e=document.getElementById('ope_era'),f=document.getElementById('ope-fecha-wrap');
+          if(!e||!f)return;
+          var pasadoFields=f.querySelectorAll('input,select');
+          function u(){
+            var p=(e.value==='pasado');
+            f.classList.toggle('is-on',p);
+            pasadoFields.forEach(function(el){el.disabled=!p;});
+          }
+          e.addEventListener('change',u);u();
+        })();
+        </script>
+        <div class="ope-form-field">
+          <label>Mensaje</label>
+          <div class="ope-plate ope-tools">
+            <div class="ope-plate-h"><span class="ope-plate-h-t">Herramientas</span><span class="ope-plate-h-c">// editor completo</span></div>
+            <div class="ope-plate-b">
+              {$codebuttons}
+              <textarea name="message" id="message" class="ope-form-textarea-full" rows="20">{$message}</textarea>
+            </div>
+          </div>
+          {$ope_tpl_inserter}
+        </div>
+        {$posticons}
+        {$postoptions}
+        <div class="ope-form-actions">
+          <input type="submit" name="submit" class="ope-btn ope-btn-hot" value="Publicar historia" />
+          <input type="submit" name="previewpost" class="ope-btn ope-btn-ghost" value="Previsualizar" />
+          <input type="submit" name="savedraft" class="ope-btn ope-btn-ghost" value="Guardar borrador" />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{$footer}
+</body></html>
+]]></template>
+
+    <template name="newreply" version="1839"><![CDATA[
+<html><head>{$headerinclude}</head><body>
+<div id="ope-breadcrumb"><div class="ope-breadcrumb-in"><a href="{$mybb->settings['bburl']}/index.php">Inicio</a><span class="sep">›</span>{$breadcrumb}</div></div>
+{$header}
+<div class="ope-wrap ope-wrap-form">
+  <div class="ope-shead"><h1>Responder</h1><span class="ope-shead-code">// nueva respuesta</span><span class="ope-shead-rule"></span></div>
+  {$preview}
+  <div class="ope-plate">
+    <div class="ope-plate-h"><span class="ope-plate-h-t">{$thread['subject']}</span><span class="ope-plate-h-c">// continúa la historia</span></div>
+    <div class="ope-plate-b">
+      <form action="newreply.php?tid={$tid}&amp;processed=1" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+        <input type="hidden" name="action" value="do_newreply" />
+        <input type="hidden" name="tid" value="{$tid}" />
+        <input type="hidden" name="posthash" value="{$posthash}" />
+        <div class="ope-form-field">
+          <label>Mensaje</label>
+          <div class="ope-plate ope-tools">
+            <div class="ope-plate-h"><span class="ope-plate-h-t">Herramientas</span><span class="ope-plate-h-c">// editor completo</span></div>
+            <div class="ope-plate-b">
+              {$codebuttons}
+              <textarea name="message" id="message" class="ope-form-textarea-full" rows="20">{$message}</textarea>
+            </div>
+          </div>
+          {$multiquote_external}
+          {$ope_tpl_inserter}
+        </div>
+        {$posticons}
+        {$postoptions}
+        {$modoptions}
+        <div class="ope-form-actions">
+          <input type="submit" name="submit" class="ope-btn ope-btn-hot" value="Publicar respuesta" />
+          <input type="submit" name="previewpost" class="ope-btn ope-btn-ghost" value="Previsualizar" />
+        </div>
+      </form>
+    </div>
+  </div>
+  {$threadreview}
+</div>
+{$footer}
+</body></html>
+]]></template>
+
+    <template name="editpost" version="1839"><![CDATA[
+<html><head>{$headerinclude}</head><body>
+<div id="ope-breadcrumb"><div class="ope-breadcrumb-in"><a href="{$mybb->settings['bburl']}/index.php">Inicio</a><span class="sep">›</span>{$breadcrumb}</div></div>
+{$header}
+<div class="ope-wrap ope-wrap-form">
+  <div class="ope-shead"><h1>Editar mensaje</h1><span class="ope-shead-code">// retoca tu texto</span><span class="ope-shead-rule"></span></div>
+  {$preview}
+  <div class="ope-plate">
+    <div class="ope-plate-h"><span class="ope-plate-h-t">{$thread['subject']}</span></div>
+    <div class="ope-plate-b">
+      <form action="editpost.php?pid={$pid}&amp;processed=1" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+        <input type="hidden" name="action" value="do_editpost" />
+        <input type="hidden" name="pid" value="{$pid}" />
+        <div class="ope-form-field">
+          <label>Asunto</label>
+          <input type="text" name="subject" class="ope-form-input-full" value="{$subject}" />
+        </div>
+        <div class="ope-form-field">
+          <label>Mensaje</label>
+          <div class="ope-plate ope-tools">
+            <div class="ope-plate-h"><span class="ope-plate-h-t">Herramientas</span><span class="ope-plate-h-c">// editor completo</span></div>
+            <div class="ope-plate-b">
+              {$codebuttons}
+              <textarea name="message" id="message" class="ope-form-textarea-full" rows="20">{$message}</textarea>
+            </div>
+          </div>
+          {$ope_tpl_inserter}
+        </div>
+        <div class="ope-form-field">
+          <label>Razón de edición</label>
+          <input type="text" name="editreason" class="ope-form-input-full" value="{$editreason}" />
+        </div>
+        {$posticons}
+        {$postoptions}
+        <div class="ope-form-actions">
+          <input type="submit" name="submitbutton" class="ope-btn ope-btn-hot" value="Actualizar" />
+          <input type="submit" name="previewpost" class="ope-btn ope-btn-ghost" value="Previsualizar" />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{$footer}
+</body></html>
+]]></template>
+
+    <template name="redirect" version="1839"><![CDATA[
+<html><head>
+<title>{$title}</title>
+{$headerinclude}
+<meta http-equiv="refresh" content="2;URL={$url}" />
+</head><body>
+<div class="ope-wrap" style="padding-top:70px">
+  <div class="ope-plate" style="text-align:center;padding:48px 24px">
+    <div style="font-family:var(--disp);font-weight:900;font-size:2rem;text-transform:uppercase;color:var(--paper);margin-bottom:8px">{$title}</div>
+    <p style="font-family:var(--mono);font-size:.82rem;color:var(--paper-dim);margin-bottom:16px">{$message}</p>
+    <a href="{$url}" class="ope-btn ope-btn-hot">Continuar</a>
+  </div>
+</div>
+</body></html>
+]]></template>
+
+    <template name="error" version="1839"><![CDATA[
+<html><head>
+<title>{$title}</title>
+{$headerinclude}
+</head><body>
+<div class="ope-wrap" style="padding-top:70px">
+  <div class="ope-plate" style="border-color:var(--crack);text-align:center;padding:48px 24px">
+    <div style="font-family:var(--disp);font-weight:900;font-size:2rem;text-transform:uppercase;color:var(--crack);margin-bottom:8px">{$title}</div>
+    <p style="font-family:var(--mono);font-size:.82rem;color:var(--paper-dim);margin-bottom:16px">{$message}</p>
+    {$error}
+  </div>
+</div>
+</body></html>
+]]></template>
+
+    <template name="error_nopermission" version="1839"><![CDATA[
+<html><head>
+<title>{$title}</title>
+{$headerinclude}
+</head><body>
+<div class="ope-wrap" style="padding-top:70px">
+  <div class="ope-plate" style="border-color:var(--crack);text-align:center;padding:48px 24px">
+    <div style="font-family:var(--disp);font-weight:900;font-size:2rem;text-transform:uppercase;color:var(--crack);margin-bottom:8px">{$title}</div>
+    <p style="font-family:var(--mono);font-size:.82rem;color:var(--paper-dim);margin-bottom:16px">{$message}</p>
+  </div>
+</div>
+</body></html>
+]]></template>
+
+    <template name="multipage" version="1839"><![CDATA[
+<div class="ope-pager">
+  {$prevpage}
+  {$start}
+  {$pages}
+  {$nextpage}
+</div>
+]]></template>
+
+    <template name="multipage_page" version="1839"><![CDATA[
+<a href="{$page_url}" class="ope-page">{$page}</a>
+]]></template>
+
+    <template name="multipage_page_current" version="1839"><![CDATA[
+<span class="ope-page on">{$page}</span>
+]]></template>
+
+    <template name="multipage_prevpage" version="1839"><![CDATA[
+<a href="{$prevpage_url}" class="ope-page nav" aria-label="Anterior">‹</a>
+]]></template>
+
+    <template name="multipage_nextpage" version="1839"><![CDATA[
+<a href="{$nextpage_url}" class="ope-page nav" aria-label="Siguiente">›</a>
+]]></template>
+
+    <template name="forumjump_advanced" version="1839"><![CDATA[
+<div class="ope-plate" style="margin-top:14px">
+  <div class="ope-plate-h"><span class="ope-plate-h-t">Ir a un foro</span></div>
+  <div class="ope-plate-b">
+    <form method="get" action="forumdisplay.php" style="display:flex;gap:8px;align-items:center">
+      <select name="fid">{$forumjumpbits}</select>
+      <input type="submit" class="ope-btn ope-btn-sm ope-btn-hot" value="Ir" />
+    </form>
+  </div>
+</div>
+]]></template>
+
+    <template name="forumjump_bit" version="1839"><![CDATA[
+<option value="{$forum['fid']}">{$depth}{$forum['name']}</option>
+]]></template>
+
+    <template name="postbit_online" version="1839"><![CDATA[
+<span style="display:inline-block;width:8px;height:8px;background:var(--patina);border:1px solid #000;margin-right:4px;vertical-align:middle" title="En línea"></span>
+]]></template>
+
+    <template name="postbit_offline" version="1839"><![CDATA[
+<span style="display:inline-block;width:8px;height:8px;background:var(--ash);border:1px solid #000;margin-right:4px;vertical-align:middle" title="Desconectado"></span>
+]]></template>
+
+    <template name="posticons" version="1839"><![CDATA[
+<div style="margin-bottom:12px">
+  <label>Icono</label><br>
+  <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+    {$iconlist}
+  </div>
+</div>
+]]></template>
+
+    <template name="posticons_icon" version="1839"><![CDATA[
+<label style="cursor:pointer;border:2px solid var(--rivet);padding:4px 8px">
+  <input type="radio" name="icon" value="{$icon}" /> <img src="{$iconpath}" alt="" style="display:inline;vertical-align:middle" />
+</label>
+]]></template>
+
+    <template name="codebuttons" version="1839"><![CDATA[<link rel="stylesheet" href="{$mybb->asset_url}/jscripts/sceditor/themes/{$theme['editortheme']}" type="text/css" media="all" />
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/sceditor/jquery.sceditor.bbcode.min.js?ver=1832"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/bbcodes_sceditor.js?ver=1837"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/sceditor/plugins/undo.js?ver=1832"></script>
+<script type="text/javascript">
+var partialmode = {$mybb->settings['partialmode']},
+opt_editor = {
+	plugins: "undo",
+	format: "bbcode",
+	bbcodeTrim: false,
+	style: "{$mybb->asset_url}/jscripts/sceditor/styles/jquery.sceditor.{$theme['editortheme']}?ver=1832",
+	rtl: {$lang->settings['rtl']},
+	locale: "mybblang",
+	width: "100%",
+	enablePasteFiltering: true,
+	autoUpdate: true,
+	emoticonsEnabled: {$emoticons_enabled},
+	emoticons: {
+		dropdown: {
+			{$dropdownsmilies}
+		},
+		more: {
+			{$moresmilies}
+		},
+		hidden: {
+			{$hiddensmilies}
+		}
+	},
+	emoticonsCompat: true,
+	toolbar: "{$basic1}{$align}{$font}{$size}{$color}{$removeformat}{$basic2}image,{$email}{$link}|video{$emoticon}|{$list}{$code}quote|maximize,source",
+};
+{$editor_language}
+$(function() {
+	$("#{$bind}").sceditor(opt_editor);
+
+	MyBBEditor = $("#{$bind}").sceditor("instance");
+	{$sourcemode}
+});
+</script>]]></template>
+
+  </templates>
+</theme>

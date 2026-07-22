@@ -1,6 +1,6 @@
 ﻿<?php
 /**
- * I-Forge · Seed: Los Cuatro Yonko de la Era 4
+ * One Piece: Eternal · Seed: Los Cuatro Yonko de la Era 4
  *
  * NPCs Mayores completos. Idempotente (INSERT o UPDATE segun slug).
  * Uso: php scripts/seed-yonko.php
@@ -119,7 +119,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/shura_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/shura_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/shura_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/shura_personalidad.txt'),
     'mundo_zona' => 'new-world',
     'mundo_ubic' => 'Isla Onigashima -- Templo del Buda Demoníaco',
@@ -144,7 +144,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/sekhmet_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/sekhmet_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/sekhmet_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/sekhmet_personalidad.txt'),
     'mundo_zona' => 'new-world',
     'mundo_ubic' => 'Zou -- Trono de la Reina Leona',
@@ -169,7 +169,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/ezekiel_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/ezekiel_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/ezekiel_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/ezekiel_personalidad.txt'),
     'mundo_zona' => 'new-world',
     'mundo_ubic' => 'Red Line -- Santuario Flotante de Ark',
@@ -194,7 +194,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/balgor_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/balgor_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/balgor_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/balgor_personalidad.txt'),
     'mundo_zona' => 'new-world',
     'mundo_ubic' => 'Nuevo Mundo -- La Fortaleza de Chatarra',

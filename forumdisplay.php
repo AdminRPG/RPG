@@ -25,7 +25,7 @@ require_once "./global.php";
 require_once MYBB_ROOT."inc/functions_post.php";
 require_once MYBB_ROOT."inc/functions_forumlist.php";
 require_once MYBB_ROOT."inc/class_parser.php";
-require_once MYBB_ROOT."inc/gbe_functions.php";
+require_once MYBB_ROOT."inc/ope_functions.php";
 $parser = new postParser;
 
 $orderarrow = $sortsel = array('rating' => '', 'subject' => '', 'starter' => '', 'started' => '', 'replies' => '', 'views' => '', 'lastpost' => '');
@@ -82,16 +82,16 @@ $parentlist = $foruminfo['parentlist'];
 // To validate, turn & to &amp; but support unicode
 $foruminfo['name'] = preg_replace("#&(?!\#[0-9]+;)#si", "&amp;", $foruminfo['name']);
 
-// I-Forge: forum thread/post counters are excluded from the forum cache,
+// One Piece: Eternal: forum thread/post counters are excluded from the forum cache,
 // so read the real values for the header meta ("N coladas / N mensajes").
-$gbe_counts = $db->fetch_array($db->simple_select("forums", "threads, posts", "fid='".(int)$fid."'"));
-$foruminfo['threads'] = (int)$gbe_counts['threads'];
-$foruminfo['posts'] = (int)$gbe_counts['posts'];
+$ope_counts = $db->fetch_array($db->simple_select("forums", "threads, posts", "fid='".(int)$fid."'"));
+$foruminfo['threads'] = (int)$ope_counts['threads'];
+$foruminfo['posts'] = (int)$ope_counts['posts'];
 
-// I-Forge: los foros que cuelgan de la categoría "El Mundo" (regiones e islas)
+// One Piece: Eternal: los foros que cuelgan de la categoría "El Mundo" (regiones e islas)
 // usan un estilo enriquecido: cabecera con foto + tarjetas grandes para sus hijos.
-$gbe_world_root = gbe_world_root_name($foruminfo);
-$gbe_is_world = (mb_stripos($gbe_world_root, 'mundo') !== false);
+$ope_world_root = ope_world_root_name($foruminfo);
+$ope_is_world = (mb_stripos($ope_world_root, 'mundo') !== false);
 
 $forumpermissions = forum_permissions();
 $fpermissions = $forumpermissions[$fid];
@@ -163,26 +163,26 @@ else
 }
 
 $subforums = '';
-$gbe_world_cards = $gbe_is_world ? gbe_render_region_cards($fid, $forumpermissions) : '';
+$ope_world_cards = $ope_is_world ? ope_render_region_cards($fid, $forumpermissions) : '';
 
 // Un "mar" es una región de El Mundo con islas colgando (o la propia categoría
 // El Mundo con sus regiones): funciona como PORTADA -> solo foto + nombre + islas.
 // La ficha de datos (dueño/clima/zonas), los contadores, "Nueva historia" y el
 // listado de historias pertenecen a las ISLAS (foros hoja donde se juega).
-$gbe_is_sea = $gbe_is_world && ($gbe_world_cards !== '');
+$ope_is_sea = $ope_is_world && ($ope_world_cards !== '');
 
-if ($gbe_world_cards !== '')
+if ($ope_world_cards !== '')
 {
 	// Región de "El Mundo": sus hijos son islas -> tarjetas grandes con foto.
 	// $forums se mantiene con contenido (aunque no se use en la plantilla) porque
 	// MyBB comprueba más abajo `empty($forums)` para decidir si una categoría
 	// "no tiene subforos" y lanzar un error.
-	$forums = $gbe_world_cards;
-	$gbe_subheading = (mb_stripos($foruminfo['name'], 'mundo') !== false) ? 'Regiones' : 'Islas';
+	$forums = $ope_world_cards;
+	$ope_subheading = (mb_stripos($foruminfo['name'], 'mundo') !== false) ? 'Regiones' : 'Islas';
 	$subforums = '
-	<div class="gbe-shead"><h2>'.$gbe_subheading.'</h2><span class="gbe-shead-code">// navega el mundo</span><span class="gbe-shead-rule"></span></div>
-	<div class="gbe-regions mb-22">
-		'.$gbe_world_cards.'
+	<div class="ope-shead"><h2>'.$ope_subheading.'</h2><span class="ope-shead-code">// navega el mundo</span><span class="ope-shead-rule"></span></div>
+	<div class="ope-regions mb-22">
+		'.$ope_world_cards.'
 	</div>';
 }
 else
@@ -197,87 +197,87 @@ else
 	}
 }
 
-// I-Forge: cabecera con foto para foros del "El Mundo" (foto + nombre, y debajo
+// One Piece: Eternal: cabecera con foto para foros del "El Mundo" (foto + nombre, y debajo
 // una ficha con pestañas: Resumen, Dueño actual, Clima, Zonas y Anotaciones,
 // leídas de mybb_rol_forum_meta). Cuando hay banner, la placa clásica de debajo
 // omite el nombre/descripción (ya en el banner/ficha) y solo conserva contadores.
-$gbe_world_head = '';
-$gbe_fhead_title = '<h1 class="gbe-fhead-t">'.$foruminfo['name'].'</h1>';
-$gbe_fhead_desc = '<p class="gbe-fhead-d">'.$foruminfo['description'].'</p>';
-if ($gbe_is_world)
+$ope_world_head = '';
+$ope_fhead_title = '<h1 class="ope-fhead-t">'.$foruminfo['name'].'</h1>';
+$ope_fhead_desc = '<p class="ope-fhead-d">'.$foruminfo['description'].'</p>';
+if ($ope_is_world)
 {
-	$gbe_fhead_title = '';
-	$gbe_fhead_desc = '';
+	$ope_fhead_title = '';
+	$ope_fhead_desc = '';
 
-	$gbe_head_img = gbe_forum_image($fid);
-	$gbe_head_art = $gbe_head_img !== null
-		? '<img src="'.$gbe_head_img.'" alt="'.$foruminfo['name'].'" loading="lazy">'
-		: gbe_sector_art($fid);
+	$ope_head_img = ope_forum_image($fid);
+	$ope_head_art = $ope_head_img !== null
+		? '<img src="'.$ope_head_img.'" alt="'.$foruminfo['name'].'" loading="lazy">'
+		: ope_sector_art($fid);
 
-	$gbe_meta = gbe_forum_meta($fid);
+	$ope_meta = ope_forum_meta($fid);
 
 	// Construye pestañas solo para los datos que existen de verdad, y SOLO en
 	// islas: un mar es portada (foto + nombre) sin dueño, clima ni resumen.
-	$gbe_itabs = '';
-	$gbe_ipanels = '';
-	$gbe_itab_n = 0;
-	if (!$gbe_is_sea)
+	$ope_itabs = '';
+	$ope_ipanels = '';
+	$ope_itab_n = 0;
+	if (!$ope_is_sea)
 	{
-	$gbe_add_tab = function ($key, $label, $bodyHtml) use (&$gbe_itabs, &$gbe_ipanels, &$gbe_itab_n) {
-		$active = ($gbe_itab_n === 0) ? ' gbe-itab-active' : '';
-		$pressed = ($gbe_itab_n === 0) ? 'true' : 'false';
-		$gbe_itabs .= '<button type="button" class="gbe-itab'.$active.'" data-itab="'.$key.'" aria-pressed="'.$pressed.'">'.$label.'</button>';
-		$gbe_ipanels .= '<div class="gbe-itabpanel'.$active.'" data-itabpanel="'.$key.'">'.$bodyHtml.'</div>';
-		$gbe_itab_n++;
+	$ope_add_tab = function ($key, $label, $bodyHtml) use (&$ope_itabs, &$ope_ipanels, &$ope_itab_n) {
+		$active = ($ope_itab_n === 0) ? ' ope-itab-active' : '';
+		$pressed = ($ope_itab_n === 0) ? 'true' : 'false';
+		$ope_itabs .= '<button type="button" class="ope-itab'.$active.'" data-itab="'.$key.'" aria-pressed="'.$pressed.'">'.$label.'</button>';
+		$ope_ipanels .= '<div class="ope-itabpanel'.$active.'" data-itabpanel="'.$key.'">'.$bodyHtml.'</div>';
+		$ope_itab_n++;
 	};
 
 	if (trim($foruminfo['description']) !== '')
 	{
-		$gbe_add_tab('resumen', 'Resumen', '<p class="gbe-itab-text">'.$foruminfo['description'].'</p>');
+		$ope_add_tab('resumen', 'Resumen', '<p class="ope-itab-text">'.$foruminfo['description'].'</p>');
 	}
-	if (trim($gbe_meta['dueno']) !== '')
+	if (trim($ope_meta['dueno']) !== '')
 	{
-		$gbe_add_tab('dueno', 'Dueño actual', '<p class="gbe-itab-text">'.htmlspecialchars_uni($gbe_meta['dueno']).'</p>');
+		$ope_add_tab('dueno', 'Dueño actual', '<p class="ope-itab-text">'.htmlspecialchars_uni($ope_meta['dueno']).'</p>');
 	}
-	if (trim($gbe_meta['clima']) !== '')
+	if (trim($ope_meta['clima']) !== '')
 	{
-		$gbe_add_tab('clima', 'Clima', '<p class="gbe-itab-text">'.htmlspecialchars_uni($gbe_meta['clima']).'</p>');
+		$ope_add_tab('clima', 'Clima', '<p class="ope-itab-text">'.htmlspecialchars_uni($ope_meta['clima']).'</p>');
 	}
-	if (!empty($gbe_meta['zonas']))
+	if (!empty($ope_meta['zonas']))
 	{
-		$gbe_zonas_html = '<ul class="gbe-itab-zonas">';
-		foreach ($gbe_meta['zonas'] as $gbe_zona)
+		$ope_zonas_html = '<ul class="ope-itab-zonas">';
+		foreach ($ope_meta['zonas'] as $ope_zona)
 		{
-			$gbe_zonas_html .= '<li>'.htmlspecialchars_uni((string)$gbe_zona).'</li>';
+			$ope_zonas_html .= '<li>'.htmlspecialchars_uni((string)$ope_zona).'</li>';
 		}
-		$gbe_zonas_html .= '</ul>';
-		$gbe_add_tab('zonas', 'Zonas', $gbe_zonas_html);
+		$ope_zonas_html .= '</ul>';
+		$ope_add_tab('zonas', 'Zonas', $ope_zonas_html);
 	}
-	if (trim($gbe_meta['anotaciones']) !== '')
+	if (trim($ope_meta['anotaciones']) !== '')
 	{
-		$gbe_add_tab('anotaciones', 'Anotaciones', '<div class="gbe-itab-text">'.nl2br(htmlspecialchars_uni($gbe_meta['anotaciones'])).'</div>');
+		$ope_add_tab('anotaciones', 'Anotaciones', '<div class="ope-itab-text">'.nl2br(htmlspecialchars_uni($ope_meta['anotaciones'])).'</div>');
 	}
 	} // fin: pestañas solo en islas (no en mares)
 
-	$gbe_tabbox = '';
-	if ($gbe_itab_n > 0)
+	$ope_tabbox = '';
+	if ($ope_itab_n > 0)
 	{
-		$gbe_tabbox = '
-	<div class="gbe-island-tabs" role="tablist">'.$gbe_itabs.'</div>
-	<div class="gbe-island-tabpanels">'.$gbe_ipanels.'</div>';
+		$ope_tabbox = '
+	<div class="ope-island-tabs" role="tablist">'.$ope_itabs.'</div>
+	<div class="ope-island-tabpanels">'.$ope_ipanels.'</div>';
 	}
 
-	$gbe_world_head = '
-<div class="gbe-wrap">
-	<div class="gbe-island-head">
-		<div class="gbe-island-art">'.$gbe_head_art.'</div>
-		<div class="gbe-island-veil"></div>
-		<div class="gbe-island-in">
-			<div class="gbe-island-kicker">// '.$gbe_world_root.'</div>
-			<h1 class="gbe-island-n">'.$foruminfo['name'].'</h1>
+	$ope_world_head = '
+<div class="ope-wrap">
+	<div class="ope-island-head">
+		<div class="ope-island-art">'.$ope_head_art.'</div>
+		<div class="ope-island-veil"></div>
+		<div class="ope-island-in">
+			<div class="ope-island-kicker">// '.$ope_world_root.'</div>
+			<h1 class="ope-island-n">'.$foruminfo['name'].'</h1>
 		</div>
-	</div>'.($gbe_tabbox !== '' ? '
-	<div class="gbe-island-card">'.$gbe_tabbox.'
+	</div>'.($ope_tabbox !== '' ? '
+	<div class="ope-island-card">'.$ope_tabbox.'
 	</div>' : '').'
 </div>';
 }
@@ -1685,24 +1685,24 @@ $foruminfo['name'] = strip_tags($foruminfo['name']);
 // El Mundo: en un MAR (portada) NO se muestran ni la placa de datos/contadores
 // ni el listado de historias; solo la foto, el nombre y las islas. En islas y en
 // foros normales se muestran ambos bloques como siempre.
-$gbe_fhead = '';
-$gbe_stories = '';
-if (!$gbe_is_sea)
+$ope_fhead = '';
+$ope_stories = '';
+if (!$ope_is_sea)
 {
-	$gbe_fhead = '
-  <section class="gbe-plate mt-22">
-    <div class="gbe-fhead">
-      <div class="gbe-fhead-in">
+	$ope_fhead = '
+  <section class="ope-plate mt-22">
+    <div class="ope-fhead">
+      <div class="ope-fhead-in">
         <div>
-          '.$gbe_fhead_title.'
-          '.$gbe_fhead_desc.'
-          <div class="gbe-fhead-meta">
+          '.$ope_fhead_title.'
+          '.$ope_fhead_desc.'
+          <div class="ope-fhead-meta">
             <span><b>'.$foruminfo['threads'].'</b> historias</span>
             <span><b>'.$foruminfo['posts'].'</b> mensajes</span>
             '.$moderatedby.'
           </div>
         </div>
-        <div class="gbe-fhead-btns">
+        <div class="ope-fhead-btns">
           '.$newthread.'
           '.$clearstoredpass.'
         </div>
@@ -1710,23 +1710,23 @@ if (!$gbe_is_sea)
     </div>
   </section>';
 
-	$gbe_stories = '
-  <div class="gbe-shead"><h2>Historias</h2><span class="gbe-shead-code">// temas</span><span class="gbe-shead-rule"></span></div>
-  <div class="gbe-toolbar">
-    <div class="gbe-filters" role="group" aria-label="Filtrar historias">
-      <button class="gbe-filt" type="button" aria-pressed="true" data-f="todos">Todos</button>
-      <button class="gbe-filt" type="button" aria-pressed="false" data-f="abiertos">Abiertos</button>
-      <button class="gbe-filt" type="button" aria-pressed="false" data-f="calientes">Calientes</button>
-      <button class="gbe-filt" type="button" aria-pressed="false" data-f="cerrados">Cerrados</button>
+	$ope_stories = '
+  <div class="ope-shead"><h2>Historias</h2><span class="ope-shead-code">// temas</span><span class="ope-shead-rule"></span></div>
+  <div class="ope-toolbar">
+    <div class="ope-filters" role="group" aria-label="Filtrar historias">
+      <button class="ope-filt" type="button" aria-pressed="true" data-f="todos">Todos</button>
+      <button class="ope-filt" type="button" aria-pressed="false" data-f="abiertos">Abiertos</button>
+      <button class="ope-filt" type="button" aria-pressed="false" data-f="calientes">Calientes</button>
+      <button class="ope-filt" type="button" aria-pressed="false" data-f="cerrados">Cerrados</button>
     </div>
-    <div class="gbe-toolbar-count"><b>'.$threadcount.'</b> temas</div>
+    <div class="ope-toolbar-count"><b>'.$threadcount.'</b> temas</div>
   </div>
-  <div class="gbe-slab">
+  <div class="ope-slab">
     '.$announcementlist.'
     '.$threads.'
     '.$inlinemod.'
   </div>
-  <div class="gbe-pager-wrap">'.$multipage.'</div>';
+  <div class="ope-pager-wrap">'.$multipage.'</div>';
 }
 
 eval("\$forums = \"".$templates->get("forumdisplay")."\";");

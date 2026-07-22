@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Migración de metadatos de foro (mybb_rol_forum_meta)
+ * One Piece: Eternal · Migración de metadatos de foro (mybb_rol_forum_meta)
  * -----------------------------------------------------------------
  * Tabla auxiliar (1:1 con mybb_forums por fid) para la ficha enriquecida
  * de regiones/islas de "El Mundo": dueño actual, clima, zonas y

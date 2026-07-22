@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Siembra de estructura de foros
+ * One Piece: Eternal · Siembra de estructura de foros
  * -----------------------------------------
  * Borra la categoría de pruebas y crea:
  *   - "El Mundo"  (macro categoría) -> regiones -> islas (subforos)

@@ -1,0 +1,135 @@
+{
+  "id": "identidad-cazador",
+  "nombre": "Cazador",
+  "tipo": "identidad",
+  "version": "3.0",
+  "recurso_secundario": "Rastro",
+  "recurso_base": "El Rastro se mide por objetivo: designas una presa marcada (solo una a la vez) y generas 1 Rastro al conectar un golpe contra ella y 1 Rastro al mantener presión sostenida sobre ella (máx. 1 por este concepto por turno). Tope base 6; si en un turno no acumulas Rastro sobre tu presa, pierde 1 carga. Se gasta a través de los nodos y técnicas de este árbol.",
+  "resumen_arquetipo": "Cazador es la filosofía de que la presa no necesita caer de un solo golpe, solo necesita cansarse antes que tú: marcaje persistente, persecución que no deja escapar y desgaste que erosiona a la presa con el tiempo, sin importar qué Arma empuñe el personaje.",
+  "rol_mecanico": "Desgaste / control de escape. Marca una presa, acumula Rastro sobre ella y lo libera en remates que escalan con el tiempo de caza.",
+  "corrientes": [
+    { "clave": "Marcaje", "simbolo": "α", "filosofia": "Fijar. Acumular Rastro sobre la presa marcada y liberarlo en remates que pegan más fuerte cuanto más tiempo la has perseguido." },
+    { "clave": "Persecución", "simbolo": "β", "filosofia": "Alcanzar. Cerrar distancia, seguir a la presa allá donde vaya e impedirle el escape; nadie huye del Cazador." },
+    { "clave": "Desgaste", "simbolo": "γ", "filosofia": "Erosionar. Impedir la curación, debilitar las resistencias de la presa y drenarla poco a poco hasta que ceda." }
+  ],
+  "focos": ["Marcaje", "Persecución", "Desgaste"],
+  "nodos": [
+    {
+      "id": "cazador-marcaje-t1", "codigo": "Cz-α1", "nombre": "Marca de Caza",
+      "tier": 1, "foco": "Marcaje", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Generas +1 Rastro adicional al conectar un golpe contra tu presa marcada (además del base). Además, el primer golpe que conectas contra una presa recién marcada le aplica el estado Marcado (1 turno) y genera 2 Rastro en vez de 1.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-persecucion-t1", "codigo": "Cz-β1", "nombre": "Paso del Sabueso",
+      "tier": 1, "foco": "Persecución", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cuando tu presa marcada se desplaza para alejarse, puedes seguirla: una vez por turno, como reacción sin gastar PA, te desplazas hasta la mitad de tu movimiento libre para mantener la distancia. Además, tu movimiento hacia tu presa marcada ignora terreno difícil y enemigos interpuestos.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-desgaste-t1", "codigo": "Cz-γ1", "nombre": "Herida que no Cierra",
+      "tier": 1, "foco": "Desgaste", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Mientras tu presa marcada tenga al menos 1 Rastro, toda curación que reciba se reduce en un 25%. Cada vez que tu presa intenta curarse (a sí misma o por un aliado), generas +1 Rastro sobre ella (tu acoso no le da respiro).",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-marcaje-t2", "codigo": "Cz-α2", "nombre": "Sentencia del Rastro",
+      "tier": 2, "foco": "Marcaje", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de remate que consuman Rastro de tu presa para añadir daño puro que ignora mitigación física, escalando con el Rastro gastado (presupuesto según NUMEROS-Y-BALANCE §7).",
+      "profundidad": "Si ya tienes Marca de Caza (α1), estas técnicas, al consumir ≥4 Rastro, aplican Marcado 1 turno además de su efecto.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-persecucion-t2", "codigo": "Cz-β2", "nombre": "Cerco Implacable",
+      "tier": 2, "foco": "Persecución", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas que, al conectar con tu presa marcada, la dejen acorralada: no puede completar la acción Correr / huir mientras estés adyacente y su movimiento libre se reduce a la mitad hasta su próximo turno (le cierras las salidas, no la inmovilizas).",
+      "profundidad": "Si ya tienes Paso del Sabueso (β1), cada vez que la presa intenta huir y falla por este efecto, ganas +2 Rastro.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-desgaste-t2", "codigo": "Cz-γ2", "nombre": "Toxina de Cazador",
+      "tier": 2, "foco": "Desgaste", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de desgaste que aprovechen el Rastro acumulado para reducir la mitigación de la presa (escalando con el Rastro) y/o aplicarle erosión: pérdida de PV al inicio de sus turnos mientras conserve Rastro.",
+      "profundidad": "Si ya tienes Herida que no Cierra (γ1), estas técnicas también impiden toda curación de la presa durante 1 turno.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-marcaje-t3", "codigo": "Cz-α3", "nombre": "Rastro Imborrable",
+      "tier": 3, "foco": "Marcaje", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu tope de Rastro sube de 6 a 9 y el Rastro sobre tu presa ya no decae mientras la presa siga viva y tú en combate: persiste hasta que lo gastes.",
+      "profundidad": "Si ya tienes Sentencia del Rastro (α2), tus remates que consuman ≥6 Rastro aplican Marcado 1 turno (o lo extienden a 2 si ya lo aplicaban).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-persecucion-t3", "codigo": "Cz-β3", "nombre": "Instinto de Persecución",
+      "tier": 3, "foco": "Persecución", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Mientras tu presa marcada esté en el campo, tus desplazamientos hacia ella no gastan tu movimiento libre (es movimiento de caza dedicado). Si la presa usa la acción Correr, puedes reaccionar persiguiéndola gratis, igualando su desplazamiento sin gastar PA.",
+      "profundidad": "Si ya tienes Cerco Implacable (β2), cuando persigues así a una presa que intenta huir, además le aplicas Ralentizado 1 turno.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-desgaste-t3", "codigo": "Cz-γ3", "nombre": "Erosión Constante",
+      "tier": 3, "foco": "Desgaste", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Mientras tu presa marcada tenga ≥3 Rastro, su mitigación efectiva se reduce un 10% por cada 3 Rastro (máx. −30%) y la curación que reciba se reduce a la mitad.",
+      "profundidad": "Si ya tienes Toxina de Cazador (γ2), cuando la presa cae por debajo del 50% de PV, la reducción de curación pasa a total (no puede curarse en absoluto).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-marcaje-t4", "codigo": "Cz-α4", "nombre": "Golpe de Cacería",
+      "tier": 4, "foco": "Marcaje", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear técnicas de remate final que consuman todo el Rastro de tu presa; el daño de la técnica se multiplica por ⌊Rastro consumido ÷ 3⌋ (9 Rastro = ×3). Cuanto más la has cazado, más duele. Tras un remate no puedes generar Rastro durante 1 turno.",
+      "profundidad": "Si ya tienes Rastro Imborrable (α3), el remate conserva la mitad del Rastro consumido, eliminando la restricción de 1 turno.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-persecucion-t4", "codigo": "Cz-β4", "nombre": "No Hay Escapatoria",
+      "tier": 4, "foco": "Persecución", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Mientras tu presa marcada conserve ≥1 Rastro y tú puedas actuar, no puede completar la acción Correr / romper combate: cada intento fallido te genera +1 Rastro sobre ella.",
+      "profundidad": "Si ya tienes Instinto de Persecución (β3), cuando la presa falla una huida quedas adyacente a ella de inmediato (persiguiéndola) y tu siguiente golpe contra ella genera +2 Rastro.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-desgaste-t4", "codigo": "Cz-γ4", "nombre": "Presa Agonizante",
+      "tier": 4, "foco": "Desgaste", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cada vez que acumulas Rastro o aplicas erosión sobre tu presa marcada, si está por debajo del 50% de PV, tu siguiente golpe contra ella ignora un 25% de mitigación y no puede ser esquivado.",
+      "profundidad": "Si ya tienes Erosión Constante (γ3), mientras tu presa esté por debajo del 50% de PV no puede recibir curación por ningún medio.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-pinaculo-marcaje", "codigo": "Cz-★α", "nombre": "Cacería Perfecta",
+      "tier": 5, "foco": "Marcaje", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus técnicas de remate ya no tienen tope de multiplicador por Rastro. Además, cuando un remate reduce a tu presa a 0 PV, puedes marcar de inmediato a un nuevo objetivo visible y transferirle la mitad del Rastro que ibas a consumir (la cacería nunca termina).",
+      "profundidad": "", "pinaculo": true, "afinidad": "Marcaje",
+      "afinidad_bonus": "Tus golpes contra tu presa marcada generan +1 Rastro adicional siempre.",
+      "prereq": [], "excluye": ["cazador-pinaculo-persecucion", "cazador-pinaculo-desgaste"], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-pinaculo-persecucion", "codigo": "Cz-★β", "nombre": "Sin Refugio",
+      "tier": 5, "foco": "Persecución", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu presa marcada no puede escapar de ti por ningún medio: ninguna acción, estado ni efecto de movilidad le permite romper tu persecución mientras puedas actuar, y cierras cualquier distancia hacia ella con tu movimiento sin gastar PA.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Persecución",
+      "afinidad_bonus": "Además, cada turno que tu presa termine sin haber logrado alejarse de ti, ganas +2 Rastro.",
+      "prereq": [], "excluye": ["cazador-pinaculo-marcaje", "cazador-pinaculo-desgaste"], "decision": false, "terminal": false
+    },
+    {
+      "id": "cazador-pinaculo-desgaste", "codigo": "Cz-★γ", "nombre": "Muerte Lenta",
+      "tier": 5, "foco": "Desgaste", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Mientras tu presa marcada conserve Rastro, no puede recuperar PV por ningún medio y al inicio de cada uno de sus turnos sufre erosión (pierde PV escalando con su Rastro acumulado).",
+      "profundidad": "", "pinaculo": true, "afinidad": "Desgaste",
+      "afinidad_bonus": "Además, la reducción de mitigación por Rastro deja de tener tope: la erosión desgasta a la presa sin límite.",
+      "prereq": [], "excluye": ["cazador-pinaculo-marcaje", "cazador-pinaculo-persecucion"], "decision": false, "terminal": false
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "id": "identidad-coloso",
+  "nombre": "Coloso",
+  "tipo": "identidad",
+  "version": "3.0",
+  "recurso_secundario": "Mole",
+  "recurso_base": "Generas 1 Mole al conectar un golpe con fuerza y 1 Mole al recibir da\u00f1o (m\u00e1x. 1 por turno enemigo). Tope base 6; si en un turno no generas Mole, pierde 1 carga. Se gasta a trav\u00e9s de nodos y t\u00e9cnicas.",
+  "resumen_arquetipo": "Coloso es la filosof\u00eda de que la fuerza es una verdad que no necesita demostrarse dos veces: golpes que aplastan y resistencia bruta, sin importar qu\u00e9 Arma empu\u00f1e el personaje.",
+  "rol_mecanico": "Burst / tank ofensivo. Acumula Mole y la libera en descargas o la convierte en aguante.",
+  "corrientes": [
+    { "clave": "Peso", "simbolo": "\u03b1", "filosofia": "Amplificar. Acumular Mole y liberarla en descargas devastadoras; cada golpe pesa m\u00e1s que el anterior." },
+    { "clave": "Inquebrantable", "simbolo": "\u03b2", "filosofia": "Absorber. Convertir la Mole en aguante puro; el cuerpo como muro que no cede." },
+    { "clave": "Ruptura", "simbolo": "\u03b3", "filosofia": "Avanzar. Nada se interpone; atravesar guardias, obst\u00e1culos y posiciones sin frenar." }
+  ],
+  "focos": ["Peso", "Inquebrantable", "Ruptura"],
+  "nodos": [
+    {
+      "id": "coloso-peso-t1", "codigo": "Co-\u03b11", "nombre": "Fuerza que Crece",
+      "tier": 1, "foco": "Peso", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Generas +1 Mole adicional al conectar un golpe contra un objetivo al que ya golpeaste en este combate. Adem\u00e1s, el primer golpe de cada combate genera 2 Mole en vez de 1.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-inquebrantable-t1", "codigo": "Co-\u03b21", "nombre": "Piel de Coloso",
+      "tier": 1, "foco": "Inquebrantable", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cuando recibes da\u00f1o, tu cuerpo endurece en proporci\u00f3n a tu reserva: reduces ese golpe con +5 de mitigaci\u00f3n por cada 3 Mole acumulada (m\u00e1x. +15). La Mole no se consume al hacerlo.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-ruptura-t1", "codigo": "Co-\u03b31", "nombre": "Avance Imparable",
+      "tier": 1, "foco": "Ruptura", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cuando te desplazas en l\u00ednea hacia un enemigo, no puedes ser detenido por terreno dif\u00edcil ni por enemigos interpuestos (los atraviesas empuj\u00e1ndolos 2m). Si terminas el desplazamiento con un golpe, ese golpe genera +1 Mole.",
+      "profundidad": "", "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-peso-t2", "codigo": "Co-\u03b12", "nombre": "Descarga de Peso",
+      "tier": 2, "foco": "Peso", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear t\u00e9cnicas que consuman Mole para a\u00f1adir da\u00f1o puro que ignora mitigaci\u00f3n f\u00edsica, escalando con la Mole gastada (presupuesto seg\u00fan NUMEROS-Y-BALANCE \u00a77).",
+      "profundidad": "Si ya tienes Fuerza que Crece (\u03b11), estas t\u00e9cnicas, al consumir \u22654 Mole, aplican Ralentizado 1 turno adem\u00e1s de su efecto.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-inquebrantable-t2", "codigo": "Co-\u03b22", "nombre": "Muro de Voluntad",
+      "tier": 2, "foco": "Inquebrantable", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear t\u00e9cnicas defensivas de reacci\u00f3n (declaradas fuera de tu turno, al recibir un ataque) que consuman Mole para anular da\u00f1o entrante este turno; la cantidad anulada escala con la Mole gastada.",
+      "profundidad": "Si ya tienes Piel de Coloso (\u03b21), cuando anulas todo el da\u00f1o de un ataque de esta forma, generas +2 Mole.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-ruptura-t2", "codigo": "Co-\u03b32", "nombre": "Carga Arrolladora",
+      "tier": 2, "foco": "Ruptura", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear t\u00e9cnicas de embestida que atraviesen a todos los enemigos en la l\u00ednea recta de tu desplazamiento, aplicando da\u00f1o e ignorando guardias y bloqueos.",
+      "profundidad": "Si ya tienes Avance Imparable (\u03b31), estas embestidas generan +1 Mole por cada enemigo atravesado.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-peso-t3", "codigo": "Co-\u03b13", "nombre": "Mole Desatada",
+      "tier": 3, "foco": "Peso", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu tope de Mole sube de 6 a 9 y la Mole ya no decae durante el combate: persiste hasta que la gastes.",
+      "profundidad": "Si ya tienes Descarga de Peso (\u03b12), tus t\u00e9cnicas que consuman \u22656 Mole aplican Ralentizado 1 turno (o lo extienden a 2 si ya lo aplicaban).",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-inquebrantable-t3", "codigo": "Co-\u03b23", "nombre": "Postura Inamovible",
+      "tier": 3, "foco": "Inquebrantable", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Mientras no te desplaces durante un turno, tu mitigaci\u00f3n aumenta de forma acumulativa (+2 por turno, m\u00e1x. +10) y eres inmune a movimiento forzado (empuje, Enraizado). El contador se reinicia si te mueves.",
+      "profundidad": "Si ya tienes Muro de Voluntad (\u03b22), mientras est\u00e9s en Postura tus t\u00e9cnicas defensivas de anulaci\u00f3n cuestan la mitad de Mole.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-ruptura-t3", "codigo": "Co-\u03b33", "nombre": "Rompeguardias",
+      "tier": 3, "foco": "Ruptura", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus golpes contra objetivos que est\u00e9n bloqueando, cubri\u00e9ndose o en postura defensiva ignoran un 30% de su mitigaci\u00f3n y generan +1 Mole.",
+      "profundidad": "Si ya tienes Carga Arrolladora (\u03b32), tus embestidas rompen adem\u00e1s cualquier estado de guardia o postura defensiva del objetivo alcanzado.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-peso-t4", "codigo": "Co-\u03b14", "nombre": "Golpe de Ejecuci\u00f3n",
+      "tier": 4, "foco": "Peso", "tipo": "habilitador", "coste_pt": 1,
+      "efecto": "Puedes crear t\u00e9cnicas de remate que consuman toda tu Mole; el da\u00f1o se multiplica por \u230aMole consumida \u00f7 3\u230b (9 Mole = \u00d73). Tras un remate no puedes generar Mole durante 1 turno.",
+      "profundidad": "Si ya tienes Mole Desatada (\u03b13), el remate conserva la mitad de la Mole consumida, eliminando la restricci\u00f3n de 1 turno.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-inquebrantable-t4", "codigo": "Co-\u03b24", "nombre": "Cuerpo de Tit\u00e1n",
+      "tier": 4, "foco": "Inquebrantable", "tipo": "mini-sistema", "coste_pt": 1,
+      "efecto": "Al inicio de cada turno enemigo, tu Mole acumulada act\u00faa como mitigaci\u00f3n adicional (1 punto por cada 1 Mole) contra el primer golpe que recibas ese turno, sin consumirse.",
+      "profundidad": "Si ya tienes Postura Inamovible (\u03b23), mientras est\u00e9s en Postura esa mitigaci\u00f3n se aplica a todos los golpes del turno, no solo al primero.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-ruptura-t4", "codigo": "Co-\u03b34", "nombre": "Sin Freno",
+      "tier": 4, "foco": "Ruptura", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Cada vez que atraviesas o empujas a un enemigo (por desplazamiento, embestida o Avance Imparable), tu siguiente golpe ignora un 25% de mitigaci\u00f3n y no puede ser esquivado.",
+      "profundidad": "Si ya tienes Rompeguardias (\u03b33), atravesar a un enemigo tambi\u00e9n le aplica Ralentizado 1 turno.",
+      "pinaculo": false, "afinidad": "", "afinidad_bonus": "",
+      "prereq": [], "excluye": [], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-pinaculo-peso", "codigo": "Co-\u2605\u03b1", "nombre": "Peso Absoluto",
+      "tier": 5, "foco": "Peso", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tus t\u00e9cnicas de remate ya no tienen tope de multiplicador por Mole. Adem\u00e1s, cuando un remate reduce a un objetivo a 0 PV, conservas toda la Mole que ibas a consumir.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Peso",
+      "afinidad_bonus": "\u22653 nodos Peso: tus golpes b\u00e1sicos generan +1 Mole adicional siempre.",
+      "prereq": [], "excluye": ["coloso-pinaculo-inquebrantable", "coloso-pinaculo-ruptura"], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-pinaculo-inquebrantable", "codigo": "Co-\u2605\u03b2", "nombre": "Inm\u00f3vil como Monta\u00f1a",
+      "tier": 5, "foco": "Inquebrantable", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Mientras no te desplaces, eres inmune a todo control (Aturdido, Enraizado, empuje) y ning\u00fan golpe individual puede infligirte m\u00e1s da\u00f1o que tu Mole actual \u00d7 5.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Inquebrantable",
+      "afinidad_bonus": "\u22653 nodos Inquebrantable: adem\u00e1s, cada golpe que resistas de este modo genera +2 Mole.",
+      "prereq": [], "excluye": ["coloso-pinaculo-peso", "coloso-pinaculo-ruptura"], "decision": false, "terminal": false
+    },
+    {
+      "id": "coloso-pinaculo-ruptura", "codigo": "Co-\u2605\u03b3", "nombre": "Fuerza de la Naturaleza",
+      "tier": 5, "foco": "Ruptura", "tipo": "pasiva", "coste_pt": 1,
+      "efecto": "Tu desplazamiento se vuelve imparable en sentido absoluto: atraviesas cualquier n\u00famero de enemigos y obst\u00e1culos en l\u00ednea recta aplicando da\u00f1o de embestida a todos, y ning\u00fan efecto puede detener, ralentizar ni redirigir tu movimiento.",
+      "profundidad": "", "pinaculo": true, "afinidad": "Ruptura",
+      "afinidad_bonus": "\u22653 nodos Ruptura: cada enemigo atravesado queda Aturdido y te genera +1 Mole.",
+      "prereq": [], "excluye": ["coloso-pinaculo-peso", "coloso-pinaculo-inquebrantable"], "decision": false, "terminal": false
+    }
+  ]
+}

@@ -39,7 +39,7 @@ function upsert_setting(mysqli $db, string $prefix, string $name, string $title,
         return;
     }
     run($db, "INSERT setting {$name}", "INSERT INTO {$prefix}settings (name, title, description, optionscode, value, disporder, gid)
-        VALUES ('{$nameE}', '{$titleE}', 'FID del foro Alta Mar (travesías GBEternal)', 'numeric', '{$valE}', 1, 1)");
+        VALUES ('{$nameE}', '{$titleE}', 'FID del foro Alta Mar (travesías OPE Eternal)', 'numeric', '{$valE}', 1, 1)");
 }
 
 function upsert_forum(mysqli $db, string $prefix, string $name, string $desc, int $pid, string $type, int $disporder): int
@@ -107,11 +107,11 @@ run($db, 'CREATE rol_viajes', "
 ");
 
 echo "\n=== Foro Alta Mar ===\n";
-$navCat = upsert_forum($db, $PREFIX, 'Navegación', 'Travesías en alta mar. Los hilos los abre GBEternal con el Oráculo de Viaje.', 0, 'c', 3);
+$navCat = upsert_forum($db, $PREFIX, 'Navegación', 'Travesías en alta mar. Los hilos los abre OPE Eternal con el Oráculo de Viaje.', 0, 'c', 3);
 $altaMarFid = upsert_forum($db, $PREFIX, 'Alta Mar', 'Bitácoras de travesía generadas por el Oráculo. Rolear aquí hasta solicitar la llegada.', $navCat, 'f', 1);
 
-echo "\n=== Setting gbe_alta_mar_fid ===\n";
-upsert_setting($db, $PREFIX, 'gbe_alta_mar_fid', 'Foro Alta Mar (FID)', (string) $altaMarFid);
+echo "\n=== Setting ope_alta_mar_fid ===\n";
+upsert_setting($db, $PREFIX, 'ope_alta_mar_fid', 'Foro Alta Mar (FID)', (string) $altaMarFid);
 
 $db->query("DELETE FROM {$PREFIX}datacache WHERE title IN ('forums','forumsdisplay','moderators')");
 echo "  [OK] Caché de foros invalidada\n";

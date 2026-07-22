@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Reestructuración de "El Mundo"
+ * One Piece: Eternal · Reestructuración de "El Mundo"
  * -------------------------------------------------------------------
  * Cambios pedidos:
  *   - Los 4 Blues (East/West/North/South) dejan de ser islas de un

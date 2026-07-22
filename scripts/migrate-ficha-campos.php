@@ -1,6 +1,6 @@
 <?php
 /**
- * Granblue Fantasy: Eternal · Migración "campos de ficha" (rediseño de ficha.php)
+ * One Piece: Eternal · Migración "campos de ficha" (rediseño de ficha.php)
  * ---------------------------------------------------------------------
  * Añade a rol_personajes las columnas que necesita la ficha rediseñada:
  *   - rango_faccion : rango del personaje DENTRO de su facción (grumete, capitán…)

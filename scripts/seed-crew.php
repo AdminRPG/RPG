@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Seed: Tripulacion Carmesi y Aliados
+ * One Piece: Eternal · Seed: Tripulacion Carmesi y Aliados
  *
  * NPCs Mayores completos. Idempotente (INSERT o UPDATE segun slug).
  * Uso: php scripts/seed-crew.php
@@ -119,7 +119,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/jack_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/jack_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/jack_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/jack_personalidad.txt'),
     'mundo_zona' => 'paraiso',
     'mundo_ubic' => 'Isla Sabaody -- Guarida Secreta de los Carmesi',
@@ -144,7 +144,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/aurelian_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/aurelian_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/aurelian_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/aurelian_personalidad.txt'),
     'mundo_zona' => 'paraiso',
     'mundo_ubic' => 'Isla Sabaody -- Clinica Clandestina',
@@ -169,7 +169,7 @@ seed_npc($db, [
     'datos_internos' => file_get_contents(__DIR__ . '/_seed-data/ignis_internos.json'),
     'bio' => file_get_contents(__DIR__ . '/_seed-data/ignis_bio.json'),
     'desc_fisica' => file_get_contents(__DIR__ . '/_seed-data/ignis_fisica.txt'),
-    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de I-Forge',
+    'from_fisico' => 'One Piece, Eiichiro Oda -- adaptado por el staff de One Piece: Eternal',
     'personalidad' => file_get_contents(__DIR__ . '/_seed-data/ignis_personalidad.txt'),
     'mundo_zona' => 'paraiso',
     'mundo_ubic' => 'Isla Baltigo -- Base del Ejercito Revolucionario',

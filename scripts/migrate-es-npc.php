@@ -1,6 +1,6 @@
 <?php
 /**
- * I-Forge · Migracion NPCs + soft-delete
+ * One Piece: Eternal · Migracion NPCs + soft-delete
  * ---------------------------------------
  * Añade la columna es_npc a rol_personajes y el estado 'eliminado'
  * al ENUM de estado para el soft-delete de expedientes.

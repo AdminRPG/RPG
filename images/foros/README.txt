@@ -1,4 +1,4 @@
-Imagenes de foros (regiones e islas) — I-Forge RPG
+Imagenes de foros (regiones e islas) — One Piece: Eternal
 ==================================================
 
 Coloca aqui la imagen de cada foro/region usando su FID como nombre:

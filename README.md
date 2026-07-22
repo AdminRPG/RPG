@@ -1,4 +1,4 @@
-# I-Forge-RPG
+# One Piece: Eternal
 
 Foro de rol play-by-post sobre MyBB con backend propio de mecánicas de juego.
 

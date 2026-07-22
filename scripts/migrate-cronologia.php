@@ -1,6 +1,6 @@
 <?php
 /**
- * Granblue Fantasy: Eternal · Migración "cronología por personaje"
+ * One Piece: Eternal · Migración "cronología por personaje"
  * --------------------------------------------------------
  * Crea la tabla que guarda la DESCRIPCIÓN que un personaje le pone a cada tema
  * de su línea de tiempo. La descripción es por (personaje, tema), de ahí la PK
@@ -10,7 +10,7 @@
  *
  * Ejecutar:
  *   & "C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64\php.exe" \
- *     "C:\Users\Fgonz\Documents\Proyectos\I-Forge-RPG\scripts\migrate-cronologia.php"
+ *     "C:\Users\Fgonz\Documents\Proyectos\One Piece: Eternal\scripts\migrate-cronologia.php"
  */
 
 error_reporting(E_ALL);
