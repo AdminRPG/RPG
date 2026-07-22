@@ -57,6 +57,24 @@ $paneles = array(
         'count_key' => 'cola_tram',
         'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>',
     ),
+    array(
+        'id' => 'personajes',
+        'titulo' => 'Gestión de personajes',
+        'code' => 'STF-03',
+        'desc' => 'Listado interactivo de fichas. Cambiar estado, asignar rango Staff o borrar personajes sin escribir IDs.',
+        'rank_min' => 1,
+        'href' => 'zona-staff-personajes.php',
+        'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    ),
+    array(
+        'id' => 'cuentas',
+        'titulo' => 'Gestión de cuentas y narradores',
+        'code' => 'STF-04',
+        'desc' => 'Administración de usuarios. Cambiar número de slots de PJ, rol de Narrador, rango Staff y personaje activo.',
+        'rank_min' => 2,
+        'href' => 'zona-staff-cuentas.php',
+        'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>',
+    ),
 );
 
 $counts = array('cola_pj' => 0, 'cola_tram' => 0);
