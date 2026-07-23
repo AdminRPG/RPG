@@ -50,6 +50,7 @@
       <div class="ope-th-badge-row">
         {$thread['displayprefix']}
         <span class="ope-mono ope-th-views">// {$thread['views']} vistas &middot; {$thread['replies']} respuestas</span>
+        {$thread['ope_tags_html']}
       </div>
       <h1 class="ope-th-title">{$thread['subject']}</h1>
       <div class="ope-th-meta">
@@ -94,63 +95,66 @@
     <br class="clear" />
   </div>
 
+</div>
 </main>
-
-{$usersbrowsing}
 {$footer}
-
-<script type="text/javascript">
-	var thread_deleted = "{$thread_deleted}";
-	if(thread_deleted == "1")
-	{
-		$("#quick_reply_form, .new_reply_button, .thread_tools, .inline_rating").hide();
-		$("#moderator_options_selector option.option_mirage").attr("disabled","disabled");
-	}
-</script>
-
 </body>
 </html>]]></template>
 
     <template name="postbit" version="1839"><![CDATA[{$ignore_bit}{$deleted_bit}
 <a name="pid{$post['pid']}" id="pid{$post['pid']}"></a>
-<article class="ope-post {$unapproved_shade}" style="{$post_visibility}" id="post_{$post['pid']}">
-  <div class="ope-post-author {$post['ope_fac_class']}">
-    {$post['useravatar']}
-    <div class="ope-pa-name">{$post['profilelink']}</div>
-    <div class="ope-pa-rank">
-      <span class="ope-tag ope-tag-rank" style="background:var(--h3)">{$post['usertitle']}</span>
-      {$post['groupimage']}
-    </div>
-    {$post['ope_char_side']}
-  </div>
-
-  <div class="ope-post-body">
-    <div class="ope-post-head">
-      <div class="ope-post-head-row">
-        <span class="ope-post-date">{$post['postdate']} &middot; {$post['posttime']}</span>
-        <div class="ope-post-actions">
-          <a href="{$post['postlink']}#pid{$post['pid']}" class="ope-post-num">#{$post['postnum']}</a>
-          <a href="newreply.php?tid={$tid}&amp;pid={$post['pid']}" class="ope-btn ope-btn-sm ope-btn-ghost">Citar</a>
-          <a href="newreply.php?tid={$tid}" class="ope-btn ope-btn-sm ope-btn-ghost">Responder</a>
-          {$post['button_edit']}
-          {$post['button_report']}
-          {$post['button_warn']}
-          {$post['button_purgespammer']}
-          {$post['button_quickdelete']}
-          {$post['button_quickrestore']}
+<div class="ope-postbit-container" id="post-container-{$post['pid']}">
+  <div class="ope-postbit-card" id="post-card-{$post['pid']}">
+    
+    <!-- LADO FRONTAL: POSTBIT NORMAL -->
+    <div class="ope-postbit-front">
+      <article class="ope-post {$unapproved_shade}" style="{$post_visibility}" id="post_{$post['pid']}">
+        <div class="ope-post-author {$post['ope_fac_class']}">
+          {$post['useravatar']}
+          <div class="ope-pa-name">{$post['profilelink']}</div>
+          <div class="ope-pa-rank">
+            <span class="ope-tag ope-tag-rank" style="background:var(--h3)">{$post['usertitle']}</span>
+            {$post['groupimage']}
+          </div>
+          {$post['ope_char_side']}
         </div>
-      </div>
-      <div class="ope-post-head-ip" id="post_meta_{$post['pid']}">{$post['iplogged']}{$post['poststatus']}</div>
+
+        <div class="ope-post-body">
+          <div class="ope-post-head">
+            <div class="ope-post-head-row">
+              <span class="ope-post-date">{$post['postdate']} &middot; {$post['posttime']}</span>
+              <div class="ope-post-actions">
+                <a href="{$post['postlink']}#pid{$post['pid']}" class="ope-post-num">#{$post['postnum']}</a>
+                <a href="newreply.php?tid={$tid}&amp;pid={$post['pid']}" class="ope-btn ope-btn-sm ope-btn-ghost">Citar</a>
+                <a href="newreply.php?tid={$tid}" class="ope-btn ope-btn-sm ope-btn-ghost">Responder</a>
+                {$post['button_edit']}
+                {$post['button_report']}
+                {$post['button_warn']}
+                {$post['button_purgespammer']}
+                {$post['button_quickdelete']}
+                {$post['button_quickrestore']}
+              </div>
+            </div>
+            <div class="ope-post-head-ip" id="post_meta_{$post['pid']}">{$post['iplogged']}{$post['poststatus']}</div>
+          </div>
+          <div class="ope-post-content" id="pid_{$post['pid']}">
+            {$post['message']}
+          </div>
+          {$post['signature']}
+          {$post['attachments']}
+          {$post['editedmsg']}
+        </div>
+      </article>
+      {$post['ope_rpgsys']}
     </div>
-    <div class="ope-post-content" id="pid_{$post['pid']}">
-      {$post['message']}
+
+    <!-- LADO TRASERO: FICHA CONGELADA DEL POST (3D CARD FLIP) -->
+    <div class="ope-postbit-back">
+      {$post['ope_post_back_html']}
     </div>
-    {$post['signature']}
-    {$post['attachments']}
-    {$post['editedmsg']}
+
   </div>
-</article>
-{$post['ope_rpgsys']}]]></template>
+</div>]]></template>
 
     <template name="postbit_author_user" version="1839"><![CDATA[]]></template>
 

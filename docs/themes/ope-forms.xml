@@ -24,40 +24,41 @@
         </div>
         <div class="ope-meta-fields">
           <div class="ope-meta-field">
-            <label>Época</label>
-            <select name="ope_era" id="ope_era" class="ope-meta-sel">
-              <option value="presente">Presente &middot; fecha actual (inalterable)</option>
-              <option value="pasado">Pasado</option>
+            <label>Época Temporal</label>
+            <select name="temporal_tipo" id="temporal_tipo" class="ope-meta-sel" onchange="document.getElementById('ope-fecha-pasado-wrap').style.display = (this.value==='pasado'?'flex':'none')">
+              <option value="presente" selected>Presente &middot; Fecha Actual del Foro</option>
+              <option value="pasado">Pasado &middot; Fecha Histórica Personalizada</option>
             </select>
           </div>
-          <div id="ope-fecha-wrap" class="ope-fecha-wrap">
+          <div id="ope-fecha-pasado-wrap" class="ope-fecha-wrap" style="display:none">
             <div class="ope-meta-field">
-              <label>Año in-rol</label>
-              <input type="number" name="ope_fecha_rol" id="ope_fecha_rol" class="ope-meta-sel" min="0" max="9999" step="1" placeholder="p. ej. 1518" />
-            </div>
-            <div class="ope-meta-field">
-              <label>Día</label>
-              <input type="number" name="ope_fecha_dia" class="ope-meta-sel" min="1" max="65" step="1" placeholder="1&ndash;65" />
+              <label>Día (1&ndash;65)</label>
+              <input type="number" name="temporal_dia" class="ope-meta-sel" min="1" max="65" step="1" value="1" placeholder="1-65" />
             </div>
             <div class="ope-meta-field">
               <label>Estación</label>
-              <select name="ope_estacion" class="ope-meta-sel">
-                <option value="">Automática (por día)</option>
+              <select name="temporal_estacion" class="ope-meta-sel">
                 <option value="Primavera">Primavera</option>
                 <option value="Verano">Verano</option>
                 <option value="Otoño">Otoño</option>
                 <option value="Invierno">Invierno</option>
               </select>
             </div>
+            <div class="ope-meta-field">
+              <label>Año in-rol</label>
+              <input type="number" name="temporal_ano" class="ope-meta-sel" min="1000" max="3000" step="1" value="1518" placeholder="ej: 1518" />
+            </div>
           </div>
           <div class="ope-meta-field">
-            <label>Etiqueta</label>
-            <select name="ope_tag" class="ope-meta-sel">
-              <option value="">Sin etiqueta</option>
-              <option value="Mision">Misión</option>
-              <option value="Trama">Trama</option>
-              <option value="Viaje">Viaje</option>
-              <option value="Fic">Fic</option>
+            <label>Tipo de Tema</label>
+            <select name="tema_tipo" class="ope-meta-sel">
+              <option value="travesia">Travesía</option>
+              <option value="aventura">Aventura</option>
+              <option value="fic">Fic</option>
+              <option value="combate">Combate</option>
+              <option value="entrenamiento">Entrenamiento</option>
+              <option value="social" selected>Social</option>
+              <option value="trama">Trama</option>
             </select>
           </div>
         </div>

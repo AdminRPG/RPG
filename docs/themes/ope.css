@@ -7933,3 +7933,38 @@ body.ope-pg-barco .log-time{font-family:var(--mono);font-size:.65rem;color:var(-
 body.ope-pg-barco .c-gold{color:var(--gold-deep)!important}
 body.ope-pg-barco .c-crack{color:var(--crack)!important}
 body.ope-pg-barco .c-patina{color:var(--patina)!important}
+
+/* ─────────────────────────────────────────────────────────────
+   Efecto 3D Card Flip — Ficha del Post (Snapshot Congelado)
+   ───────────────────────────────────────────────────────────── */
+.ope-postbit-container{perspective:1400px;margin-bottom:24px;width:100%}
+.ope-postbit-card{position:relative;width:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.4,0,.2,1)}
+.ope-postbit-card.is-flipped{transform:rotateY(180deg)}
+.ope-postbit-front,.ope-postbit-back{width:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.ope-postbit-front{position:relative;z-index:2}
+.ope-postbit-back{position:absolute;top:0;left:0;right:0;bottom:0;transform:rotateY(180deg);z-index:1;background:var(--iron-hi);border:1px solid var(--gold-deep);border-radius:12px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.5);overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+
+.ope-flip-back-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line-soft);padding-bottom:10px}
+.ope-flip-back-header .back-kicker{font-family:var(--mono);font-size:.68rem;color:var(--ash);text-transform:uppercase;display:block}
+.ope-flip-back-header h3{font-family:var(--disp);font-size:1.15rem;color:var(--gold-deep);margin:0}
+
+.ope-flip-back-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.ope-flip-card-box{background:var(--concrete);border:1px solid var(--line-soft);border-radius:8px;padding:12px}
+.ope-flip-card-box.full-width{grid-column:1/-1}
+.ope-flip-card-box h4{font-family:var(--disp);font-size:.85rem;color:var(--paper);margin:0 0 8px 0;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--line-soft);padding-bottom:4px}
+.ope-flip-stat-row{display:flex;justify-content:space-between;font-size:.78rem;padding:4px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
+.ope-flip-stat-row:last-child{border-bottom:none}
+.ope-flip-stat-label{color:var(--paper-dim)}
+.ope-flip-stat-val{font-family:var(--mono);font-weight:700;color:var(--gold-deep)}
+
+/* Avatar Sidebar adjustments (Max 280x450, full fill) */
+.ope-post-author{width:280px!important;min-width:280px!important;max-width:280px!important}
+.ope-post-author .ope-avatar{width:100%!important;max-height:450px!important;overflow:hidden;border-radius:8px;border:1px solid var(--line-soft)}
+.ope-post-author .ope-avatar img{width:100%!important;height:100%!important;object-fit:cover!important;max-height:450px!important;display:block}
+
+/* Badges de Título e Hilo (Presente / Pasado / Travesía / Combate) */
+.ope-th-top-meta,.ope-th-tags-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:8px}
+.ope-tag-badge{font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;padding:4px 10px;border-radius:4px;letter-spacing:.5px}
+.ope-tag-presente{background:var(--patina);color:#000}
+.ope-tag-pasado{background:var(--gold-deep);color:#000}
+.ope-tag-tipo{background:var(--concrete);color:var(--paper);border:1px solid var(--line-soft)}

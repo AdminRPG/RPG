@@ -83,6 +83,7 @@ $plugins->add_hook('forumdisplay_thread_end', 'ope_rol_forumdisplay_thread');
 // moderador/admin en MyBB, si el personaje activo no tiene rol de staff no debe
 // ver el desplegable "Moderation Options" del tema.
 $plugins->add_hook('showthread_end', 'ope_rol_hide_modtools_showthread');
+$plugins->add_hook('showthread_end', 'ope_rol_showthread_tags');
 
 // Navbar única: se inyecta automáticamente en CUALQUIER página que use el
 // pipeline estándar de MyBB (output_page) y que todavía no la traiga incluida
@@ -919,8 +920,48 @@ function ope_rol_char_link($pid, $fallback_name = '')
 
 function ope_rol_stamp_thread(&$dh)
 {
+    global $mybb, $db;
     $uid = (int) ($dh->data['uid'] ?? 0);
-    $dh->thread_insert_data['ope_pid'] = ope_rol_active_pid_for($uid);
+    $active_pid = ope_rol_active_pid_for($uid);
+    $dh->thread_insert_data['ope_pid'] = $active_pid;
+
+    // Capturar etiquetas de Hilo: temporal_tipo, temporal_fecha, tema_tipo
+    $temp_tipo  = strtolower(trim((string)$mybb->get_input('temporal_tipo')));
+    if ($temp_tipo !== 'pasado') {
+        $temp_tipo = 'presente';
+    }
+    
+    $tema_tipo  = strtolower(trim((string)$mybb->get_input('tema_tipo')));
+    $validos_tema = array('travesia', 'aventura', 'fic', 'combate', 'entrenamiento', 'social', 'trama');
+    if (!in_array($tema_tipo, $validos_tema, true)) {
+        $tema_tipo = 'social';
+    }
+
+    $temp_fecha = '';
+    if ($temp_tipo === 'pasado') {
+        $dia      = max(1, min(65, (int)$mybb->get_input('temporal_dia')));
+        $estacion = trim((string)$mybb->get_input('temporal_estacion'));
+        $validas_est = array('Primavera', 'Verano', 'Otoño', 'Invierno');
+        if (!in_array($estacion, $validas_est, true)) {
+            $estacion = 'Primavera';
+        }
+        $ano = (int)$mybb->get_input('temporal_ano');
+        if ($ano < 1000 || $ano > 3000) {
+            $ano = 1518;
+        }
+        $temp_fecha = 'Día ' . $dia . ' · ' . $estacion . ' · Año ' . $ano;
+    } else {
+        $temp_fecha = function_exists('ope_rol_mv_fecha_onrol')
+            ? ope_rol_mv_fecha_onrol(TIME_NOW)
+            : my_date('j F Y', TIME_NOW);
+    }
+
+    if ($db->field_exists('temporal_tipo', 'threads')) {
+        $dh->thread_insert_data['temporal_tipo']  = $db->escape_string($temp_tipo);
+        $dh->thread_insert_data['temporal_fecha'] = $db->escape_string($temp_fecha);
+        $dh->thread_insert_data['tema_tipo']      = $db->escape_string($tema_tipo);
+    }
+
     return $dh;
 }
 
@@ -1006,41 +1047,72 @@ function ope_rol_snapshot_post(&$dh)
         return $dh;
     }
 
-    // Idempotente: un mismo pid de post nunca debe tener dos snapshots.
-    $exists = $db->simple_select('rol_post_snapshot', 'pid', "pid = {$post_pid}", array('limit' => 1));
-    if ($db->num_rows($exists)) {
-        return $dh;
-    }
-
     $uid      = (int) ($dh->data['uid'] ?? 0);
     $char_pid = ope_rol_active_pid_for($uid);
     if ($char_pid < 1) {
         return $dh;
     }
 
-    $q = $db->simple_select('rol_personajes', 'datos, inventario, pv_max, en_max, pa_por_turno', "pid = {$char_pid}", array('limit' => 1));
+    $tid = (int) ($dh->data['tid'] ?? ($dh->tid ?? 0));
+
+    $q = $db->simple_select('rol_personajes', '*', "pid = {$char_pid}", array('limit' => 1));
     if (!$db->num_rows($q)) {
         return $dh;
     }
-    $row = $db->fetch_array($q);
+    $char = $db->fetch_array($q);
+    $datos = json_decode((string) ($char['datos'] ?? ''), true) ?: array();
 
-    $datos = json_decode((string) $row['datos'], true);
+    // 1. LOCK CONGELACIÓN DE FICHA EN EL HILO (mybb_rol_thread_snapshots)
+    $thread_snap = null;
+    if ($tid > 0 && $db->table_exists('rol_thread_snapshots')) {
+        $ts_q = $db->simple_select('rol_thread_snapshots', '*', "tid = {$tid} AND pid = {$char_pid}", array('limit' => 1));
+        if ($db->num_rows($ts_q)) {
+            $thread_snap = $db->fetch_array($ts_q);
+        } else {
+            // Crear congelación inicial para este hilo
+            $stats_base = is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array();
+            $inv        = json_decode((string) ($char['inventario'] ?? ''), true) ?: array();
+            $items      = is_array($inv['encima'] ?? null) ? $inv['encima'] : array();
+            $fruta      = $char['fruta'] ?? '';
+            $npcs       = $char['npcs'] ?? '';
+
+            $now = defined('TIME_NOW') ? TIME_NOW : time();
+            $db->insert_query('rol_thread_snapshots', array(
+                'tid'             => $tid,
+                'pid'             => $char_pid,
+                'nivel'           => (int)($char['nivel'] ?? 1),
+                'rango'           => $db->escape_string((string)($char['rango'] ?? 'Rango E')),
+                'faccion'         => $db->escape_string((string)($char['faccion'] ?? 'Pirata')),
+                'stats_base_json' => $db->escape_string(json_encode($stats_base, JSON_UNESCAPED_UNICODE)),
+                'mochila_json'    => $db->escape_string(json_encode($items, JSON_UNESCAPED_UNICODE)),
+                'fruta_json'      => $db->escape_string(json_encode($fruta, JSON_UNESCAPED_UNICODE)),
+                'npcs_json'       => $db->escape_string(json_encode($npcs, JSON_UNESCAPED_UNICODE)),
+                'dateline'        => $now,
+            ));
+
+            $ts_q2 = $db->simple_select('rol_thread_snapshots', '*', "tid = {$tid} AND pid = {$char_pid}", array('limit' => 1));
+            if ($db->num_rows($ts_q2)) {
+                $thread_snap = $db->fetch_array($ts_q2);
+            }
+        }
+    }
+
+    // 2. STATS & VÍCTIMAS DEL POST
     $stats = is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array();
+    if ($thread_snap && !empty($thread_snap['stats_base_json'])) {
+        $ts_s = json_decode((string)$thread_snap['stats_base_json'], true);
+        if (is_array($ts_s) && !empty($ts_s)) {
+            $stats = $ts_s;
+        }
+    }
 
-    $inv    = json_decode((string) $row['inventario'], true);
-    $encima = is_array($inv['encima'] ?? null) ? $inv['encima'] : array();
+    $pv_max = function_exists('ope_combat_calc_pv') ? ope_combat_calc_pv($stats) : 100;
+    $en_max = function_exists('ope_combat_calc_en') ? ope_combat_calc_en($stats) : 100;
 
-    $pv_max       = (int) ($row['pv_max'] ?? 0);
-    $en_max       = (int) ($row['en_max'] ?? 0);
-    $pa_por_turno = (int) ($row['pa_por_turno'] ?? 2);
-
-    // Valores por defecto: los máximos (primer post de combate).
     $pv_actual = $pv_max;
     $en_actual = $en_max;
 
-    // Buscar el último snapshot del mismo personaje en el mismo hilo para
-    // heredar PV/EN actuales (arrastre entre posts del mismo combate).
-    $tid = (int) ($dh->data['tid'] ?? ($dh->tid ?? 0));
+    // Arrastre entre posts del mismo combate
     if ($tid > 0 && $db->table_exists('posts') && $db->table_exists('rol_post_snapshot')) {
         $prev = $db->query("
             SELECT s.pv_actual, s.en_actual
@@ -1060,9 +1132,6 @@ function ope_rol_snapshot_post(&$dh)
         }
     }
 
-    // Estado de combate declarado por el jugador en la pestaña Combate,
-    // serializado en el bloque [rpgsys] del mensaje. Si está presente,
-    // sobreescribe los valores heredados/máximos.
     $estados_json = null;
     $stats_mod_json = null;
     $msg = (string) ($dh->data['message'] ?? '');
@@ -1083,20 +1152,46 @@ function ope_rol_snapshot_post(&$dh)
         }
     }
 
+    $mochila_items = json_decode((string)($thread_snap['mochila_json'] ?? ''), true);
+    if (!is_array($mochila_items)) {
+        $inv = json_decode((string) ($char['inventario'] ?? ''), true) ?: array();
+        $mochila_items = is_array($inv['encima'] ?? null) ? $inv['encima'] : array();
+    }
+
+    $fruta_val = json_decode((string)($thread_snap['fruta_json'] ?? ''), true);
+    if (!$fruta_val && !empty($char['fruta'])) {
+        $fruta_val = $char['fruta'];
+    }
+    $npcs_val = json_decode((string)($thread_snap['npcs_json'] ?? ''), true);
+
+    $now = defined('TIME_NOW') ? TIME_NOW : time();
     $snap_data = array(
-        'pid'           => $post_pid,
-        'personaje_pid' => $char_pid,
-        'atributos'     => $db->escape_string(json_encode($stats, JSON_UNESCAPED_UNICODE)),
-        'objetos'       => $db->escape_string(json_encode($encima, JSON_UNESCAPED_UNICODE)),
-        'dateline'      => TIME_NOW,
-        'pv_actual'     => $pv_actual,
-        'en_actual'     => $en_actual,
-        'pa_actual'     => $pa_por_turno,
-        'estados_json'  => $estados_json,
-        'stats_mod_json'=> $stats_mod_json,
+        'pid'            => $post_pid,
+        'personaje_pid'  => $char_pid,
+        'atributos'      => $db->escape_string(json_encode($stats, JSON_UNESCAPED_UNICODE)),
+        'objetos'        => $db->escape_string(json_encode($mochila_items, JSON_UNESCAPED_UNICODE)),
+        'pv_actual'      => $pv_actual,
+        'en_actual'      => $en_actual,
+        'pa_actual'      => 2,
+        'estados_json'   => $estados_json,
+        'stats_mod_json' => $stats_mod_json,
+        'dateline'       => $now,
     );
 
-    $db->insert_query('rol_post_snapshot', $snap_data);
+    if ($db->field_exists('stats_json', 'rol_post_snapshot')) {
+        $snap_data['stats_json']   = $db->escape_string(json_encode($stats, JSON_UNESCAPED_UNICODE));
+        $snap_data['mochila_json'] = $db->escape_string(json_encode($mochila_items, JSON_UNESCAPED_UNICODE));
+        $snap_data['fruta_json']   = $db->escape_string(json_encode($fruta_val, JSON_UNESCAPED_UNICODE));
+        $snap_data['npcs_json']    = $db->escape_string(json_encode($npcs_val, JSON_UNESCAPED_UNICODE));
+        $snap_data['mods_json']    = $stats_mod_json;
+    }
+
+    $exists = $db->simple_select('rol_post_snapshot', 'pid', "pid = {$post_pid}", array('limit' => 1));
+    if ($db->num_rows($exists)) {
+        $db->update_query('rol_post_snapshot', $snap_data, "pid = {$post_pid}");
+    } else {
+        $db->insert_query('rol_post_snapshot', $snap_data);
+    }
 
     return $dh;
 }
@@ -1156,9 +1251,11 @@ function ope_rol_postbit($post)
     $img_src = trim((string) $char['avatar']) !== '' ? $char['avatar'] : (string) ($post['avatar'] ?? '');
     $post['useravatar'] = '<div class="ope-avatar"><a href="' . $fichaurl . '"><img src="' . htmlspecialchars_uni($img_src) . '" alt="' . $nombre . '" onerror="this.remove()" /></a><span>' . $nombre . '</span></div>';
 
-    // Bloque bajo el avatar: facción/rango de facción/tripulación + botones
-    // Mochila/Atributos con el snapshot histórico e inmutable de ESTE post.
+    // Bloque bajo el avatar: facción/rango de facción/tripulación + botón 3D Card Flip
     $post['ope_char_side'] = ope_rol_postbit_side($char, $post);
+
+    // Ficha congelada del post (Espalda de la tarjeta 3D Flip)
+    $post['ope_post_back_html'] = ope_rol_build_post_back_html($char, $post);
 
     // Firma POR PERSONAJE: sustituye la firma de la cuenta. Si el personaje tiene
     // firma configurada en su ficha, se muestra con un separador "One Piece: Eternal".
@@ -1196,6 +1293,140 @@ function ope_rol_render_firma($firma_raw)
          . '<div class="ope-sig-sep" aria-hidden="true"><span>One Piece: Eternal</span></div>'
          . '<div class="ope-sig-body">' . $parsed . '</div>'
          . '</div>';
+}
+
+/**
+ * Genera el HTML de la espalda 3D Card Flip para la Ficha Congelada del Post.
+ */
+function ope_rol_build_post_back_html(array $char, array $post)
+{
+    global $db;
+    $pid_post = (int)$post['pid'];
+
+    $snap = ope_rol_post_snapshot($pid_post, $char);
+    $stats = $snap['stats'] ?? array();
+    $items = $snap['items'] ?? array();
+
+    $pv_max = function_exists('ope_combat_calc_pv') ? ope_combat_calc_pv($stats) : 100;
+    $en_max = function_exists('ope_combat_calc_en') ? ope_combat_calc_en($stats) : 100;
+    $pv_cur = isset($snap['pv_actual']) && $snap['pv_actual'] !== null ? (int)$snap['pv_actual'] : $pv_max;
+    $en_cur = isset($snap['en_actual']) && $snap['en_actual'] !== null ? (int)$snap['en_actual'] : $en_max;
+
+    $pv_pct = $pv_max > 0 ? max(0, min(100, round(($pv_cur / $pv_max) * 100))) : 0;
+    $en_pct = $en_max > 0 ? max(0, min(100, round(($en_cur / $en_max) * 100))) : 0;
+
+    $facciones = function_exists('ope_rol_facciones') ? ope_rol_facciones() : array();
+    $fac_slug  = (string)($char['faccion_slug'] ?? '');
+    $fac_lbl   = isset($facciones[$fac_slug]) ? $facciones[$fac_slug]['nombre'] : ucfirst($fac_slug);
+
+    $nombre   = htmlspecialchars_uni($char['nombre']);
+    $rango    = htmlspecialchars_uni($char['rango']);
+    $nivel    = (int)($char['nivel'] ?? 1);
+
+    $fruta_name = '';
+    $npcs_txt   = '';
+    $estados_list = array();
+    $mods_list    = array();
+
+    if ($db->table_exists('rol_post_snapshot')) {
+        $sq = $db->simple_select('rol_post_snapshot', 'fruta_json, npcs_json, estados_json, stats_mod_json', "pid = {$pid_post}", array('limit' => 1));
+        if ($db->num_rows($sq)) {
+            $srow = $db->fetch_array($sq);
+            if (!empty($srow['fruta_json'])) {
+                $fj = json_decode((string)$srow['fruta_json'], true);
+                $fruta_name = is_array($fj) ? ($fj['nombre'] ?? '') : (string)$fj;
+            }
+            if (!empty($srow['npcs_json'])) {
+                $nj = json_decode((string)$srow['npcs_json'], true);
+                $npcs_txt = is_array($nj) ? implode(', ', $nj) : (string)$nj;
+            }
+            if (!empty($srow['estados_json'])) {
+                $estados_list = json_decode((string)$srow['estados_json'], true) ?: array();
+            }
+            if (!empty($srow['stats_mod_json'])) {
+                $mods_list = json_decode((string)$srow['stats_mod_json'], true) ?: array();
+            }
+        }
+    }
+
+    if (empty($fruta_name) && !empty($char['fruta'])) {
+        $fruta_name = $char['fruta'];
+    }
+
+    $html = '<div class="ope-flip-back-header">'
+          .   '<div class="back-title">'
+          .     '<span class="back-kicker">// Ficha Congelada &middot; Post #' . $pid_post . '</span>'
+          .     '<h3>' . $nombre . ' &middot; Nivel ' . $nivel . ' (' . $rango . ')</h3>'
+          .   '</div>'
+          .   '<button type="button" class="btn btn-sm btn-hot" onclick="opeFlipPostCard(' . $pid_post . ')">Volver al Post</button>'
+          . '</div>'
+          . '<div class="ope-flip-back-grid mt-12">'
+          .   '<div class="ope-flip-card-box">'
+          .     '<h4>Estado de Salud &amp; Energía</h4>'
+          .     '<div class="ope-post-vitals">'
+          .       '<div class="ope-post-vital ope-post-vital--pv">'
+          .         '<div class="ope-post-vital-top"><span class="ope-post-vital-k">PV</span><span class="ope-post-vital-v"><b>' . $pv_cur . '</b>/' . $pv_max . '</span></div>'
+          .         '<div class="ope-post-vital-bar"><span class="ope-post-vital-fill" style="width:' . $pv_pct . '%"></span></div>'
+          .       '</div>'
+          .       '<div class="ope-post-vital ope-post-vital--en">'
+          .         '<div class="ope-post-vital-top"><span class="ope-post-vital-k">EN</span><span class="ope-post-vital-v"><b>' . $en_cur . '</b>/' . $en_max . '</span></div>'
+          .         '<div class="ope-post-vital-bar"><span class="ope-post-vital-fill" style="width:' . $en_pct . '%"></span></div>'
+          .       '</div>'
+          .     '</div>'
+          .   '</div>'
+          .   '<div class="ope-flip-card-box">'
+          .     '<h4>Atributos del Hilo</h4>';
+
+    $stat_names = array('fue' => 'Fuerza', 'def' => 'Defensa', 'des' => 'Destreza', 'exp' => 'EXP Acumulada');
+    foreach ($stat_names as $k => $lbl) {
+        $val = (int)($stats[$k] ?? 0);
+        $html .= '<div class="ope-flip-stat-row"><span class="ope-flip-stat-label">' . $lbl . '</span><span class="ope-flip-stat-val">' . $val . '</span></div>';
+    }
+
+    $html .= '</div>'
+          .  '<div class="ope-flip-card-box">'
+          .    '<h4>Mochila del Hilo</h4>';
+
+    if (empty($items)) {
+        $html .= '<p class="mono fs-76 c-dim">Sin objetos en la mochila.</p>';
+    } else {
+        foreach (array_slice($items, 0, 6) as $it) {
+            if (!is_array($it)) continue;
+            $n = htmlspecialchars_uni($it['n'] ?? '');
+            if ($n === '') continue;
+            $html .= '<div class="ope-flip-stat-row"><span class="ope-flip-stat-label">' . $n . '</span><span class="ope-flip-stat-val">Equipado</span></div>';
+        }
+    }
+
+    $html .= '</div>'
+          .  '<div class="ope-flip-card-box">'
+          .    '<h4>Rasgos &amp; Compañeros</h4>'
+          .    '<div class="ope-flip-stat-row"><span class="ope-flip-stat-label">Facción</span><span class="ope-flip-stat-val fac-' . $fac_slug . '">' . htmlspecialchars_uni($fac_lbl) . '</span></div>'
+          .    '<div class="ope-flip-stat-row"><span class="ope-flip-stat-label">Fruta del Diablo</span><span class="ope-flip-stat-val">' . ($fruta_name !== '' ? htmlspecialchars_uni($fruta_name) : 'Ninguna') . '</span></div>';
+
+    if ($npcs_txt !== '') {
+        $html .= '<div class="ope-flip-stat-row"><span class="ope-flip-stat-label">NPCs Acompañantes</span><span class="ope-flip-stat-val">' . htmlspecialchars_uni($npcs_txt) . '</span></div>';
+    }
+
+    $html .= '</div>';
+
+    if (!empty($estados_list) || !empty($mods_list)) {
+        $html .= '<div class="ope-flip-card-box full-width">'
+              .    '<h4>Estados Alterados &amp; Modificadores</h4>'
+              .    '<div class="flex-row gap-8">';
+        foreach ($estados_list as $est) {
+            $html .= '<span class="ope-tag ope-tag-alert">' . htmlspecialchars_uni($est) . '</span>';
+        }
+        foreach ($mods_list as $m_k => $m_v) {
+            $html .= '<span class="ope-tag ope-tag-mod">' . htmlspecialchars_uni(strtoupper($m_k)) . ' ' . ($m_v > 0 ? '+' : '') . (int)$m_v . '</span>';
+        }
+        $html .=   '</div>'
+              .  '</div>';
+    }
+
+    $html .= '</div>';
+
+    return $html;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1285,7 +1516,7 @@ function ope_rol_snapshot_modal($id, $titulo, $post_pid, $body_html, $approx_not
  */
 function ope_rol_postbit_side(array $char, array $post)
 {
-    global $mybb;
+    global $mybb, $db;
 
     $bburl    = htmlspecialchars_uni($mybb->settings['bburl']);
     $pid_post = (int) $post['pid'];
@@ -1309,76 +1540,14 @@ function ope_rol_postbit_side(array $char, array $post)
 
     $snap = ope_rol_post_snapshot($pid_post, $char);
 
-    // ── PV / EN bajo avatar ──
-    $vitals_html = '';
-    if (function_exists('ope_combat_calc_pv') && function_exists('ope_combat_calc_en')) {
-        $snap_stats = $snap['stats'];
-        $pv_max = ope_combat_calc_pv($snap_stats);
-        $en_max = ope_combat_calc_en($snap_stats);
-        $pv_cur = isset($snap['pv_actual']) && $snap['pv_actual'] !== null ? (int) $snap['pv_actual'] : $pv_max;
-        $en_cur = isset($snap['en_actual']) && $snap['en_actual'] !== null ? (int) $snap['en_actual'] : $en_max;
-        $pv_pct = $pv_max > 0 ? max(0, min(100, round(($pv_cur / $pv_max) * 100))) : 0;
-        $en_pct = $en_max > 0 ? max(0, min(100, round(($en_cur / $en_max) * 100))) : 0;
-        $vitals_html = '<div class="ope-post-vitals">'
-            . '<div class="ope-post-vital ope-post-vital--pv">'
-            . '<div class="ope-post-vital-top"><span class="ope-post-vital-k">PV</span><span class="ope-post-vital-v"><b>' . $pv_cur . '</b>/' . $pv_max . '</span></div>'
-            . '<div class="ope-post-vital-bar"><span class="ope-post-vital-fill" style="width:' . $pv_pct . '%"></span></div>'
-            . '</div>'
-            . '<div class="ope-post-vital ope-post-vital--en">'
-            . '<div class="ope-post-vital-top"><span class="ope-post-vital-k">EN</span><span class="ope-post-vital-v"><b>' . $en_cur . '</b>/' . $en_max . '</span></div>'
-            . '<div class="ope-post-vital-bar"><span class="ope-post-vital-fill" style="width:' . $en_pct . '%"></span></div>'
-            . '</div>'
-            . '</div>';
-    }
+    // Botón de 3D Card Flip "Ver Ficha del Post"
+    $flip_btn = '<div class="ope-pa-tools mt-8">'
+              . '<button type="button" class="btn btn-sm btn-ghost btn-block" onclick="opeFlipPostCard(' . $pid_post . ')">'
+              . 'Ver Ficha del Post'
+              . '</button>'
+              . '</div>';
 
-    if (empty($snap['items'])) {
-        $mochila_body = '<p class="mono fs-76 c-dim">No llevaba nada encima en este post.</p>';
-    } else {
-        $mochila_body = '<div class="ope-snap-items">';
-        foreach ($snap['items'] as $it) {
-            if (!is_array($it)) continue;
-            $n = trim((string) ($it['n'] ?? ''));
-            if ($n === '') continue;
-            $d  = trim((string) ($it['d'] ?? ''));
-            $sz = max(1, (int) ($it['size'] ?? 1));
-            $mochila_body .= '<div class="ope-snap-item"><span class="ope-snap-item-n">' . htmlspecialchars_uni($n) . '</span>';
-            if ($d !== '') {
-                $mochila_body .= '<span class="ope-snap-item-d">' . htmlspecialchars_uni($d) . '</span>';
-            }
-            $mochila_body .= '<span class="ope-snap-item-sz">' . $sz . ' slot' . ($sz > 1 ? 's' : '') . '</span></div>';
-        }
-        $mochila_body .= '</div>';
-    }
-
-    $stat_groups = function_exists('ope_rol_stats') ? ope_rol_stats() : array();
-    $atrib_body  = '<div class="ope-snap-stats">';
-    foreach ($stat_groups as $grupo) {
-        $atrib_body .= '<div class="ope-snap-pillar"><div class="ope-snap-pillar-h">' . htmlspecialchars_uni($grupo['label']) . '</div>';
-        foreach ($grupo['stats'] as $ab => $nombre_stat) {
-            $v     = ope_rol_stat_num($snap['stats'], $ab);
-            $lbl   = ope_rol_stat_label($v);
-            $atrib_body .= '<div class="ope-snap-stat-row"><span>' . htmlspecialchars_uni($nombre_stat) . '</span><b>' . $v . ' ' . htmlspecialchars_uni($lbl) . '</b></div>';
-        }
-        $atrib_body .= '</div>';
-    }
-    $atrib_body .= '</div>';
-
-    $approx_note = !empty($snap['approx'])
-        ? '<p class="ope-snap-approx">Aproximación: post anterior al sistema de snapshots, se muestra el estado actual del personaje.</p>'
-        : '';
-
-    $mochila_id = 'ope-mochila-' . $pid_post;
-    $atrib_id   = 'ope-atributos-' . $pid_post;
-
-    $tools = '<div class="ope-pa-tools">'
-           . '<button type="button" class="ope-btn ope-btn-sm ope-btn-ghost" onclick="document.getElementById(\'' . $mochila_id . '\').hidden=false">Mochila</button>'
-           . '<button type="button" class="ope-btn ope-btn-sm ope-btn-ghost" onclick="document.getElementById(\'' . $atrib_id . '\').hidden=false">Atributos</button>'
-           . '</div>';
-
-    $modals = ope_rol_snapshot_modal($mochila_id, 'Mochila', $pid_post, $mochila_body, $approx_note)
-            . ope_rol_snapshot_modal($atrib_id, 'Atributos', $pid_post, $atrib_body, $approx_note);
-
-    return $org_html . $vitals_html . $tools . $modals;
+    return $org_html . $flip_btn;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -3583,4 +3752,28 @@ function ope_rol_tecnica_card_css()
     $done = true;
     /* CSS en docs/themes/ope.css — .ope-tk / .ope-tk-deck */
     return '';
+}
+
+/**
+ * Inyecta las etiquetas de Época (Presente/Pasado) y Tipo de Tema en showthread.
+ */
+function ope_rol_showthread_tags()
+{
+    global $thread, $db;
+
+    if (!is_array($thread) || empty($thread['tid'])) {
+        return;
+    }
+
+    $temp_tipo  = !empty($thread['temporal_tipo']) ? strtolower($thread['temporal_tipo']) : 'presente';
+    $temp_fecha = !empty($thread['temporal_fecha']) ? htmlspecialchars_uni($thread['temporal_fecha']) : my_date('j F Y', $thread['dateline']);
+    $tema_tipo  = !empty($thread['tema_tipo']) ? strtoupper(htmlspecialchars_uni($thread['tema_tipo'])) : 'SOCIAL';
+
+    $temp_badge_class = ($temp_tipo === 'pasado') ? 'ope-tag-pasado' : 'ope-tag-presente';
+    $temp_label       = ($temp_tipo === 'pasado') ? 'PASADO' : 'PRESENTE';
+
+    $thread['ope_tags_html'] = '<div class="ope-th-tags-row">'
+        . '<span class="ope-tag-badge ' . $temp_badge_class . '">' . $temp_label . ' &middot; ' . $temp_fecha . '</span>'
+        . '<span class="ope-tag-badge ope-tag-tipo">' . $tema_tipo . '</span>'
+        . '</div>';
 }

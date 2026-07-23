@@ -6,6 +6,13 @@
  * Dependencias: ROL_API_URL (definida por el plugin)
  */
 
+window.opeFlipPostCard = function (pid) {
+  const card = document.getElementById('post-card-' + pid);
+  if (card) {
+    card.classList.toggle('is-flipped');
+  }
+};
+
 (function () {
   'use strict';
 
