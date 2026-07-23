@@ -1538,16 +1538,7 @@ function ope_rol_postbit_side(array $char, array $post)
     }
     $org_html = $rows !== '' ? '<div class="ope-pa-stats ope-pa-org">' . $rows . '</div>' : '';
 
-    $snap = ope_rol_post_snapshot($pid_post, $char);
-
-    // Botón de 3D Card Flip "Ver Ficha del Post"
-    $flip_btn = '<div class="ope-pa-tools mt-8">'
-              . '<button type="button" class="btn btn-sm btn-ghost btn-block" onclick="opeFlipPostCard(' . $pid_post . ')">'
-              . 'Ver Ficha del Post'
-              . '</button>'
-              . '</div>';
-
-    return $org_html . $flip_btn;
+    return $org_html;
 }
 
 // ─────────────────────────────────────────────────────────────

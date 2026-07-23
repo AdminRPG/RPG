@@ -7957,10 +7957,15 @@ body.ope-pg-barco .c-patina{color:var(--patina)!important}
 .ope-flip-stat-label{color:var(--paper-dim)}
 .ope-flip-stat-val{font-family:var(--mono);font-weight:700;color:var(--gold-deep)}
 
-/* Avatar Sidebar adjustments (Max 280x450, full fill) */
-.ope-post-author{width:280px!important;min-width:280px!important;max-width:280px!important}
-.ope-post-author .ope-avatar{width:100%!important;max-height:450px!important;overflow:hidden;border-radius:8px;border:1px solid var(--line-soft)}
-.ope-post-author .ope-avatar img{width:100%!important;height:100%!important;object-fit:cover!important;max-height:450px!important;display:block}
+/* Avatar Sidebar adjustments (Columna Izquierda Limpia) */
+.ope-post-author{width:240px!important;min-width:240px!important;max-width:240px!important;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;padding:16px!important}
+.ope-post-author .ope-avatar{position:relative;width:100%!important;max-height:380px!important;overflow:hidden;border-radius:10px;border:1px solid var(--line-soft);background:var(--concrete)}
+.ope-post-author .ope-avatar img{width:100%!important;height:auto!important;max-height:380px!important;object-fit:cover!important;display:block}
+.ope-post-author .ope-avatar span{display:none!important}
+
+.ope-pa-info{display:flex;flex-direction:column;gap:8px;text-align:center;width:100%}
+.ope-pa-name{font-family:var(--disp);font-size:1.1rem;line-height:1.2;font-weight:700;word-break:break-word}
+.ope-pa-name a{color:inherit;text-decoration:none}
 
 /* Badges de Título e Hilo (Presente / Pasado / Travesía / Combate) */
 .ope-th-top-meta,.ope-th-tags-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:8px}

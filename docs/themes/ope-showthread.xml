@@ -30,6 +30,14 @@
 <script type="text/javascript" src="{$mybb->asset_url}/jscripts/report.js?ver=1820"></script>
 <script src="{$mybb->asset_url}/jscripts/jeditable/jeditable.min.js"></script>
 <script type="text/javascript" src="{$mybb->asset_url}/jscripts/thread.js?ver=1838"></script>
+<script type="text/javascript">
+function opeFlipPostCard(pid) {
+  var card = document.getElementById('post-card-' + pid);
+  if (card) {
+    card.classList.toggle('is-flipped');
+  }
+}
+</script>
 </head>
 <body>
 
@@ -111,10 +119,11 @@
       <article class="ope-post {$unapproved_shade}" style="{$post_visibility}" id="post_{$post['pid']}">
         <div class="ope-post-author {$post['ope_fac_class']}">
           {$post['useravatar']}
-          <div class="ope-pa-name">{$post['profilelink']}</div>
-          <div class="ope-pa-rank">
-            <span class="ope-tag ope-tag-rank" style="background:var(--h3)">{$post['usertitle']}</span>
-            {$post['groupimage']}
+          <div class="ope-pa-info">
+            <div class="ope-pa-name">{$post['profilelink']}</div>
+            <button type="button" class="btn btn-sm btn-ghost btn-block mt-8 mb-4" onclick="opeFlipPostCard({$post['pid']})">
+              Ver Ficha del Post
+            </button>
           </div>
           {$post['ope_char_side']}
         </div>
