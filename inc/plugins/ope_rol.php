@@ -1296,19 +1296,60 @@ function ope_rol_render_firma($firma_raw)
 }
 
 /**
- * Genera el HTML de la espalda 3D Card Flip para la Ficha Congelada del Post.
+ * Genera el HTML de la espalda 3D Card Flip para la Ficha RPG SYSTEM del Post.
  */
 function ope_rol_build_post_back_html(array $char, array $post)
 {
-    global $db;
+    global $db, $tid;
     $pid_post = (int)$post['pid'];
 
-    $snap = ope_rol_post_snapshot($pid_post, $char);
+    $snap  = ope_rol_post_snapshot($pid_post, $char);
     $stats = $snap['stats'] ?? array();
     $items = $snap['items'] ?? array();
 
-    $pv_max = function_exists('ope_combat_calc_pv') ? ope_combat_calc_pv($stats) : 100;
-    $en_max = function_exists('ope_combat_calc_en') ? ope_combat_calc_en($stats) : 100;
+    $datos_char = json_decode((string)($char['datos'] ?? ''), true) ?: array();
+    $stats_json_char = json_decode((string)($char['stats_json'] ?? ''), true) ?: array();
+
+    $real_stats = !empty($stats) ? $stats : (!empty($stats_json_char) ? $stats_json_char : ($datos_char['stats_efectivas'] ?? $datos_char['stats_base'] ?? array()));
+
+    $stat_map = array(
+        'FUE' => 'Fuerza',
+        'RES' => 'Resistencia',
+        'AGI' => 'Agilidad',
+        'INT' => 'Intelecto',
+        'PER' => 'Percepción',
+        'TEM' => 'Temple',
+        'VOL' => 'Voluntad',
+        'CAR' => 'Carisma',
+    );
+
+    $stats_clean = array();
+    foreach ($stat_map as $k => $lbl) {
+        $val = (int)($real_stats[$k] ?? ($real_stats[strtolower($k)] ?? 1));
+        if ($val < 1) {
+            $val = 1;
+        }
+        $stats_clean[$k] = $val;
+    }
+
+    $nombre = htmlspecialchars_uni($char['nombre']);
+    $rango  = htmlspecialchars_uni($char['rango']);
+    $nivel  = (int)($char['nivel'] ?? 1);
+    $tramo  = function_exists('ope_rol_tramo') ? ope_rol_tramo($nivel) : 1;
+    $tramo_rom = function_exists('ope_rol_tramo_romano') ? ope_rol_tramo_romano($tramo) : 'I';
+
+    $fue = $stats_clean['FUE'];
+    $res = $stats_clean['RES'];
+    $agi = $stats_clean['AGI'];
+    $int = $stats_clean['INT'];
+    $tem = $stats_clean['TEM'];
+
+    $pv_calc = 50 + ($res * 10) + ($fue * 5) + ($nivel * 15);
+    $en_calc = 30 + ($tem * 10) + ($int * 5) + ($nivel * 10);
+
+    $pv_max = function_exists('ope_combat_calc_pv') ? ope_combat_calc_pv($stats_clean) : $pv_calc;
+    $en_max = function_exists('ope_combat_calc_en') ? ope_combat_calc_en($stats_clean) : $en_calc;
+
     $pv_cur = isset($snap['pv_actual']) && $snap['pv_actual'] !== null ? (int)$snap['pv_actual'] : $pv_max;
     $en_cur = isset($snap['en_actual']) && $snap['en_actual'] !== null ? (int)$snap['en_actual'] : $en_max;
 
@@ -1319,12 +1360,16 @@ function ope_rol_build_post_back_html(array $char, array $post)
     $fac_slug  = (string)($char['faccion_slug'] ?? '');
     $fac_lbl   = isset($facciones[$fac_slug]) ? $facciones[$fac_slug]['nombre'] : ucfirst($fac_slug);
 
-    $nombre   = htmlspecialchars_uni($char['nombre']);
-    $rango    = htmlspecialchars_uni($char['rango']);
-    $nivel    = (int)($char['nivel'] ?? 1);
+    if (empty($items)) {
+        $inv_char = json_decode((string)($char['inventario'] ?? ''), true) ?: array();
+        $items    = is_array($inv_char['encima'] ?? null) ? $inv_char['encima'] : array();
+    }
 
-    $fruta_name = '';
-    $npcs_txt   = '';
+    $eco_char = json_decode((string)($char['economia'] ?? ''), true) ?: array();
+    $berries  = (int)($eco_char['berries'] ?? ($eco_char['rupies'] ?? 0));
+
+    $fruta_name   = '';
+    $npcs_txt     = '';
     $estados_list = array();
     $mods_list    = array();
 
@@ -1355,8 +1400,8 @@ function ope_rol_build_post_back_html(array $char, array $post)
 
     $html = '<div class="ope-flip-back-header">'
           .   '<div class="back-title">'
-          .     '<span class="back-kicker">// Ficha Congelada &middot; Post #' . $pid_post . '</span>'
-          .     '<h3>' . $nombre . ' &middot; Nivel ' . $nivel . ' (' . $rango . ')</h3>'
+          .     '<span class="back-kicker">// RPG SYSTEM &middot; Post #' . $pid_post . '</span>'
+          .     '<h3>' . $nombre . ' &middot; Nivel ' . $nivel . ' (Tramo ' . $tramo_rom . ')</h3>'
           .   '</div>'
           .   '<button type="button" class="btn btn-sm btn-hot" onclick="opeFlipPostCard(' . $pid_post . ')">Volver al Post</button>'
           . '</div>'
@@ -1375,24 +1420,30 @@ function ope_rol_build_post_back_html(array $char, array $post)
           .     '</div>'
           .   '</div>'
           .   '<div class="ope-flip-card-box">'
-          .     '<h4>Atributos del Hilo</h4>';
+          .     '<h4>Atributos del Personaje</h4>';
 
-    $stat_names = array('fue' => 'Fuerza', 'def' => 'Defensa', 'des' => 'Destreza', 'exp' => 'EXP Acumulada');
-    foreach ($stat_names as $k => $lbl) {
-        $val = (int)($stats[$k] ?? 0);
+    foreach ($stat_map as $k => $lbl) {
+        $val = $stats_clean[$k];
         $html .= '<div class="ope-flip-stat-row"><span class="ope-flip-stat-label">' . $lbl . '</span><span class="ope-flip-stat-val">' . $val . '</span></div>';
     }
 
     $html .= '</div>'
           .  '<div class="ope-flip-card-box">'
-          .    '<h4>Mochila del Hilo</h4>';
+          .    '<h4>Mochila &amp; Recursos</h4>';
+
+    if ($berries > 0) {
+        $html .= '<div class="ope-flip-stat-row"><span class="ope-flip-stat-label">Berries</span><span class="ope-flip-stat-val c-gold">' . number_format($berries, 0, ',', '.') . ' &#3647;</span></div>';
+    }
 
     if (empty($items)) {
-        $html .= '<p class="mono fs-76 c-dim">Sin objetos en la mochila.</p>';
+        $html .= '<p class="mono fs-76 c-dim mt-4">Sin objetos en la mochila.</p>';
     } else {
         foreach (array_slice($items, 0, 6) as $it) {
-            if (!is_array($it)) continue;
-            $n = htmlspecialchars_uni($it['n'] ?? '');
+            if (!is_array($it)) {
+                $n = (string)$it;
+            } else {
+                $n = htmlspecialchars_uni($it['n'] ?? '');
+            }
             if ($n === '') continue;
             $html .= '<div class="ope-flip-stat-row"><span class="ope-flip-stat-label">' . $n . '</span><span class="ope-flip-stat-val">Equipado</span></div>';
         }
@@ -1400,8 +1451,9 @@ function ope_rol_build_post_back_html(array $char, array $post)
 
     $html .= '</div>'
           .  '<div class="ope-flip-card-box">'
-          .    '<h4>Rasgos &amp; Compañeros</h4>'
+          .    '<h4>Rasgos &amp; Afiliación</h4>'
           .    '<div class="ope-flip-stat-row"><span class="ope-flip-stat-label">Facción</span><span class="ope-flip-stat-val fac-' . $fac_slug . '">' . htmlspecialchars_uni($fac_lbl) . '</span></div>'
+          .    '<div class="ope-flip-stat-row"><span class="ope-flip-stat-label">Rango Ficha</span><span class="ope-flip-stat-val">' . $rango . '</span></div>'
           .    '<div class="ope-flip-stat-row"><span class="ope-flip-stat-label">Fruta del Diablo</span><span class="ope-flip-stat-val">' . ($fruta_name !== '' ? htmlspecialchars_uni($fruta_name) : 'Ninguna') . '</span></div>';
 
     if ($npcs_txt !== '') {
@@ -1425,6 +1477,16 @@ function ope_rol_build_post_back_html(array $char, array $post)
     }
 
     $html .= '</div>';
+
+    // Zona de acciones del post en la espalda
+    $html .= '<div class="ope-flip-back-actions mt-12 pt-10 flex-row gap-8 align-center justify-between border-t">'
+          .    '<span class="mono fs-76 c-dim">Acciones del Post #' . (int)($post['postnum'] ?? 0) . '</span>'
+          .    '<div class="flex-row gap-6">'
+          .      '<a href="' . htmlspecialchars_uni($post['postlink'] ?? '') . '#pid' . $pid_post . '" class="ope-btn ope-btn-sm ope-btn-ghost">#' . (int)($post['postnum'] ?? 0) . '</a>'
+          .      '<a href="newreply.php?tid=' . (int)$tid . '&amp;pid=' . $pid_post . '" class="ope-btn ope-btn-sm ope-btn-ghost">Citar</a>'
+          .      '<a href="newreply.php?tid=' . (int)$tid . '" class="ope-btn ope-btn-sm ope-btn-ghost">Responder</a>'
+          .    '</div>'
+          .  '</div>';
 
     return $html;
 }

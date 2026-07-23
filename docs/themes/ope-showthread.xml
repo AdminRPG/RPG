@@ -122,7 +122,7 @@ function opeFlipPostCard(pid) {
           <div class="ope-pa-info">
             <div class="ope-pa-name">{$post['profilelink']}</div>
             <button type="button" class="btn btn-sm btn-ghost btn-block mt-8 mb-4" onclick="opeFlipPostCard({$post['pid']})">
-              Ver Ficha del Post
+              Ver Ficha RPG SYSTEM
             </button>
           </div>
           {$post['ope_char_side']}
