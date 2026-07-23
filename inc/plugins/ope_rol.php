@@ -2264,6 +2264,10 @@ function ope_rol_parse_viaje($message)
     }
 
     $message = preg_replace_callback('#\[viaje=(\d+)\]#i', function ($m) {
+        // En showthread, la tarjeta del Oráculo YA se muestra arriba en $ope_viaje_panel
+        if (defined('THIS_SCRIPT') && THIS_SCRIPT === 'showthread.php') {
+            return '';
+        }
         $vid = (int) $m[1];
         if ($vid < 1 || !function_exists('ope_viaje_por_id')) {
             return '';
@@ -2339,12 +2343,19 @@ function ope_rol_viaje_showthread_end()
     // Oculta el primer post (OPE Eternal) para que el oráculo no se vea como post.
     $first_pid = (int) ($thread['firstpost'] ?? 0);
     if ($first_pid > 0 && !empty($posts) && is_string($posts)) {
-        $posts = preg_replace(
-            '#<a name="pid' . $first_pid . '"[^>]*></a>\s*<article\b[^>]*id="post_' . $first_pid . '"[\s\S]*?</article>#',
-            '',
-            $posts,
-            1
-        );
+        // Eliminar el primer post de la lista (Narrador) en hilos de viaje
+        $pattern1 = '#<a\s+name="pid' . $first_pid . '"[^>]*></a>\s*<div\s+class="ope-postbit-container"\s+id="post-container-' . $first_pid . '">[\s\S]*?<!-- LADO TRASERO: FICHA CONGELADA DEL POST \(3D CARD FLIP\) -->[\s\S]*?</div>\s*</div>\s*</div>#i';
+        $pattern2 = '#<a\s+name="pid' . $first_pid . '"[^>]*></a>\s*<div\s+class="ope-postbit-container"\s+id="post-container-' . $first_pid . '">[\s\S]*?</div>\s*</div>#i';
+        $pattern3 = '#<a\s+name="pid' . $first_pid . '"[^>]*></a>\s*<article\b[^>]*id="post_' . $first_pid . '"[\s\S]*?</article>#i';
+        
+        $posts_new = preg_replace($pattern1, '', $posts, 1);
+        if ($posts_new === $posts) {
+            $posts_new = preg_replace($pattern2, '', $posts, 1);
+        }
+        if ($posts_new === $posts) {
+            $posts_new = preg_replace($pattern3, '', $posts, 1);
+        }
+        $posts = $posts_new;
     }
 
     if (function_exists('ope_oraculo_showthread_scripts')) {
