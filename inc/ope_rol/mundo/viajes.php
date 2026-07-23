@@ -7,62 +7,66 @@ if (!defined('IN_MYBB')) {
     die('Direct initialization of this file is not allowed.');
 }
 
-function ope_viaje_alta_mar_fid()
+function ope_viaje_alta_mar_fid(string $macro_destino = '')
 {
     global $mybb, $db;
+
+    if ($macro_destino !== '' && $db->table_exists('forums')) {
+        $macros_labels = array(
+            'east_blue'  => 'East Blue',
+            'west_blue'  => 'West Blue',
+            'north_blue' => 'North Blue',
+            'south_blue' => 'South Blue',
+            'calm_belt'  => 'Calm Belt',
+            'red_line'   => 'Red Line',
+            'paradise'   => 'Paraíso',
+            'new_world'  => 'New World',
+        );
+        $lbl = isset($macros_labels[$macro_destino]) ? $macros_labels[$macro_destino] : '';
+        if ($lbl !== '') {
+            $name = 'Mar Abierto (' . $lbl . ')';
+            $q = $db->simple_select('forums', 'fid', "name = '" . $db->escape_string($name) . "'", array('limit' => 1));
+            if ($db->num_rows($q)) {
+                return (int) $db->fetch_field($q, 'fid');
+            }
+        }
+    }
+
     $fid = (int) ($mybb->settings['ope_alta_mar_fid'] ?? 0);
     if ($fid > 0) {
         return $fid;
     }
-    if (!$db->table_exists('forums')) {
-        return 0;
-    }
-    $q = $db->simple_select('forums', 'fid', "name = 'Alta Mar'", array('limit' => 1));
-    if ($db->num_rows($q)) {
-        return (int) $db->fetch_field($q, 'fid');
+    if ($db->table_exists('forums')) {
+        $q = $db->simple_select('forums', 'fid', "name LIKE 'Mar Abierto%' OR name = 'Alta Mar'", array('limit' => 1));
+        if ($db->num_rows($q)) {
+            return (int) $db->fetch_field($q, 'fid');
+        }
     }
     return 0;
 }
 
-/** Islas navegables: foros hoja bajo "El Mundo" (regiones → islas). */
+/** Islas navegables: catálogo de 44 islas o foros hoja. */
 function ope_viaje_islas()
 {
-    global $db;
-    $out = array();
-    if (!$db->table_exists('forums')) {
-        return $out;
-    }
-    $elMundo = 0;
-    $q = $db->simple_select('forums', 'fid', "name = 'El Mundo' AND type = 'c'", array('limit' => 1));
-    if ($db->num_rows($q)) {
-        $elMundo = (int) $db->fetch_field($q, 'fid');
-    }
-    if ($elMundo < 1) {
-        return $out;
-    }
-    $regions = array();
-    $rq = $db->simple_select('forums', 'fid, name', "pid = {$elMundo} AND type = 'f'", array('order_by' => 'disporder'));
-    while ($r = $db->fetch_array($rq)) {
-        $regions[(int) $r['fid']] = (string) $r['name'];
-    }
-    foreach ($regions as $rfid => $rname) {
-        $iq = $db->simple_select('forums', 'fid, name, description', "pid = {$rfid} AND type = 'f'", array('order_by' => 'disporder'));
-        while ($isla = $db->fetch_array($iq)) {
-            $child = $db->fetch_field($db->simple_select('forums', 'COUNT(*) c', "pid = " . (int) $isla['fid']), 'c');
-            if ((int) $child > 0) {
-                continue;
-            }
+    // Retorna las 44 islas del catálogo oficial
+    if (function_exists('ope_islas_catalogo')) {
+        $cat = ope_islas_catalogo();
+        $out = array();
+        foreach ($cat as $i) {
             $out[] = array(
-                'fid'         => (int) $isla['fid'],
-                'nombre'      => (string) $isla['name'],
-                'region'      => $rname,
-                'region_fid'  => $rfid,
-                'macro'       => ope_viaje_macro_region($rname),
-                'description' => (string) ($isla['description'] ?? ''),
+                'slug'        => $i['slug'],
+                'fid'         => 0,
+                'nombre'      => $i['nombre'],
+                'region'      => $i['region'],
+                'macro'       => $i['macro'],
+                'tier'        => $i['tier'],
+                'peligro_base'=> $i['peligro_base'],
+                'description' => $i['region'] . ' (Tier ' . $i['tier'] . ')',
             );
         }
+        return $out;
     }
-    return $out;
+    return array();
 }
 
 function ope_viaje_macro_region(string $region_name)
@@ -87,34 +91,6 @@ function ope_viaje_isla_por_fid($fid)
     return null;
 }
 
-/** Calcula tramos entre dos islas (guía AV-02 simplificada). */
-function ope_viaje_calc_tramos($fid_origen, $fid_destino)
-{
-    $o = ope_viaje_isla_por_fid($fid_origen);
-    $d = ope_viaje_isla_por_fid($fid_destino);
-    if (!$o || !$d) {
-        return 2;
-    }
-    if ((int) $o['fid'] === (int) $d['fid']) {
-        return 0;
-    }
-    if ((int) $o['region_fid'] === (int) $d['region_fid']) {
-        return 1;
-    }
-    if ($o['macro'] === $d['macro']) {
-        return 2;
-    }
-    $tramos = 3;
-    $hard = array('calm_belt', 'red_line', 'grand_line_plus');
-    if (in_array($o['macro'], $hard, true) || in_array($d['macro'], $hard, true)) {
-        $tramos++;
-    }
-    if ($o['macro'] === 'grand_line_plus' || $d['macro'] === 'grand_line_plus') {
-        $tramos++;
-    }
-    return min(5, max(1, $tramos));
-}
-
 /** Tripulación activa del personaje + compañeros seleccionados. */
 function ope_viaje_tripulantes_data($pid_capitan, array $extra_pids = array())
 {
@@ -126,7 +102,7 @@ function ope_viaje_tripulantes_data($pid_capitan, array $extra_pids = array())
     $oficio_map = array(
         'capitan' => 'navegante', 'navegante' => 'navegante', 'timonel' => 'timonel',
         'vigia' => 'vigia', 'carpintero' => 'carpintero', 'cocinero' => 'cocinero',
-        'medico' => 'medico', 'medico' => 'medico', 'artillero' => 'artillero',
+        'medico' => 'medico', 'artillero' => 'artillero',
     );
 
     foreach ($pids as $pid) {
@@ -197,74 +173,124 @@ function ope_viaje_puede_cerrar(array $viaje, $uid, $active_pid)
     return $staff >= 1;
 }
 
-/** Solicitar viaje: crea hilo OPE Eternal + registro rol_viajes. */
+/** Solicitar viaje: utiliza la matriz de rutas, barcos, items y oráculo v2. */
 function ope_viaje_solicitar(array $data)
 {
     global $db, $mybb;
 
     if (!$db->table_exists('rol_viajes')) {
-        return array('ok' => false, 'msg' => 'Sistema de viajes no instalado. Ejecuta migrate-oleada3.php.');
+        return array('ok' => false, 'msg' => 'Sistema de viajes no instalado. Ejecuta migrate-navegacion.php.');
     }
 
     $pid_capitan = (int) ($data['pid_capitan'] ?? 0);
     $uid         = (int) ($data['uid'] ?? 0);
-    $fid_origen  = (int) ($data['fid_origen'] ?? 0);
-    $fid_destino = (int) ($data['fid_destino'] ?? 0);
-    $barco_nom   = trim((string) ($data['barco_nombre'] ?? ''));
-    $barco_tipo  = trim((string) ($data['barco_tipo'] ?? 'estandar'));
+    $barco_id    = (int) ($data['barco_id'] ?? 0);
+
+    // Cargar personaje capitán para obtener nivel e isla_actual
+    $pj_nivel = 1;
+    $origen_slug = 'isla_dawn';
+    if ($db->table_exists('rol_personajes') && $pid_capitan > 0) {
+        $pq = $db->simple_select('rol_personajes', 'nivel, isla_actual', "pid = {$pid_capitan}", array('limit' => 1));
+        if ($db->num_rows($pq)) {
+            $prow = $db->fetch_array($pq);
+            $pj_nivel = (int) ($prow['nivel'] ?? 1);
+            if (!empty($prow['isla_actual'])) {
+                $origen_slug = (string) $prow['isla_actual'];
+            }
+        }
+    }
+
+    // Permitir sobreescribir origen si viene especificado como slug
+    if (!empty($data['origen_slug'])) {
+        $origen_slug = (string) $data['origen_slug'];
+    }
+
+    $destino_slug = (string) ($data['destino_slug'] ?? '');
+    if ($destino_slug === '' && !empty($data['fid_destino'])) {
+        $d_isla = ope_viaje_isla_por_fid($data['fid_destino']);
+        if ($d_isla) $destino_slug = $d_isla['slug'];
+    }
+
+    $isla_origen  = function_exists('ope_isla_por_slug') ? ope_isla_por_slug($origen_slug) : null;
+    $isla_destino = function_exists('ope_isla_por_slug') ? ope_isla_por_slug($destino_slug) : null;
+
+    if (!$isla_origen || !$isla_destino) {
+        return array('ok' => false, 'msg' => 'Isla de origen o destino no válidas.');
+    }
+    if ($origen_slug === $destino_slug) {
+        return array('ok' => false, 'msg' => 'Origen y destino no pueden ser la misma isla.');
+    }
+
+    // Cargar barco del personaje
+    $barco = array();
+    if ($barco_id > 0 && function_exists('ope_barco_obtener')) {
+        $barco = ope_barco_obtener($barco_id);
+    }
+    if (empty($barco) && function_exists('ope_barco_lista')) {
+        $barcos_pj = ope_barco_lista($pid_capitan);
+        if (!empty($barcos_pj)) {
+            $barco = $barcos_pj[0];
+            $barco_id = (int) $barco['barco_id'];
+        }
+    }
+    $barco_nom  = trim((string) ($barco['nombre'] ?? ($data['barco_nombre'] ?? 'Bote estándar')));
+    $barco_tipo = trim((string) ($barco['tipo'] ?? ($data['barco_tipo'] ?? 'bote')));
+
+    // Cargar items de navegación equipados
+    $items_slugs = function_exists('ope_nav_item_slugs') ? ope_nav_item_slugs($pid_capitan) : array();
+    if (!empty($data['items']) && is_array($data['items'])) {
+        $items_slugs = array_unique(array_merge($items_slugs, $data['items']));
+    }
+
     $extra_pids  = is_array($data['tripulantes'] ?? null) ? $data['tripulantes'] : array();
     $suministros = trim((string) ($data['suministros'] ?? ''));
     $notas       = trim((string) ($data['notas'] ?? ''));
-
-    $origen  = ope_viaje_isla_por_fid($fid_origen);
-    $destino = ope_viaje_isla_por_fid($fid_destino);
-    if (!$origen || !$destino) {
-        return array('ok' => false, 'msg' => 'Origen o destino no válidos.');
-    }
-    if ($fid_origen === $fid_destino) {
-        return array('ok' => false, 'msg' => 'Origen y destino no pueden ser la misma isla.');
-    }
-    if ($barco_nom === '') {
-        return array('ok' => false, 'msg' => 'Indica el nombre del barco.');
-    }
 
     $activo = ope_viaje_por_capitan_activo($pid_capitan);
     if ($activo) {
         return array('ok' => false, 'msg' => 'Ya tienes un viaje activo. Ciérralo antes de iniciar otro.');
     }
 
-    $tramos = ope_viaje_calc_tramos($fid_origen, $fid_destino);
-    $trip   = ope_viaje_tripulantes_data($pid_capitan, $extra_pids);
+    // Cargar tripulación
+    $trip = ope_viaje_tripulantes_data($pid_capitan, $extra_pids);
     if (empty($trip)) {
         return array('ok' => false, 'msg' => 'No se pudo cargar la tripulación.');
     }
 
-    $oraculo = ope_oraculo_viaje($tramos, $trip, $barco_tipo);
-    $pp      = ope_oraculo_posts_plazo($tramos);
+    // Calcular la ruta marítima completa
+    if (function_exists('ope_navegacion_calcular_ruta')) {
+        $ruta_res = ope_navegacion_calcular_ruta($origen_slug, $destino_slug, $barco, $items_slugs, $trip, $pj_nivel);
+        if (!$ruta_res['ok']) {
+            return array('ok' => false, 'msg' => $ruta_res['msg']);
+        }
+    } else {
+        return array('ok' => false, 'msg' => 'Motor de rutas no cargado.');
+    }
 
-    $viaje_row = array(
-        'origen_nombre'  => $origen['nombre'],
-        'destino_nombre' => $destino['nombre'],
-        'barco_nombre'   => $barco_nom,
-        'barco_tipo'     => $barco_tipo,
-        'tripulantes_json' => json_encode($trip, JSON_UNESCAPED_UNICODE),
-        'tramos'         => $tramos,
-        'posts_min'      => $pp['posts_min'],
-        'plazo_dias'     => $pp['plazo_dias'],
-        'suministros'    => $suministros,
-        'notas'          => $notas,
-    );
+    $tramos         = (int) $ruta_res['tramos_total'];
+    $nivel_peligro  = (string) $ruta_res['nivel_peligro'];
+    $peligro_total  = (int) $ruta_res['peligro_acumulado'];
+    $dias_onrol     = (int) $ruta_res['dias_onrol'];
+    $es_temeraria   = !empty($ruta_res['es_temeraria']);
+    $posts_sugeridos= (int) $ruta_res['posts_sugeridos'];
+    $plazo_offrol   = (int) $ruta_res['plazo_offrol_dias'];
 
-    $fid_alta = ope_viaje_alta_mar_fid();
+    // Generar Oráculo v2 con 6 mesas por tramo
+    if (function_exists('ope_oraculo_v2_viaje')) {
+        $oraculo = ope_oraculo_v2_viaje($tramos, $ruta_res['mods_total'], $ruta_res['nivel_peligro_idx'], $isla_origen['macro'], $isla_destino['macro']);
+    } else {
+        $oraculo = array('mods' => array(), 'tramos' => array());
+    }
+
+    $fid_alta = ope_viaje_alta_mar_fid($isla_destino['macro']);
     if ($fid_alta < 1) {
         return array('ok' => false, 'msg' => 'Foro Alta Mar no configurado.');
     }
 
-    $subject = '🌊 ' . $origen['nombre'] . ' → ' . $destino['nombre'] . ' · ' . $barco_nom;
-    // Mensaje corto: el HTML del oráculo se renderiza vía [viaje=ID] en parse_message.
+    $subject = 'Travesía: ' . $isla_origen['nombre'] . ' → ' . $isla_destino['nombre'] . ' · ' . $barco_nom;
     $tid = ope_system_create_thread($fid_alta, $subject, '[viaje=0]', 'Viaje');
     if ($tid < 1) {
-        return array('ok' => false, 'msg' => 'Lyria no pudo crear el hilo. ¿Está activo el bot?');
+        return array('ok' => false, 'msg' => 'El Narrador no pudo crear el hilo en Alta Mar.');
     }
 
     $db->insert_query('rol_viajes', array(
@@ -272,19 +298,28 @@ function ope_viaje_solicitar(array $data)
         'fid_alta_mar'     => $fid_alta,
         'pid_capitan'      => $pid_capitan,
         'uid_solicitante'  => $uid,
-        'fid_origen'       => $fid_origen,
-        'fid_destino'      => $fid_destino,
-        'origen_nombre'    => $db->escape_string($origen['nombre']),
-        'destino_nombre'   => $db->escape_string($destino['nombre']),
+        'fid_origen'       => 0,
+        'fid_destino'      => 0,
+        'origen_slug'      => $db->escape_string($origen_slug),
+        'destino_slug'     => $db->escape_string($destino_slug),
+        'origen_nombre'    => $db->escape_string($isla_origen['nombre']),
+        'destino_nombre'   => $db->escape_string($isla_destino['nombre']),
+        'barco_id'         => $barco_id,
         'barco_nombre'     => $db->escape_string($barco_nom),
         'barco_tipo'       => $db->escape_string($barco_tipo),
         'tripulantes_json' => $db->escape_string(json_encode($trip, JSON_UNESCAPED_UNICODE)),
+        'items_json'       => $db->escape_string(json_encode($items_slugs, JSON_UNESCAPED_UNICODE)),
+        'ruta_json'        => $db->escape_string(json_encode($ruta_res, JSON_UNESCAPED_UNICODE)),
         'tramos'           => $tramos,
-        'posts_min'        => (int) $pp['posts_min'],
-        'plazo_dias'       => (int) $pp['plazo_dias'],
+        'peligro_total'    => $peligro_total,
+        'nivel_peligro'    => $db->escape_string($nivel_peligro),
+        'dias_onrol'       => $dias_onrol,
+        'es_temeraria'     => $es_temeraria ? 1 : 0,
+        'posts_min'        => $posts_sugeridos,
+        'plazo_dias'       => $plazo_offrol,
         'estado'           => 'activo',
         'resultado_json'   => $db->escape_string(json_encode($oraculo, JSON_UNESCAPED_UNICODE)),
-        'mods_json'        => $db->escape_string(json_encode($oraculo['mods'] ?? array(), JSON_UNESCAPED_UNICODE)),
+        'mods_json'        => $db->escape_string(json_encode($ruta_res['mods_total'] ?? array(), JSON_UNESCAPED_UNICODE)),
         'suministros'      => $db->escape_string($suministros),
         'notas'            => $db->escape_string($notas),
         'dateline'         => TIME_NOW,
@@ -300,7 +335,8 @@ function ope_viaje_solicitar(array $data)
         ), "pid = {$first_pid}");
     }
 
-    ope_viaje_actualizar_ubicacion_trip($trip, $destino['nombre'], 'En tránsito hacia ' . $destino['nombre']);
+    // Actualizar estado 'En tránsito' sin cambiar la isla_actual todavía (se cambia al cerrar)
+    ope_viaje_actualizar_ubicacion_trip($trip, $isla_origen['nombre'], 'En tránsito hacia ' . $isla_destino['nombre']);
 
     $bburl = rtrim((string) $mybb->settings['bburl'], '/');
     return array(
@@ -323,7 +359,7 @@ function ope_viaje_por_capitan_activo($pid_capitan)
     return $db->num_rows($q) ? $db->fetch_array($q) : null;
 }
 
-/** Cierre manual a petición del jugador. */
+/** Cierre manual a petición del jugador. Actualiza isla_actual de los tripulantes. */
 function ope_viaje_cerrar($viaje_id, $uid, $active_pid)
 {
     global $db;
@@ -347,8 +383,6 @@ function ope_viaje_cerrar($viaje_id, $uid, $active_pid)
         }
     }
 
-    $cierre_html = ope_oraculo_cierre_post_html($viaje, $cap_nombre);
-    unset($cierre_html);
     $pid_post = ope_system_create_post((int) $viaje['tid'], '[viaje-cierre=' . (int) $viaje_id . ']');
     if ($pid_post < 1) {
         return array('ok' => false, 'msg' => 'No se pudo publicar el post de llegada.');
@@ -360,20 +394,67 @@ function ope_viaje_cerrar($viaje_id, $uid, $active_pid)
         'cierre_pid'      => (int) $active_pid,
     ), 'viaje_id = ' . (int) $viaje_id);
 
-    $trip = json_decode((string) $viaje['tripulantes_json'], true);
+    // Actualizar despensa y estado del casco del barco tras la travesía
+    $barco_id = (int) ($viaje['barco_id'] ?? 0);
+    $tramos   = max(1, (int) ($viaje['tramos'] ?? 1));
+    $trip     = json_decode((string) ($viaje['tripulantes_json'] ?? '[]'), true);
+    if (!is_array($trip)) $trip = array();
+
+    // Detectar si hay Cocinero o Carpintero en la tripulación
+    $tiene_cocinero   = false;
+    $tiene_carpintero = false;
+    foreach ($trip as $t_member) {
+        $ofi = strtolower((string)($t_member['oficio'] ?? ''));
+        if ($ofi === 'cocinero')   $tiene_cocinero = true;
+        if ($ofi === 'carpintero') $tiene_carpintero = true;
+    }
+
+    if ($barco_id > 0 && function_exists('ope_barco_obtener')) {
+        $barco_data = ope_barco_obtener($barco_id);
+        if ($barco_data) {
+            // Consumo de despensa: 10% por tramo (reducido a 5% si hay Cocinero)
+            $consumo_por_tramo = $tiene_cocinero ? 5 : 10;
+            $despensa_actual   = (int) ($barco_data['despensa'] ?? 100);
+            $nueva_despensa    = max(0, $despensa_actual - ($tramos * $consumo_por_tramo));
+
+            // Desgaste de casco: 5% por tramo (+5% extra si fue temeraria), reducido a la mitad si hay Carpintero
+            $desgaste_base   = !empty($viaje['es_temeraria']) ? 10 : 5;
+            $desgaste_total  = $tramos * $desgaste_base;
+            if ($tiene_carpintero) {
+                $desgaste_total = (int) ceil($desgaste_total * 0.5);
+            }
+            $casco_actual = (int) ($barco_data['estado_casco'] ?? 100);
+            $nuevo_casco  = max(0, $casco_actual - $desgaste_total);
+
+            // Guardar cambios en el barco
+            if (function_exists('ope_barco_actualizar_despensa')) {
+                ope_barco_actualizar_despensa($barco_id, $nueva_despensa);
+            }
+            if (function_exists('ope_barco_actualizar_casco')) {
+                ope_barco_actualizar_casco($barco_id, $nuevo_casco);
+            }
+        }
+    }
+
     if (is_array($trip)) {
-        ope_viaje_actualizar_ubicacion_trip($trip, (string) $viaje['destino_nombre'], 'Amarrado en ' . $viaje['destino_nombre']);
+        $destino_slug = (string) ($viaje['destino_slug'] ?? '');
+        ope_viaje_actualizar_ubicacion_trip(
+            $trip,
+            (string) $viaje['destino_nombre'],
+            'Amarrado en ' . $viaje['destino_nombre'],
+            $destino_slug
+        );
     }
 
     $bburl = rtrim((string) $GLOBALS['mybb']->settings['bburl'], '/');
     return array(
         'ok'  => true,
-        'msg' => 'Llegada confirmada. Lyria ha publicado el cierre.',
+        'msg' => 'Llegada confirmada. El Narrador ha publicado el cierre.',
         'url' => $bburl . '/showthread.php?tid=' . (int) $viaje['tid'],
     );
 }
 
-function ope_viaje_actualizar_ubicacion_trip(array $trip, string $ubic, string $accion)
+function ope_viaje_actualizar_ubicacion_trip(array $trip, string $ubic, string $accion, string $isla_slug = '')
 {
     global $db;
     if (!$db->table_exists('rol_personajes')) {
@@ -388,6 +469,9 @@ function ope_viaje_actualizar_ubicacion_trip(array $trip, string $ubic, string $
         }
         if ($db->field_exists('mundo_accion', 'rol_personajes')) {
             $upd['mundo_accion'] = $db->escape_string($accion);
+        }
+        if ($isla_slug !== '' && $db->field_exists('isla_actual', 'rol_personajes')) {
+            $upd['isla_actual'] = $db->escape_string($isla_slug);
         }
         if ($upd) {
             $db->update_query('rol_personajes', $upd, "pid = {$pid}");
@@ -409,14 +493,17 @@ function ope_viaje_panel_showthread($tid, $uid, $active_pid)
     $orig   = htmlspecialchars_uni((string) $viaje['origen_nombre']);
     $tramos = (int) ($viaje['tramos'] ?? 1);
     $posts  = (int) ($viaje['posts_min'] ?? 6);
+    $dias_onrol = (int) ($viaje['dias_onrol'] ?? ($tramos * 2));
+    $peligro    = htmlspecialchars_uni((string) ($viaje['nivel_peligro'] ?? 'bajo'));
 
     $html  = '<aside class="ope-viaje-panel" id="ope-viaje-panel">';
     $html .= '<div class="ope-viaje-panel-h"><span class="ope-viaje-panel-badge">Viaje en curso</span>';
-    $html .= '<span class="ope-viaje-panel-route">' . $orig . ' → ' . $dest . '</span></div>';
+    $html .= '<span class="ope-viaje-panel-route">' . $orig . ' &rarr; ' . $dest . '</span></div>';
     $html .= '<div class="ope-viaje-panel-b">';
     $html .= '<div class="ope-viaje-panel-stats">';
     $html .= '<span><b>' . $tramos . '</b><small>Tramos</small></span>';
-    $html .= '<span><b>' . $posts . '</b><small>Posts sug.</small></span>';
+    $html .= '<span><b>' . $dias_onrol . 'd</b><small>Días on-rol</small></span>';
+    $html .= '<span><b>' . ucfirst($peligro) . '</b><small>Peligro</small></span>';
     $html .= '<span class="ope-viaje-st-' . ($estado === 'activo' ? 'on' : 'off') . '"><b>' . strtoupper($estado) . '</b><small>Estado</small></span>';
     $html .= '</div>';
 
@@ -426,11 +513,11 @@ function ope_viaje_panel_showthread($tid, $uid, $active_pid)
         $html .= '<input type="hidden" name="my_post_key" value="' . htmlspecialchars_uni($mybb->post_code) . '">';
         $html .= '<input type="hidden" name="action" value="cerrar">';
         $html .= '<input type="hidden" name="viaje_id" value="' . (int) $viaje['viaje_id'] . '">';
-        $html .= '<p class="ope-viaje-panel-note">Cuando la tripulación haya roteado lo suficiente, solicita la <strong>llegada a ' . $dest . '</strong>. Lyria publicará el cierre.</p>';
+        $html .= '<p class="ope-viaje-panel-note">Cuando la tripulación haya roleado lo suficiente, solicita la <strong>llegada a ' . $dest . '</strong>. Lyria publicará el cierre.</p>';
         $html .= '<button type="submit" class="ope-btn ope-btn-hot">Solicitar llegada</button>';
         $html .= '</form>';
     } elseif ($estado === 'cerrado') {
-        $html .= '<p class="ope-viaje-panel-note ope-viaje-panel-note--done">Travesía completada. Los personajes están en <strong>' . $dest . '</strong>.</p>';
+        $html .= '<p class="ope-viaje-panel-note ope-viaje-panel-note--done">Travesía completada. Los personajes están amarrados en <strong>' . $dest . '</strong>.</p>';
     }
 
     $html .= '<a href="' . $bburl . '/tramites.php" class="ope-btn ope-btn-ghost ope-btn-sm">Trámites</a>';

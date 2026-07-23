@@ -72,14 +72,24 @@ header('Content-Type: text/html; charset=utf-8');
 
   <section class="reveal">
     <div class="shead"><h2>Ventanillas</h2><span class="rule"></span></div>
-<?php if (empty($catalogo)): ?>
-    <div class="plate">
-      <div class="plate-b">
-        <p class="pj-empty">No hay ventanillas de trámite manual activas. Las gestiones de personaje se realizan automáticamente desde la <a href="<?php echo $bburl; ?>/ficha.php">ficha</a>.</p>
-      </div>
-    </div>
-<?php else: ?>
     <div class="cards tram-hub">
+      <article class="card card--featured">
+        <div class="card-top">
+          <div>
+            <div class="card-title">Navegación y Rutas</div>
+            <div class="card-code">viaje_maritimo</div>
+          </div>
+        </div>
+        <div class="card-body">Planifica tu travesía entre las 44 islas del mundo. Selecciona tu barco, equipamiento y tripulación para tirar el Oráculo de Viaje en Alta Mar.</div>
+        <div class="card-foot">
+          <span class="card-meta">Automático</span>
+<?php if ($pid < 1): ?>
+          <span class="chip">Sin PJ activo</span>
+<?php else: ?>
+          <a class="btn btn-hot btn-sm" href="<?php echo $bburl; ?>/viajes.php">Planificar Viaje</a>
+<?php endif; ?>
+        </div>
+      </article>
 <?php foreach ($catalogo as $tipo => $info): ?>
       <article class="card">
         <div class="card-top">
@@ -90,7 +100,7 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
         <div class="card-body"><?php echo htmlspecialchars_uni($info['desc']); ?></div>
         <div class="card-foot">
-          <span class="card-meta">Staff rank ≥ <?php echo (int) ($info['rank_min'] ?? 2); ?></span>
+          <span class="card-meta">Staff rank &ge; <?php echo (int) ($info['rank_min'] ?? 2); ?></span>
 <?php if ($pid < 1): ?>
           <span class="chip">Sin PJ activo</span>
 <?php else: ?>
@@ -100,7 +110,6 @@ header('Content-Type: text/html; charset=utf-8');
       </article>
 <?php endforeach; ?>
     </div>
-<?php endif; ?>
   </section>
 
   <section class="reveal">

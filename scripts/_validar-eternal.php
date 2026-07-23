@@ -12,8 +12,8 @@
 declare(strict_types=1);
 
 // ── Rutas ──────────────────────────────────────────────────────────────
-$SCRIPT_DIR = dirname(__DIR__); // .../I-Forge-RPG
-$SISTEMA_DIR = dirname($SCRIPT_DIR) . '/I-Forge-Sistema'; // .../I-Forge-Sistema
+$SCRIPT_DIR = dirname(__DIR__); // .../Op-Eternal/Eternal-RPG
+$SISTEMA_DIR = dirname($SCRIPT_DIR) . '/Eternal-Sistema'; // .../Op-Eternal/Eternal-Sistema
 
 $JSON_DIR        = $SCRIPT_DIR . '/inc/ope_eternal';
 $MD_DIR          = $SISTEMA_DIR . '/docs/11-SISTEMA ETERNAL';

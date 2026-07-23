@@ -75,9 +75,19 @@ $paneles = array(
         'href' => 'zona-staff-cuentas.php',
         'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>',
     ),
+    array(
+        'id' => 'cards',
+        'titulo' => 'Catálogo de Cards',
+        'code' => 'STF-05',
+        'desc' => 'Crea y gestiona tarjetas reutilizables (objetos, técnicas, lore) y asígnalas a las fichas de personajes.',
+        'rank_min' => 1,
+        'href' => 'zona-staff-cards.php',
+        'count_key' => 'cards',
+        'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>',
+    ),
 );
 
-$counts = array('cola_pj' => 0, 'cola_tram' => 0);
+$counts = array('cola_pj' => 0, 'cola_tram' => 0, 'cards' => 0);
 if ($is_staff && $db->table_exists('rol_personajes')) {
     $q = $db->simple_select('rol_personajes', 'COUNT(*) AS c', "estado = 'revision'");
     $counts['cola_pj'] = (int) $db->fetch_field($q, 'c');
@@ -89,6 +99,9 @@ if ($is_staff && $staff_rank >= 1 && $db->table_exists('rol_tramites')) {
         "estado IN ('pendiente','en_proceso') AND tipo != 'crear_personaje'"
     );
     $counts['cola_tram'] = (int) $db->fetch_field($q, 'c');
+}
+if ($is_staff && $db->table_exists('rol_cards')) {
+    $counts['cards'] = (int) $db->fetch_field($db->simple_select('rol_cards', 'COUNT(*) AS c', 'activo = 1'), 'c');
 }
 
 $by_rank = array();

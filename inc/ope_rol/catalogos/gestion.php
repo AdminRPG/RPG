@@ -539,3 +539,343 @@ if (!function_exists('ope_rol_cat_lore')) {
         return array('ok' => true, 'msg' => 'Trámite rechazado.');
     }
 }
+
+if (!function_exists('ope_rol_cat_slugify')) {
+    function ope_rol_cat_slugify($text)
+    {
+        $text = trim((string) $text);
+        if ($text === '') {
+            return 'sin-titulo';
+        }
+        $text = strtr($text, array(
+            'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u',
+            'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U',
+            'ñ' => 'n', 'Ñ' => 'N', 'ü' => 'u', 'Ü' => 'U',
+        ));
+        $text = preg_replace('/[^a-zA-Z0-9\-\s]/', '', $text);
+        $text = preg_replace('/[\s\-]+/', '-', $text);
+        $text = trim($text, '-');
+        $text = function_exists('mb_strtolower') ? mb_strtolower($text, 'UTF-8') : strtolower($text);
+        return $text === '' ? 'sin-titulo' : $text;
+    }
+}
+
+if (!function_exists('ope_rol_cat_cards_setup')) {
+    /** Crea las tablas rol_cards y rol_pj_cards si no existen. */
+    function ope_rol_cat_cards_setup()
+    {
+        global $db;
+        $pref = TABLE_PREFIX;
+
+        if (!$db->table_exists('rol_cards')) {
+            $db->write_query("CREATE TABLE {$pref}rol_cards (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nombre VARCHAR(200) NOT NULL,
+                slug VARCHAR(200) NOT NULL,
+                tipo VARCHAR(50) NOT NULL DEFAULT 'tecnica',
+                descripcion TEXT,
+                contenido TEXT,
+                icono VARCHAR(255) DEFAULT '',
+                estadisticas TEXT,
+                activo TINYINT(1) NOT NULL DEFAULT 1,
+                orden INT NOT NULL DEFAULT 0,
+                dateline INT NOT NULL DEFAULT 0,
+                lastedit INT NOT NULL DEFAULT 0,
+                UNIQUE KEY slug_idx (slug)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        }
+
+        if (!$db->table_exists('rol_pj_cards')) {
+            $db->write_query("CREATE TABLE {$pref}rol_pj_cards (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                pid INT NOT NULL,
+                card_id INT NOT NULL,
+                slot VARCHAR(50) NOT NULL DEFAULT 'misc',
+                datos TEXT,
+                orden INT NOT NULL DEFAULT 0,
+                dateline INT NOT NULL DEFAULT 0,
+                KEY pid_idx (pid),
+                KEY card_idx (card_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        }
+    }
+}
+
+if (!function_exists('ope_rol_cat_card_tipos')) {
+    /** Etiquetas para tipos de card. */
+    function ope_rol_cat_card_tipos()
+    {
+        return array(
+            'tecnica' => 'Técnica custom',
+            'haki'    => 'Haki',
+            'fruta'   => 'Akuma no Mi',
+            'arma'    => 'Técnica de arma',
+            'eternal' => 'Activo Eternal',
+            'item'    => 'Objeto / Ítem',
+            'lore'    => 'Lore / Conocimiento',
+            'npc'     => 'PNJ / Aliado',
+            'misc'    => 'Otro / Miscelánea',
+        );
+    }
+}
+
+if (!function_exists('ope_rol_cat_pj_card_slots')) {
+    /** Etiquetas para slots de asignación a personaje. */
+    function ope_rol_cat_pj_card_slots()
+    {
+        return array(
+            'descripcion' => 'Descripción',
+            'inventario'  => 'Inventario',
+            'tecnicas'    => 'Técnicas',
+            'poderes'     => 'Poderes',
+            'historia'    => 'Historia / Trasfondo',
+            'relaciones'  => 'Relaciones',
+            'misc'        => 'General / Otro',
+        );
+    }
+}
+
+if (!function_exists('ope_rol_cat_cards')) {
+    /** Lista todas las cards del catálogo. */
+    function ope_rol_cat_cards($solo_activos = true)
+    {
+        global $db;
+        $out = array();
+        if (!$db->table_exists('rol_cards')) {
+            return $out;
+        }
+        $where = $solo_activos ? 'activo = 1' : '';
+        $q = $db->simple_select('rol_cards', '*', $where, array('order_by' => 'orden, id', 'order_dir' => 'ASC'));
+        while ($r = $db->fetch_array($q)) {
+            $r['estadisticas_arr'] = ope_rol_cat_json_list($r['estadisticas'] ?? '');
+            $out[] = $r;
+        }
+        return $out;
+    }
+
+    /** Devuelve una card por ID. */
+    function ope_rol_cat_card_por_id($id)
+    {
+        global $db;
+        $id = (int) $id;
+        if ($id < 1 || !$db->table_exists('rol_cards')) {
+            return null;
+        }
+        $q = $db->simple_select('rol_cards', '*', "id = {$id}", array('limit' => 1));
+        if (!$db->num_rows($q)) {
+            return null;
+        }
+        $r = $db->fetch_array($q);
+        $r['estadisticas_arr'] = ope_rol_cat_json_list($r['estadisticas'] ?? '');
+        return $r;
+    }
+
+    /** Crea una nueva card. Devuelve array('ok'=>bool, 'msg'=>string, 'id'=>int). */
+    function ope_rol_cat_card_crear(array $data)
+    {
+        global $db;
+        $now = (int) TIME_NOW;
+
+        if (empty($data['nombre'])) {
+            return array('ok' => false, 'msg' => 'El nombre es obligatorio.', 'id' => 0);
+        }
+
+        // Slug auto-generado
+        $slug = !empty($data['slug']) ? ope_rol_cat_slugify($data['slug']) : ope_rol_cat_slugify($data['nombre']);
+
+        // Evitar slugs duplicados
+        $base_slug = $slug;
+        $counter = 1;
+        while ($db->table_exists('rol_cards') && $db->fetch_field($db->simple_select('rol_cards', 'COUNT(*) AS c', "slug = '{$db->escape_string($slug)}'"), 'c') > 0) {
+            $slug = $base_slug . '-' . $counter;
+            $counter++;
+        }
+
+        $id = $db->insert_query('rol_cards', array(
+            'nombre'       => $db->escape_string($data['nombre']),
+            'slug'         => $db->escape_string($slug),
+            'tipo'         => $db->escape_string($data['tipo'] ?? 'tecnica'),
+            'descripcion'  => $db->escape_string($data['descripcion'] ?? ''),
+            'contenido'    => $db->escape_string($data['contenido'] ?? ''),
+            'icono'        => $db->escape_string($data['icono'] ?? ''),
+            'estadisticas' => $db->escape_string($data['estadisticas'] ?? ''),
+            'activo'       => isset($data['activo']) ? (int) $data['activo'] : 1,
+            'orden'        => (int) ($data['orden'] ?? 0),
+            'dateline'     => $now,
+            'lastedit'     => $now,
+        ));
+
+        return array('ok' => true, 'msg' => "Card \"{$data['nombre']}\" creada.", 'id' => (int) $id);
+    }
+
+    /** Edita una card existente. Devuelve array('ok'=>bool, 'msg'=>string). */
+    function ope_rol_cat_card_editar($id, array $data)
+    {
+        global $db;
+        $id = (int) $id;
+        if ($id < 1 || !$db->table_exists('rol_cards')) {
+            return array('ok' => false, 'msg' => 'Card no encontrada.');
+        }
+
+        $q = $db->simple_select('rol_cards', 'id', "id = {$id}", array('limit' => 1));
+        if (!$db->num_rows($q)) {
+            return array('ok' => false, 'msg' => 'Card no encontrada.');
+        }
+
+        $update = array('lastedit' => (int) TIME_NOW);
+
+        if (isset($data['nombre'])) {
+            $update['nombre'] = $db->escape_string($data['nombre']);
+        }
+        if (isset($data['tipo'])) {
+            $update['tipo'] = $db->escape_string($data['tipo']);
+        }
+        if (isset($data['descripcion'])) {
+            $update['descripcion'] = $db->escape_string($data['descripcion']);
+        }
+        if (isset($data['contenido'])) {
+            $update['contenido'] = $db->escape_string($data['contenido']);
+        }
+        if (isset($data['icono'])) {
+            $update['icono'] = $db->escape_string($data['icono']);
+        }
+        if (isset($data['estadisticas'])) {
+            $update['estadisticas'] = $db->escape_string($data['estadisticas']);
+        }
+        if (isset($data['activo'])) {
+            $update['activo'] = (int) $data['activo'];
+        }
+        if (isset($data['orden'])) {
+            $update['orden'] = (int) $data['orden'];
+        }
+        // Slug regenerado si cambia nombre
+        if (isset($data['nombre'])) {
+            $slug = ope_rol_cat_slugify($data['nombre']);
+            $base_slug = $slug;
+            $counter = 1;
+            while ($db->fetch_field($db->simple_select('rol_cards', 'COUNT(*) AS c', "slug = '{$db->escape_string($slug)}' AND id != {$id}"), 'c') > 0) {
+                $slug = $base_slug . '-' . $counter;
+                $counter++;
+            }
+            $update['slug'] = $db->escape_string($slug);
+        }
+
+        $db->update_query('rol_cards', $update, "id = {$id}");
+        return array('ok' => true, 'msg' => 'Card actualizada.');
+    }
+
+    /** Borrado lógico (activo = 0) o físico si se fuerza. Devuelve array('ok'=>bool, 'msg'=>string). */
+    function ope_rol_cat_card_borrar($id, $force = false)
+    {
+        global $db;
+        $id = (int) $id;
+        if ($id < 1 || !$db->table_exists('rol_cards')) {
+            return array('ok' => false, 'msg' => 'Card no encontrada.');
+        }
+
+        if ($force) {
+            // Quitar asignaciones primero
+            if ($db->table_exists('rol_pj_cards')) {
+                $db->delete_query('rol_pj_cards', "card_id = {$id}");
+            }
+            $db->delete_query('rol_cards', "id = {$id}");
+            return array('ok' => true, 'msg' => 'Card eliminada permanentemente.');
+        }
+
+        $db->update_query('rol_cards', array('activo' => 0, 'lastedit' => (int) TIME_NOW), "id = {$id}");
+        return array('ok' => true, 'msg' => 'Card desactivada.');
+    }
+}
+
+if (!function_exists('ope_rol_cat_pj_cards')) {
+    /** Cards asignadas a un personaje. */
+    function ope_rol_cat_pj_cards($pid)
+    {
+        global $db;
+        $pid = (int) $pid;
+        $out = array();
+        if ($pid < 1 || !$db->table_exists('rol_pj_cards') || !$db->table_exists('rol_cards')) {
+            return $out;
+        }
+
+        $pref = TABLE_PREFIX;
+        $q = $db->query("SELECT pc.*, c.nombre AS card_nombre, c.tipo AS card_tipo, c.slug AS card_slug, c.icono AS card_icono, c.descripcion AS card_desc, c.contenido AS card_contenido
+            FROM {$pref}rol_pj_cards pc
+            JOIN {$pref}rol_cards c ON c.id = pc.card_id AND c.activo = 1
+            WHERE pc.pid = {$pid}
+            ORDER BY pc.orden, pc.id ASC");
+
+        while ($r = $db->fetch_array($q)) {
+            $out[] = $r;
+        }
+        return $out;
+    }
+
+    /** Asigna una card a un personaje. Devuelve array('ok'=>bool, 'msg'=>string, 'id'=>int). */
+    function ope_rol_cat_pj_card_asignar($pid, $card_id, $slot = 'misc', $datos = '')
+    {
+        global $db;
+        $pid = (int) $pid;
+        $card_id = (int) $card_id;
+        $slot = $db->escape_string(trim((string) $slot) !== '' ? $slot : 'misc');
+
+        if ($pid < 1 || $card_id < 1) {
+            return array('ok' => false, 'msg' => 'Personaje o card inválidos.', 'id' => 0);
+        }
+
+        if (!$db->table_exists('rol_pj_cards') || !$db->table_exists('rol_cards')) {
+            return array('ok' => false, 'msg' => 'Tablas no disponibles.', 'id' => 0);
+        }
+
+        // Verificar que la card existe
+        $cq = $db->simple_select('rol_cards', 'id, nombre', "id = {$card_id} AND activo = 1", array('limit' => 1));
+        if (!$db->num_rows($cq)) {
+            return array('ok' => false, 'msg' => 'Card no encontrada o inactiva.', 'id' => 0);
+        }
+        $card_nombre = $db->fetch_field($cq, 'nombre');
+
+        // Verificar duplicado
+        $dup = $db->simple_select('rol_pj_cards', 'COUNT(*) AS c', "pid = {$pid} AND card_id = {$card_id}", array('limit' => 1));
+        if ($db->num_rows($dup) && (int) $db->fetch_field($dup, 'c') > 0) {
+            return array('ok' => false, 'msg' => 'Esa card ya está asignada a este personaje.', 'id' => 0);
+        }
+
+        $id = $db->insert_query('rol_pj_cards', array(
+            'pid'       => $pid,
+            'card_id'   => $card_id,
+            'slot'      => $slot,
+            'datos'     => $db->escape_string((string) $datos),
+            'orden'     => 0,
+            'dateline'  => (int) TIME_NOW,
+        ));
+
+        return array('ok' => true, 'msg' => "Card \"{$card_nombre}\" asignada al personaje.", 'id' => (int) $id);
+    }
+
+    /** Desasigna una card de un personaje. */
+    function ope_rol_cat_pj_card_desasignar($id)
+    {
+        global $db;
+        $id = (int) $id;
+        if ($id < 1 || !$db->table_exists('rol_pj_cards')) {
+            return array('ok' => false, 'msg' => 'Asignación no encontrada.');
+        }
+        $db->delete_query('rol_pj_cards', "id = {$id}");
+        return array('ok' => true, 'msg' => 'Card desasignada del personaje.');
+    }
+
+    /** Lista de personajes (pid + nombre) para selects. */
+    function ope_rol_cat_personajes_lista()
+    {
+        global $db;
+        $out = array();
+        if (!$db->table_exists('rol_personajes')) {
+            return $out;
+        }
+        $q = $db->simple_select('rol_personajes', 'pid, nombre', "estado = 'aprobado' OR es_npc = 1", array('order_by' => 'nombre', 'order_dir' => 'ASC'));
+        while ($r = $db->fetch_array($q)) {
+            $out[] = $r;
+        }
+        return $out;
+    }
+}

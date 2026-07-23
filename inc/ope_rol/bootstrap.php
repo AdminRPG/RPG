@@ -36,5 +36,12 @@ require_once $dir . '/mundo/oraculo.php';
 require_once $dir . '/mundo/oraculo_post.php';
 require_once $dir . '/mundo/viajes.php';
 
+// Navegacion: catalogo de islas, matriz de rutas, barcos, items, oraculo v2
+require_once $dir . '/mundo/islas_cat.php';
+require_once $dir . '/mundo/matriz_rutas.php';
+require_once $dir . '/mundo/barcos.php';
+require_once $dir . '/mundo/nav_items.php';
+require_once $dir . '/mundo/oraculo_v2.php';
+
 // Trámites
 require_once $dir . '/tramites/tramites.php';

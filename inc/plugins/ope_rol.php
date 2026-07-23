@@ -385,6 +385,7 @@ function ope_rol_navbar_html()
     // Nav reducido (F1 cleanup): Personaje · Trámites · Guías (+ Zona Staff si aplica).
     // Tripulación, Mundo Vivo y Bibliotecas fuera del menú; páginas conservadas.
     $links   = '<a href="' . $bburl . '/personajes.php" class="ope-nav-link' . $isOn(array('personajes.php', 'ficha.php', 'crear-personaje.php')) . '">Personaje</a>';
+    $links  .= '<a href="' . $bburl . '/barco.php" class="ope-nav-link' . $isOn(array('barco.php', 'barcos.php')) . '">Barco</a>';
     $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php')) . '">Trámites</a>';
 
     // Zona Catálogo (dropdown). Por ahora solo Akuma no Mi.
@@ -1040,12 +1041,13 @@ function ope_rol_snapshot_post(&$dh)
     // Buscar el último snapshot del mismo personaje en el mismo hilo para
     // heredar PV/EN actuales (arrastre entre posts del mismo combate).
     $tid = (int) ($dh->data['tid'] ?? ($dh->tid ?? 0));
-    if ($tid > 0 && $db->table_exists('posts')) {
-        $subquery = "SELECT pid FROM {$db->table_prefix}posts WHERE tid = {$tid} AND pid != {$post_pid} ORDER BY dateline DESC LIMIT 5";
+    if ($tid > 0 && $db->table_exists('posts') && $db->table_exists('rol_post_snapshot')) {
         $prev = $db->query("
-            SELECT pv_actual, en_actual FROM {$db->table_prefix}rol_post_snapshot
-            WHERE personaje_pid = {$char_pid} AND pid IN ({$subquery})
-            ORDER BY dateline DESC LIMIT 1
+            SELECT s.pv_actual, s.en_actual
+            FROM {$db->table_prefix}rol_post_snapshot s
+            INNER JOIN {$db->table_prefix}posts p ON (p.pid = s.pid)
+            WHERE s.personaje_pid = {$char_pid} AND p.tid = {$tid} AND p.pid != {$post_pid}
+            ORDER BY s.dateline DESC LIMIT 1
         ");
         if ($prev && $db->num_rows($prev) > 0) {
             $prev_row = $db->fetch_array($prev);

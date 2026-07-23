@@ -1,6 +1,10 @@
 <?php
 /**
  * One Piece: Eternal · Generador HTML del post automático del Oráculo de Viaje (OPE Eternal).
+ *
+ * Versión 2.0: Soporta las 6 mesas D100 (Clima, Encuentro, Peligro, Hallazgo, Misterio, Bonanza),
+ * nivel de peligro, días onrol, indicación de ruta temeraria e ítems equipados.
+ * SIN EMOJIS — los elementos visuales se maquetan con CSS (.ope-vo-*).
  */
 
 if (!defined('IN_MYBB')) {
@@ -15,11 +19,15 @@ function ope_oraculo_post_html(array $viaje, array $oraculo)
     $tramos  = (int) ($viaje['tramos'] ?? 1);
     $posts   = (int) ($viaje['posts_min'] ?? 6);
     $plazo   = (int) ($viaje['plazo_dias'] ?? 5);
+    $dias_onrol = (int) ($viaje['dias_onrol'] ?? ($tramos * 2));
+    $nivel_peligro = htmlspecialchars_uni((string) ($viaje['nivel_peligro'] ?? 'bajo'));
+    $es_temeraria  = !empty($viaje['es_temeraria']);
 
     $cal = function_exists('ope_rol_onrol_calendar') ? ope_rol_onrol_calendar() : array('season' => '', 'day' => 0);
     $estacion = htmlspecialchars_uni((string) ($cal['season'] ?? ''));
     $dia      = (int) ($cal['day'] ?? 0);
 
+    // Tripulantes
     $trip_html = '';
     $trip = json_decode((string) ($viaje['tripulantes_json'] ?? '[]'), true);
     if (is_array($trip)) {
@@ -30,9 +38,17 @@ function ope_oraculo_post_html(array $viaje, array $oraculo)
         }
     }
 
+    // Modificadores globales
     $oficios_html = '';
     $mods = is_array($oraculo['mods'] ?? null) ? $oraculo['mods'] : array();
-    $labels = array('clima' => 'Clima', 'encuentros' => 'Encuentros', 'hallazgos' => 'Hallazgos', 'peligros' => 'Peligros');
+    $labels = array(
+        'clima'     => 'Clima',
+        'encuentro' => 'Encuentros',
+        'peligro'   => 'Peligros',
+        'hallazgo'  => 'Hallazgos',
+        'misterio'  => 'Misterios',
+        'bonanza'   => 'Bonanzas'
+    );
     foreach ($labels as $k => $lbl) {
         $v = (int) ($mods[$k] ?? 0);
         $sign = $v > 0 ? '+' : '';
@@ -40,65 +56,89 @@ function ope_oraculo_post_html(array $viaje, array $oraculo)
                        . '<span class="ope-vo-oficio-v">' . $sign . $v . '</span></div>';
     }
 
+    // Tramos del oráculo
     $tramos_html = '';
+    $map = array(
+        'clima'     => array('cls' => 'clima',     'label' => 'Clima'),
+        'encuentro' => array('cls' => 'encuentro', 'label' => 'Encuentro'),
+        'peligro'   => array('cls' => 'peligro',   'label' => 'Peligro'),
+        'hallazgo'  => array('cls' => 'hallazgo',  'label' => 'Hallazgo'),
+        'misterio'  => array('cls' => 'misterio',  'label' => 'Misterio'),
+        'bonanza'   => array('cls' => 'bonanza',   'label' => 'Bonanza'),
+    );
+
     foreach ($oraculo['tramos'] ?? array() as $tr) {
         $n = (int) ($tr['num'] ?? 1);
         $tramos_html .= '<section class="ope-vo-tramo" data-tramo="' . $n . '">';
         $tramos_html .= '<h3 class="ope-vo-tramo-titulo">Tramo ' . $n . '</h3>';
         $tramos_html .= '<div class="ope-vo-grid">';
-        $map = array(
-            'clima'      => array('cls' => 'clima', 'label' => 'Clima'),
-            'encuentros' => array('cls' => 'encuentro', 'label' => 'Encuentro'),
-            'hallazgos'  => array('cls' => 'hallazgo', 'label' => 'Hallazgo'),
-            'peligros'   => array('cls' => 'peligro', 'label' => 'Peligro'),
-        );
+
         foreach ($map as $key => $meta) {
-            $c = $tr['cartas'][$key] ?? array();
-            $icon = htmlspecialchars_uni((string) ($c['icon'] ?? '?'));
-            $nom  = htmlspecialchars_uni((string) ($c['nombre'] ?? '—'));
-            $efe  = htmlspecialchars_uni((string) ($c['efecto'] ?? ''));
-            $tone = preg_replace('/[^a-z]/', '', (string) ($c['tone'] ?? 'neutral'));
+            if (empty($tr['cartas'][$key])) {
+                continue; // Si no aplica Misterio o Bonanza en este tramo, no renderizar
+            }
+            $c = $tr['cartas'][$key];
+            $ico_cls = htmlspecialchars_uni((string) ($c['ico'] ?? $key));
+            $nom     = htmlspecialchars_uni((string) ($c['nombre'] ?? '—'));
+            $efe     = htmlspecialchars_uni((string) ($c['efecto'] ?? ''));
+            $tone    = preg_replace('/[^a-z]/', '', (string) ($c['tone'] ?? 'neutral'));
+
             $tramos_html .= '<div class="ope-vo-card ope-vo-' . $meta['cls'] . ' tone-' . $tone . '">';
-            $tramos_html .= '<div class="ope-vo-card-icon">' . $icon . '</div>';
+            $tramos_html .= '<div class="ope-vo-card-icon-box"><span class="ope-vo-ico ope-vo-ico-' . $ico_cls . '"></span></div>';
             $tramos_html .= '<div class="ope-vo-card-label">' . $meta['label'] . '</div>';
             $tramos_html .= '<div class="ope-vo-card-valor">' . $nom . '</div>';
             if ($efe !== '') {
                 $tramos_html .= '<div class="ope-vo-card-efecto">' . $efe . '</div>';
             }
-            $tramos_html .= '<div class="ope-vo-card-roll">D100: ' . (int) ($c['roll_adj'] ?? 0) . '</div>';
+            $tramos_html .= '<div class="ope-vo-card-roll">D100: ' . (int) ($c['roll_adj'] ?? $c['roll'] ?? 0) . '</div>';
             $tramos_html .= '</div>';
         }
         $tramos_html .= '</div>';
         $nar = htmlspecialchars_uni((string) ($tr['narrativa'] ?? ''));
-        $tramos_html .= '<div class="ope-vo-narrativa"><p>' . $nar . '</p></div>';
+        if ($nar !== '') {
+            $tramos_html .= '<div class="ope-vo-narrativa"><p>' . $nar . '</p></div>';
+        }
         $tramos_html .= '</section>';
     }
 
-    $html  = '<div class="ope-viaje-oraculo">';
+    $nivel_peligro_clean = str_replace('_', ' ', (string) ($viaje['nivel_peligro'] ?? 'bajo'));
+    $peligro_class       = htmlspecialchars_uni((string) ($viaje['nivel_peligro'] ?? 'bajo'));
+    $peligro_label       = htmlspecialchars_uni(strtoupper($nivel_peligro_clean));
+
+    $html  = '<div class="ope-viaje-oraculo' . ($es_temeraria ? ' is-temeraria' : '') . '">';
     $html .= '<header class="ope-vo-head">';
-    $html .= '<div class="ope-vo-kicker">Oráculo de Viaje &middot; Lyria</div>';
-    $html .= '<h2 class="ope-vo-titulo">Travesía: ' . $origen . ' → ' . $destino . '</h2>';
-    $html .= '<div class="ope-vo-meta">';
-    $html .= '<span>⛵ ' . $barco . '</span>';
-    $html .= '<span>📏 ' . $tramos . ' tramo' . ($tramos === 1 ? '' : 's') . '</span>';
-    if ($estacion !== '') {
-        $html .= '<span>📅 ' . $estacion . ($dia > 0 ? (', Día ' . $dia) : '') . '</span>';
+    $html .= '<div class="ope-vo-kicker">Oráculo de Viaje &middot; El Narrador</div>';
+    $html .= '<h2 class="ope-vo-titulo">Travesía: ' . $origen . ' &rarr; ' . $destino . '</h2>';
+    
+    if ($es_temeraria) {
+        $html .= '<div class="ope-vo-temeraria-badge">Ruta Temeraria — Peligro Incrementado</div>';
     }
-    $html .= '<span>⏱ Plazo sugerido: ' . $plazo . ' días off-rol</span>';
+
+    $html .= '<div class="ope-vo-meta">';
+    $html .= '<span class="ope-vo-meta-item"><strong class="meta-label">Barco:</strong> ' . $barco . '</span>';
+    $html .= '<span class="ope-vo-meta-item"><strong class="meta-label">Tramos:</strong> ' . $tramos . ' (' . $dias_onrol . ' días en rol)</span>';
+    $html .= '<span class="ope-vo-meta-item"><strong class="meta-label">Peligro:</strong> <span class="peligro-tag danger-' . $peligro_class . '">' . $peligro_label . '</span></span>';
+    if ($estacion !== '') {
+        $html .= '<span class="ope-vo-meta-item"><strong class="meta-label">Estación:</strong> ' . $estacion . ($dia > 0 ? (', Día ' . $dia) : '') . '</span>';
+    }
+    $html .= '<span class="ope-vo-meta-item"><strong class="meta-label">Plazo:</strong> ' . $plazo . ' días off-rol</span>';
     $html .= '</div>';
+
     if ($trip_html !== '') {
-        $html .= '<div class="ope-vo-trip-row">' . $trip_html . '</div>';
+        $html .= '<div class="ope-vo-trip-row"><span class="meta-label">Tripulación:</span> ' . $trip_html . '</div>';
     }
     $html .= '</header>';
+
     $html .= $tramos_html;
+
     $html .= '<footer class="ope-vo-footer">';
-    $html .= '<div class="ope-vo-reglas"><h4>Reglas del viaje</h4><ul>';
+    $html .= '<div class="ope-vo-reglas"><h4>Reglas de la Travesía</h4><ul>';
     $html .= '<li>Posts sugeridos: <strong>' . $posts . '</strong> (mínimo 1 por jugador activo)</li>';
-    $html .= '<li>Plazo orientativo: <strong>' . $plazo . ' días</strong> off-rol</li>';
-    $html .= '<li>Rolean la travesía en este hilo. Cuando quieran llegar, el <strong>capitán</strong> solicita el cierre desde el panel del viaje.</li>';
-    $html .= '<li>Lyria publicará la llegada a <strong>' . $destino . '</strong> al confirmar.</li>';
+    $html .= '<li>Duración estimada en rol: <strong>' . $dias_onrol . ' días</strong> | Plazo off-rol: <strong>' . $plazo . ' días</strong></li>';
+    $html .= '<li>Rolean la travesía en este hilo. Cuando quieran llegar, el <strong>capitán</strong> solicita el cierre desde el planificador de viajes.</li>';
+    $html .= '<li>El Narrador confirmará la llegada a <strong>' . $destino . '</strong> y actualizará la isla actual de los tripulantes.</li>';
     $html .= '</ul></div>';
-    $html .= '<div class="ope-vo-oficios"><h4>Modificadores activos</h4><div class="ope-vo-oficios-grid">' . $oficios_html . '</div></div>';
+    $html .= '<div class="ope-vo-oficios"><h4>Modificadores Activos</h4><div class="ope-vo-oficios-grid">' . $oficios_html . '</div></div>';
     $html .= '</footer></div>';
 
     return $html;
@@ -113,15 +153,15 @@ function ope_oraculo_cierre_post_html(array $viaje, string $capitan_nombre)
 
     return '<div class="ope-viaje-oraculo ope-vo-cierre">'
          . '<header class="ope-vo-head ope-vo-head--cierre">'
-         . '<div class="ope-vo-kicker">Llegada confirmada &middot; Lyria</div>'
-         . '<h2 class="ope-vo-titulo">⚓ ' . $destino . '</h2>'
+         . '<div class="ope-vo-kicker">Llegada confirmada &middot; El Narrador</div>'
+         . '<h2 class="ope-vo-titulo">Puerto de Destino: ' . $destino . '</h2>'
          . '<p class="ope-vo-cierre-lead">A solicitud del capitán <strong>' . $cap . '</strong>, '
-         . 'la tripulación completa la travesía desde <em>' . $origen . '</em> y amarra en '
-         . '<em>' . $destino . '</em>. El viento amaina; el Log Pose marca tierra firme.</p>'
+         . 'la tripulación completa la travesía desde <em>' . $origen . '</em> y amarra exitosamente en '
+         . '<em>' . $destino . '</em>. El viento amaina; las anclas tocan tierra firme.</p>'
          . '</header>'
          . '<div class="ope-vo-narrativa ope-vo-narrativa--cierre">'
-         . '<p>Los personajes participantes quedan ubicados en <strong>' . $destino . '</strong>. '
-         . 'Podéis abrir tramas en presente en el foro de la isla cuando queráis.</p>'
+         . '<p>Los personajes participantes quedan oficialmente ubicados en <strong>' . $destino . '</strong>. '
+         . 'Podéis iniciar vuestras tramas en presente en el foro correspondiente a esta isla.</p>'
          . '</div></div>';
 }
 

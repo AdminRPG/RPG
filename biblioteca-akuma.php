@@ -56,6 +56,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 <script>
 (function(){
+  var BB = <?php echo json_encode($bburl, JSON_UNESCAPED_SLASHES); ?>;
   var data = <?php echo $data_json; ?>;
   var filtro = 'todas';
   var grid = document.getElementById('bibGrid');

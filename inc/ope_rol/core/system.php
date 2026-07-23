@@ -13,7 +13,7 @@ if (!defined('IN_MYBB')) {
 // OPE Eternal: usuario y personaje del sistema
 // ─────────────────────────────────────────────────────────────────────────
 
-/** Devuelve el uid de MyBB del bot OPE Eternal. */
+/** Devuelve el uid de MyBB del bot NARRADOR del sistema. */
 function ope_system_uid()
 {
     global $db;
@@ -21,7 +21,7 @@ function ope_system_uid()
     if ($uid !== null) return $uid;
 
     if ($db->table_exists('users')) {
-        $q = $db->simple_select('users', 'uid', "username = 'OPE Eternal'", array('limit' => 1));
+        $q = $db->simple_select('users', 'uid', "username = 'Narrador' OR username = 'OPE Eternal'", array('order_by' => 'uid', 'order_dir' => 'ASC', 'limit' => 1));
         if ($db->num_rows($q)) {
             $uid = (int) $db->fetch_field($q, 'uid');
             return $uid;
@@ -31,7 +31,7 @@ function ope_system_uid()
     return $uid;
 }
 
-/** Devuelve el pid del personaje OPE Eternal. */
+/** Devuelve el pid del personaje NARRADOR del sistema. */
 function ope_system_pid()
 {
     global $db;
@@ -40,7 +40,7 @@ function ope_system_pid()
 
     $suid = ope_system_uid();
     if ($suid > 0 && $db->table_exists('rol_personajes')) {
-        $q = $db->simple_select('rol_personajes', 'pid', "uid = {$suid} AND nombre = 'OPE Eternal'", array('limit' => 1));
+        $q = $db->simple_select('rol_personajes', 'pid', "nombre = 'Narrador' OR uid = {$suid}", array('order_by' => 'pid', 'order_dir' => 'ASC', 'limit' => 1));
         if ($db->num_rows($q)) {
             $pid = (int) $db->fetch_field($q, 'pid');
             return $pid;
@@ -51,7 +51,7 @@ function ope_system_pid()
 }
 
 /**
- * Publica un tema/hilo como OPE Eternal en el foro indicado.
+ * Publica un tema/hilo como Narrador en el foro indicado.
  * Devuelve el tid creado o 0 en caso de error.
  */
 function ope_system_create_thread($fid, $subject, $message, $tag = '')
@@ -68,7 +68,7 @@ function ope_system_create_thread($fid, $subject, $message, $tag = '')
     $dh->set_data(array(
         'fid'         => (int) $fid,
         'uid'         => $sys_uid,
-        'username'    => 'OPE Eternal',
+        'username'    => 'Narrador',
         'subject'     => $subject,
         'message'     => $message,
         'visible'     => 1,
@@ -117,7 +117,7 @@ function ope_system_create_post($tid, $message)
     $dh->set_data(array(
         'tid'      => (int) $tid,
         'uid'      => $sys_uid,
-        'username' => 'OPE Eternal',
+        'username' => 'Narrador',
         'message'  => $message,
         'visible'  => 1,
         'options'  => array(),

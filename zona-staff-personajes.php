@@ -158,41 +158,6 @@ header('Content-Type: text/html; charset=utf-8');
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Gestión de Personajes</title>
 <?php echo ope_rol_head_base(); ?>
-<style>
-.zs-mgr-toolbar { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-bottom:20px; background:var(--iron-hi); padding:12px 16px; border-radius:12px; border:1px solid var(--rivet); }
-.zs-mgr-search { flex:1; min-width:240px; }
-.zs-mgr-search input { width:100%; padding:8px 14px; border-radius:8px; background:var(--iron); border:1px solid var(--rivet); color:var(--paper); font-size:.9rem; }
-.zs-pills { display:flex; gap:6px; flex-wrap:wrap; }
-.zs-pill { padding:6px 12px; border-radius:20px; font-size:.78rem; font-family:var(--mono); background:var(--iron); border:1px solid var(--rivet); color:var(--paper-dim); cursor:pointer; transition:all .15s; }
-.zs-pill.on, .zs-pill:hover { background:var(--gold-dim); border-color:var(--gold); color:var(--paper-hi); }
-.zs-pj-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px; }
-.zs-pj-card { background:var(--iron-hi); border:1px solid var(--rivet); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:12px; position:relative; transition:border-color .15s, transform .15s; }
-.zs-pj-card:hover { border-color:var(--gold-dim); transform:translateY(-2px); }
-.zs-pj-head { display:flex; gap:12px; align-items:center; }
-.zs-pj-avatar { width:48px; height:48px; border-radius:10px; background:var(--concrete); display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.2rem; overflow:hidden; flex-shrink:0; border:1px solid var(--rivet); }
-.zs-pj-avatar img { width:100%; height:100%; object-fit:cover; }
-.zs-pj-info { flex:1; min-width:0; }
-.zs-pj-name { font-family:var(--disp); font-weight:700; font-size:1.05rem; color:var(--paper); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.zs-pj-owner { font-size:.75rem; font-family:var(--mono); color:var(--paper-dim); }
-.zs-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.7rem; font-family:var(--mono); text-transform:uppercase; font-weight:bold; }
-.zs-badge.aprobado { background:rgba(46,160,67,0.2); color:#3fb950; border:1px solid rgba(46,160,67,0.4); }
-.zs-badge.revision { background:rgba(210,153,34,0.2); color:#d29922; border:1px solid rgba(210,153,34,0.4); }
-.zs-badge.rechazado { background:rgba(248,81,73,0.2); color:#f85149; border:1px solid rgba(248,81,73,0.4); }
-.zs-badge.borrador { background:rgba(139,148,158,0.2); color:#8b949e; border:1px solid rgba(139,148,158,0.4); }
-.zs-pj-meta { display:flex; gap:12px; font-size:.8rem; color:var(--paper-dim); border-top:1px solid var(--rivet); border-bottom:1px solid var(--rivet); padding:8px 0; }
-.zs-pj-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-
-/* Modal Drawer / Dialog Styles */
-.zs-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px; opacity:0; pointer-events:none; transition:opacity .2s; }
-.zs-modal-overlay.open { opacity:1; pointer-events:auto; }
-.zs-modal-box { background:var(--iron-hi); border:1px solid var(--rivet); border-radius:14px; max-width:540px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.5); }
-.zs-modal-h { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--rivet); padding-bottom:12px; }
-.zs-modal-h h3 { margin:0; font-family:var(--disp); font-size:1.2rem; color:var(--paper); }
-.zs-modal-close { background:none; border:none; color:var(--paper-dim); font-size:1.4rem; cursor:pointer; }
-.zs-form-group { margin-bottom:14px; }
-.zs-form-group label { display:block; font-size:.8rem; font-family:var(--mono); color:var(--paper-dim); margin-bottom:6px; }
-.zs-form-group input, .zs-form-group select { width:100%; padding:8px 12px; border-radius:8px; background:var(--iron); border:1px solid var(--rivet); color:var(--paper); }
-</style>
 </head>
 <body class="ope-pg-zona-staff">
 <?php echo ope_rol_navbar_html(); ?>
@@ -234,7 +199,6 @@ header('Content-Type: text/html; charset=utf-8');
     <div class="zs-pj-grid" id="pjGrid">
 <?php if (empty($personajes)): ?>
       <div style="grid-column:1/-1;text-align:center;padding:40px 20px;background:var(--iron-hi);border:1px dashed var(--rivet);border-radius:12px;">
-        <div style="font-size:2.5rem;margin-bottom:8px;">🏴‍☠️</div>
         <div style="font-family:var(--disp);font-size:1.1rem;color:var(--paper);font-weight:bold;margin-bottom:6px;">No hay personajes registrados en la base de datos</div>
         <p style="color:var(--paper-dim);font-size:.88rem;margin-bottom:16px;">Acabas de limpiar los personajes de prueba o aún no se ha creado ninguna ficha.</p>
         <a href="<?php echo $bburl; ?>/crear-personaje.php" class="btn btn-hot btn-sm">+ Crear nuevo personaje</a>
@@ -276,9 +240,9 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
 
         <div class="zs-pj-actions">
-          <a href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" target="_blank" class="btn btn-ghost btn-sm" title="Ver Expediente Público">👁️ Ver Ficha</a>
-          <button type="button" class="btn btn-hot btn-sm btn-edit-pj" data-pj="<?php echo $json_data; ?>">✏️ Gestionar</button>
-          <button type="button" class="btn btn-ghost btn-sm btn-del-pj" data-pid="<?php echo (int) $pj['pid']; ?>" data-nombre="<?php echo htmlspecialchars_uni($pj['nombre']); ?>" style="color:#f85149;">🗑️ Borrar</button>
+          <a href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" target="_blank" class="btn btn-ghost btn-sm" title="Ver Expediente Público">Ver Ficha</a>
+          <button type="button" class="btn btn-hot btn-sm btn-edit-pj" data-pj="<?php echo $json_data; ?>">Gestionar</button>
+          <button type="button" class="btn btn-ghost btn-sm btn-del-pj" data-pid="<?php echo (int) $pj['pid']; ?>" data-nombre="<?php echo htmlspecialchars_uni($pj['nombre']); ?>" style="color:#f85149;">Borrar</button>
         </div>
       </div>
 <?php endforeach; ?>
@@ -448,6 +412,14 @@ function submitEstado(){
 function submitStaff(){
   document.getElementById('editAction').value = 'cambiar_staff';
   document.getElementById('editModalForm').submit();
+}
+</script>
+<script>
+if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('vis'); io.unobserve(e.target); }}); }, { threshold: .08 });
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+} else {
+  document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('vis'); });
 }
 </script>
 </body>

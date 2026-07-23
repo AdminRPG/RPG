@@ -130,39 +130,6 @@ header('Content-Type: text/html; charset=utf-8');
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Gestión de Cuentas y Narradores</title>
 <?php echo ope_rol_head_base(); ?>
-<style>
-.zs-mgr-toolbar { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-bottom:20px; background:var(--iron-hi); padding:12px 16px; border-radius:12px; border:1px solid var(--rivet); }
-.zs-mgr-search { flex:1; min-width:240px; }
-.zs-mgr-search input { width:100%; padding:8px 14px; border-radius:8px; background:var(--iron); border:1px solid var(--rivet); color:var(--paper); font-size:.9rem; }
-.zs-pills { display:flex; gap:6px; flex-wrap:wrap; }
-.zs-pill { padding:6px 12px; border-radius:20px; font-size:.78rem; font-family:var(--mono); background:var(--iron); border:1px solid var(--rivet); color:var(--paper-dim); cursor:pointer; transition:all .15s; }
-.zs-pill.on, .zs-pill:hover { background:var(--gold-dim); border-color:var(--gold); color:var(--paper-hi); }
-.zs-acc-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px; }
-.zs-acc-card { background:var(--iron-hi); border:1px solid var(--rivet); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:12px; position:relative; transition:border-color .15s, transform .15s; }
-.zs-acc-card:hover { border-color:var(--gold-dim); transform:translateY(-2px); }
-.zs-acc-head { display:flex; gap:12px; align-items:center; }
-.zs-acc-avatar { width:48px; height:48px; border-radius:10px; background:var(--concrete); display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.2rem; overflow:hidden; flex-shrink:0; border:1px solid var(--rivet); }
-.zs-acc-avatar img { width:100%; height:100%; object-fit:cover; }
-.zs-acc-info { flex:1; min-width:0; }
-.zs-acc-name { font-family:var(--disp); font-weight:700; font-size:1.05rem; color:var(--paper); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.zs-acc-sub { font-size:.75rem; font-family:var(--mono); color:var(--paper-dim); }
-.zs-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.7rem; font-family:var(--mono); font-weight:bold; }
-.zs-badge.narrador { background:rgba(210,153,34,0.2); color:#d29922; border:1px solid rgba(210,153,34,0.4); }
-.zs-badge.staff { background:rgba(187,134,252,0.2); color:#bb86fc; border:1px solid rgba(187,134,252,0.4); }
-.zs-acc-meta { display:flex; gap:12px; font-size:.8rem; color:var(--paper-dim); border-top:1px solid var(--rivet); border-bottom:1px solid var(--rivet); padding:8px 0; }
-.zs-acc-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-
-/* Modal Styles */
-.zs-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px; opacity:0; pointer-events:none; transition:opacity .2s; }
-.zs-modal-overlay.open { opacity:1; pointer-events:auto; }
-.zs-modal-box { background:var(--iron-hi); border:1px solid var(--rivet); border-radius:14px; max-width:520px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.5); }
-.zs-modal-h { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--rivet); padding-bottom:12px; }
-.zs-modal-h h3 { margin:0; font-family:var(--disp); font-size:1.2rem; color:var(--paper); }
-.zs-modal-close { background:none; border:none; color:var(--paper-dim); font-size:1.4rem; cursor:pointer; }
-.zs-form-group { margin-bottom:14px; }
-.zs-form-group label { display:block; font-size:.8rem; font-family:var(--mono); color:var(--paper-dim); margin-bottom:6px; }
-.zs-form-group input, .zs-form-group select { width:100%; padding:8px 12px; border-radius:8px; background:var(--iron); border:1px solid var(--rivet); color:var(--paper); }
-</style>
 </head>
 <body class="ope-pg-zona-staff">
 <?php echo ope_rol_navbar_html(); ?>
@@ -224,7 +191,7 @@ header('Content-Type: text/html; charset=utf-8');
               <span class="zs-badge staff">Staff Nv.<?php echo $st_lvl; ?></span>
 <?php endif; ?>
 <?php if ($is_nar): ?>
-              <span class="zs-badge narrador">🎙️ Narrador</span>
+              <span class="zs-badge narrador">Narrador</span>
 <?php endif; ?>
             </div>
           </div>
@@ -236,7 +203,7 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
 
         <div class="zs-acc-actions">
-          <button type="button" class="btn btn-hot btn-sm btn-edit-acc" data-acc="<?php echo $json_data; ?>">⚙️ Ajustes Cuenta</button>
+          <button type="button" class="btn btn-hot btn-sm btn-edit-acc" data-acc="<?php echo $json_data; ?>">Ajustes Cuenta</button>
           <form method="post" style="display:inline;">
             <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
             <input type="hidden" name="action" value="toggle_narrador">
@@ -284,7 +251,7 @@ header('Content-Type: text/html; charset=utf-8');
         <label>Rol de Narrador / Game Master</label>
         <select name="narrador" id="accNarrador">
           <option value="0">No es Narrador</option>
-          <option value="1">🎙️ Narrador Oficial Activo</option>
+          <option value="1">Narrador Oficial Activo</option>
         </select>
       </div>
 
@@ -366,6 +333,14 @@ header('Content-Type: text/html; charset=utf-8');
 
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+</script>
+<script>
+if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('vis'); io.unobserve(e.target); }}); }, { threshold: .08 });
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+} else {
+  document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('vis'); });
+}
 </script>
 </body>
 </html>

@@ -304,6 +304,9 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
                 'dateline' => TIME_NOW,
                 'lastedit' => TIME_NOW,
             );
+            if ($db->field_exists('isla_actual', 'rol_personajes')) {
+                $ins['isla_actual'] = 'isla_dawn';
+            }
             if ($db->field_exists('pt_disponibles', 'rol_personajes')) {
                 $ins['pt_disponibles'] = 0;
             }
@@ -311,6 +314,15 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
                 $ins['pt_gastados'] = 0;
             }
             $pid = $db->insert_query('rol_personajes', $ins);
+
+            if ($pid > 0) {
+                if (function_exists('ope_barco_crear_defecto')) {
+                    ope_barco_crear_defecto((int)$pid, (int)$uid, $nombre);
+                }
+                if (function_exists('ope_nav_item_defecto')) {
+                    ope_nav_item_defecto((int)$pid, 'isla_dawn');
+                }
+            }
 
             // Fruta opcional: tirada obligatoria si eligió «Tirar».
             $fruta_opcion = $mybb->get_input('fruta_opcion');
