@@ -1,7 +1,7 @@
 <?php
 /**
  * One Piece: Eternal · Sistema de Haki
- * Canon: I-Forge-Sistema/docs/02-HAKI-Y-FRUTAS/SISTEMA-DE-HAKI.md
+ * Canon: Eternal-Sistema/docs/02-HAKI-Y-FRUTAS/SISTEMA-DE-HAKI.md
  */
 
 if (!defined('IN_MYBB')) {

@@ -267,14 +267,14 @@ header('Content-Type: text/html; charset=utf-8');
           como <span><?php echo htmlspecialchars_uni($inv['puesto']); ?></span>.
         </div>
         <div class="invitacion-actions">
-          <form method="post" action="<?php echo $bburl; ?>/barco.php" style="display:inline">
+          <form method="post" action="<?php echo $bburl; ?>/barco.php" class="ope-form-inline">
             <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
             <input type="hidden" name="action" value="responder_invitacion">
             <input type="hidden" name="invitacion_id" value="<?php echo (int)$inv['invitacion_id']; ?>">
             <input type="hidden" name="aceptar" value="1">
             <button type="submit" class="btn btn-sm btn-hot">Aceptar y Embarcar</button>
           </form>
-          <form method="post" action="<?php echo $bburl; ?>/barco.php" style="display:inline">
+          <form method="post" action="<?php echo $bburl; ?>/barco.php" class="ope-form-inline">
             <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
             <input type="hidden" name="action" value="responder_invitacion">
             <input type="hidden" name="invitacion_id" value="<?php echo (int)$inv['invitacion_id']; ?>">
@@ -359,7 +359,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 <?php if ($is_owner && empty($barco['activo'])): ?>
           <div class="barco-hero-actions">
-            <form method="post" action="<?php echo $bburl; ?>/barco.php" style="display:inline">
+            <form method="post" action="<?php echo $bburl; ?>/barco.php" class="ope-form-inline">
               <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
               <input type="hidden" name="action" value="set_activo">
               <input type="hidden" name="barco_id" value="<?php echo (int)$barco['barco_id']; ?>">
@@ -507,7 +507,7 @@ foreach ($puestos_map as $p_key => $p_info):
                 <div class="embarcado-chip">
                   <span><strong><?php echo htmlspecialchars_uni($emb_pj['pj_nombre']); ?></strong> (<?php echo htmlspecialchars_uni(ucfirst($emb_pj['puesto'])); ?>)</span>
 <?php if ($is_owner): ?>
-                  <form method="post" action="<?php echo $bburl; ?>/barco.php" style="display:inline">
+                  <form method="post" action="<?php echo $bburl; ?>/barco.php" class="ope-form-inline">
                     <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
                     <input type="hidden" name="action" value="desembarcar">
                     <input type="hidden" name="barco_id" value="<?php echo (int)$barco['barco_id']; ?>">
@@ -812,7 +812,7 @@ if ($idx_count === 0):
                 <strong><?php echo htmlspecialchars_uni($emb_manage['pj_nombre']); ?></strong>
                 <span class="c-dim"> &middot; <?php echo htmlspecialchars_uni(ucfirst($emb_manage['puesto'])); ?></span>
               </div>
-              <form method="post" action="<?php echo $bburl; ?>/barco.php" style="display:inline">
+              <form method="post" action="<?php echo $bburl; ?>/barco.php" class="ope-form-inline">
                 <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
                 <input type="hidden" name="action" value="desembarcar">
                 <input type="hidden" name="barco_id" value="<?php echo (int)$barco['barco_id']; ?>">

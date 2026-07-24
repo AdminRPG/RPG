@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * One Piece: Eternal · Rol (plugin de integración)
  * -------------------------------------
@@ -543,6 +543,7 @@ function ope_rol_head_base()
     $html .= '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
     $html .= '<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&amp;family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=Spectral:ital,wght@0,400;0,500;0,600;1,400&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">' . "\n";
     $html .= '<link rel="stylesheet" href="' . htmlspecialchars_uni($href) . '">' . "\n";
+    $html .= '<style>.reveal{opacity:1!important;transform:none!important;visibility:visible!important}</style>' . "\n";
 
     return $html;
 }
@@ -859,18 +860,25 @@ function ope_rol_guard_newreply()
 function ope_rol_faccion_slug($faccion)
 {
     $s = strtolower(trim((string) $faccion));
-    // quita acentos comunes
     $s = strtr($s, array('á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u','ñ'=>'n'));
-    $validas = array('pirata', 'marine', 'revolucionario', 'gobierno', 'cazarrecompensas', 'civil');
-    if (in_array($s, $validas, true)) {
-        return $s;
+    
+    if (in_array($s, array('pirata', 'piratas'), true)) {
+        return 'pirata';
     }
-    // alias tolerantes
-    if ($s === 'cazador' || $s === 'cazadores' || $s === 'bounty' || $s === 'bountyhunter') {
+    if (in_array($s, array('marine', 'marines', 'marina'), true)) {
+        return 'marine';
+    }
+    if (in_array($s, array('revolucionario', 'revolucionarios'), true)) {
+        return 'revolucionario';
+    }
+    if (in_array($s, array('gobierno', 'gobierno-mundial', 'gobierno mundial', 'gov', 'cipher pol', 'cp'), true)) {
+        return 'gobierno';
+    }
+    if (in_array($s, array('cazarrecompensas', 'cazador', 'cazadores', 'bounty', 'bountyhunter'), true)) {
         return 'cazarrecompensas';
     }
-    if ($s === 'gov' || $s === 'gobierno mundial' || $s === 'cipher pol' || $s === 'cp') {
-        return 'gobierno';
+    if (in_array($s, array('civil', 'civiles', 'independiente'), true)) {
+        return 'civil';
     }
     return '';
 }

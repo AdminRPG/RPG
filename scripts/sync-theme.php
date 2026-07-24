@@ -13,6 +13,16 @@ require __DIR__ . '/_theme-sync-lib.php';
 $command = $argv[1] ?? 'import';
 
 switch ($command) {
+    case 'diff':
+    case '--diff':
+    case '--dry-run':
+        $db = ope_db_connect();
+        $theme = ope_resolve_theme($db);
+        echo "Dry-run / Diff for tid={$theme['tid']} templateset={$theme['templateset']}\n\n";
+        $diffs = ope_diff_sync($db, $theme['tid'], $theme['templateset']);
+        $db->close();
+        exit($diffs > 0 ? 1 : 0);
+
     case 'bootstrap':
         ope_bootstrap_from_legacy();
         break;

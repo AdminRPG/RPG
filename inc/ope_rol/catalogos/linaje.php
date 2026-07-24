@@ -8,7 +8,7 @@ if (!defined('IN_MYBB')) { die('Direct initialization of this file is not allowe
  * Las reglas (PL suma cero, acceso por linaje, hibridación) viven en
  * inc/ope_rol/dominio/creacion.php. La UI vive en crear-personaje.php.
  *
- * Canon: I-Forge-Sistema/docs/01-PERSONAJE/FACTOR-LINAJE.md
+ * Canon: Eternal-Sistema/docs/01-PERSONAJE/FACTOR-LINAJE.md
  *   §3.3 Rasgos Raciales · §3.4 Rasgo Puro · §4.3 Rasgos Generales
  *   §4.4 Defectos · §4.5 Defectos de Hibridación · §6 Dotes Innatas
  *

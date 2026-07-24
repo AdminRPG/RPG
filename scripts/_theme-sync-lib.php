@@ -467,6 +467,92 @@ function ope_verify_sync(mysqli $db, int $tid, int $templateset): int
     return $errors;
 }
 
+/**
+ * Realiza una comparación previa (dry-run/diff) mostrando las diferencias
+ * exactas línea por línea entre la DB y los XML del repo sin alterar la base de datos.
+ */
+function ope_diff_sync(mysqli $db, int $tid, int $templateset): int
+{
+    $diffs = 0;
+
+    echo "=== COMPARING REPO VS DATABASE (DRY-RUN / DIFF) ===\n\n";
+
+    // ── 1. CSS ──
+    $repoCss = ope_read_css();
+    $stmt = $db->prepare('SELECT stylesheet FROM mybb_themestylesheets WHERE tid = ? AND name = ?');
+    $name = 'ope.css';
+    $stmt->bind_param('is', $tid, $name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+
+    if (!$row) {
+        echo "🔴 DRIFT CSS: ope.css existe en repo pero NO en la base de datos.\n\n";
+        $diffs++;
+    } elseif (md5($repoCss) !== md5($row['stylesheet'])) {
+        echo "🔴 DRIFT CSS: docs/themes/ope.css difiere de la base de datos\n";
+        ope_render_line_diff($row['stylesheet'], $repoCss, 'DB', 'REPO (ope.css)');
+        $diffs++;
+    } else {
+        echo "🟢 OK CSS: ope.css está 100% sincronizado.\n\n";
+    }
+
+    // ── 2. Templates ──
+    $repo = ope_load_repo_templates();
+    foreach ($repo as $title => $meta) {
+        $stmt = $db->prepare('SELECT template, version FROM mybb_templates WHERE title = ? AND sid = ?');
+        $stmt->bind_param('si', $title, $templateset);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+
+        if (!$row) {
+            echo "🔴 DRIFT TPL: Plantilla '$title' existe en {$meta['file']} pero NO en la DB.\n\n";
+            $diffs++;
+            continue;
+        }
+        if ($row['template'] !== $meta['content']) {
+            echo "🔴 DRIFT TPL: Plantilla '$title' en DB difiere del XML {$meta['file']}\n";
+            ope_render_line_diff($row['template'], $meta['content'], 'DB', "REPO ({$meta['file']})");
+            $diffs++;
+        }
+    }
+
+    if ($diffs === 0) {
+        echo "🟢 Sin diferencias: Todo el tema está 100% en sincronía entre Repo y DB.\n";
+    } else {
+        echo "⚠️ Total de diferencias detectadas: $diffs. Usa 'php scripts/sync-theme.php import' para aplicar o 'export' para guardar la DB al repo.\n";
+    }
+
+    return $diffs;
+}
+
+function ope_render_line_diff(string $strA, string $strB, string $labelA, string $labelB): void
+{
+    $linesA = explode("\n", str_replace("\r\n", "\n", $strA));
+    $linesB = explode("\n", str_replace("\r\n", "\n", $strB));
+    $max = max(count($linesA), count($linesB));
+
+    echo "--- $labelA\n";
+    echo "+++ $labelB\n";
+    for ($i = 0; $i < $max; $i++) {
+        $lineA = $linesA[$i] ?? null;
+        $lineB = $linesB[$i] ?? null;
+
+        if ($lineA !== $lineB) {
+            if ($lineA !== null) {
+                echo "- L" . ($i + 1) . ": " . trim($lineA) . "\n";
+            }
+            if ($lineB !== null) {
+                echo "+ L" . ($i + 1) . ": " . trim($lineB) . "\n";
+            }
+        }
+    }
+    echo "\n";
+}
+
 function ope_child_theme_properties(): array
 {
     if (is_file(OPE_CHILD_XML)) {

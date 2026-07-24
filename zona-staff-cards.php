@@ -166,9 +166,9 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
 
 <?php if (empty($cards)): ?>
-    <div style="text-align:center;padding:60px 20px;background:var(--iron-hi);border:1px dashed var(--rivet);border-radius:12px;">
-      <div style="font-family:var(--disp);font-size:1.1rem;color:var(--paper);font-weight:bold;margin-bottom:6px;">No hay cards en el catálogo</div>
-      <p style="color:var(--paper-dim);font-size:.88rem;margin-bottom:16px;">Crea tu primera card para empezar a construir el catálogo.</p>
+    <div class="zs-empty-state">
+      <div class="zs-empty-state-h">No hay cards creadas todavía</div>
+      <p class="zs-empty-state-p">Crea la primera técnica, pasiva o consumible para poblar el catálogo de cards.</p>
       <button type="button" class="btn btn-hot btn-sm" onclick="openModal('createCardModal')">+ Crear primera card</button>
     </div>
 <?php else: ?>
@@ -179,36 +179,38 @@ header('Content-Type: text/html; charset=utf-8');
     $desc_corta = truncate_html($c['descripcion'] ?? '', 120);
     $st = (int) ($c['activo'] ?? 1) === 1 ? 'activo' : 'inactivo';
     $json = htmlspecialchars_uni(json_encode($c, JSON_UNESCAPED_UNICODE));
+    $icono = trim((string) ($c['icono'] ?? ''));
+    $est = json_decode($c['estadisticas'] ?? '{}', true);
 ?>
       <div class="zs-pj-card card-item" data-card-id="<?php echo (int) $c['id']; ?>" data-search="<?php echo htmlspecialchars_uni(mb_strtolower($c['nombre'] . ' ' . $tipo_lbl)); ?>">
         <div class="zs-pj-head">
-          <div class="zs-pj-avatar" style="font-size:1.4rem;">
-<?php if (trim((string) ($c['icono'] ?? '')) !== ''): ?>
-            <span><?php echo htmlspecialchars_uni($c['icono']); ?></span>
+          <div class="zs-pj-avatar zs-avatar-lg">
+<?php if ($icono !== ''): ?>
+            <span><?php echo htmlspecialchars_uni($icono); ?></span>
 <?php else: ?>
-            <span>#</span>
+            <span>🃏</span>
 <?php endif; ?>
           </div>
           <div class="zs-pj-info">
             <div class="zs-pj-name"><?php echo htmlspecialchars_uni($c['nombre']); ?></div>
-            <div class="zs-pj-owner">slug: <b><?php echo htmlspecialchars_uni($c['slug']); ?></b> &middot; ID #<?php echo (int) $c['id']; ?></div>
-            <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;">
-              <span class="zs-badge" style="background:rgba(var(--ember-rgb),.2);color:var(--ember);border:1px solid rgba(var(--ember-rgb),.4);"><?php echo htmlspecialchars_uni($tipo_lbl); ?></span>
-<?php if ($st === 'inactivo'): ?>
-              <span class="zs-badge" style="background:rgba(248,81,73,0.2);color:#f85149;border:1px solid rgba(248,81,73,0.4);">Inactiva</span>
+            <div class="zs-pj-owner">Tipo: <b><?php echo htmlspecialchars_uni($tipo_lbl); ?></b> &middot; ID #<?php echo (int) $c['id']; ?></div>
+            <div class="zs-badge-group">
+              <span class="zs-badge active">PA: <?php echo (int) ($est['pa'] ?? 0); ?> | EN: <?php echo (int) ($est['en'] ?? 0); ?></span>
+<?php if (empty($c['activo'])): ?>
+              <span class="zs-badge zs-badge-inactive">Inactiva</span>
 <?php endif; ?>
             </div>
           </div>
         </div>
 
-        <div class="zs-pj-meta" style="font-size:.82rem;color:var(--paper-dim);">
+        <div class="zs-pj-meta">
           <?php echo htmlspecialchars_uni($desc_corta !== '' ? $desc_corta : 'Sin descripción'); ?>
         </div>
 
         <div class="zs-pj-actions">
           <button type="button" class="btn btn-hot btn-sm btn-edit-card" data-card="<?php echo $json; ?>">Editar</button>
           <button type="button" class="btn btn-ghost btn-sm btn-asign-card" data-card-id="<?php echo (int) $c['id']; ?>" data-card-nombre="<?php echo htmlspecialchars_uni($c['nombre']); ?>">Asignar</button>
-          <button type="button" class="btn btn-ghost btn-sm btn-del-card" data-card-id="<?php echo (int) $c['id']; ?>" data-card-nombre="<?php echo htmlspecialchars_uni($c['nombre']); ?>" style="color:#f85149;">Desactivar</button>
+          <button type="button" class="btn btn-ghost btn-sm btn-del-card zs-txt-danger" data-card-id="<?php echo (int) $c['id']; ?>" data-card-nombre="<?php echo htmlspecialchars_uni($c['nombre']); ?>">Borrar</button>
         </div>
       </div>
 <?php endforeach; ?>
@@ -218,18 +220,15 @@ header('Content-Type: text/html; charset=utf-8');
   </section>
 
   <!-- Sección de asignaciones activas -->
-  <section class="reveal" style="margin-top:32px;">
-    <div class="shead">
-      <h2>Asignaciones a Personajes</h2>
-      <span class="code">// cards vinculadas a fichas</span>
-      <span class="rule"></span>
-    </div>
-
+  <section class="reveal zs-mt-32">
+    <div class="plate">
+      <div class="plate-h"><span class="t">Asignación de Cards a Personajes</span><span class="c">// cartas desbloqueadas</span></div>
+      <div class="plate-b zs-plate-left">
 <?php
 $asignaciones = array();
 if ($db->table_exists('rol_pj_cards') && $db->table_exists('rol_cards')) {
     $pref = TABLE_PREFIX;
-    $q = $db->query("SELECT pc.*, c.nombre AS card_nombre, c.tipo AS card_tipo, c.slug AS card_slug, p.nombre AS pj_nombre
+    $q = $db->query("SELECT pc.*, c.nombre AS card_nombre, c.tipo AS card_tipo, c.estadisticas, c.slug AS card_slug, p.nombre AS pj_nombre
         FROM {$pref}rol_pj_cards pc
         JOIN {$pref}rol_cards c ON c.id = pc.card_id
         LEFT JOIN {$pref}rol_personajes p ON p.pid = pc.pid
@@ -239,72 +238,63 @@ if ($db->table_exists('rol_pj_cards') && $db->table_exists('rol_cards')) {
     }
 }
 ?>
-
 <?php if (empty($asignaciones)): ?>
-    <div class="empty-state" style="margin-top:12px;">
-      <div class="big">Sin asignaciones</div>
-      <p>Ninguna card asignada aún. Usa el botón <b>Asignar</b> en cada card para vincularla a un personaje.</p>
-    </div>
+        <p class="empty-state zs-mt-12">No hay cards asignadas a personajes actualmente.</p>
 <?php else: ?>
-    <div class="zs-stafftbl" style="margin-top:12px;">
-<?php foreach ($asignaciones as $a):
-    $slot_lbl = $card_slots[$a['slot']] ?? ucfirst($a['slot']);
-    $pj_nombre = (string) ($a['pj_nombre'] ?? 'PID #' . $a['pid']);
+        <div class="zs-stafftbl zs-mt-12">
+<?php foreach ($asignaciones as $as): 
+    $est = json_decode($as['estadisticas'] ?? '{}', true);
 ?>
-      <div class="zs-staffrow asig-row" data-asig-id="<?php echo (int) $a['id']; ?>">
-        <div class="zs-staffwho" style="flex:2;">
-          <div class="zs-staffname"><?php echo htmlspecialchars_uni($a['card_nombre']); ?></div>
-          <div class="zs-staffowner"><?php echo htmlspecialchars_uni($a['card_slug']); ?> &middot; #<?php echo (int) $a['card_id']; ?></div>
-        </div>
-        <div style="flex:1;font-family:var(--mono);font-size:.72rem;color:var(--paper-dim);">
-          → <b><?php echo htmlspecialchars_uni($pj_nombre); ?></b>
-          <span class="zs-badge" style="margin-left:6px;background:rgba(var(--ember-rgb),.15);color:var(--ember);border:1px solid rgba(var(--ember-rgb),.3);"><?php echo htmlspecialchars_uni($slot_lbl); ?></span>
-        </div>
-        <div>
-          <form method="post" style="display:inline;" onsubmit="return confirm('¿Desasignar esta card del personaje?');">
-            <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
-            <input type="hidden" name="action" value="desasignar_card">
-            <input type="hidden" name="asig_id" value="<?php echo (int) $a['id']; ?>">
-            <button type="submit" class="btn btn-ghost btn-sm" style="color:#f85149;">Quitar</button>
-          </form>
-        </div>
-      </div>
+          <div class="zs-staffrow">
+            <div class="zs-staffwho col-grow">
+              <span class="zs-staffname"><?php echo htmlspecialchars_uni($as['card_nombre']); ?></span>
+              <span class="zs-staffowner">&rarr; <?php echo htmlspecialchars_uni($as['pj_nombre'] ?? 'PID #' . $as['pid']); ?></span>
+              <span class="col-grow zs-lbl-subtle">PA: <?php echo (int) ($est['pa'] ?? 0); ?> | EN: <?php echo (int) ($est['en'] ?? 0); ?></span>
+            </div>
+            <form method="post" class="zs-inline" onsubmit="return confirm('¿Desasignar esta card del personaje?');">
+              <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
+              <input type="hidden" name="action" value="desasignar_card">
+              <input type="hidden" name="asig_id" value="<?php echo (int) $as['id']; ?>">
+              <button type="submit" class="btn btn-ghost btn-sm zs-txt-danger">Quitar</button>
+            </form>
+          </div>
 <?php endforeach; ?>
-    </div>
+        </div>
 <?php endif; ?>
+      </div>
+    </div>
   </section>
 </div>
 
 <!-- Modal: Crear Card -->
 <div class="zs-modal-overlay" id="createCardModal">
-  <div class="zs-modal-box" style="max-width:600px;">
+  <div class="zs-modal-box zs-modal-card">
     <div class="zs-modal-h">
-      <h3>Nueva Card</h3>
+      <h3>Crear Nueva Card</h3>
       <button type="button" class="zs-modal-close" onclick="closeModal('createCardModal')">✕</button>
     </div>
     <form method="post">
       <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
       <input type="hidden" name="action" value="crear_card">
 
-      <div class="zs-form-group">
-        <label>Nombre *</label>
-        <input type="text" name="nombre" id="createNombre" required placeholder="Ej: Gomu Gomu no Pistol">
-      </div>
-
-      <div class="zs-form-group" style="display:flex;gap:12px;">
-        <div style="flex:1;">
+      <div class="zs-form-row">
+        <div class="col-grow">
+          <label>Nombre de la Card *</label>
+          <input type="text" name="nombre" required placeholder="ej. Tajo del Dragón">
+        </div>
+        <div class="col-grow">
           <label>Tipo</label>
           <select name="tipo">
 <?php foreach ($card_tipos as $tk => $tv): ?>
-            <option value="<?php echo htmlspecialchars_uni($tk); ?>" <?php echo $tk === 'tecnica' ? 'selected' : ''; ?>><?php echo htmlspecialchars_uni($tv); ?></option>
+            <option value="<?php echo htmlspecialchars_uni($tk); ?>"><?php echo htmlspecialchars_uni($tv); ?></option>
 <?php endforeach; ?>
           </select>
         </div>
-        <div style="flex:0 0 80px;">
+        <div class="col-narrow">
           <label>Orden</label>
-          <input type="number" name="orden" value="0" min="0" style="width:100%;">
+          <input type="number" name="orden" value="0" min="0" class="zs-control-fill">
         </div>
-        <div style="flex:0 0 90px;">
+        <div class="col-narrow">
           <label>Activo</label>
           <select name="activo">
             <option value="1">Sí</option>
@@ -313,20 +303,20 @@ if ($db->table_exists('rol_pj_cards') && $db->table_exists('rol_cards')) {
         </div>
       </div>
 
-      <div class="zs-form-group" style="display:flex;gap:12px;">
-        <div style="flex:0 0 80px;">
+      <div class="zs-form-row">
+        <div class="col-narrow">
           <label>PA</label>
-          <input type="number" name="pa" value="1" min="0" max="99" style="width:100%;">
+          <input type="number" name="pa" value="1" min="0" max="99" class="zs-control-fill">
         </div>
-        <div style="flex:0 0 100px;">
+        <div class="col-medium">
           <label>EN</label>
-          <input type="number" name="en" value="10" min="0" max="999" style="width:100%;">
+          <input type="number" name="en" value="10" min="0" max="999" class="zs-control-fill">
         </div>
-        <div style="flex:0 0 100px;">
+        <div class="col-medium">
           <label>Nivel mín.</label>
-          <input type="number" name="nivel_min" value="1" min="1" max="100" style="width:100%;">
+          <input type="number" name="nivel_min" value="1" min="1" max="100" class="zs-control-fill">
         </div>
-        <div style="flex:1;">
+        <div class="col-grow">
           <label>Icono (emoji)</label>
           <input type="text" name="icono" placeholder="⚔️ 🔥">
         </div>
@@ -334,20 +324,20 @@ if ($db->table_exists('rol_pj_cards') && $db->table_exists('rol_cards')) {
 
       <div class="zs-form-group">
         <label>Descripción breve</label>
-        <textarea name="descripcion" rows="2" style="width:100%;padding:8px 12px;border-radius:8px;background:var(--iron);border:1px solid var(--rivet);color:var(--paper);font-family:var(--mono);font-size:.78rem;resize:vertical;" placeholder="Efecto breve para vista rápida"></textarea>
+        <textarea name="descripcion" rows="2" class="zs-control" placeholder="Efecto breve para vista rápida"></textarea>
       </div>
 
       <div class="zs-form-group">
         <label>Contenido (markup HTML o BBCode)</label>
-        <textarea name="contenido" rows="4" style="width:100%;padding:8px 12px;border-radius:8px;background:var(--iron);border:1px solid var(--rivet);color:var(--paper);font-family:var(--mono);font-size:.78rem;resize:vertical;" placeholder="Descripción completa, fórmula de daño, efectos secundarios…"></textarea>
+        <textarea name="contenido" rows="4" class="zs-control" placeholder="Descripción completa, fórmula de daño, efectos secundarios…"></textarea>
       </div>
 
       <div class="zs-form-group">
         <label>Estadísticas / Atributos extra (JSON)</label>
-        <textarea name="estadisticas" rows="2" style="width:100%;padding:8px 12px;border-radius:8px;background:var(--iron);border:1px solid var(--rivet);color:var(--paper);font-family:var(--mono);font-size:.78rem;resize:vertical;" placeholder='{"fuente": "haki", "daño": "FUE x 3", "efectos": ["Quemado 1t"]}'></textarea>
+        <textarea name="estadisticas" rows="2" class="zs-control" placeholder='{"fuente": "haki", "daño": "FUE x 3", "efectos": ["Quemado 1t"]}'></textarea>
       </div>
 
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+      <div class="zs-modal-actions">
         <button type="button" class="btn btn-ghost" onclick="closeModal('createCardModal')">Cancelar</button>
         <button type="submit" class="btn btn-hot">Crear Card</button>
       </div>
@@ -357,7 +347,7 @@ if ($db->table_exists('rol_pj_cards') && $db->table_exists('rol_cards')) {
 
 <!-- Modal: Editar Card -->
 <div class="zs-modal-overlay" id="editCardModal">
-  <div class="zs-modal-box" style="max-width:600px;">
+  <div class="zs-modal-box zs-modal-card">
     <div class="zs-modal-h">
       <h3>Editar Card</h3>
       <button type="button" class="zs-modal-close" onclick="closeModal('editCardModal')">✕</button>
@@ -372,8 +362,8 @@ if ($db->table_exists('rol_pj_cards') && $db->table_exists('rol_cards')) {
         <input type="text" name="nombre" id="editNombre" required>
       </div>
 
-      <div class="zs-form-group" style="display:flex;gap:12px;">
-        <div style="flex:1;">
+      <div class="zs-form-row">
+        <div class="col-grow">
           <label>Tipo</label>
           <select name="tipo" id="editTipo">
 <?php foreach ($card_tipos as $tk => $tv): ?>
@@ -381,11 +371,11 @@ if ($db->table_exists('rol_pj_cards') && $db->table_exists('rol_cards')) {
 <?php endforeach; ?>
           </select>
         </div>
-        <div style="flex:0 0 80px;">
+        <div class="col-narrow">
           <label>Orden</label>
-          <input type="number" name="orden" id="editOrden" min="0" style="width:100%;">
+          <input type="number" name="orden" id="editOrden" min="0" class="zs-control-fill">
         </div>
-        <div style="flex:0 0 90px;">
+        <div class="col-narrow">
           <label>Activo</label>
           <select name="activo" id="editActivo">
             <option value="1">Sí</option>
@@ -394,20 +384,20 @@ if ($db->table_exists('rol_pj_cards') && $db->table_exists('rol_cards')) {
         </div>
       </div>
 
-      <div class="zs-form-group" style="display:flex;gap:12px;">
-        <div style="flex:0 0 80px;">
+      <div class="zs-form-row">
+        <div class="col-narrow">
           <label>PA</label>
-          <input type="number" name="pa" id="editPa" min="0" max="99" style="width:100%;">
+          <input type="number" name="pa" id="editPa" min="0" max="99" class="zs-control-fill">
         </div>
-        <div style="flex:0 0 100px;">
+        <div class="col-medium">
           <label>EN</label>
-          <input type="number" name="en" id="editEn" min="0" max="999" style="width:100%;">
+          <input type="number" name="en" id="editEn" min="0" max="999" class="zs-control-fill">
         </div>
-        <div style="flex:0 0 100px;">
+        <div class="col-medium">
           <label>Nivel mín.</label>
-          <input type="number" name="nivel_min" id="editNivelMin" min="1" max="100" style="width:100%;">
+          <input type="number" name="nivel_min" id="editNivelMin" min="1" max="100" class="zs-control-fill">
         </div>
-        <div style="flex:1;">
+        <div class="col-grow">
           <label>Icono (emoji)</label>
           <input type="text" name="icono" id="editIcono">
         </div>
@@ -415,20 +405,20 @@ if ($db->table_exists('rol_pj_cards') && $db->table_exists('rol_cards')) {
 
       <div class="zs-form-group">
         <label>Descripción breve</label>
-        <textarea name="descripcion" id="editDescripcion" rows="2" style="width:100%;padding:8px 12px;border-radius:8px;background:var(--iron);border:1px solid var(--rivet);color:var(--paper);font-family:var(--mono);font-size:.78rem;resize:vertical;" placeholder="Efecto breve para vista rápida"></textarea>
+        <textarea name="descripcion" id="editDescripcion" rows="2" class="zs-control"></textarea>
       </div>
 
       <div class="zs-form-group">
         <label>Contenido (markup HTML o BBCode)</label>
-        <textarea name="contenido" id="editContenido" rows="4" style="width:100%;padding:8px 12px;border-radius:8px;background:var(--iron);border:1px solid var(--rivet);color:var(--paper);font-family:var(--mono);font-size:.78rem;resize:vertical;" placeholder="Descripción completa, fórmula de daño, efectos secundarios…"></textarea>
+        <textarea name="contenido" id="editContenido" rows="4" class="zs-control"></textarea>
       </div>
 
       <div class="zs-form-group">
         <label>Estadísticas / Atributos extra (JSON)</label>
-        <textarea name="estadisticas" id="editEstadisticas" rows="2" style="width:100%;padding:8px 12px;border-radius:8px;background:var(--iron);border:1px solid var(--rivet);color:var(--paper);font-family:var(--mono);font-size:.78rem;resize:vertical;" placeholder='{"fuente": "haki", "daño": "FUE x 3", "efectos": ["Quemado 1t"]}'></textarea>
+        <textarea name="estadisticas" id="editEstadisticas" rows="2" class="zs-control"></textarea>
       </div>
 
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+      <div class="zs-modal-actions">
         <button type="button" class="btn btn-ghost" onclick="closeModal('editCardModal')">Cancelar</button>
         <button type="submit" class="btn btn-hot">Guardar Cambios</button>
       </div>
@@ -436,26 +426,26 @@ if ($db->table_exists('rol_pj_cards') && $db->table_exists('rol_cards')) {
   </div>
 </div>
 
-<!-- Modal: Asignar a Personaje -->
-<div class="zs-modal-overlay" id="assignCardModal">
-  <div class="zs-modal-box" style="max-width:480px;">
+<!-- Modal: Asignar Card a Personaje -->
+<div class="zs-modal-overlay" id="assignModal">
+  <div class="zs-modal-box zs-modal-dialog">
     <div class="zs-modal-h">
-      <h3>Asignar Card</h3>
-      <button type="button" class="zs-modal-close" onclick="closeModal('assignCardModal')">✕</button>
+      <h3>Asignar Card a Personaje</h3>
+      <button type="button" class="zs-modal-close" onclick="closeModal('assignModal')">✕</button>
     </div>
     <form method="post">
       <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
       <input type="hidden" name="action" value="asignar_card">
       <input type="hidden" name="card_id" id="assignCardId">
 
-      <p style="margin-bottom:14px;font-family:var(--mono);font-size:.82rem;color:var(--paper);">
-        Card: <b id="assignCardNombre">—</b>
+      <p class="zs-text-lead">
+        Selecciona el personaje y el slot para la card: <b id="assignCardNombre"></b>
       </p>
 
       <div class="zs-form-group">
-        <label>Personaje</label>
-        <select name="pid" id="assignPid" required>
-          <option value="">— Seleccionar personaje —</option>
+        <label>Personaje *</label>
+        <select name="pid" required>
+          <option value="">-- Seleccionar Personaje --</option>
 <?php foreach ($personajes as $pj): ?>
           <option value="<?php echo (int) $pj['pid']; ?>"><?php echo htmlspecialchars_uni($pj['nombre']); ?> (PID #<?php echo (int) $pj['pid']; ?>)</option>
 <?php endforeach; ?>
@@ -463,39 +453,41 @@ if ($db->table_exists('rol_pj_cards') && $db->table_exists('rol_cards')) {
       </div>
 
       <div class="zs-form-group">
-        <label>Slot (sección en la ficha)</label>
-        <select name="slot" id="assignSlot">
+        <label>Slot *</label>
+        <select name="slot">
 <?php foreach ($card_slots as $sk => $sv): ?>
           <option value="<?php echo htmlspecialchars_uni($sk); ?>"><?php echo htmlspecialchars_uni($sv); ?></option>
 <?php endforeach; ?>
         </select>
       </div>
 
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
-        <button type="button" class="btn btn-ghost" onclick="closeModal('assignCardModal')">Cancelar</button>
-        <button type="submit" class="btn btn-hot">Asignar</button>
+      <div class="zs-modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('assignModal')">Cancelar</button>
+        <button type="submit" class="btn btn-hot">Asignar Card</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Modal: Confirmar desactivación -->
-<div class="zs-modal-overlay" id="deleteCardModal">
-  <div class="zs-modal-box" style="max-width:420px;">
+<!-- Modal: Confirmar Borrado de Card -->
+<div class="zs-modal-overlay" id="delCardModal">
+  <div class="zs-modal-box zs-modal-alert">
     <div class="zs-modal-h">
-      <h3>Desactivar Card</h3>
-      <button type="button" class="zs-modal-close" onclick="closeModal('deleteCardModal')">✕</button>
+      <h3 class="zs-txt-danger">⚠️ Confirmar Desactivación</h3>
+      <button type="button" class="zs-modal-close" onclick="closeModal('delCardModal')">✕</button>
     </div>
-    <p style="margin-bottom:16px;font-size:.92rem;color:var(--paper-dim);">
-      ¿Desactivar <b id="delCardNombre">—</b>? La card dejará de estar visible pero los datos se conservan.
-    </p>
     <form method="post">
       <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
       <input type="hidden" name="action" value="borrar_card">
       <input type="hidden" name="card_id" id="delCardId">
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button type="button" class="btn btn-ghost" onclick="closeModal('deleteCardModal')">Cancelar</button>
-        <button type="submit" class="btn btn-hot" style="background:var(--crack);border-color:var(--crack);">Desactivar</button>
+
+      <p class="zs-text-sub">
+        ¿Estás seguro de que deseas desactivar la card <b id="delCardNombre" class="zs-text-hi"></b>?
+      </p>
+
+      <div class="zs-modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('delCardModal')">Cancelar</button>
+        <button type="submit" class="btn btn-hot zs-btn-danger">Desactivar</button>
       </div>
     </form>
   </div>

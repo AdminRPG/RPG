@@ -3,7 +3,7 @@ if (!defined('IN_MYBB')) { die('Direct initialization of this file is not allowe
 
 /**
  * Catálogos de creación de PJ — One Piece: Eternal.
- * Fuente: ARMAS.md, FACCIONES.md, FACTOR-LINAJE.md (I-Forge-Sistema).
+ * Fuente: ARMAS.md, FACCIONES.md, FACTOR-LINAJE.md (Eternal-Sistema).
  * Catálogo canónico de creación de PJ; se carga desde ope_rol_data.php.
  */
 

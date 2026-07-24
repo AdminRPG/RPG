@@ -1,9 +1,9 @@
-﻿<?php
+<?php
 /**
  * One Piece: Eternal · Catálogo del sistema de rol
  * ------------------------------------------------
  * Fuente única para wizard (crear-personaje.php) y validación server-side.
- * Canon: I-Forge-Sistema/docs/01-PERSONAJE (STATS, FACTOR-LINAJE, ARMAS)
+ * Canon: Eternal-Sistema/docs/01-PERSONAJE (STATS, FACTOR-LINAJE, ARMAS)
  *        + 11-SISTEMA ETERNAL (Identidad + Familia Arma).
  *
  * Arrays PHP planos → JSON para UI; validación en servidor al enviar.

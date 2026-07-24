@@ -1,7 +1,7 @@
 <?php
 /**
  * One Piece: Eternal · Akuma no Mi (fruta por PJ)
- * Canon: I-Forge-Sistema/docs/02-HAKI-Y-FRUTAS/SISTEMA-DE-FRUTAS.md
+ * Canon: Eternal-Sistema/docs/02-HAKI-Y-FRUTAS/SISTEMA-DE-FRUTAS.md
  */
 
 if (!defined('IN_MYBB')) {

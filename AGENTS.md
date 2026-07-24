@@ -1,8 +1,22 @@
 # Instrucciones para agentes — One Piece: Eternal
 
-> **Documentación de sistemas (reglas de juego):** repo hermano `I-Forge-Sistema/docs/` (Haki, Frutas, Eternal, Combate…).  
+> **Documentación de sistemas (reglas de juego):** repo hermano `Eternal-Sistema/docs/` (Haki, Frutas, Eternal, Combate…).  
 > **Documentación de este foro (código MyBB):** `docs/` aquí.  
-> Plan de implementación: `I-Forge-Sistema/docs/10-AUTOMATISMOS/PLAN-IMPLEMENTACION-MYBB.md`.
+> Plan de implementación: `Eternal-Sistema/docs/10-AUTOMATISMOS/PLAN-IMPLEMENTACION-MYBB.md`.
+
+---
+
+## Referencias de Lore y Voz de Marca (repo hermano)
+
+> **Nota importante:** Estas referencias viven en un repositorio separado (`Eternal-Sistema`). Si el workspace actual abierto es solo `Eternal-RPG`, estos archivos NO son accesibles directamente al agente salvo que se abran o se referencien manualmente — consúltense siempre que se trabaje contenido de lore o copy narrativo desde este repo.
+
+| Documento | Ruta Absoluta | Cuándo Consultarlo |
+|---|---|---|
+| Dirección de Lore y Sistemas | `c:/Users/Fgonz/Documents/Proyectos/Op-Eternal/Eternal-Sistema/docs/DIRECCION-LORE-Y-SISTEMAS.md` | Antes de escribir cualquier copy narrativo o definir tono |
+| Facciones | `c:/Users/Fgonz/Documents/Proyectos/Op-Eternal/Eternal-Sistema/docs/03-MUNDO/FACCIONES.md` | Al mencionar Marina, Gobierno Mundial, Emperadores, Revolucionarios |
+| Islas | `c:/Users/Fgonz/Documents/Proyectos/Op-Eternal/Eternal-Sistema/docs/03-MUNDO/ISLAS.md` | Al crear o describir islas/lugares |
+| Cronología y NPCs | `c:/Users/Fgonz/Documents/Proyectos/Op-Eternal/Eternal-Sistema/docs/03-MUNDO/CRONOLOGIA-Y-NPCS.md` | Al introducir NPCs o referencias temporales |
+| Sistema de NPCs | `c:/Users/Fgonz/Documents/Proyectos/Op-Eternal/Eternal-Sistema/docs/03-MUNDO/SISTEMA-NPCS.md` | Al definir mecánicas o stats de NPCs |
 
 ---
 
@@ -55,11 +69,11 @@ No usa `body.ope-pg-*`. Usa **`body.ope-index`**.
 
 | Tarea | Leer primero |
 |---|---|
-| Sistemas / lore (reglas) | `I-Forge-Sistema/docs/DIRECCION-LORE-Y-SISTEMAS.md` |
+| Sistemas / lore (reglas) | `Eternal-Sistema/docs/DIRECCION-LORE-Y-SISTEMAS.md` |
 | UI / tema / portada | `docs/DESIGN-ONE-PIECE-ETERNAL.md`, `docs/themes/README.md` |
 | Página PHP nueva | DESIGN + `docs/GUIA-ESTILOS-PHP.md` + `.cursor/rules/page-scaffold.mdc` |
 | Producto / copy | `docs/PRODUCT.md` |
-| Roadmap de implementación | `I-Forge-Sistema/docs/10-AUTOMATISMOS/PLAN-IMPLEMENTACION-MYBB.md` |
+| Roadmap de implementación | `Eternal-Sistema/docs/10-AUTOMATISMOS/PLAN-IMPLEMENTACION-MYBB.md` |
 | Tema MyBB / sync | `docs/themes/README.md` |
 
 ---

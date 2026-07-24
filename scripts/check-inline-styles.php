@@ -48,16 +48,12 @@ function shouldExclude(string $rel, array $excludeDirs): bool {
  * Detecta si un valor style contiene variables dinámicas
  * (PHP echo/var, JS concat, CSS custom props)
  */
-function isDynamic(string $styleValue): bool {
-    // Contiene PHP
-    if (preg_match('/<\?php|\$[a-zA-Z_]/', $styleValue)) return true;
-    // Contiene JS concatenación
+function isDynamic(string $styleValue, string $line = ''): bool {
+    // Contiene PHP (echo, variables de backend)
+    if (preg_match('/<\?php|\$[a-zA-Z_]/', $styleValue) || preg_match('/\.[ \t]*\$[a-zA-Z_]/', $line)) return true;
+    // Contiene JS concatenación o sintaxis de plantillas JS
     if (str_contains($styleValue, "+'") || str_contains($styleValue, "'+") || str_contains($styleValue, '"+') || str_contains($styleValue, '+"')) return true;
     if (str_contains($styleValue, '${') || str_contains($styleValue, 'd.') || str_contains($styleValue, 't.')) return true;
-    // Solo CSS custom properties (--var: value)
-    if (preg_match('/^--[a-zA-Z]/', trim($styleValue))) return true;
-    // Usa var(--...) dentro del valor (variable de tema dinámica)
-    if (preg_match('/var\(--[a-zA-Z]/', $styleValue)) return true;
     return false;
 }
 
@@ -75,13 +71,13 @@ function findInlineStyles(string $content, bool $all): array {
             if ($valLen === false) continue;
             $styleValue = substr($line, $valStart, $valLen);
 
-            if (!$all && isDynamic($styleValue)) continue;
+            if (!$all && isDynamic($styleValue, $line)) continue;
 
             $truncated = substr(trim($line), 0, 150);
             $hits[] = [
                 'line' => $i + 1,
                 'snippet' => $truncated,
-                'dynamic' => isDynamic($styleValue),
+                'dynamic' => isDynamic($styleValue, $line),
             ];
         }
     }

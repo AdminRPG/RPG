@@ -255,9 +255,9 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endif; ?>
         </p>
         <div class="mb-12">
-          <label style="font-size:.82rem;font-family:var(--mono);color:var(--paper-dim);">
+          <label class="zs-lbl-subtle">
             Modificar / Reasignar fruta libre (Staff):
-            <select name="cambiar_fruta_id" form="zs-form-aprobar-main" style="padding:4px 8px;border-radius:6px;background:var(--iron-hi);color:var(--paper);border:1px solid var(--rivet);margin-left:6px;">
+            <select name="cambiar_fruta_id" form="zs-form-aprobar-main" class="zs-select-sm">
               <option value="0">-- Mantener actual / Sin cambio --</option>
 <?php foreach ($frutas_libres as $flib): ?>
               <option value="<?php echo (int) $flib['id']; ?>">

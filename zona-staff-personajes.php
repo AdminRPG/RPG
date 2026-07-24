@@ -1,7 +1,7 @@
 <?php
 /**
  * One Piece: Eternal · Panel Staff: Gestión de Personajes (STF-03)
- * Permite buscar, filtrar, editar estado, rol de staff y borrar personajes sin escribir IDs a mano.
+ * Permite buscar, filtrar, editar estado, rol de staff y borrar personajes en formato Tabla.
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'zona-staff-personajes.php');
@@ -112,11 +112,18 @@ if ($mybb->request_method === 'post') {
             $nueva_faccion = trim((string) $mybb->get_input('faccion_slug'));
 
             if ($nuevo_nombre !== '') {
+                $pq = $db->simple_select('rol_personajes', 'datos', "pid = {$target_pid}", array('limit' => 1));
+                $d_obj = array();
+                if ($db->num_rows($pq)) {
+                    $d_obj = json_decode((string)$db->fetch_field($pq, 'datos'), true) ?: array();
+                }
+                $d_obj['faccion'] = $nueva_faccion;
+
                 $update_data = array(
-                    'nombre'       => $db->escape_string($nuevo_nombre),
-                    'nivel'        => $nuevo_nivel,
-                    'faccion_slug' => $db->escape_string($nueva_faccion),
-                    'lastedit'     => TIME_NOW,
+                    'nombre'   => $db->escape_string($nuevo_nombre),
+                    'nivel'    => $nuevo_nivel,
+                    'datos'    => $db->escape_string(json_encode($d_obj, JSON_UNESCAPED_UNICODE)),
+                    'lastedit' => TIME_NOW,
                 );
                 $db->update_query('rol_personajes', $update_data, "pid = {$target_pid}");
                 $flash = "Datos del personaje PID #{$target_pid} (\"{$nuevo_nombre}\") actualizados.";
@@ -158,6 +165,158 @@ header('Content-Type: text/html; charset=utf-8');
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Gestión de Personajes</title>
 <?php echo ope_rol_head_base(); ?>
+<style>
+.reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+.zs-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 20px;
+}
+.zs-pj-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  font-family: inherit;
+  font-size: 14px;
+}
+.zs-pj-table th {
+  padding: 12px 16px;
+  color: var(--gold-light, #d4af37);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 1px;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+  text-align: left;
+}
+.zs-pj-row {
+  background: var(--iron-hi, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--rivet, rgba(255, 255, 255, 0.08));
+  transition: all 0.2s ease;
+}
+.zs-pj-row:hover {
+  background: rgba(212, 175, 55, 0.08);
+  transform: translateY(-1px);
+}
+.zs-pj-row td {
+  padding: 14px 16px;
+  vertical-align: middle;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.zs-pj-row td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+.zs-pj-row td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+.zs-tbl-pj-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.zs-tbl-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--gold, #c5a059);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--paper, #f0f0f0);
+  flex-shrink: 0;
+}
+.zs-tbl-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.zs-tbl-pj-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.zs-tbl-pj-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--paper, #ffffff);
+}
+.zs-tbl-pj-sub {
+  font-size: 12px;
+  color: var(--gold-light, #d4af37);
+  font-style: italic;
+}
+.zs-tag-fac {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+}
+.fac-marines { background: rgba(30, 144, 255, 0.18); border: 1px solid #1e90ff; color: #70a1ff; }
+.fac-piratas { background: rgba(220, 20, 60, 0.18); border: 1px solid #dc143c; color: #ff6b81; }
+.fac-gobierno-mundial { background: rgba(212, 175, 55, 0.18); border: 1px solid #d4af37; color: #eccc68; }
+.fac-cazarrecompensas { background: rgba(255, 127, 80, 0.18); border: 1px solid #ff7f50; color: #ffa502; }
+.fac-civiles { background: rgba(169, 169, 169, 0.18); border: 1px solid #a9a9a9; color: #ced6e0; }
+
+.zs-level-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--paper, #f0f0f0);
+}
+.zs-tag-fruit {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(155, 89, 182, 0.18);
+  border: 1px solid #9b59b6;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #d8a7ca;
+  font-weight: 600;
+}
+.zs-tag-nofruit {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  font-style: italic;
+}
+.zs-tbl-owner {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+.zs-tbl-pid {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+.zs-tbl-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+.btn-xs {
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+</style>
 </head>
 <body class="ope-pg-zona-staff">
 <?php echo ope_rol_navbar_html(); ?>
@@ -196,56 +355,121 @@ header('Content-Type: text/html; charset=utf-8');
       </div>
     </div>
 
-    <div class="zs-pj-grid" id="pjGrid">
+    <div class="zs-table-wrapper">
+      <table class="zs-pj-table" id="pjTable">
+        <thead>
+          <tr>
+            <th>Personaje</th>
+            <th>Facción</th>
+            <th>Nivel</th>
+            <th>Akuma no Mi</th>
+            <th>Usuario / PID</th>
+            <th>Estado</th>
+            <th style="text-align:right;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="pjTableBody">
 <?php if (empty($personajes)): ?>
-      <div style="grid-column:1/-1;text-align:center;padding:40px 20px;background:var(--iron-hi);border:1px dashed var(--rivet);border-radius:12px;">
-        <div style="font-family:var(--disp);font-size:1.1rem;color:var(--paper);font-weight:bold;margin-bottom:6px;">No hay personajes registrados en la base de datos</div>
-        <p style="color:var(--paper-dim);font-size:.88rem;margin-bottom:16px;">Acabas de limpiar los personajes de prueba o aún no se ha creado ninguna ficha.</p>
-        <a href="<?php echo $bburl; ?>/crear-personaje.php" class="btn btn-hot btn-sm">+ Crear nuevo personaje</a>
-      </div>
+          <tr>
+            <td colspan="7">
+              <div class="zs-empty-state">
+                <div class="zs-empty-state-h">No hay personajes registrados en la base de datos</div>
+                <p class="zs-empty-state-p">Acabas de limpiar los personajes de prueba o aún no se ha creado ninguna ficha.</p>
+                <a href="<?php echo $bburl; ?>/crear-personaje.php" class="btn btn-hot btn-sm">+ Crear nuevo personaje</a>
+              </div>
+            </td>
+          </tr>
 <?php endif; ?>
 <?php foreach ($personajes as $pj):
     $st = (string) ($pj['estado'] ?? 'borrador');
     $initial = function_exists('mb_substr') ? mb_strtoupper(mb_substr($pj['nombre'], 0, 1)) : strtoupper(substr($pj['nombre'], 0, 1));
     $avatar = trim((string) ($pj['avatar'] ?? ''));
+
+    // Extract faccion from datos JSON
+    $datos_pj = json_decode((string) ($pj['datos'] ?? ''), true) ?: array();
+    $raw_fac = trim((string) ($pj['faccion_slug'] ?? ($datos_pj['faccion'] ?? '')));
+    $aliases = array(
+        'marine' => 'marines', 'marina' => 'marines',
+        'pirata' => 'piratas',
+        'gobierno' => 'gobierno-mundial',
+        'civil' => 'civiles'
+    );
+    if (isset($aliases[$raw_fac])) {
+        $raw_fac = $aliases[$raw_fac];
+    }
+    
+    $f_map = function_exists('ope_rol_facciones') ? ope_rol_facciones() : array();
+    if (isset($f_map[$raw_fac])) {
+        $fac_label_disp = $f_map[$raw_fac]['nombre'];
+    } elseif ($raw_fac !== '') {
+        $fac_label_disp = ucfirst($raw_fac);
+    } elseif (!empty($pj['rango_faccion'])) {
+        $fac_label_disp = (string) $pj['rango_faccion'];
+    } else {
+        $fac_label_disp = '—';
+    }
+
+    $pj['faccion_slug'] = $raw_fac;
     $json_data = htmlspecialchars_uni(json_encode($pj, JSON_UNESCAPED_UNICODE));
 ?>
-      <div class="zs-pj-card" data-pid="<?php echo (int) $pj['pid']; ?>" data-estado="<?php echo $st; ?>" data-search="<?php echo htmlspecialchars_uni(mb_strtolower($pj['nombre'] . ' ' . $pj['owner_name'] . ' ' . $pj['faccion_slug'])); ?>">
-        <div class="zs-pj-head">
-          <div class="zs-pj-avatar">
+          <tr class="zs-pj-row" data-pid="<?php echo (int) $pj['pid']; ?>" data-estado="<?php echo $st; ?>" data-search="<?php echo htmlspecialchars_uni(mb_strtolower($pj['nombre'] . ' ' . $pj['owner_name'] . ' ' . $raw_fac . ' ' . $fac_label_disp)); ?>">
+            <td>
+              <div class="zs-tbl-pj-cell">
+                <div class="zs-tbl-avatar">
 <?php if ($avatar !== ''): ?>
-            <img src="<?php echo htmlspecialchars_uni($avatar); ?>" alt="" loading="lazy" onerror="this.remove();">
+                  <img src="<?php echo htmlspecialchars_uni($avatar); ?>" alt="" loading="lazy" onerror="this.remove();">
 <?php else: ?>
-            <span><?php echo htmlspecialchars_uni($initial); ?></span>
+                  <span><?php echo htmlspecialchars_uni($initial); ?></span>
 <?php endif; ?>
-          </div>
-          <div class="zs-pj-info">
-            <div class="zs-pj-name"><?php echo htmlspecialchars_uni($pj['nombre']); ?></div>
-            <div class="zs-pj-owner">Usuario: <b><?php echo htmlspecialchars_uni($pj['owner_name']); ?></b> (PID #<?php echo (int) $pj['pid']; ?>)</div>
-            <div style="margin-top:4px;">
+                </div>
+                <div class="zs-tbl-pj-info">
+                  <div class="zs-tbl-pj-name"><?php echo htmlspecialchars_uni($pj['nombre']); ?></div>
+<?php if (!empty($pj['rango_faccion'])): ?>
+                  <div class="zs-tbl-pj-sub"><?php echo htmlspecialchars_uni($pj['rango_faccion']); ?></div>
+<?php endif; ?>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="zs-tag-fac fac-<?php echo htmlspecialchars_uni($raw_fac); ?>">
+                <?php echo htmlspecialchars_uni($fac_label_disp); ?>
+              </span>
+            </td>
+            <td>
+              <span class="zs-level-badge">Nv. <?php echo (int) ($pj['nivel'] ?? 1); ?></span>
+            </td>
+            <td>
+<?php if (!empty($pj['fruta_nombre'])): ?>
+              <span class="zs-tag-fruit" title="<?php echo htmlspecialchars_uni($pj['fruta_nombre']); ?>">
+                🍇 <?php echo htmlspecialchars_uni($pj['fruta_nombre']); ?>
+              </span>
+<?php else: ?>
+              <span class="zs-tag-nofruit">Sin Fruta</span>
+<?php endif; ?>
+            </td>
+            <td>
+              <div class="zs-tbl-owner">
+                <b><?php echo htmlspecialchars_uni($pj['owner_name']); ?></b>
+                <span class="zs-tbl-pid">PID #<?php echo (int) $pj['pid']; ?></span>
+              </div>
+            </td>
+            <td>
               <span class="zs-badge <?php echo $st; ?>"><?php echo htmlspecialchars_uni($st); ?></span>
 <?php if ((int) ($pj['staff_level'] ?? 0) > 0): ?>
-              <span class="zs-badge" style="background:rgba(187,134,252,0.2);color:#bb86fc;border:1px solid rgba(187,134,252,0.4);">Staff Nv.<?php echo (int) $pj['staff_level']; ?></span>
+              <span class="zs-badge zs-badge-staff">Staff Nv.<?php echo (int) $pj['staff_level']; ?></span>
 <?php endif; ?>
-            </div>
-          </div>
-        </div>
-
-        <div class="zs-pj-meta">
-          <div>Nivel: <b><?php echo (int) ($pj['nivel'] ?? 1); ?></b></div>
-          <div>Facción: <b><?php echo htmlspecialchars_uni($pj['faccion_slug'] !== '' ? ucfirst($pj['faccion_slug']) : '—'); ?></b></div>
-<?php if (!empty($pj['fruta_nombre'])): ?>
-          <div>Fruta: <b><?php echo htmlspecialchars_uni($pj['fruta_nombre']); ?></b></div>
-<?php endif; ?>
-        </div>
-
-        <div class="zs-pj-actions">
-          <a href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" target="_blank" class="btn btn-ghost btn-sm" title="Ver Expediente Público">Ver Ficha</a>
-          <button type="button" class="btn btn-hot btn-sm btn-edit-pj" data-pj="<?php echo $json_data; ?>">Gestionar</button>
-          <button type="button" class="btn btn-ghost btn-sm btn-del-pj" data-pid="<?php echo (int) $pj['pid']; ?>" data-nombre="<?php echo htmlspecialchars_uni($pj['nombre']); ?>" style="color:#f85149;">Borrar</button>
-        </div>
-      </div>
+            </td>
+            <td style="text-align:right;">
+              <div class="zs-tbl-actions">
+                <a href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" target="_blank" class="btn btn-ghost btn-xs" title="Ver Expediente">Ver Ficha</a>
+                <button type="button" class="btn btn-hot btn-xs btn-edit-pj" data-pj="<?php echo $json_data; ?>">Gestionar</button>
+                <button type="button" class="btn btn-ghost btn-xs btn-del-pj zs-txt-danger" data-pid="<?php echo (int) $pj['pid']; ?>" data-nombre="<?php echo htmlspecialchars_uni($pj['nombre']); ?>">Borrar</button>
+              </div>
+            </td>
+          </tr>
 <?php endforeach; ?>
+        </tbody>
+      </table>
     </div>
   </section>
 </div>
@@ -267,28 +491,28 @@ header('Content-Type: text/html; charset=utf-8');
         <input type="text" name="nombre" id="editNombre" required>
       </div>
 
-      <div class="zs-form-group" style="display:flex;gap:12px;">
-        <div style="flex:1;">
+      <div class="zs-form-row">
+        <div class="col-grow">
           <label>Nivel (1-100)</label>
           <input type="number" name="nivel" id="editNivel" min="1" max="100" required>
         </div>
-        <div style="flex:1;">
+        <div class="col-grow">
           <label>Facción</label>
           <select name="faccion_slug" id="editFaccion">
             <option value="piratas">Piratas</option>
-            <option value="marina">Marina</option>
+            <option value="marines">Marina</option>
             <option value="revolucionarios">Revolucionarios</option>
-            <option value="gobierno">Gobierno Mundial</option>
+            <option value="gobierno-mundial">Gobierno Mundial</option>
             <option value="cazarrecompensas">Cazarrecompensas</option>
-            <option value="civil">Civil / Independiente</option>
+            <option value="civiles">Civil / Independiente</option>
           </select>
         </div>
       </div>
 
       <div class="zs-form-group">
         <label>Estado de la Ficha</label>
-        <div style="display:flex;gap:8px;">
-          <select name="nuevo_estado" id="editEstado" style="flex:1;">
+        <div class="zs-modal-actions">
+          <select name="nuevo_estado" id="editEstado" class="col-grow">
             <option value="aprobado">Aprobado</option>
             <option value="revision">En revisión</option>
             <option value="rechazado">Rechazado</option>
@@ -298,22 +522,22 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
       </div>
 
-      <div class="zs-form-group" style="border-top:1px solid var(--rivet);padding-top:12px;margin-top:16px;">
+      <div class="zs-form-group zs-section-divider">
         <label>Asignación de Rango Staff</label>
-        <div style="display:flex;gap:8px;">
-          <select name="staff_level" id="editStaffLevel" style="flex:1;">
+        <div class="zs-modal-actions">
+          <select name="staff_level" id="editStaffLevel" class="col-grow">
             <option value="0">0: Sin Rango Staff</option>
             <option value="1">1: Colaborador</option>
             <option value="2">2: Moderador</option>
             <option value="3">3: Administrador</option>
             <option value="4">4: Webmaster</option>
           </select>
-          <input type="text" name="staff_rol" id="editStaffRol" placeholder="Rol / Cargo (ej. Árbitro)" style="flex:1;">
+          <input type="text" name="staff_rol" id="editStaffRol" placeholder="Rol / Cargo (ej. Árbitro)" class="col-grow">
           <button type="button" class="btn btn-ghost btn-sm" onclick="submitStaff()">Guardar Staff</button>
         </div>
       </div>
 
-      <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px;">
+      <div class="zs-modal-footer">
         <button type="button" class="btn btn-ghost" onclick="closeModal('editModalOverlay')">Cancelar</button>
         <button type="submit" class="btn btn-hot">Guardar Cambios Rápido</button>
       </div>
@@ -325,7 +549,7 @@ header('Content-Type: text/html; charset=utf-8');
 <div class="zs-modal-overlay" id="delModalOverlay">
   <div class="zs-modal-box">
     <div class="zs-modal-h">
-      <h3 style="color:#f85149;">⚠️ Confirmar Borrado de Personaje</h3>
+      <h3 class="zs-txt-danger">⚠️ Confirmar Borrado de Personaje</h3>
       <button type="button" class="zs-modal-close" onclick="closeModal('delModalOverlay')">✕</button>
     </div>
     <form method="post">
@@ -333,16 +557,16 @@ header('Content-Type: text/html; charset=utf-8');
       <input type="hidden" name="action" value="borrar_personaje">
       <input type="hidden" name="pid" id="delPid">
 
-      <p style="color:var(--paper);font-size:.95rem;line-height:1.5;">
-        ¿Estás seguro de que deseas borrar permanentemente el personaje <b id="delNombre" style="color:var(--paper-hi);"></b>?
+      <p class="zs-text-lead">
+        ¿Estás seguro de que deseas borrar permanentemente el personaje <b id="delNombre" class="zs-text-hi"></b>?
       </p>
-      <p style="font-size:.85rem;color:var(--paper-dim);">
+      <p class="zs-text-sub">
         Se liberará automáticamente su Akuma no Mi (si poseía una) y se borrarán todos sus registros asociados. Esta acción no se puede deshacer.
       </p>
 
-      <div style="margin-top:24px;display:flex;justify-content:flex-end;gap:10px;">
+      <div class="zs-modal-footer-lg">
         <button type="button" class="btn btn-ghost" onclick="closeModal('delModalOverlay')">Cancelar</button>
-        <button type="submit" class="btn btn-hot" style="background:#f85149;border-color:#f85149;">Sí, Eliminar Definitivamente</button>
+        <button type="submit" class="btn btn-hot zs-btn-danger">Sí, Eliminar Definitivamente</button>
       </div>
     </form>
   </div>
@@ -354,14 +578,14 @@ header('Content-Type: text/html; charset=utf-8');
 (function(){
   var currentFilter = 'todos';
   var searchInput = document.getElementById('pjSearchInput');
-  var cards = document.querySelectorAll('.zs-pj-card');
+  var rows = document.querySelectorAll('.zs-pj-row');
 
-  function filterCards(){
+  function filterRows(){
     var q = searchInput.value.toLowerCase().trim();
-    cards.forEach(function(card){
-      var matchStatus = (currentFilter === 'todos' || card.getAttribute('data-estado') === currentFilter);
-      var matchSearch = !q || card.getAttribute('data-search').indexOf(q) !== -1;
-      card.style.display = (matchStatus && matchSearch) ? 'flex' : 'none';
+    rows.forEach(function(row){
+      var matchStatus = (currentFilter === 'todos' || row.getAttribute('data-estado') === currentFilter);
+      var matchSearch = !q || row.getAttribute('data-search').indexOf(q) !== -1;
+      row.style.display = (matchStatus && matchSearch) ? 'table-row' : 'none';
     });
   }
 
@@ -370,11 +594,11 @@ header('Content-Type: text/html; charset=utf-8');
       document.querySelectorAll('#pjFilterPills .zs-pill').forEach(function(p){ p.classList.remove('on'); });
       pill.classList.add('on');
       currentFilter = pill.getAttribute('data-filter');
-      filterCards();
+      filterRows();
     });
   });
 
-  searchInput.addEventListener('input', filterCards);
+  searchInput.addEventListener('input', filterRows);
 
   // Bind edit modal
   document.querySelectorAll('.btn-edit-pj').forEach(function(btn){
@@ -400,27 +624,20 @@ header('Content-Type: text/html; charset=utf-8');
       openModal('delModalOverlay');
     });
   });
+
+  document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('vis'); });
 })();
 
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-
-function submitEstado(){
+function submitEstado() {
   document.getElementById('editAction').value = 'cambiar_estado';
   document.getElementById('editModalForm').submit();
 }
-function submitStaff(){
+function submitStaff() {
   document.getElementById('editAction').value = 'cambiar_staff';
   document.getElementById('editModalForm').submit();
 }
-</script>
-<script>
-if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
-  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('vis'); io.unobserve(e.target); }}); }, { threshold: .08 });
-  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
-} else {
-  document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('vis'); });
-}
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 </script>
 </body>
 </html>

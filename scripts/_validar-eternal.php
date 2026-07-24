@@ -6,7 +6,7 @@
  *
  * Valida:
  *  - Todos los JSON en inc/ope_eternal/
- *  - Todos los MD en docs/11-SISTEMA ETERNAL/ (hermano en I-Forge-Sistema)
+ *  - Todos los MD en docs/11-SISTEMA ETERNAL/ (hermano en Eternal-Sistema)
  */
 
 declare(strict_types=1);

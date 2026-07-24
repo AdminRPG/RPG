@@ -87,7 +87,7 @@ header('Content-Type: text/html; charset=utf-8');
     grid.innerHTML = items.map(function(p){
       var i = data.indexOf(p);
       var ownerText = p.ocupada_pid > 0
-        ? '<a href="' + BB + '/ficha.php?pid=' + p.ocupada_pid + '" onclick="event.stopPropagation();" style="color:inherit;text-decoration:underline;"><b>' + esc(p.usuario || ('Personaje #' + p.ocupada_pid)) + '</b></a>'
+        ? '<a href="' + BB + '/ficha.php?pid=' + p.ocupada_pid + '" onclick="event.stopPropagation();" class="akuma-link-subtle"><b>' + esc(p.usuario || ('Personaje #' + p.ocupada_pid)) + '</b></a>'
         : '<b>' + esc(p.usuario) + '</b>';
       var usuHtml = (p.ocupada_pid > 0 || p.usuario)
         ? '<div class="bib-card-meta"><span class="ope-tag-usada">En uso · ' + ownerText + '</span></div>'

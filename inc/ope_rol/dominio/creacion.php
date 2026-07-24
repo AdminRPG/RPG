@@ -9,7 +9,7 @@ if (!defined('IN_MYBB')) { die('Direct initialization of this file is not allowe
  * (scripts/_test-factor-linaje.php).
  *
  * Modelo Factor Linaje: TODO se compra con Puntos de Linaje (PL) a suma cero.
- * Canon: I-Forge-Sistema/docs/01-PERSONAJE/FACTOR-LINAJE.md.
+ * Canon: Eternal-Sistema/docs/01-PERSONAJE/FACTOR-LINAJE.md.
  *
  * Depende de la capa de datos: inc/ope_rol/catalogos/linaje.php.
  */

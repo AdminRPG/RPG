@@ -15,7 +15,7 @@ import sys
 import unicodedata
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MACRO = os.path.join(ROOT, '..', 'I-Forge-Sistema', 'docs', '02-HAKI-Y-FRUTAS',
+MACRO = os.path.join(ROOT, '..', 'Eternal-Sistema', 'docs', '02-HAKI-Y-FRUTAS',
                      'MACRO-CATALOGO-AKUMA-NO-MI.md')
 JSON_PATH = os.path.join(ROOT, 'inc', 'ope_rol', 'catalogos', 'akuma_no_mi_db.json')
 

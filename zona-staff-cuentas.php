@@ -186,7 +186,7 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="zs-acc-info">
             <div class="zs-acc-name"><?php echo htmlspecialchars_uni($acc['username']); ?></div>
             <div class="zs-acc-sub">UID #<?php echo (int) $acc['uid']; ?> · <?php echo (int) $acc['total_pjs']; ?> personajes</div>
-            <div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;">
+            <div class="zs-badge-group">
 <?php if ($st_lvl > 0): ?>
               <span class="zs-badge staff">Staff Nv.<?php echo $st_lvl; ?></span>
 <?php endif; ?>
@@ -204,7 +204,7 @@ header('Content-Type: text/html; charset=utf-8');
 
         <div class="zs-acc-actions">
           <button type="button" class="btn btn-hot btn-sm btn-edit-acc" data-acc="<?php echo $json_data; ?>">Ajustes Cuenta</button>
-          <form method="post" style="display:inline;">
+          <form method="post" class="zs-inline">
             <input type="hidden" name="my_post_key" value="<?php echo $mybb->post_code; ?>">
             <input type="hidden" name="action" value="toggle_narrador">
             <input type="hidden" name="target_uid" value="<?php echo (int) $acc['uid']; ?>">
@@ -262,7 +262,7 @@ header('Content-Type: text/html; charset=utf-8');
         </select>
       </div>
 
-      <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px;">
+      <div class="zs-modal-footer">
         <button type="button" class="btn btn-ghost" onclick="closeModal('accModalOverlay')">Cancelar</button>
         <button type="submit" class="btn btn-hot">Guardar Ajustes de Cuenta</button>
       </div>
