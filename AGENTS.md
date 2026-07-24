@@ -83,7 +83,7 @@ No usa `body.ope-pg-*`. Usa **`body.ope-index`**.
 | Entorno | Qué lee el agente |
 |---|---|
 | **Cursor** | `AGENTS.md`, `.cursor/rules/*.mdc`, skills `.agents/skills/` |
-| **OpenCode** | `AGENTS.md`, `.opencode/README.md`, plugin `graphify.js` |
+| **OpenCode** | `AGENTS.md` (convención automática), `opencode.json` (MCPs: playwright, firecrawl; plugin: superpowers), skills `.agents/skills/` vía `skills.paths` |
 
 **PowerShell (Windows):** separar comandos con `;`, no `&&`.
 

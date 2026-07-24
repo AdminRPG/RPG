@@ -36,22 +36,23 @@ Si el comando `verify` muestra **`DRIFT`**, significa que hay desincronización 
 
 ---
 
-## 2. Inspección Visual Automatizada sin MCP Playwright
+## 2. Inspección Visual Automatizada
 
 > [!IMPORTANT]
-> **NO existe un servidor MCP de Playwright independiente**. Toda inspección visual, pruebas de maquetación y capturas end-to-end deben realizarse mediante la herramienta nativa **`browser_subagent`**.
+> **No existe un servidor MCP de Playwright independiente para todos los agentes.** La disponibilidad depende del agente:
+> - **Antigravity**: Toda inspección visual, pruebas de maquetación y capturas end-to-end deben realizarse mediante la herramienta nativa `browser_subagent`.
+> - **OpenCode**: Usar el MCP playwright configurado en `opencode.json` (herramientas MCP de playwright). No existe equivalente nativo a `browser_subagent`; el QA visual se hace invocando el MCP local de playwright.
+> - **Cursor**: Usar el MCP playwright configurado en `.cursor/mcp.json`.
 
 ### Flujo de Verificación Visual Paso a Paso:
 
-1. **Lanzar el subagente de navegador**:
-   Utiliza `browser_subagent` indicando la tarea específica, la URL local (ej. `http://localhost/ope/index.php` o `http://localhost/ope/ficha.php`) y la acción.
-
+1. **Según tu agente**:
+   - Antigravity: Lanzar `browser_subagent` indicando la tarea específica, la URL local y la acción.
+   - OpenCode: Invocar el MCP playwright desde las herramientas MCP disponibles.
 2. **Realizar interacción y scroll**:
-   Indica al subagente que haga scroll completo por la pantalla para forzar la activación de las animaciones `.reveal.vis` de IntersectionObserver.
-
+   Indica al agente o MCP que haga scroll completo por la pantalla para forzar la activación de las animaciones `.reveal.vis` de IntersectionObserver.
 3. **Captura de evidencia y comparación**:
-   El subagente grabará un vídeo en formato `.webp` y tomará capturas de pantalla que se almacenarán automáticamente en la carpeta de artefactos de la sesión.
-
+   El subagente o MCP grabará capturas de pantalla que se almacenarán en los artefactos de la sesión.
 4. **Comparación con el Prototipo**:
    Compara la captura generada contra el prototipo estático en `docs/Prototypes/Granblue/index.html`.
 
@@ -107,4 +108,4 @@ DRIFT TPL: showthread_usersbrowsing differs (source: ope-showthread.xml)
 - [ ] Ejecución de `php scripts/sync-theme.php import`.
 - [ ] Verificación de sincronización `php scripts/sync-theme.php verify` devolviendo `OK CSS: in sync`.
 - [ ] Comprobación de estilos inline sin errores: `php scripts/check-inline-styles.php`.
-- [ ] Inspección visual realizada en navegador mediante `browser_subagent`.
+- [ ] Inspección visual realizada en navegador mediante `browser_subagent` (Antigravity) o MCP playwright (OpenCode / Cursor).

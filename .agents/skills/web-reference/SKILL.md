@@ -58,7 +58,7 @@ read_url_content({
 
 Si el usuario proporciona una URL o prototipo externo como referencia para una nueva funcionalidad:
 
-1. **Extracción**: Usa `read_url_content` para analizar el texto o `browser_subagent` para tomar capturas de la web.
+1. **Extracción**: Usa `read_url_content` para analizar el texto o, según tu agente, usa `browser_subagent` (Antigravity) o el MCP playwright (OpenCode / Cursor) para tomar capturas de la web.
 2. **Análisis de Patrones**: Identifica los siguientes 4 pilares:
    - **Paleta de Color**: Extrae los colores primarios y tradúcelos a variables HSL en `ope.css`.
    - **Tipografía**: Revisa si usa tipografías Serif o Sans-serif y compáralas con las fuentes del proyecto (Cinzel / Cormorant / Spectral).
@@ -73,7 +73,7 @@ Si el usuario proporciona una URL o prototipo externo como referencia para una n
 
 1. **Intentar llamar al MCP `firecrawl` o `playwright`**:
    - ❌ *Error*: Tratar de invocar un MCP inexistente que devolverá fallo de sistema.
-   - ✅ *Correcto*: Usar `read_url_content` / `search_web` para texto o `browser_subagent` para inspección gráfica.
+   - ✅ *Correcto*: Usar `read_url_content` / `search_web` para texto o `browser_subagent` (Antigravity) / MCP playwright (OpenCode / Cursor) para inspección gráfica.
 
 2. **Copiar estilos CSS directamente de frameworks (Tailwind / Bootstrap) al código del foro**:
    - ❌ *Error*: Inyectar clases como `bg-blue-500 flex p-4` o utilizar neobrutalismo con sombras duras negras (`box-shadow: 4px 4px 0 #000`).

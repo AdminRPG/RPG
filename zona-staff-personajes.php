@@ -316,6 +316,9 @@ header('Content-Type: text/html; charset=utf-8');
   font-size: 12px;
   border-radius: 6px;
 }
+.zs-pj-table .zs-th-actions {
+  text-align: right;
+}
 </style>
 </head>
 <body class="ope-pg-zona-staff">
@@ -365,7 +368,7 @@ header('Content-Type: text/html; charset=utf-8');
             <th>Akuma no Mi</th>
             <th>Usuario / PID</th>
             <th>Estado</th>
-            <th style="text-align:right;">Acciones</th>
+            <th class="zs-th-actions">Acciones</th>
           </tr>
         </thead>
         <tbody id="pjTableBody">
@@ -459,7 +462,7 @@ header('Content-Type: text/html; charset=utf-8');
               <span class="zs-badge zs-badge-staff">Staff Nv.<?php echo (int) $pj['staff_level']; ?></span>
 <?php endif; ?>
             </td>
-            <td style="text-align:right;">
+            <td>
               <div class="zs-tbl-actions">
                 <a href="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" target="_blank" class="btn btn-ghost btn-xs" title="Ver Expediente">Ver Ficha</a>
                 <button type="button" class="btn btn-hot btn-xs btn-edit-pj" data-pj="<?php echo $json_data; ?>">Gestionar</button>

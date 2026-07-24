@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Piece: Eternal &middot; Vaelen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&amp;family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=Spectral:ital,wght@0,400;0,500;0,600;1,400&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="http://localhost/iforge/cache/themes/theme13/ope.css?v=1784883617">
+<!-- estilos en docs/themes/ope.css (scope: ope-pg-ficha) -->
+</head>
+<body class="ope-pg-ficha fac-gobierno" data-fac="gobierno">
+
+<script>document.documentElement.setAttribute("data-theme",(function(){var m=document.cookie.match(/(?:^|; )ope_theme=([^;]+)/);var t=m?decodeURIComponent(m[1]):"";return t==="noche"?"noche":"cielo";})());</script>
+<!-- ===== NAVBAR (fixed) · fuente única ===== -->
+<nav id="ope-navbar"><div class="ope-nav"><a href="http://localhost/iforge/index.php" class="ope-nav-logo">One Piece: <b>Eternal</b></a><div class="ope-nav-links"><a href="http://localhost/iforge/personajes.php" class="ope-nav-link">Personaje</a><a href="http://localhost/iforge/barco.php" class="ope-nav-link">Barco</a><a href="http://localhost/iforge/tramites.php" class="ope-nav-link">Trámites</a><div class="ope-nav-drop"><button type="button" class="ope-nav-link ope-nav-dd-btn" aria-haspopup="true" aria-expanded="false" onclick="var d=this.nextElementSibling;var o=d.classList.toggle('open');this.setAttribute('aria-expanded',o?'true':'false');">Catálogo</button><div class="ope-dropdown ope-nav-dropdown"><a href="http://localhost/iforge/biblioteca-akuma.php" class="ope-dropdown-item">Akuma no Mi</a></div></div><a href="http://localhost/iforge/guias.php" class="ope-nav-link">Guías</a></div><div class="ope-nav-right"><button type="button" class="ope-theme-toggle-btn" id="ope-theme-toggle" title="Cambiar tema" data-theme="cielo" aria-label="Cambiar a modo noche">Noche</button><a href="http://localhost/iforge/member.php?action=register" class="ope-nav-cta">Regístrate</a><a href="http://localhost/iforge/member.php?action=login" class="ope-btn-ghost ope-btn-sm">Acceder</a></div></div></nav>
+<script id="ope-theme-js">
+(function(){document.addEventListener('click',function(e){var h=e.target.closest&&e.target.closest('.ope-spoiler-head');if(!h)return;e.preventDefault();var b=h.nextElementSibling;if(!b||!b.classList.contains('ope-spoiler-body'))return;var open=b.hasAttribute('hidden');if(open){b.removeAttribute('hidden');h.classList.add('is-open');}else{b.setAttribute('hidden','');h.classList.remove('is-open');}});})();
+(function(){document.addEventListener('click',function(e){var h=e.target.closest&&e.target.closest('.ope-rpgsys-h');if(!h)return;e.preventDefault();var box=h.parentNode;var b=box.querySelector('.ope-rpgsys-b');if(!b)return;var t=h.querySelector('.ope-rpgsys-toggle');var open=b.hasAttribute('hidden');if(open){b.removeAttribute('hidden');box.classList.remove('is-collapsed');h.setAttribute('aria-expanded','true');if(t)t.textContent='Ocultar';}else{b.setAttribute('hidden','');box.classList.add('is-collapsed');h.setAttribute('aria-expanded','false');if(t)t.textContent='Mostrar';}});})();
+(function(){document.addEventListener('click',function(e){var h=e.target.closest&&e.target.closest('.ope-hud-actions-h');if(!h)return;e.preventDefault();var box=h.parentNode;var b=box.querySelector('.ope-hud-actions-b');if(!b)return;var t=h.querySelector('.ope-hud-actions-toggle');var open=b.hasAttribute('hidden');if(open){b.removeAttribute('hidden');box.classList.remove('is-collapsed');h.setAttribute('aria-expanded','true');if(t)t.textContent='Ocultar';}else{b.setAttribute('hidden','');box.classList.add('is-collapsed');h.setAttribute('aria-expanded','false');if(t)t.textContent='Mostrar';}});})();
+(function(){var btn=document.getElementById('ope-theme-toggle');if(btn){btn.addEventListener('click',function(e){e.stopPropagation();var cur=btn.getAttribute('data-theme')||'cielo';var next=cur==='noche'?'cielo':'noche';btn.setAttribute('data-theme',next);btn.textContent=next==='noche'?'Cielo':'Noche';document.documentElement.setAttribute('data-theme',next);document.cookie='ope_theme='+next+'; path=/; max-age=31536000; SameSite=Lax';});}})();
+(function(){document.addEventListener('click',function(e){var openDrops=document.querySelectorAll('#ope-navbar .ope-dropdown.open');for(var k=0;k<openDrops.length;k++){var od=openDrops[k];if(!od.contains(e.target)&&!(e.target.closest&&e.target.closest('.ope-user-name'))&&!(e.target.closest&&e.target.closest('.ope-nav-dd-btn'))){od.classList.remove('open');}}});})();
+</script>
+
+<div class="breadcrumb">
+  <div class="breadcrumb-in">
+    <a href="http://localhost/iforge/index.php">Inicio</a>
+    <span class="sep">&#8250;</span>
+    <a href="http://localhost/iforge/personajes.php">Personaje</a>
+    <span class="sep">&#8250;</span>
+    <b>Vaelen</b>
+  </div>
+</div>
+
+
+<div class="wrap ope-ficha-wrap">
+  <div class="ope-ficha-game" id="ope-inspector">
+
+    <aside class="ope-ficha-stage" data-fac="gobierno">
+      <div class="ope-ficha-stage-sky" aria-hidden="true"></div>
+      <div class="ope-ficha-stage-top">
+        <div class="ope-ficha-lv" title="Nivel">
+          <span class="ope-ficha-lv-lbl">Lvl</span>
+          <b>50</b>
+        </div>
+        <div class="ope-ficha-stage-top-r">
+          <span class="ope-ficha-facpill" title="Facción">Gobierno Mundial</span>
+        </div>
+      </div>
+
+      <div class="ope-ficha-stage-art">
+        <span class="ope-ficha-stage-ph">V</span>
+      </div>
+
+      <div class="ope-ficha-stage-foot">
+        <h1 class="ope-ficha-name">Vaelen</h1>
+        <p class="ope-ficha-alias">«El Inquisidor Dorado» · Humanos · 52 años</p>
+      </div>
+    </aside>
+
+    <!-- ══ IZQUIERDA · PERFIL ══ -->
+    <aside class="ope-col ope-col--left" aria-label="Perfil">
+      <div class="rk-section">
+        <header class="rk-section-h"><span>Perfil</span><small>#00015</small></header>
+        <div class="rk-section-b">
+          <dl class="ope-deflist">
+            <div><dt>Apodo</dt><dd>El Inquisidor Dorado</dd></div>
+            <div><dt>Raza</dt><dd>Humanos</dd></div>
+            <div><dt>Edad</dt><dd>52 años</dd></div>
+            <div><dt>Género</dt><dd>Masculino</dd></div>
+            <div><dt>Facción</dt><dd>Gobierno Mundial</dd></div>
+            <div><dt>Renombre</dt><dd>Desconocido · 0</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="rk-section">
+        <header class="rk-section-h"><span>Vía Eternal</span></header>
+        <div class="rk-section-b">
+          <dl class="ope-deflist">
+            <div><dt>Identidad</dt><dd>Centinela</dd></div>
+            <div><dt>Arma</dt><dd>Alcance · Lanza / Alabarda</dd></div>
+          </dl>
+        </div>
+      </div>
+
+
+
+      <div class="rk-section">
+        <header class="rk-section-h"><span>Haki</span></header>
+        <div class="rk-section-b">
+          <dl class="ope-deflist">
+            <div><dt>Observación</dt><dd class="c-dim">—</dd></div>
+            <div><dt>Armadura</dt><dd class="c-dim">—</dd></div>
+            <div><dt>Rey</dt><dd class="c-dim">—</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="rk-section rk-section--compact">
+        <header class="rk-section-h"><span>Oficios</span></header>
+        <div class="rk-section-b"><p class="ope-empty">Sin oficios</p></div>
+      </div>
+
+      <div class="rk-section rk-section--compact">
+        <header class="rk-section-h"><span>Tripulación</span></header>
+        <div class="rk-section-b"><p class="ope-empty">Sin tripulación</p></div>
+      </div>
+    </aside>
+
+    <!-- ══ DERECHA · PODER ══ -->
+    <aside class="ope-col ope-col--right" aria-label="Poder y combate">
+      <div class="rk-section" id="ope-stat-switcher">
+        <header class="rk-section-h rk-section-h--switch">
+          <div class="ope-sswitch" role="tablist" aria-label="Vista de estadísticas">
+            <button type="button" class="ope-ss-btn" role="tab" aria-selected="true" data-ss="attrs">Atributos</button>
+            <button type="button" class="ope-ss-btn" role="tab" aria-selected="false" data-ss="deriv">Derivadas</button>
+          </div>
+        </header>
+
+        <div class="rk-section-b ope-ss-pane" data-ss-pane="attrs">
+          <div class="pgroup">
+            <div class="pgroup-h">
+              <span class="n">Cuerpo</span>
+              <span class="bar"></span>
+            </div>
+            <div class="stat">
+              <span class="nm">Fuerza</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" data-fill="71" style="background:var(--h8)"></div>
+              </div>
+              <span class="stat-num" style="color:var(--h8)">70</span>
+            </div>
+            <div class="stat">
+              <span class="nm">Resistencia</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" data-fill="81" style="background:var(--h9)"></div>
+              </div>
+              <span class="stat-num" style="color:var(--h9)">80</span>
+            </div>
+            <div class="stat">
+              <span class="nm">Agilidad</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" data-fill="86" style="background:var(--h9)"></div>
+              </div>
+              <span class="stat-num" style="color:var(--h9)">85</span>
+            </div>
+          </div>
+          <div class="pgroup">
+            <div class="pgroup-h">
+              <span class="n">Mente</span>
+              <span class="bar"></span>
+            </div>
+            <div class="stat">
+              <span class="nm">Intelecto</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" data-fill="99" style="background:var(--h9)"></div>
+              </div>
+              <span class="stat-num" style="color:var(--h9)">98</span>
+            </div>
+            <div class="stat">
+              <span class="nm">Percepción</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" data-fill="91" style="background:var(--h9)"></div>
+              </div>
+              <span class="stat-num" style="color:var(--h9)">90</span>
+            </div>
+          </div>
+          <div class="pgroup">
+            <div class="pgroup-h">
+              <span class="n">Espíritu</span>
+              <span class="bar"></span>
+            </div>
+            <div class="stat">
+              <span class="nm">Temple</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" data-fill="81" style="background:var(--h9)"></div>
+              </div>
+              <span class="stat-num" style="color:var(--h9)">80</span>
+            </div>
+            <div class="stat">
+              <span class="nm">Voluntad</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" data-fill="91" style="background:var(--h9)"></div>
+              </div>
+              <span class="stat-num" style="color:var(--h9)">90</span>
+            </div>
+            <div class="stat">
+              <span class="nm">Carisma</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" data-fill="86" style="background:var(--h9)"></div>
+              </div>
+              <span class="stat-num" style="color:var(--h9)">85</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rk-section-b ope-ss-pane" data-ss-pane="deriv" hidden>
+          <div class="ope-deriv">
+            <div class="ope-deriv-row ope-deriv-row--vitals">
+              <div class="ope-deriv-card ope-deriv-card--pv">
+                <span class="ope-deriv-k">PV máx</span>
+                <span class="ope-deriv-v">2050</span>
+              </div>
+              <div class="ope-deriv-card ope-deriv-card--en">
+                <span class="ope-deriv-k">Energía</span>
+                <span class="ope-deriv-v">1600</span>
+              </div>
+              <div class="ope-deriv-card ope-deriv-card--pa">
+                <span class="ope-deriv-k">PA / turno</span>
+                <span class="ope-deriv-v">18</span>
+              </div>
+            </div>
+            <div class="ope-deriv-row">
+              <div class="ope-deriv-card"><span class="ope-deriv-k">Movimiento</span><span class="ope-deriv-v">33<small>m</small></span></div>
+              <div class="ope-deriv-card"><span class="ope-deriv-k">Esprint</span><span class="ope-deriv-v">+33<small>m</small></span></div>
+              <div class="ope-deriv-card"><span class="ope-deriv-k">Carrera</span><span class="ope-deriv-v">66<small>m</small></span></div>
+              <div class="ope-deriv-card"><span class="ope-deriv-k">Salto V</span><span class="ope-deriv-v">22<small>m</small></span></div>
+              <div class="ope-deriv-card"><span class="ope-deriv-k">Salto H</span><span class="ope-deriv-v">23<small>m</small></span></div>
+              <div class="ope-deriv-card"><span class="ope-deriv-k">Caída</span><span class="ope-deriv-v">33<small>m</small></span></div>
+              <div class="ope-deriv-card"><span class="ope-deriv-k">Carga</span><span class="ope-deriv-v">720<small>kg</small></span></div>
+              <div class="ope-deriv-card"><span class="ope-deriv-k">Levante</span><span class="ope-deriv-v">1.440<small>kg</small></span></div>
+              <div class="ope-deriv-card"><span class="ope-deriv-k">Mitigación</span><span class="ope-deriv-v">80</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rk-section rk-section--compact">
+        <header class="rk-section-h"><span>Akuma no Mi</span></header>
+        <div class="rk-section-b">
+          <button type="button" class="ope-akuma-card tipo-paramecia" data-fruta="{&quot;id&quot;:66,&quot;nombre&quot;:&quot;Ito Ito no Mi&quot;,&quot;tipo&quot;:&quot;Paramecia&quot;,&quot;tipo_base&quot;:&quot;paramecia&quot;,&quot;tier&quot;:4,&quot;tier_roman&quot;:&quot;IV&quot;,&quot;rareza&quot;:&quot;Épica&quot;,&quot;secundario&quot;:&quot;AGI&quot;,&quot;potencia&quot;:&quot;TEM + AGI → ⌊suma\/8⌋ (suelo 1)&quot;,&quot;desc&quot;:&quot;La fruta de los hilos de corte y marionetismo. Concede la facultad de generar y manipular hilos invisibles de tenacidad y filo superior al acero. Permite al usuario enganchar sus hilos en las nubes para desplazarse volando por los cielos a gran velocidad (Sky Knight). Puede penetrar el cuerpo de sus oponentes con filamentos invisibles para controlar sus movimientos como marionetas involuntarias (Parasite). Su técnica suprema es la Jaula de Pájaros: erige un domo insular de hilos afilados que se va contrayendo lentamente cortando todo a su paso. En su Despertar, transfigura las estructuras de piedra y edificios del entorno en colosales marejadas de hilos blancos de ataque.&quot;,&quot;efecto&quot;:&quot;Hilos invisibles afilados, desplazamiento por nubes (Sky Knight), marionetismo (Parasite) y Jaula de Pájaros insular.&quot;,&quot;debilidad&quot;:&quot;- Universal: Agua de mar \/ Kairoseki\n- Específica: Ninguna&quot;,&quot;despertar&quot;:&quot;&quot;,&quot;caps&quot;:&quot;&quot;,&quot;origen&quot;:&quot;&quot;,&quot;ocupada_pid&quot;:15,&quot;usuario&quot;:&quot;Vaelen&quot;,&quot;imagen&quot;:&quot;images\/frutas\/ito_ito.png&quot;}" aria-label="Ver detalle de Ito Ito no Mi">
+            <span class="ope-akuma-thumb">
+              <img src="images/frutas/ito_ito.png" alt="" loading="lazy" onerror="this.remove()">
+            </span>
+            <span class="ope-akuma-info">
+              <span class="ope-akuma-kicker">Paramecia · Tier IV</span>
+              <b class="ope-akuma-name">Ito Ito no Mi</b>
+              <span class="ope-akuma-sub">Nv.3 Despertar · Pot 22 · CU 120</span>
+            </span>
+            <span class="ope-akuma-go" aria-hidden="true">Ver ficha ›</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="rk-section rk-section--compact">
+        <header class="rk-section-h"><span>Dotes de Poder</span><small>0/4</small></header>
+        <div class="rk-section-b"><p class="ope-empty">Sin dotes</p></div>
+      </div>
+    </aside>
+
+    <!-- ══ ABAJO · DECK ══ -->
+    <div class="ope-ficha-deck" id="ope-deck">
+      <div class="ope-deck-tabs tabs" role="tablist" aria-label="Detalle del expediente">
+        <button type="button" class="tab ope-dtab" role="tab" aria-selected="true"  data-tab="eternal">Talentos</button>
+        <button type="button" class="tab ope-dtab" role="tab" aria-selected="false" data-tab="combate">Técnicas</button>
+        <button type="button" class="tab ope-dtab" role="tab" aria-selected="false" data-tab="equipo">Equipo</button>
+        <button type="button" class="tab ope-dtab" role="tab" aria-selected="false" data-tab="cronica">Historia</button>
+        <button type="button" class="tab ope-dtab" role="tab" aria-selected="false" data-tab="relaciones">Vínculos</button>
+        <button type="button" class="tab ope-dtab" role="tab" aria-selected="false" data-tab="aliados">Aliados</button>
+        <button type="button" class="tab ope-dtab" role="tab" aria-selected="false" data-tab="rasgos">Rasgos</button>
+      </div>
+      <div class="ope-deck-body">
+
+    <!-- CRÓNICA -->
+    <section class="panel" id="tab-cronica" role="tabpanel">
+        <div>
+          <!-- Descripción física (siempre visible) -->
+          <div class="plate">
+            <div class="plate-h"><span class="t">Descripción física</span></div>
+            <div class="plate-b prose">
+              <p class="ope-from-line"><span class="l">Faceclaim (PB):</span> Aristócrata de Mary Geoise</p>
+              <p>Humano de 1,95 metros de estatura con un porte aristocrático impecable y regio. Sus vestiduras ceremoniales están confeccionadas en seda blanca ártica bordada con hilo de oro puro que forma los emblemas sagrados del Gobierno Mundial y Mary Geoise. Cubre la mitad superior de su rostro con una máscara inquisitorial tallada en porcelana dorada que oculta sus ojos por completo, dejando al descubierto tan solo su barbilla pulcra y unos labios delgados que jamás esbozan una sonrisa.</p><p>En combate, la serenidad de su postura contrasta con la brutalidad estética de su Akuma no Mi. Al canalizar la Ito Ito no Mi, de sus yemas brotan hebras de hilo invisibles pero reflectantes al sol como filamentos de titanio incandescente. Estos hilos se extienden a cientos de metros, enredándose en el aire y en las estructuras de los barcos hasta crear una tela de araña mortal donde cada movimiento de sus dedos controla la postura o cercena las extremidades de sus oponentes.</p>            </div>
+          </div>
+
+          <!-- Personalidad (siempre visible) -->
+          <div class="plate">
+            <div class="plate-h"><span class="t">Personalidad</span></div>
+            <div class="plate-b prose">
+              <p>Frío, calculador y desprovisto de toda vacilación emocional. Vaelen representa la personificación de la Autoridad Inquisitorial de la Santa Tierra de Mary Geoise: para él, la humanidad y los reinos del mar no son más que piezas de ajedrez en un gran tablero de estabilidad global que debe ser protegido a cualquier precio.</p><p>No siente odio personal hacia los piratas ni compasión hacia los civiles sacrificados; su mente funciona con la lógica matemática y fría de los decretos supremos. Entiende la justicia no como una virtud moral, sino como una estructura de sumisión absoluta donde el caos debe ser erradicado de raíz antes de que germine. Cuando pronuncia una sentencia, lo hace con la voz pausada y solemne de quien se sabe respaldado por el peso incontestado de ocho siglos de hegemonía mundial.</p>            </div>
+          </div>
+
+          <!-- Historia -->
+          <div class="plate">
+            <div class="plate-h"><span class="t">Historia</span></div>
+            <div class="plate-b prose">
+              <p>Nacido en el seno de una de las casas aristocráticas más influyentes vinculadas a la administración central de Mary Geoise, Vaelen fue educado desde su juventud en la doctrina del Gobierno Mundial y el dominio táctico de la ley inquisitorial. Tras consumir la Ito Ito no Mi y destacar por su frialdad táctica, ascendió rápidamente a través de las ramas más oscuras de la inquisición judicial y los servicios de inteligencia del Tribunal del Dragón.</p><p>A lo largo de tres décadas, dirigió purgas silenciosas en reinos conspiradores del Paraíso, desarticuló células revolucionarias embrionarias y coordinó las órdenes ejecutivas de los Cipher Pol contra piratas del Nuevo Mundo. Su nombramiento como Comisionado Supremo se produjo tras sofocar con éxito el levantamiento de la Isla de Ostraka, donde tendió una red de hilos que bloqueó la bahía entera y sometió a la flota rebelde sin permitir una sola huida. En la actualidad, preside el comité extraordinario de seguridad tras el arresto de Rolf D. Basterra y los movimientos amenazantes de los cuatro Yonkou.</p>            </div>
+          </div>
+
+          <!-- Notas -->
+
+          <div class="plate">
+            <div class="plate-h"><span class="t">Línea de tiempo</span><span class="c">// historias por año</span></div>
+            <div class="plate-b">
+              <p class="mono fs-76 c-dim">Este personaje aún no ha participado en ninguna historia.</p>
+            </div>
+          </div>
+        </div>
+    </section>
+
+    <!-- RELACIONES (Vínculos) -->
+    <section class="panel" id="tab-relaciones" role="tabpanel">
+      <div class="plate">
+        <div class="plate-h">
+          <span class="t">Relaciones</span><span class="c">// mapa de vínculos</span>
+        </div>
+        <div class="plate-b">
+          <div class="ope-rel-empty" id="relaciones-map">
+            <div class="ope-rel-empty-ic" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="2.4"/><circle cx="5" cy="17" r="2.4"/><circle cx="19" cy="17" r="2.4"/><path d="M12 8.4l-5.6 6.7M12 8.4l5.6 6.7M7 17h10"/></svg>
+            </div>
+            <p>Aún no hay vínculos registrados en este expediente.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- TALENTOS ETERNAL (solo nodos poseídos) -->
+    <section class="panel on" id="tab-eternal" role="tabpanel">
+      <div class="plate">
+        <div class="plate-h"><span class="t">Sistema Eternal · Forja</span><span class="c">// solo nodos elegidos</span></div>
+        <div class="plate-b">
+          <div class="ope-etbudget">
+            <div class="ope-etb">
+              <span class="ope-etb-l">Identidad</span>
+              <b class="ope-etb-v">5<span>/5</span></b>
+              <span class="ope-etb-s">0 PT libres</span>
+            </div>
+            <div class="ope-etb">
+              <span class="ope-etb-l">Arma</span>
+              <b class="ope-etb-v">5<span>/5</span></b>
+              <span class="ope-etb-s">0 PT libres</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="plate"><div class="plate-b"><div class="eternal-owned"><h3 class="eternal-owned__h">Centinela <span class="c-dim">// 5 elegidos</span></h3><ul class="eternal-owned__list"><li class="eternal-owned__item eternal-owned__item--pasiva"><div class="eternal-owned__name">Raíces de Bastión</div><div class="eternal-owned__meta">T1 · Bastión · Pasiva</div><p class="eternal-owned__efecto">Mientras no te hayas desplazado desde el inicio de tu último turno, tu cuerpo se ancla y endurece en proporción a tu reserva: reduces el daño entrante con +5 de mitigación por cada 3 Resistencia acumulada (máx. +15). La Resistencia no se consume al hacerlo.</p></li><li class="eternal-owned__item eternal-owned__item--habilitador"><div class="eternal-owned__name">Fortaleza Personal</div><div class="eternal-owned__meta">T2 · Bastión · Habilitador</div><p class="eternal-owned__efecto">Puedes crear técnicas que consuman Resistencia para volverte inamovible (inmune a empuje y a movimiento forzado) y reducir drásticamente el daño que recibes durante 1 turno; la reducción escala con la Resistencia gastada.</p></li><li class="eternal-owned__item eternal-owned__item--mini-sistema"><div class="eternal-owned__name">Postura Inamovible</div><div class="eternal-owned__meta">T3 · Bastión · Mini-sistema</div><p class="eternal-owned__efecto">Mientras no te desplaces durante un turno, tu mitigación aumenta de forma acumulativa (+2 por turno, máx. +10), eres inmune a movimiento forzado (empuje, Enraizado) y tu Resistencia ya no decae. El contador se reinicia si te mueves.</p></li><li class="eternal-owned__item eternal-owned__item--mini-sistema"><div class="eternal-owned__name">Cuerpo Fortaleza</div><div class="eternal-owned__meta">T4 · Bastión · Mini-sistema</div><p class="eternal-owned__efecto">Al inicio de cada turno enemigo, tu Resistencia acumulada actúa como mitigación adicional (1 punto por cada 1 Resistencia) contra el primer golpe que recibas ese turno, sin consumirse.</p></li><li class="eternal-owned__item eternal-owned__item--pasiva"><div class="eternal-owned__name">Fortaleza Eterna</div><div class="eternal-owned__meta">Pináculo · Bastión · Pasiva</div><p class="eternal-owned__efecto">Mientras no te desplaces, eres inmune a todo control (Aturdido, Ralentizado, Enraizado, empuje) y compartes tu mitigación efectiva con todos los aliados adyacentes (reciben tu misma mitigación mientras aguantes firme).</p></li></ul></div></div></div>
+      <div class="plate"><div class="plate-b"><div class="eternal-owned"><h3 class="eternal-owned__h">Alcance <span class="c-dim">// 5 elegidos</span></h3><ul class="eternal-owned__list"><li class="eternal-owned__item eternal-owned__item--pasiva"><div class="eternal-owned__name">Enganche</div><div class="eternal-owned__meta">T1 · Control · Pasiva</div><p class="eternal-owned__efecto">Tus ataques de Alcance contra un objetivo a más de 2m aplican automáticamente Enraizado (1 turno): el objetivo no puede alejarse de ti hasta romperlo (Gap FUE vs valor del efecto). Si el objetivo ya estaba Enraizado, tu ataque ignora 10% de su mitigación física.</p></li><li class="eternal-owned__item eternal-owned__item--habilitador"><div class="eternal-owned__name">Atadura</div><div class="eternal-owned__meta">T2 · Control · Habilitador</div><p class="eternal-owned__efecto">Puedes crear técnicas de Alcance que inmovilicen a un objetivo: Enraizado que requiere 2 éxitos de Gap FUE para romper (en vez de 1). Mientras el objetivo esté inmovilizado, no puede usar técnicas que requieran movimiento.</p></li><li class="eternal-owned__item eternal-owned__item--mini-sistema"><div class="eternal-owned__name">Zona Prohibida</div><div class="eternal-owned__meta">T3 · Control · Mini-sistema</div><p class="eternal-owned__efecto">Mientras tengas un objetivo Enraizado por una de tus técnicas, ningún otro enemigo puede entrar en un radio de 3m alrededor de ti sin recibir automáticamente un ataque de oportunidad que aplica Enraizado (1 turno) al intruso.</p></li><li class="eternal-owned__item eternal-owned__item--habilitador"><div class="eternal-owned__name">Prisión de Acero</div><div class="eternal-owned__meta">T4 · Control · Habilitador</div><p class="eternal-owned__efecto">Puedes crear técnicas de Alcance que atrapen completamente a un objetivo: Enraizado permanente hasta que el portador del arma se mueva, cambie de objetivo o el atrapado supere 3 éxitos de Gap FUE consecutivos. Mientras esté atrapado, el objetivo no puede atacar al portador del arma (está fuera de su alcance, sujeto por la punta).</p></li><li class="eternal-owned__item eternal-owned__item--pasiva"><div class="eternal-owned__name">Telaraña de Acero</div><div class="eternal-owned__meta">Pináculo · Control · Pasiva</div><p class="eternal-owned__efecto">Puedes tener hasta 3 objetivos Enraizados simultáneamente por tus técnicas (sin límite de distancia entre ellos). Mientras tengas 2+ Enraizados, tu mitigación aumenta en +10 por cada Enraizado activo.</p></li></ul></div></div></div>
+    </section>
+
+    <!-- RASGOS (Factor Linaje: solo los comprados) -->
+    <section class="panel" id="tab-rasgos" role="tabpanel">
+      <div class="plate">
+        <div class="plate-h"><span class="t">Rasgos Raciales</span><span class="c">// comprados con PL</span></div>
+        <div class="plate-b">
+          <div class="trait">
+            <span class="d v"></span>
+            <div>
+              <span class="b">Ito Ito no Mi (Hilos) — <em class="c-dim">Paramecia Tier IV. Control de hilos cortantes, marionetización y jaula de hilos.</em></span>
+            </div>
+            <span class="id">0 PL</span>
+          </div>
+          <div class="trait">
+            <span class="d v"></span>
+            <div>
+              <span class="b">Alcance — Control — <em class="c-dim">Control de marioneta a distancia.</em></span>
+            </div>
+            <span class="id">0 PL</span>
+          </div>
+          <div class="trait">
+            <span class="d v"></span>
+            <div>
+              <span class="b">Intelecto Aristocrático — <em class="c-dim">Estrategia y calculo político perfecto (+6 INT, +4 CAR).</em></span>
+            </div>
+            <span class="id">0 PL</span>
+          </div>
+          <div class="trait">
+            <span class="d v"></span>
+            <div>
+              <span class="b">Centinela — Bastión — <em class="c-dim">Red de hilos defensiva inexpugnable.</em></span>
+            </div>
+            <span class="id">0 PL</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="plate">
+        <div class="plate-h"><span class="t">Rasgos Generales y Defectos</span><span class="c">// balance PL 0</span></div>
+        <div class="plate-b">
+          <p class="mono fs-76 c-dim">Sin rasgos generales ni defectos registrados.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALIADOS (acompañantes NPC + tripulación) -->
+    <section class="panel" id="tab-aliados" role="tabpanel">
+      <!-- Acompañantes NPC (hasta 2) -->
+      <div class="plate" id="acomp-plate">
+        <div class="plate-h">
+          <span class="t">Acompañantes</span><span class="c">// 0/2</span>
+        </div>
+        <div class="plate-b">
+          <p class="mono fs-76 c-dim">Sin acompañantes NPC. Puedes solicitarlos en <a href="http://localhost/iforge/solicitar-acompanante.php">Trámites &rsaquo; Acompañante</a>.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TÉCNICAS (deck de cartas) -->
+    <section class="panel" id="tab-combate" role="tabpanel">
+      <!-- Deck de cartas de técnica (INI-03) -->
+      <div class="plate" id="deck-plate">
+        <div class="plate-h">
+          <span class="t">Deck</span><span class="c">// 0 carta(s)</span>
+          <button type="button" class="ope-deck-toggle" id="deck-toggle" aria-expanded="false">&#9660; Desplegar</button>
+        </div>
+        <div class="plate-b tal" id="deck-body" hidden>
+          <div class="ope-soon-box">
+            <span class="ope-soon-tag">Deck vacío</span>
+            <p class="mono fs-76 c-dim mt-8">Este personaje aún no ha aprendido ninguna carta de técnica.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- EQUIPO -->
+    <section class="panel" id="tab-equipo" role="tabpanel">
+      <!-- Mochila: berries + capacidad de slots -->
+      <div class="plate">
+        <div class="plate-h"><span class="t">Mochila</span><span class="c">// 0/12 slots</span></div>
+        <div class="plate-b">
+          <div class="ope-berries">
+            <span class="ope-berries-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8.5 9.5h5M8.5 12h5M11 7v10"/></svg></span>
+            <span class="ope-berries-l">Berries</span>
+            <b class="ope-berries-v">0</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="ope-inv">
+        <!-- Inventario (lo que llevas encima): cuadrícula de slots -->
+        <div class="plate ope-inv-side">
+          <div class="plate-h"><span class="t">Inventario</span><span class="c">// encima &middot; 0 obj.</span></div>
+          <div class="plate-b">
+            <p class="ope-inv-hint">Pulsa un objeto para ver su información. Los objetos grandes ocupan varios slots.</p>
+            <p class="mono fs-76 c-dim">No llevas nada encima.</p>
+            <div class="ope-slotgrid">
+              <div class="ope-slot empty" aria-hidden="true"></div>
+              <div class="ope-slot empty" aria-hidden="true"></div>
+              <div class="ope-slot empty" aria-hidden="true"></div>
+              <div class="ope-slot empty" aria-hidden="true"></div>
+              <div class="ope-slot empty" aria-hidden="true"></div>
+              <div class="ope-slot empty" aria-hidden="true"></div>
+              <div class="ope-slot empty" aria-hidden="true"></div>
+              <div class="ope-slot empty" aria-hidden="true"></div>
+              <div class="ope-slot empty" aria-hidden="true"></div>
+              <div class="ope-slot empty" aria-hidden="true"></div>
+              <div class="ope-slot empty" aria-hidden="true"></div>
+              <div class="ope-slot empty" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Almacén: lista de objetos guardados -->
+        <div class="plate ope-inv-side">
+          <div class="plate-h"><span class="t">Almacén</span><span class="c">// 0 obj.</span></div>
+          <div class="plate-b">
+            <p class="ope-inv-hint">Pulsa un objeto para ver su información.</p>
+            <p class="mono fs-76 c-dim">Almacén vacío.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalle del objeto pulsado (se rellena por JS; no mueve nada) -->
+      <div class="plate ope-inv-detail" id="ope-inv-detail" hidden>
+        <div class="plate-h"><span class="t" id="ope-inv-detail-name">&mdash;</span><span class="c" id="ope-inv-detail-size"></span></div>
+        <div class="plate-b prose"><p id="ope-inv-detail-desc" class="mono c-dim"></p></div>
+      </div>
+    </section>
+      </div><!-- .ope-deck-body -->
+    </div><!-- .ope-ficha-deck -->
+  </div><!-- .ope-ficha-game -->
+
+</div><!-- .ope-ficha-wrap -->
+
+<footer class="foot">
+  <div class="foot-in">
+    <div class="foot-b">One Piece: Eternal</div>
+    <div class="foot-links"><a href="http://localhost/iforge/index.php">Inicio</a><a href="http://localhost/iforge/personajes.php">Personaje</a><a href="http://localhost/iforge/tramites.php">Trámites</a><a href="http://localhost/iforge/guias.php">Guías</a></div>
+    <div class="foot-c">One Piece: Eternal</div>
+  </div>
+</footer>
+
+<script>
+// ── Switcher Atributos ↔ Derivadas (columna derecha) ──
+(function () {
+  var root = document.getElementById('ope-stat-switcher');
+  if (!root) return;
+  var btns = root.querySelectorAll('.ope-ss-btn');
+  var panes = root.querySelectorAll('[data-ss-pane]');
+  function show(key) {
+    btns.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.ss === key ? 'true' : 'false'); });
+    panes.forEach(function (p) { p.hidden = p.dataset.ssPane !== key; });
+  }
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () { show(b.dataset.ss); });
+  });
+})();
+
+// ── Pestañas de la franja inferior (deck) ──
+document.querySelectorAll('.ope-dtab').forEach(function (t) {
+  t.addEventListener('click', function () {
+    var deck = t.closest('.ope-ficha-deck');
+    if (!deck) return;
+    deck.querySelectorAll('.ope-dtab').forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+    t.setAttribute('aria-selected', 'true');
+    deck.querySelectorAll('.ope-deck-body > .panel').forEach(function (p) { p.classList.remove('on'); });
+    var panel = deck.querySelector('#tab-' + t.dataset.tab);
+    if (panel) panel.classList.add('on');
+  });
+});
+
+// ── Vista Gestión a pantalla completa (reemplaza al visor) ──
+(function () {
+  var gview = document.getElementById('ope-gestion-view');
+  var inspector = document.getElementById('ope-inspector');
+  function selectMtab(key) {
+    if (!gview || !key) return;
+    var btn = gview.querySelector('.ope-mtab[data-mtab="' + key + '"]');
+    if (btn) btn.click();
+  }
+  function openGestion(mtab) {
+    if (!gview) return;
+    gview.hidden = false;
+    if (inspector) inspector.style.display = 'none';
+    if (typeof mtab === 'string') selectMtab(mtab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function closeGestion() {
+    if (!gview) return;
+    gview.hidden = true;
+    if (inspector) inspector.style.display = '';
+  }
+  document.querySelectorAll('[data-goto-area="gestion"], #ope-gestion-open').forEach(function (b) {
+    b.addEventListener('click', function () { openGestion(b.dataset.gotoMtab); });
+  });
+  var back = document.getElementById('ope-gestion-close');
+  if (back) back.addEventListener('click', closeGestion);
+  // Compatibilidad con llamadas previas.
+  window.opeShowArea = function (a) { if (a === 'gestion') { openGestion(); } else { closeGestion(); } };
+})();
+
+document.querySelectorAll('.subtab').forEach(function (s) {
+  s.addEventListener('click', function () {
+    document.querySelectorAll('.subtab').forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+    s.setAttribute('aria-selected', 'true');
+    document.querySelectorAll('[data-bio-c]').forEach(function (c) { c.hidden = (c.dataset.bioC !== s.dataset.bio); });
+  });
+});
+// Pestañas por año de la línea de tiempo.
+document.querySelectorAll('.tl-tab').forEach(function (s) {
+  s.addEventListener('click', function () {
+    document.querySelectorAll('.tl-tab').forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+    s.setAttribute('aria-selected', 'true');
+    document.querySelectorAll('[data-year-c]').forEach(function (c) { c.hidden = (c.dataset.yearC !== s.dataset.year); });
+  });
+});
+
+// ── Equipo (vista de ficha): pulsar un objeto despliega su info (no lo mueve) ──
+(function () {
+  var box = document.getElementById('ope-inv-detail');
+  if (!box) return;
+  var elName = document.getElementById('ope-inv-detail-name');
+  var elSize = document.getElementById('ope-inv-detail-size');
+  var elDesc = document.getElementById('ope-inv-detail-desc');
+  var current = null;
+  document.querySelectorAll('.ope-invitem').forEach(function (it) {
+    it.addEventListener('click', function () {
+      document.querySelectorAll('.ope-invitem.is-open').forEach(function (x) { if (x !== it) x.classList.remove('is-open'); });
+      if (current === it) { it.classList.remove('is-open'); box.hidden = true; current = null; return; }
+      current = it;
+      it.classList.add('is-open');
+      var n = it.getAttribute('data-name') || '';
+      var s = parseInt(it.getAttribute('data-size') || '1', 10) || 1;
+      var d = it.getAttribute('data-desc') || '';
+      elName.textContent = n;
+      elSize.textContent = s + ' slot' + (s > 1 ? 's' : '');
+      if (d) { elDesc.textContent = d; elDesc.style.color = 'var(--paper)'; }
+      else { elDesc.textContent = 'Sin descripción.'; elDesc.style.color = 'var(--paper-dim)'; }
+      box.hidden = false;
+    });
+  });
+})();
+
+// ── Gestión (panel): sub-pestañas, previews, plantillas, Eternal, deep-link ──
+(function () {
+  var panel = document.getElementById('tab-gestion');
+  if (!panel) return;
+
+  function openTab(name) {
+    var found = false;
+    panel.querySelectorAll('.ope-mtab').forEach(function (x) {
+      var on = x.dataset.mtab === name;
+      x.setAttribute('aria-selected', on ? 'true' : 'false');
+      x.classList.toggle('on', on);
+      if (on) found = true;
+    });
+    panel.querySelectorAll('.ope-mpanel').forEach(function (p) {
+      p.classList.toggle('on', p.dataset.mpanel === name);
+    });
+    return found;
+  }
+  panel.querySelectorAll('.ope-mtab').forEach(function (t) {
+    t.addEventListener('click', function () { openTab(t.dataset.mtab); });
+  });
+
+  // Previsualización en vivo del retrato (ficha) y del avatar (posts).
+  function bindPrev(inputName, imgId, emptyId, altLabel) {
+    var inp = panel.querySelector('input[name="' + inputName + '"]');
+    var img = document.getElementById(imgId);
+    var empty = document.getElementById(emptyId);
+    if (!inp) return;
+    inp.addEventListener('input', function () {
+      var v = inp.value.trim();
+      if (!/^https?:\/\//i.test(v)) return;
+      if (!img && empty) {
+        img = document.createElement('img');
+        img.id = imgId;
+        img.alt = altLabel;
+        empty.replaceWith(img);
+        empty = null;
+      }
+      if (img) img.src = v;
+    });
+  }
+  bindPrev('retrato', 'ope-prev-retrato', 'ope-prev-retrato-empty', 'Retrato');
+  bindPrev('avatar', 'ope-prev-avatar', 'ope-prev-avatar-empty', 'Avatar');
+
+  // Botones "Editar relaciones" (cabecera del mapa y estado vacío).
+  ['ope-rel-edit-open', 'ope-rel-edit-open2'].forEach(function (id) {
+    var b = document.getElementById(id);
+    if (b) b.addEventListener('click', function () {
+      if (window.opeShowArea) window.opeShowArea('gestion');
+      openTab('relaciones');
+    });
+  });
+
+  // Herramientas de inserción BBCode/spoiler en los editores de plantillas.
+  panel.addEventListener('click', function (e) {
+    var t = e.target.closest('.ope-tpl-tool');
+    if (!t) return;
+    var form = t.closest('form');
+    var ta = form && form.querySelector('textarea[name="cuerpo"]');
+    if (!ta) return;
+    var ins = t.getAttribute('data-ins') || '';
+    var s = ta.selectionStart || 0, en = ta.selectionEnd || 0, v = ta.value;
+    var m = /^(\[[^\]]*\])(\[\/[^\]]*\])$/.exec(ins);
+    var caret;
+    if (m) {
+      var sel = v.slice(s, en);
+      ta.value = v.slice(0, s) + m[1] + sel + m[2] + v.slice(en);
+      caret = s + m[1].length + sel.length;
+    } else {
+      ta.value = v.slice(0, s) + ins + v.slice(en);
+      caret = s + ins.length;
+    }
+    ta.focus();
+    try { ta.setSelectionRange(caret, caret); } catch (x) {}
+  });
+
+  // Elegir / retirar nodos Eternal (submit del formulario oculto).
+  var etForm = document.getElementById('ope-eternal-form');
+  if (etForm) {
+    panel.querySelectorAll('.ope-gtree').forEach(function (wrap) {
+      var arbol = wrap.getAttribute('data-arbol') || '';
+      wrap.querySelectorAll('.eternal-node--interactivo').forEach(function (node) {
+        node.addEventListener('click', function () {
+          if (node.classList.contains('eternal-node--blocked')) return;
+          var nid = node.getAttribute('data-node-id') || '';
+          if (!nid) return;
+          document.getElementById('ope-eternal-arbol').value = arbol;
+          document.getElementById('ope-eternal-nodo').value = nid;
+          document.getElementById('ope-eternal-gaccion').value =
+            node.classList.contains('is-owned') ? 'eternal_unpick' : 'eternal_pick';
+          etForm.submit();
+        });
+      });
+    });
+  }
+
+  // Si venimos de guardar (?g=1), abre el área Gestión y la sub-pestaña del hash.
+  if (/[?&]g=1(&|$)/.test(location.search)) {
+    if (window.opeShowArea) window.opeShowArea('gestion');
+    var map = {
+      '#g-atributos': 'atributos', '#g-talentos': 'talentos', '#g-haki': 'haki', '#g-equipo': 'equipo',
+      '#cronologia': 'cronologia', '#relaciones': 'relaciones', '#templates': 'templates',
+      '#equipo': 'equipo', '#perfil': 'perfil'
+    };
+    openTab(map[location.hash] || 'atributos');
+  }
+})();
+
+// ── Mapa de relaciones: activar pestaña + arrastre de nodos ──
+(function () {
+  var svg = document.querySelector('.ope-relmap');
+  if (!svg) return;
+
+  // Si venimos de guardar posiciones, muestra la pestaña Relaciones.
+  if (location.hash === '#relaciones-map') {
+    var relTab = document.querySelector('.tab[data-tab="relaciones"]');
+    if (relTab) relTab.click();
+  }
+
+  if (!svg.classList.contains('is-editable')) return;
+  var saveBtn = document.getElementById('ope-relpos-save');
+  var pt = svg.createSVGPoint();
+  var dragging = null;
+
+  function toSvg(evt) {
+    pt.x = evt.clientX; pt.y = evt.clientY;
+    var m = svg.getScreenCTM();
+    if (!m) return { x: 0, y: 0 };
+    var p = pt.matrixTransform(m.inverse());
+    return { x: p.x, y: p.y };
+  }
+  function clamp(v, min, max) { return v < min ? min : (v > max ? max : v); }
+
+  svg.querySelectorAll('.ope-relnode[data-rid]').forEach(function (node) {
+    node.addEventListener('pointerdown', function (e) {
+      // No arrastres al pulsar el enlace del nombre.
+      if (e.target.closest('.ope-relnode-link')) return;
+      e.preventDefault();
+      dragging = node;
+      node.classList.add('is-dragging');
+      node.setPointerCapture(e.pointerId);
+    });
+  });
+
+  svg.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    var p = toSvg(e);
+    var x = Math.round(clamp(p.x, 40, 960));
+    var y = Math.round(clamp(p.y, 40, 600));
+    dragging.setAttribute('transform', 'translate(' + x + ',' + y + ')');
+    var rid = dragging.getAttribute('data-rid');
+    var hx = dragging.querySelector('input[name="px[' + rid + ']"]');
+    var hy = dragging.querySelector('input[name="py[' + rid + ']"]');
+    if (hx) hx.value = x;
+    if (hy) hy.value = y;
+    updateEdges();
+    if (saveBtn) saveBtn.disabled = false;
+  });
+  function endDrag(e) {
+    if (!dragging) return;
+    dragging.classList.remove('is-dragging');
+    dragging = null;
+  }
+  svg.addEventListener('pointerup', endDrag);
+  svg.addEventListener('pointercancel', endDrag);
+
+  // Recalcula posición de aristas/etiquetas a partir de los nodos.
+  function updateEdges() {
+    var cx = 500, cy = 320;
+    var nodes = svg.querySelectorAll('.ope-relnode[data-rid]');
+    var edges = svg.querySelectorAll('.ope-reledge');
+    nodes.forEach(function (node, i) {
+      var t = node.getAttribute('transform') || '';
+      var m = /translate\(\s*(-?\d+\.?\d*)[ ,]+(-?\d+\.?\d*)\)/.exec(t);
+      if (!m) return;
+      var x = parseFloat(m[1]), y = parseFloat(m[2]);
+      var edge = edges[i];
+      if (!edge) return;
+      var ln = edge.querySelector('line');
+      if (ln) { ln.setAttribute('x2', x); ln.setAttribute('y2', y); }
+      var lbl = edge.querySelector('.ope-rellabel');
+      if (lbl) lbl.setAttribute('transform', 'translate(' + Math.round((cx + x) / 2) + ',' + Math.round((cy + y) / 2) + ')');
+    });
+  }
+})();
+
+// ── Deck: desplegable, filtros, búsqueda, paginado ──
+(function () {
+  var toggle = document.getElementById('deck-toggle');
+  var body = document.getElementById('deck-body');
+  if (!toggle || !body) return;
+
+  toggle.addEventListener('click', function () {
+    var open = body.hidden;
+    body.hidden = !open;
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.innerHTML = open ? '&#9650; Contraer' : '&#9660; Desplegar';
+    if (open) doFilter();
+  });
+
+  var grid = document.getElementById('deck-grid');
+  var search = document.getElementById('deck-search');
+  var pagDiv = document.getElementById('deck-pagination');
+  var cards = grid ? grid.querySelectorAll('.ope-tk') : [];
+  var perPage = 6;
+  var currentPage = 1;
+  var activeTag = '';
+
+  if (!grid || !cards.length) return;
+
+  if (search) search.addEventListener('input', function () { doFilter(); });
+  var tagCbs = document.querySelectorAll('.ope-deck-tag-cb');
+  tagCbs.forEach(function (cb) {
+    cb.addEventListener('change', function () {
+      if (cb.checked) {
+        tagCbs.forEach(function (x) { if (x !== cb) x.checked = false; });
+        activeTag = cb.value;
+      } else {
+        activeTag = '';
+      }
+      doFilter();
+    });
+  });
+
+  function doFilter() {
+    var q = search ? search.value.toLowerCase().trim() : '';
+    var visible = [];
+    cards.forEach(function (c) {
+      var name = (c.getAttribute('data-name') || '').toLowerCase();
+      var desc = (c.getAttribute('data-desc') || '').toLowerCase();
+      var tags = c.getAttribute('data-tags') || '';
+      var matchSearch = !q || name.indexOf(q) !== -1 || desc.indexOf(q) !== -1;
+      var matchTag = !activeTag || tags.indexOf(activeTag) !== -1;
+      c.style.display = (matchSearch && matchTag) ? '' : 'none';
+      if (matchSearch && matchTag) visible.push(c);
+    });
+    renderPages(visible);
+  }
+
+  function renderPages(visible) {
+    var total = visible.length;
+    var pages = Math.max(1, Math.ceil(total / perPage));
+    if (currentPage > pages) currentPage = pages;
+    visible.forEach(function (c, i) {
+      c.style.display = (i >= (currentPage - 1) * perPage && i < currentPage * perPage) ? '' : 'none';
+    });
+    if (pages <= 1) { pagDiv.innerHTML = ''; return; }
+    var h = '';
+    for (var p = 1; p <= pages; p++) {
+      h += '<button type="button" class="ope-deck-pg' + (p === currentPage ? ' on' : '') + '" data-p="' + p + '">' + p + '</button>';
+    }
+    pagDiv.innerHTML = h;
+    pagDiv.querySelectorAll('.ope-deck-pg').forEach(function (b) {
+      b.addEventListener('click', function () {
+        currentPage = parseInt(b.dataset.p, 10);
+        renderPages(visible);
+      });
+    });
+  }
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function() {
+  var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
+  function fillBars(scope) {
+    (scope || document).querySelectorAll('[data-fill]').forEach(function(i) {
+      if (i.dataset.done) return;
+      i.dataset.done = 1;
+      var v = i.getAttribute('data-fill') + '%';
+      if (REDUCED) {
+        i.style.width = v;
+        return;
+      }
+      setTimeout(function() {
+        i.style.width = v;
+      }, 80);
+    });
+  }
+
+  window.addEventListener('load', function() {
+    fillBars(document.querySelector('.ope-ficha-wrap'));
+    if (window.gsap && window.ScrollTrigger) {
+      gsap.registerPlugin(ScrollTrigger);
+      document.querySelectorAll('[data-count]').forEach(function(el) {
+        var end = +el.getAttribute('data-count'), o = { v: 0 };
+        if (REDUCED) {
+          el.textContent = end.toLocaleString('es');
+          return;
+        }
+        gsap.to(o, {
+          v: end,
+          duration: 1.4,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 92%' },
+          onUpdate: function() {
+            el.textContent = Math.floor(o.v).toLocaleString('es');
+          }
+        });
+      });
+    }
+  });
+
+  // Listen to tab clicks to re-fill bars in new panes
+  document.querySelectorAll('.tab').forEach(function(t) {
+    t.addEventListener('click', function() {
+      var paneId = 'tab-' + t.dataset.tab;
+      var pane = document.getElementById(paneId);
+      if (pane) {
+        fillBars(pane);
+      }
+    });
+  });
+})();
+</script>
+
+<div class="bib-overlay fruta-overlay" id="frutaOverlay" hidden><div class="bib-detail" id="frutaDetail" role="dialog" aria-modal="true" aria-label="Detalle de Akuma no Mi"></div></div><script id="ope-fruta-modal">
+(function(){
+var BB="http:\/\/localhost\/iforge";
+var overlay=document.getElementById("frutaOverlay"),detail=document.getElementById("frutaDetail");
+if(!overlay||!detail)return;
+function esc(s){return (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+var LBL={paramecia:"Paramecia",zoa:"Zoan",logia:"Logia"};
+function fruitSvg(){return '<span class="bib-media-fruit" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 12c4-6 14-6 16 2 2 8-6 20-16 22C14 34 6 22 8 14c2-8 12-8 16-2z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M24 12c-1-3 1-6 4-7" fill="none" stroke="currentColor" stroke-width="2.5"/></svg></span>';}
+function media(p){return p.imagen?'<img src="'+esc(p.imagen)+'" alt="" loading="lazy" onerror="this.parentNode.classList.add(\'no-img\');this.remove()">':fruitSvg();}
+function row(l,v){return v?'<div class="bib-d-row"><span class="bib-d-l">'+esc(l)+'</span><span class="bib-d-v">'+v+'</span></div>':"";}
+function block(l,v,pre){if(!v||!String(v).trim())return "";var body=pre?'<pre class="bib-d-caps">'+esc(v)+"</pre>":"<p>"+esc(v).replace(/\n/g,"<br>")+"</p>";return '<div class="bib-d-block"><span class="bib-d-h">'+esc(l)+"</span>"+body+"</div>";}
+function typeCls(t){t=(t||"").toLowerCase();if(t.indexOf("propiedad")>=0)return"tp-prop";if(t.indexOf("habilitador")>=0)return"tp-hab";if(t.indexOf("mini")>=0)return"tp-mini";if(t.indexOf("pasiva")>=0)return"tp-pas";return"tp-oth";}
+function capB(s){return esc(s).replace(/(Techos?:|Estados:|Techo hasta|Techo por objetivo hasta|Costes?:)/g,"<b>$1</b>");}
+function capsHtml(raw){if(!raw||!String(raw).trim())return"";var L=String(raw).split("\n"),o='<div class="bib-caps">',op=false;
+for(var i=0;i<L.length;i++){var ln=L[i].trim();if(!ln)continue;
+var mL=ln.match(/^Nv\.(\d)\s*[\u2014-]\s*(.+)$/);
+if(mL){if(op)o+="</div>";o+='<div class="bib-caps-lvl l'+mL[1]+'"><div class="bib-caps-lvlh"><span class="bib-caps-lvln">Nv.'+mL[1]+'</span>'+esc(mL[2])+"</div>";op=true;continue;}
+var mC=ln.match(/^-\s*(CAP-0\d)\s+(.+?)\s*\(([^)]+)\)\s*:\s*([\s\S]+)$/);
+if(mC){o+='<div class="bib-cap"><div class="bib-cap-h"><span class="bib-cap-id">'+esc(mC[1])+'</span><span class="bib-cap-nm">'+esc(mC[2])+'</span><span class="bib-cap-tp '+typeCls(mC[3])+'">'+esc(mC[3])+'</span></div><div class="bib-cap-b">'+capB(mC[4])+'</div></div>';continue;}
+var mP=ln.match(/^-\s*Pasiva\s*:\s*([\s\S]+)$/);
+if(mP){o+='<div class="bib-cap bib-cap-pas"><div class="bib-cap-h"><span class="bib-cap-tp tp-pas">Pasiva</span></div><div class="bib-cap-b">'+capB(mP[1])+'</div></div>';continue;}
+var m2=ln.match(/^-\s*(CAP-0\d)\s+(.+?)\s*:\s*([\s\S]+)$/);
+if(m2){o+='<div class="bib-cap"><div class="bib-cap-h"><span class="bib-cap-id">'+esc(m2[1])+'</span><span class="bib-cap-nm">'+esc(m2[2])+'</span></div><div class="bib-cap-b">'+capB(m2[3])+'</div></div>';continue;}
+o+='<div class="bib-cap-b">'+capB(ln.replace(/^-\s*/,""))+'</div>';}
+if(op)o+="</div>";o+="</div>";
+return '<div class="bib-d-block"><span class="bib-d-h">Capacidades y pasivas</span>'+o+'</div>';}
+function open(p){
+var poss;if(p.ocupada_pid>0){poss='<a href="'+BB+"/ficha.php?pid="+p.ocupada_pid+'">'+esc(p.usuario||("Personaje #"+p.ocupada_pid))+"</a>";}else if(p.usuario){poss=esc(p.usuario);}else{poss='<span class="fruta-libre">Libre</span>';}
+var grid=row("Tipo",esc(p.tipo||LBL[p.tipo_base]||""))+row("Stat de Potencia","TEM + "+esc(p.secundario||"—"))+row("Poseedor",poss);
+var blocks=block("Concepto",p.desc)+block("Efecto general",p.efecto)+block("Fórmula de Potencia",p.potencia,true)+block("Debilidades",p.debilidad)+block("Despertar",p.despertar)+(p.caps?capsHtml(p.caps):"");
+detail.innerHTML='<button type="button" class="bib-d-close" aria-label="Cerrar">\u2715</button>'+'<div class="bib-d-head tipo-'+esc(p.tipo_base)+'"><div class="bib-d-media">'+media(p)+'</div>'+'<div class="bib-d-title"><span class="bib-d-kicker">'+esc(LBL[p.tipo_base]||p.tipo_base)+'</span><h2>'+esc(p.nombre)+'</h2>'+'<div class="bib-d-tags"><span class="bib-d-tier t'+esc(p.tier)+'">Tier '+esc(p.tier_roman)+' · '+esc(p.rareza)+'</span>'+(p.origen?'<span class="bib-d-origen">'+esc(p.origen)+'</span>':"")+'</div></div></div>'+'<div class="bib-d-grid">'+grid+'</div>'+blocks;
+overlay.hidden=false;document.body.classList.add("bib-no-scroll");requestAnimationFrame(function(){detail.classList.add("in");});}
+function close(){detail.classList.remove("in");overlay.hidden=true;document.body.classList.remove("bib-no-scroll");}
+overlay.addEventListener("click",function(e){if(e.target===overlay||(e.target.closest&&e.target.closest(".bib-d-close")))close();});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!overlay.hidden)close();});
+window.OPEFruta={open:open,close:close};
+})();
+</script><script>
+(function(){
+  var card = document.querySelector('.ope-akuma-card[data-fruta]');
+  if (!card) return;
+  function abrir(){ if(!window.OPEFruta) return; try { OPEFruta.open(JSON.parse(card.getAttribute('data-fruta'))); } catch(e){} }
+  card.addEventListener('click', abrir);
+  card.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); abrir(); } });
+})();
+</script>
+
+</body>
+</html>

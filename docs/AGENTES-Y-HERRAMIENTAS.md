@@ -6,10 +6,22 @@ Este documento constituye la **referencia obligatoria de herramientas y protocol
 
 ## 1. MCPs y Herramientas Disponibles
 
-### 1.1. Servidores MCP Configurados
-Actualmente, el único servidor MCP conectado y configurado es:
+### 1.1. Servidores MCP por agente
 
-- **`stitch`** (`https://stitch.googleapis.com/mcp`): Servidor MCP para generación y gestión de pantallas UI y sistemas de diseño (`apply_design_system`, `create_design_system`, `create_design_system_from_design_md`, `generate_screen_from_text`, `generate_variants`, `upload_design_md`, etc.).
+La disponibilidad de MCPs **difiere según el agente/IDE** que se esté usando:
+
+| Agente | MCP stitch | MCP playwright | MCP firecrawl |
+|---|---|---|---|
+| **Antigravity** | ✅ Único MCP disponible | ❌ No disponible (usar `browser_subagent`) | ❌ No disponible (usar `read_url_content` / `search_web`) |
+| **OpenCode** | ❌ No disponible | ✅ Configurado y activo | ✅ Configurado y activo |
+| **Cursor** | ❌ No disponible | ✅ Configurado en `.cursor/mcp.json` | ✅ Configurado en `.cursor/mcp.json` |
+
+> [!CAUTION]
+> **MCPs que NO DEBEN invocarse si no están disponibles en tu agente:**
+> - ❌ **`MCP stitch`**: Solo disponible en Antigravity. OpenCode y Cursor **no** lo tienen.
+> - ❌ **`MCP playwright`**: No existe como servidor independiente. En Antigravity usar `browser_subagent`. En OpenCode/Cursor está disponible como MCP local.
+> - ❌ **`MCP firecrawl`**: No existe en Antigravity (usar `read_url_content` / `search_web`). En OpenCode/Cursor está disponible como MCP local.
+> - ❌ **`MCP mysql`**: NO EXISTE en ningún agente. Usar PHP CLI (`php -r "..."`) para interactuar con la base de datos.
 
 ### 1.2. Herramientas Nativas Integradas del Agente
 El agente cuenta con las siguientes herramientas nativas directamente integradas:
@@ -29,8 +41,8 @@ El agente cuenta con las siguientes herramientas nativas directamente integradas
 > [!CAUTION]
 > **MCPs INEXISTENTES — NO INTENTAR INVOCAR**:
 > - ❌ **`MCP mysql`**: NO EXISTE. Para interactuar con la base de datos o validar tablas, se debe usar la CLI de PHP (`php -r "..."`) ejecutando el motor `$db` de MyBB o consultas vía `run_command`.
-> - ❌ **`MCP playwright` (como servidor MCP independiente)**: NO EXISTE. Toda navegación e inspección visual en navegador debe realizarse obligatoriamente mediante la herramienta nativa `browser_subagent`.
-> - ❌ **`MCP firecrawl`**: NO EXISTE. Para leer documentación web o URLs, usar `read_url_content` o `search_web`.
+> - ❌ **`MCP stitch`**: Solo disponible en Antigravity. OpenCode y Cursor no tienen acceso.
+> - ❌ **`MCP playwright` (como servidor MCP independiente)**: Solo disponible en OpenCode y Cursor. En Antigravity, usar la herramienta nativa `browser_subagent`.
 
 ---
 
