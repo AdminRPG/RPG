@@ -401,7 +401,7 @@ function ope_rol_navbar_html()
              . '<div class="ope-dropdown ope-nav-dropdown">'
              . '<a href="' . $bburl . '/biblioteca-akuma.php" class="ope-dropdown-item">Akuma no Mi</a>'
              . '<a href="' . $bburl . '/biblioteca-lore.php" class="ope-dropdown-item">Lore y Cronología</a>'
-             . '<a href="' . $bburl . '/biblioteca-lore.php#npcs" class="ope-dropdown-item">Catálogo de NPCs</a>'
+             . '<a href="' . $bburl . '/catalogo-npcs.php" class="ope-dropdown-item">Catálogo de NPCs</a>'
              . '</div></div>';
 
     $links  .= '<a href="' . $bburl . '/guias.php" class="ope-nav-link' . $isOn(array('guias.php')) . '">Guías</a>';
