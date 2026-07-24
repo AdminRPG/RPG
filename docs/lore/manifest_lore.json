@@ -1,0 +1,79 @@
+{
+  "titulo": "One Piece: Eternal — Lore Manifest",
+  "version": "1.1.0",
+  "año_onrol": 25,
+  "era": "Nueva Era de la Piratería (E.P.)",
+  "evento_apertura": {
+    "nombre": "La Ejecución de Rolf D. Basterra",
+    "ubicacion": "Plaza de Marineford",
+    "frase_patibulo": "¡Mi legado no cabe en una horca! Romped el Tributo Celestial, surcad los mares prohibidos y desafiad los ochocientos años de tiranía... ¡Mi gran tesoro y la verdad oculta del mundo aguardan en el Nuevo Mundo a quienes tengan el valor de tomarlos!",
+    "motivo_oculto": "Protección familiar ante la amenaza de un Buster Call del Gobierno Mundial",
+    "respuesta_gobierno": "Cierre y Bloqueo de los Blues (Reverse Mountain y Calm Belt)"
+  },
+  "trono_vacio": {
+    "ocupado": true,
+    "descripcion": "Existe una entidad soberana suprema en las sombras de Mary Geoise que dicta las purgas mundiales."
+  },
+  "armas_ancestrales": {
+    "poseidon": "Poder biológico de comandar Reyes Marinos (Realeza Gyojin)",
+    "pluton": "Acorazado destructivo bajo Wano/Elbaf",
+    "urano": "Arma aérea custodiada en los cielos de Mary Geoise"
+  },
+  "arqueologia": {
+    "requisito": "Dote de Arqueólogo Ancestral o Raza del Tercer Ojo",
+    "mecanica": "Reunir los 4 calcos (Rubbings) traducidos desbloquea La Última Isla"
+  },
+  "yonkou": [
+    {
+      "nombre": "Kaiser Vaelgor",
+      "titulo": "El Rey de la Ruina",
+      "facción": "Imperio Asolador",
+      "raza": "Oni del Norte",
+      "fruta": "Gura Gura no Mi",
+      "isla_base": "Isla Skar",
+      "reliquia": "Poneglyph Rojo de la Ruina"
+    },
+    {
+      "nombre": "Jarl Brogaz",
+      "titulo": "El Tragahierro",
+      "facción": "Flota Titánica del Gran Cañón",
+      "raza": "Gigante de Elbaf",
+      "fruta": "Baku Baku no Mi",
+      "isla_base": "Isla Ironforge",
+      "reliquia": "Poneglyph Rojo del Acero"
+    },
+    {
+      "nombre": "Princesa Rosette",
+      "titulo": "La Masacre Diminuta",
+      "facción": "La Corte de Espinas",
+      "raza": "Tontatta",
+      "fruta": "Bat Bat no Mi: Modelo Vampiro",
+      "isla_base": "Isla Rosewood",
+      "reliquia": "Poneglyph Rojo de Sangre"
+    },
+    {
+      "nombre": "Sylphira",
+      "titulo": "La Hoja Inmaculada",
+      "facción": "Armada de las Espadas Celestes",
+      "raza": "Skypean",
+      "fruta": "Sin Fruta (Haki & Diales)",
+      "isla_base": "Isla Aethelgard",
+      "reliquia": "Poneglyph Rojo del Cielo"
+    }
+  ],
+  "gobierno": {
+    "lider": "Alto Inquisidor Vaelen",
+    "titulo": "El Inquisidor Dorado",
+    "fruta": "Ito Ito no Mi",
+    "ubicacion": "Mary Geoise — Tribunal del Dragón",
+    "objetivo": "Cobrar el Tributo Celestial y erradicar la insurgencia"
+  },
+  "marina": {
+    "almirante_flota": "Sigrun D. Basterra",
+    "almirantes": ["Halvar (Hie Hie)", "Ysolde (Mink Sulong)", "Draven (Gyojin Karate)"]
+  },
+  "cazarrecompensas": {
+    "lideres": ["Valerius (Balas Kairoseki)", "Morgana (Mink Pantera)"],
+    "mecanica": "Contratos Semanales del Staff sobre PJs piratas reales"
+  }
+}
