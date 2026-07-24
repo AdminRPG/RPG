@@ -94,23 +94,36 @@ if (!function_exists('ope_rol_stats')) {
         return (int) ($cost[$t] ?? 50);
     }
 
-    /** Tope de un stat individual según el tramo (STATS.md). */
+    /**
+     * Techo del valor INVERTIDO de un stat (base 1 + puntos de creación + comprado
+     * con PP). STATS.md. El linaje, las dotes y los buffs de combate se suman
+     * POR ENCIMA de este techo y sí pueden superar 99.
+     */
+    function ope_rol_stat_techo()
+    {
+        return 99;
+    }
+
+    /**
+     * Tope del valor INVERTIDO (base + comprado) de un stat según el tramo (STATS.md).
+     * El Tramo V llega al techo de inversión (99). El racial/dotes/buffs van aparte.
+     */
     function ope_rol_stat_cap_tramo($nivel)
     {
-        static $cap = array(1 => 15, 2 => 25, 3 => 35, 4 => 45, 5 => 60);
+        static $cap = array(1 => 20, 2 => 35, 3 => 55, 4 => 75, 5 => 99);
         $t = ope_rol_tramo($nivel);
-        return (int) ($cap[$t] ?? 60);
+        return (int) ($cap[$t] ?? ope_rol_stat_techo());
     }
 
     /** Puntos de stat comprados por nivel (STATS.md). */
     function ope_rol_stats_por_nivel()
     {
-        return 20;
+        return 5;
     }
 
     /**
      * Nivel desde stats comprados con PP (cap 50).
-     * Nivel = min(50, 1 + floor(comprados / 20))
+     * Nivel = min(50, 1 + floor(comprados / 5))
      */
     function ope_rol_nivel_from_stats_comprados($stats_comprados)
     {
@@ -123,7 +136,8 @@ if (!function_exists('ope_rol_stats')) {
     function ope_rol_nivel_from_sum($sum)
     {
         // Compat: suma total ya no define nivel; devolver tramo aproximado sin romper callers.
-        return ope_rol_nivel_from_stats_comprados(max(0, (int) $sum - 29));
+        // 28 = 8 base + 20 de creación (antes de comprar con PP).
+        return ope_rol_nivel_from_stats_comprados(max(0, (int) $sum - 28));
     }
 
     function ope_rol_nivel_label($nivel)
@@ -138,7 +152,7 @@ if (!function_exists('ope_rol_stats')) {
 
     /**
      * Stats comprados necesarios para ALCANZAR un nivel objetivo.
-     * Nivel 1 → 0; Nivel N → (N-1)*20
+     * Nivel 1 → 0; Nivel N → (N-1)*5
      */
     function ope_rol_stats_para_nivel($nivel_objetivo)
     {
@@ -201,11 +215,13 @@ if (!function_exists('ope_rol_stats')) {
     function ope_rol_stat_label($val)
     {
         $v = (int) $val;
-        if ($v >= 25) return 'Élite';
-        if ($v >= 20) return 'Notable';
+        if ($v >= 90) return 'Leyenda';
+        if ($v >= 75) return 'Cúspide';
+        if ($v >= 55) return 'Élite';
+        if ($v >= 40) return 'Maestro';
+        if ($v >= 25) return 'Veterano';
         if ($v >= 15) return 'Sólido';
-        if ($v >= 10) return 'Competente';
-        if ($v >= 6)  return 'Promedio';
+        if ($v >= 8)  return 'Competente';
         if ($v >= 3)  return 'Novato';
         return 'Básico';
     }

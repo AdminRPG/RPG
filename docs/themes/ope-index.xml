@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <theme name="One Piece: Eternal" version="1839">
   <templates>
     <template name="headerinclude" version="1839"><![CDATA[<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -81,24 +81,24 @@
           <img class="ope-hero-crest" src="{$mybb->settings['bburl']}/images/ope/crest-eternal.png" alt="">
           <span class="ope-hero-eye">Foro de rol &middot; Play-by-Post</span>
           <h1 class="ope-hero-title">El cielo no tiene fin.<br><b>Tu leyenda, tampoco.</b></h1>
-          <p class="ope-hero-sub">Un mar de nubes infinito. Islas flotantes, aeronaves y Bestias Primarias. Usa las flechas para conocer el mundo.</p>
+          <p class="ope-hero-sub">Un mar de nubes infinito. Islas flotantes, aeronaves y Bestias Legendarias. Usa las flechas para conocer el mundo.</p>
           <div class="ope-hero-cta">
-            <a href="{$mybb->settings['bburl']}/crear-personaje.php" class="ope-btn ope-btn-hot">Crear Skyfarer</a>
+            <a href="{$mybb->settings['bburl']}/crear-personaje.php" class="ope-btn ope-btn-hot">Crear personaje</a>
             <a href="{$mybb->settings['bburl']}/index.php#cat_el-cielo" class="ope-btn ope-btn-ghost">Explorar el Cielo</a>
           </div>
         </div>
       </section>
       <section class="ope-slide" data-slide="1">
         <div class="ope-slide-bg" style="background-image:url('{$mybb->settings['bburl']}/images/ope/hero-mundo.jpg')"></div>
-        <div class="ope-amb"><span class="ope-amb-tag">Ambientación &middot; El Cielo</span><h2>Un mundo sobre las nubes</h2><p>Islas flotantes en un mar de nubes. Hace 500 años los Astrales quisieron dominarlo; los pueblos del cielo los repelieron. Ahora el horizonte vuelve a agitarse.</p><a href="{$mybb->settings['bburl']}/guias.php" class="ope-btn ope-btn-hot">Leer la ambientación</a></div>
+        <div class="ope-amb"><span class="ope-amb-tag">Ambientación &middot; El Cielo</span><h2>Un mundo sobre las nubes</h2><p>Islas flotantes en un mar de nubes. Hace 500 años los Ancestrales quisieron dominarlo; los pueblos del cielo los repelieron. Ahora el horizonte vuelve a agitarse.</p><a href="{$mybb->settings['bburl']}/guias.php" class="ope-btn ope-btn-hot">Leer la ambientación</a></div>
       </section>
       <section class="ope-slide" data-slide="2">
         <div class="ope-slide-bg" style="background-image:url('{$mybb->settings['bburl']}/images/ope/hero-pueblos.jpg')"></div>
-        <div class="ope-amb"><span class="ope-amb-tag">Los pueblos del cielo</span><h2>Nacidos entre las nubes</h2><p>Humanos, Erune, Draph, Harvin y Dracónidos. Cinco pueblos, un mismo cielo por conquistar.</p><a href="{$mybb->settings['bburl']}/crear-personaje.php" class="ope-btn ope-btn-hot">Crear tu Skyfarer</a></div>
+        <div class="ope-amb"><span class="ope-amb-tag">Los pueblos del cielo</span><h2>Nacidos entre las nubes</h2><p>Humanos, Elfos, Bestianos, Gnomos y Dracónidos. Cinco pueblos, un mismo cielo por conquistar.</p><a href="{$mybb->settings['bburl']}/crear-personaje.php" class="ope-btn ope-btn-hot">Crear personaje</a></div>
       </section>
       <section class="ope-slide" data-slide="3">
         <div class="ope-slide-bg" style="background-image:url('{$mybb->settings['bburl']}/images/ope/hero-primal.jpg')"></div>
-        <div class="ope-amb"><span class="ope-amb-tag">Bestias Primarias</span><h2>Armas vivientes de los Astrales</h2><p>Sellar un Pacto es el poder más raro que un skyfarer puede alcanzar. No todos lo consiguen.</p><a href="{$mybb->settings['bburl']}/guias.php" class="ope-btn ope-btn-hot">El Bestiario</a></div>
+        <div class="ope-amb"><span class="ope-amb-tag">Bestias Legendarias</span><h2>Armas vivientes de los Ancestrales</h2><p>Sellar un Vínculo es el poder más raro que un usuario puede alcanzar. No todos lo consiguen.</p><a href="{$mybb->settings['bburl']}/guias.php" class="ope-btn ope-btn-hot">El Bestiario</a></div>
       </section>
     </div>
     <button type="button" class="ope-hero-side ope-hs-left" id="ope-prev" aria-label="Anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -195,10 +195,10 @@
 
     <!-- Censo del mundo -->
     <div class="ope-census-in">
-      <div class="ope-census-c"><div class="ope-census-v">{$stats['numusers']}</div><div class="ope-census-l">Skyfarers</div></div>
+      <div class="ope-census-c"><div class="ope-census-v">{$stats['numusers']}</div><div class="ope-census-l">Usuarios</div></div>
       <div class="ope-census-c"><div class="ope-census-v">{$stats['numthreads']}</div><div class="ope-census-l">Historias</div></div>
       <div class="ope-census-c"><div class="ope-census-v">{$stats['numposts']}</div><div class="ope-census-l">Mensajes</div></div>
-      <div class="ope-census-c"><div class="ope-census-v ope-census-v-name">{$ope_last_char}</div><div class="ope-census-l">Último skyfarer</div></div>
+      <div class="ope-census-c"><div class="ope-census-v ope-census-v-name">{$ope_last_char}</div><div class="ope-census-l">Último usuario</div></div>
     </div>
 
     <!-- Presencia -->

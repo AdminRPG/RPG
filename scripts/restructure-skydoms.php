@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * One Piece: Eternal · Reestructuración El Cielo (Skydoms)
  * ---------------------------------------------------------------
@@ -124,8 +124,8 @@ $skydoms = [
         'Villa Farolar' => 'Faros de Éter y primeras órdenes del Gremio.',
         'Los Bajíos' => 'Islotes rotos, contrabando y rumores.',
     ]],
-    ['Nalhegrande Skydom', 'Tier intermedio. Ferias Harvin, tormentas y Primales menores.', [
-        'Feria de Latón' => 'Mercado flotante de los Harvin.',
+    ['Nalhegrande Skydom', 'Tier intermedio. Ferias Gnomos, tormentas y Primales menores.', [
+        'Feria de Latón' => 'Mercado flotante de los Gnomos.',
         'Corona de Tormenta' => 'Tempestad perpetua; duerme un Primal.',
     ]],
     ['Zeephone Skydom', 'Archipiélago helado y cristales de éter. Órdenes T3–T4.', [

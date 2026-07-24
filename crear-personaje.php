@@ -175,6 +175,7 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         $racial_mods = isset($RAZAS[$raza]['bonus']['mods']) && is_array($RAZAS[$raza]['bonus']['mods']) ? $RAZAS[$raza]['bonus']['mods'] : array();
         foreach ($racial_mods as $rk => $rv) {
             if (isset($stats_con_racial[$rk])) {
+                // El racial se suma por encima del invertido; no se clampa al techo (99).
                 $stats_con_racial[$rk] = max(1, $stats_con_racial[$rk] + (int)$rv);
             }
         }
@@ -656,7 +657,7 @@ header('Content-Type: text/html; charset=utf-8');
         <!-- PASO 5: STATS -->
         <div class="wiz-step" data-step="5">
           <div class="plate">
-            <div class="plate-h"><span class="t">5. Atributos</span><span class="c">// 1 a 6 + racial</span></div>
+            <div class="plate-h"><span class="t">5. Atributos</span><span class="c">// 1 a 5 + racial</span></div>
             <div class="plate-b">
               <p class="stats-hint">Todos empiezan en <b class="c-paper">1</b>. Reparte <b class="c-ember" id="psDisponiblesLabel">20 puntos</b>. Máximo <b class="c-paper">5</b> por stat antes del perfil de linaje (puede sumar o restar según tu linaje; suelo 1). <button type="button" class="ope-help-btn" data-ope-help="stats" title="Ayuda">?</button></p>
               <div id="statsContainer"></div>

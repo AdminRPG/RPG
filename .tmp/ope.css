@@ -1,13 +1,13 @@
-
+﻿
 /* ============================================================
-   GRANBLUE FANTASY: ETERNAL — TEMA CIELO (default)
+   ONE PIECE: ETERNAL — TEMA CIELO (default)
    Paleta amanecer / cielo índigo-dorado (DESIGN §3.1).
    Tipos: Cinzel (marca) · Cormorant Garamond (mark) · Spectral (cuerpo) · Space Mono (datos)
-   Diseño de referencia: docs/DESIGN-GRANBLUE-ETERNAL.md
+   Diseño de referencia: docs/DESIGN-ONE-PIECE-ETERNAL.md
    ============================================================ */
 :root{
   /* ── TOKENS GBE CIELO (claro) mapeados a nombres legacy de ope.css ──
-     Fuente: DESIGN-GRANBLUE-ETERNAL.md §3.1 + §4 */
+     Fuente: DESIGN-ONE-PIECE-ETERNAL.md §3.1 + §4 */
   --ope-bg:#eef4f8;--ope-bg-2:#f6f3ea;--ope-wash:#dce8f2;--ope-card:#fff;--ope-card-2:#f7f9fb;
   --ope-ink:#2f4256;--ope-ink-soft:#5b6f83;--ope-ink-dim:#8ba0b3;
   --ope-gold:#b7924e;--ope-gold-hi:#d8b76b;--ope-gold-deep:#8f6f34;
@@ -26,7 +26,7 @@
   --ink:#2f4256; --ink-2:#1c314a; --ash:#8ba0b3; --paper:#2f4256; --paper-dim:#5b6f83;
   /* Acento primario: oro amanecer */
   --ember:#b7924e; --ember-hi:#d8b76b;
-  /* Acento secundario: cielo azul / éter turquesa */
+  /* Acento secundario: cielo azul / esencia turquesa */
   --patina:#5ba3d0; --patina-hi:#3bb3ab;
   /* Peligro */
   --crack:#cf3f2b;
@@ -1042,7 +1042,7 @@ legend{font-family:var(--disp);font-weight:800;font-size:1rem;text-transform:upp
    body.ope-pg-<pagina>. Fuente ÚNICA: NO reintroducir <style> en PHP.
    ============================================================ */
 
-/* ---- personajes.php — formación Relink ---- */
+/* ---- personajes.php — formación Referencia Visual ---- */
 body.ope-pg-personajes{
   --pj-cyan:#5ec8ff;
   --pj-cyan-glow:rgba(94,200,255,.55);
@@ -2545,7 +2545,7 @@ body.ope-pg-zona-staff .bg-h6{background:var(--h6)}
 body.ope-pg-zona-staff .mb-10{margin-bottom:10px}
 body.ope-pg-zona-staff .c-patina{color:var(--patina-hi)}
 
-/* ---- crear-personaje.php — Relink / ficha / formacion ---- */
+/* ---- crear-personaje.php — Referencia Visual / ficha / formacion ---- */
 body.ope-pg-crear-personaje{--wiz-aura:var(--ope-sky)}
 body.ope-pg-crear-personaje .wrap{max-width:1280px;margin:0 auto;padding:0 18px 48px}
 
@@ -4495,7 +4495,7 @@ html[data-theme="noche"] #ope-navbar .ope-nav-logo b{color:var(--ope-gold-hi)}
 .rol-char-selector{margin-bottom:12px}
 
 /* ============================================================
-   GRANBLUE FANTASY: ETERNAL — index hero + ficha v4
+   ONE PIECE: ETERNAL — index hero + ficha v4
    Tokens --ope-* definidos en :root / [data-theme="noche"] (ver inicio del fichero)
    ============================================================ */
 
@@ -4547,15 +4547,15 @@ html[data-theme="noche"] .ope-btn-hot,.ope-btn-hot:link,.ope-btn-hot:visited{bac
 .ope-btn-ghost:hover{border-color:var(--ope-gold);color:var(--ope-gold-deep);transform:translateY(-1px)}
 html[data-theme="noche"] .ope-btn-ghost:hover{color:var(--ope-gold-hi)}
 
-/* Skydoms bento (El Cielo) */
+/* Cielos bento (El Cielo) */
 .ope-world-bento{display:grid;gap:12px;grid-template-columns:repeat(4,1fr);grid-auto-rows:158px;
   grid-template-areas:"pg pg nh nh" "zp zp au au" "es es es es" "es es es es"}
 .ope-world-bento .ope-region{min-height:0;height:100%;border-radius:14px;border:1px solid var(--ope-line)}
 .ope-world-bento .ope-region-n{font-size:1.35rem;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.45)}
-.ope-world-bento .ope-region--phantagrande-skydom{grid-area:pg}
-.ope-world-bento .ope-region--nalhegrande-skydom{grid-area:nh}
-.ope-world-bento .ope-region--zeephone-skydom{grid-area:zp}
-.ope-world-bento .ope-region--auguste-skydom{grid-area:au}
+.ope-world-bento .ope-region--verdepuerto-skydom{grid-area:pg}
+.ope-world-bento .ope-region--ventisquero-skydom{grid-area:nh}
+.ope-world-bento .ope-region--cielo eléctrico-skydom{grid-area:zp}
+.ope-world-bento .ope-region--solsticio-skydom{grid-area:au}
 .ope-world-bento .ope-region--estalucia{grid-area:es}
 .ope-world-bento .ope-region--estalucia .ope-region-n{font-size:clamp(1.5rem,3vw,2rem)}
 .ope-world-bento .ope-region-veil{background:linear-gradient(to top,rgba(47,66,86,.82) 8%,rgba(47,66,86,.28) 58%,transparent)}
@@ -4573,7 +4573,7 @@ html[data-theme="noche"] .ope-btn-ghost:hover{color:var(--ope-gold-hi)}
   .ope-world-bento .ope-region-d{max-height:none;opacity:1;margin-top:6px}
 }
 
-/* Ficha Relink — PNG grande izquierda + panel info derecha */
+/* Ficha Referencia Visual — PNG grande izquierda + panel info derecha */
 body.ope-pg-ficha[data-element="fuego"]{--fac:var(--el-fuego);--fac-hi:color-mix(in srgb,var(--el-fuego) 70%,#fff);--fac-soft:color-mix(in srgb,var(--el-fuego) 12%,transparent);--fac-veil:color-mix(in srgb,var(--el-fuego) 16%,transparent)}
 body.ope-pg-ficha[data-element="agua"]{--fac:var(--el-agua);--fac-hi:color-mix(in srgb,var(--el-agua) 70%,#fff);--fac-soft:color-mix(in srgb,var(--el-agua) 12%,transparent);--fac-veil:color-mix(in srgb,var(--el-agua) 16%,transparent)}
 body.ope-pg-ficha[data-element="tierra"]{--fac:var(--el-tierra);--fac-hi:color-mix(in srgb,var(--el-tierra) 70%,#fff);--fac-soft:color-mix(in srgb,var(--el-tierra) 12%,transparent);--fac-veil:color-mix(in srgb,var(--el-tierra) 16%,transparent)}
@@ -4590,7 +4590,7 @@ body.ope-pg-ficha .ope-ficha-layout{
   body.ope-pg-ficha .ope-ficha-stage{position:relative;top:auto;min-height:560px}
 }
 
-/* Stage izquierdo — cielo + PNG personaje (Relink) */
+/* Stage izquierdo — cielo + PNG personaje (Referencia Visual) */
 body.ope-pg-ficha .ope-ficha-stage{
   --stage-aura:var(--fac,var(--ope-sky-deep));
   position:sticky;top:calc(var(--ope-nav-h,64px) + 12px);
@@ -4650,7 +4650,7 @@ body.ope-pg-ficha .ope-ficha-power-ic{
 }
 body.ope-pg-ficha .ope-ficha-power b{font-family:var(--ope-disp);font-weight:700;font-size:1.15rem;color:#5a4010;line-height:1}
 
-/* PNG full-body: contain, anclado abajo (como Relink) */
+/* PNG full-body: contain, anclado abajo (como Referencia Visual) */
 body.ope-pg-ficha .ope-ficha-stage-art{
   position:relative;z-index:2;flex:1;display:flex;align-items:flex-end;justify-content:center;
   min-height:380px;padding:8px 6px 0;margin-top:-4px
@@ -4708,7 +4708,7 @@ body.ope-pg-ficha .ope-ficha-stage-acts .btn-ghost{
 }
 body.ope-pg-ficha .ope-ficha-stage-acts .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:#fff;color:#fff}
 
-/* Panel derecho — cristal Relink */
+/* Panel derecho — cristal Referencia Visual */
 body.ope-pg-ficha .ope-ficha-panel{
   background:color-mix(in srgb,var(--ope-card) 82%,transparent);
   backdrop-filter:blur(12px);
@@ -4871,7 +4871,7 @@ body.ope-index .ope-staff-discord{display:flex;align-items:center;gap:8px;margin
 body.ope-index .ope-staff-discord svg{color:#5865f2;flex:0 0 auto}
 body.ope-index .ope-staff-discord:hover{border-color:var(--ope-gold);color:var(--ope-gold-deep)}
 
-/* Skydoms + Off Topic en portada */
+/* Cielos + Off Topic en portada */
 body.ope-index .ope-cat .ope-region{border-radius:14px;border:1px solid var(--ope-line)}
 body.ope-index .ope-slab{background:var(--ope-card);border:1px solid var(--ope-line);border-radius:14px;overflow:hidden;box-shadow:var(--ope-shadow-sm)}
 body.ope-index .ope-forum{color:var(--ope-ink);border-bottom:1px solid var(--ope-line-soft)}
@@ -5576,7 +5576,7 @@ body.ope-pg-progresion .ope-prog-log-pp {
   font-family: var(--ope-disp) !important;
 }
 
-/* Haki Dots / Progresión de éter */
+/* Haki Dots / Progresión de esencia */
 body.ope-pg-progresion .ope-haki-dot {
   background: var(--ope-card-2) !important;
   border: 1px solid var(--ope-line-soft) !important;
@@ -6674,7 +6674,7 @@ body[data-ope-page="editpost"] .ope-rpg-note b{color:var(--ope-gold-deep)!import
 }
 
 /* ==========================================================================
-   GBE Eternal - Prototype Ficha Styles (Renombre, Vitals, Pacto Primal)
+   GBE Eternal - Prototype Ficha Styles (Renombre, Vitals, Pacto Primordial)
    ========================================================================== */
 .reno {
   margin-top: 14px;

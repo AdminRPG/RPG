@@ -1,11 +1,11 @@
-# One Piece: Eternal — tema MyBB (fuente de verdad y sincronización)
+﻿# One Piece: Eternal — tema MyBB (fuente de verdad y sincronización)
 
 > **Agentes (Cursor / OpenCode / Antigravity):** antes de editar estos archivos, lee `docs/AGENTES-Y-HERRAMIENTAS.md` §2 y `.cursor/rules/visual-port-gbe.mdc`.
 
 El tema **no** vive en un único XML monolítico. Está repartido en archivos con
 roles claros para que un import no pise otro. Todo el CSS vive en **una sola
 hoja** (`ope.css`); ninguna página PHP lleva `<style>` inline. Ver la convención
-completa en `docs/DESIGN-GRANBLUE-ETERNAL.md` (§5).
+completa en `docs/DESIGN-ONE-PIECE-ETERNAL.md` (§5).
 
 ## Archivos canónicos (edita estos)
 
@@ -24,7 +24,7 @@ completa en `docs/DESIGN-GRANBLUE-ETERNAL.md` (§5).
 
 ## Portada (`index.php`)
 
-La portada **no** usa `body.ope-pg-*`. Usa `body.ope-index` (plantilla `ope-index.xml`) con componentes `.ope-section`, `.ope-bento`, `.ope-hero`. Las categorías las genera `index.php`. Ver `DESIGN-GRANBLUE-ETERNAL.md` §6, §6.7 y `docs/AGENTES-Y-HERRAMIENTAS.md` §2.5.
+La portada **no** usa `body.ope-pg-*`. Usa `body.ope-index` (plantilla `ope-index.xml`) con componentes `.ope-section`, `.ope-bento`, `.ope-hero`. Las categorías las genera `index.php`. Ver `DESIGN-ONE-PIECE-ETERNAL.md` §6, §6.7 y `docs/AGENTES-Y-HERRAMIENTAS.md` §2.5.
 
 **No declarar portada terminada** sin overrides `body.ope-index` en `ope.css` y comparación con `docs/Prototypes/Granblue/index.html`.
 

@@ -226,7 +226,7 @@ if (is_file($file)) {
         'slug' => 'sinopsis-one-piece-eternal',
         'categoria' => 'historia',
         'subcategoria' => 'sinopsis',
-        'resumen' => 'La indiscutible Reina de los Piratas, Isabella D. Vega, ha sido capturada tras la traición de su confidente. Faltan 30 días para su ejecución pública en Marineford.',
+        'resumen' => 'El Rey de los Piratas ha sido capturado. Corre la cuenta atrás para su ejecución pública, que debe presidir la Almirante de Flota «El Puño de la Marina»… su propia madre.',
         'contenido' => $html,
         'imagen' => '',
         'orden' => ++$orden,
@@ -244,7 +244,7 @@ if (is_file($file)) {
         'slug' => 'cronologia-completa',
         'categoria' => 'cronologia',
         'subcategoria' => 'linea-temporal',
-        'resumen' => 'Línea de tiempo oficial desde la caída del Gran Reino (hace 900 años) hasta la inminente ejecución de la Reina Pirata en Marineford.',
+        'resumen' => 'Línea de tiempo oficial desde la caída del Gran Reino (hace 900 años) hasta la inminente ejecución del Rey Pirata.',
         'contenido' => $html,
         'imagen' => '',
         'orden' => ++$orden,
@@ -258,10 +258,10 @@ $eras_map = array(
         '<p>Hace 900 años, estalla la Gran Guerra entre el Gran Reino y una alianza de reinos menores por razones perdidas en el tiempo. Un siglo después, el Gran Reino es completamente borrado de la historia en lo que se conoce como el <strong>Siglo Vacío</strong>.</p><p>Las <strong>16 Familias Fundadoras</strong> suben al Red Line y establecen <strong>Mary Geoise</strong>, coronándose como Dioses Mundiales y censurando todo el conocimiento antiguo. Los <strong>Poneglyphs</strong> son creados como única fuente de verdad histórica indestructible, dispersados por todo el mundo para preservar lo que el Gobierno Mundial intentó destruir.</p>'),
     array('Era 2: La Edad de las Bestias', 'era-2-edad-bestias', 'Navegantes legendarios cartografían el Grand Line. Grog "Rompe-Cielos" se erige como el guerrero más formidable de Elbaf.',
         '<p>Hace 400 años, la <strong>Gran Exploración</strong> cartografía el Grand Line, estableciendo las rutas y la geografía actual del mundo que todos conocen. Los Log Pose se convierten en la herramienta indispensable de navegación.</p><p>Hace 50 años, <strong>Grog "Rompe-Cielos"</strong> despierta como el guerrero más formidable y aterrador de la nueva generación de Elbaf, llevando la gloria a la raza de los gigantes y demostrando que el poder bruto puede rivalizar con cualquier Fruta del Diablo.</p>'),
-    array('Era 3: El Ascenso de los Nuevos Emperadores', 'era-3-ascenso-emperadores', 'Isabella escapa y funda los Piratas Carmesí. Los cuatro Yonko emergen. Valyria se convierte en Almirante de Flota.',
-        '<p>Hace 30 años, <strong>Isabella D. Vega</strong> escapa de la tiranía de su isla natal, forjando un odio eterno hacia el mundo noble. Cinco años después funda los <strong>Piratas Carmesí</strong> y se asocia temporalmente con el colosal gigante Balgor.</p><p>Hace 20 años se consolida como amenaza mundial al chocar contra otros monstruos, mientras <strong>Sekhmet "Reina Leona"</strong> —una majestuosa Mink leona— y <strong>Shura "Oni Iluminada"</strong> —una terrorífica Oni— emergen en el Nuevo Mundo.</p><p>Hace 15 años, <strong>Valyria</strong> asciende meteóricamente a Almirante de Flota tras cortar una isla por la mitad, imponiendo el respeto absoluto. Hace 10 años, <strong>Balgor</strong> asimila varias flotas enteras para convertirse en un Mecha gigante, deserta y se corona Yonko como <strong>"Titán de Chatarra"</strong>. Ese mismo año, <strong>Ezekiel</strong> —un híbrido Skypiean/Lunarian— comienza a cazar piratas desde los cielos con su rifle de Diales, siendo catalogado como el cuarto Emperador.</p>'),
-    array('Era 4: La Caída de la Reina', 'era-4-caida-reina', 'Isabella descubre la verdad en La Última Isla. Balgor la traiciona. Valyria la captura. Faltan 30 días para su ejecución.',
-        '<p>Hace 5 años, Isabella y sus leales llegan a <strong>La Última Isla</strong>. Descubre la verdad del mundo pero opta por no atacar aún, siendo coronada <strong>"Reina de los Piratas"</strong>.</p><p>Hace un mes, <strong>Balgor</strong> traiciona su antiguo pacto vendiendo las coordenadas de Isabella a cambio de armamento. La Almirante de Flota <strong>Valyria</strong> intercepta a Isabella y, tras un duelo de espadas legendario, la captura.</p><p><strong>En la actualidad (Día 0):</strong> Faltan exactamente <strong>30 días</strong> para la ejecución pública de Isabella D. Vega en Marineford. Las fuerzas mundiales se preparan para la Guerra Total. Los Cuatro Emperadores mueven ficha. El mundo entra en su era más caótica y decisiva.</p>'),
+    array('Era 3: El Ascenso de los Emperadores', 'era-3-ascenso-emperadores', 'Cuatro Emperadores se reparten el Nuevo Mundo. Un hombre con la voluntad de la D. es coronado Rey de los Piratas.',
+        '<p>En las últimas décadas, cuatro fuerzas colosales —los <strong>Cuatro Emperadores (Yonko)</strong>— se reparten el dominio del <strong>Nuevo Mundo</strong>, imponiendo un frágil equilibrio de terror y ambición.</p><p>En ese tablero, un hombre con la voluntad de la <strong>D.</strong> reúne una tripulación legendaria, cruza el Grand Line y, cinco años atrás, es reconocido como <strong>Rey de los Piratas</strong> tras alcanzar La Última Isla. Su bandera se vuelve símbolo de una libertad que el Gobierno Mundial no puede tolerar.</p>'),
+    array('Era 4: La Cuenta Atrás', 'era-4-cuenta-atras', 'El Rey Pirata es capturado. Su madre, la Almirante de Flota, debe presidir su ejecución. El mundo al borde de la guerra.',
+        '<p>Hace apenas un mes, lo imposible se hace realidad: el <strong>Rey Pirata es capturado</strong> y encerrado en la prisión de máxima seguridad de la Marina.</p><p>Quien debe garantizar su ejecución es la <strong>Almirante de Flota «El Puño de la Marina»</strong>… su propia madre, obligada a matar a su sangre ante el mundo entero.</p><p><strong>En la actualidad (Día 0):</strong> corre la cuenta atrás para la ejecución pública del Rey de los Piratas. Las fuerzas mundiales se preparan para la Guerra Total. Los Cuatro Emperadores mueven ficha. El mundo entra en su era más caótica y decisiva.</p>'),
 );
 foreach ($eras_map as $era) {
     seed_insert_lore($db, $TABLE, array(

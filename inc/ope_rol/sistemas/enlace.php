@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * One Piece: Eternal · Sistema de Enlace (One Piece: Eternal)
  * -----------------------------------------------------
@@ -23,7 +23,7 @@ function ope_enlace_niveles()
         4 => array('nombre' => 'Enlace Nivel 4', 'coste_pp' => 700,  'usos_requeridos' => 70,  'usos_max' => 3),
         5 => array('nombre' => 'Enlace Nivel 5', 'coste_pp' => 1000, 'usos_requeridos' => 110, 'usos_max' => 3),
         6 => array('nombre' => 'Enlace Nivel 6', 'coste_pp' => 1500, 'usos_requeridos' => 160, 'usos_max' => 4),
-        'primal' => array('nombre' => 'Pacto Primal', 'coste_pp' => 300, 'usos_requeridos' => 999, 'usos_max' => 4)
+        'primordial' => array('nombre' => 'Vínculo Primordial', 'coste_pp' => 300, 'usos_requeridos' => 999, 'usos_max' => 4)
     );
 }
 
@@ -107,7 +107,7 @@ function ope_enlace_subir($pid)
 
     $nivel_actual = $current['nivel'];
     if ($nivel_actual >= 6) {
-        return 'Ya has alcanzado el Nivel 6 de Enlace. El Pacto Primal requiere tramas del staff.';
+        return 'Ya has alcanzado el Nivel 6 de Enlace. El Vínculo Primordial requiere tramas del staff.';
     }
 
     $siguiente = $nivel_actual + 1;

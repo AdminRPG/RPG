@@ -1,6 +1,6 @@
-# Guía de Estilos para Nuevas Páginas PHP
+﻿# Guía de Estilos para Nuevas Páginas PHP
 
-> **Fuente de verdad: `docs/DESIGN-GRANBLUE-ETERNAL.md` §5** (resumida en `AGENTS.md` y `docs/AGENTES-Y-HERRAMIENTAS.md`).
+> **Fuente de verdad: `docs/DESIGN-ONE-PIECE-ETERNAL.md` §5** (resumida en `AGENTS.md` y `docs/AGENTES-Y-HERRAMIENTAS.md`).
 >
 > **Portada MyBB:** no uses esta guía — usa `body.ope-index` y DESIGN §6.
 >
@@ -110,7 +110,7 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:red
 
 ### 4. Reglas CSS en ope.css
 
-**PASO 1 (OBLIGATORIO en scope nuevo)** — pega el scaffolding OPE de `DESIGN-GRANBLUE-ETERNAL.md` §5.4 (o `.cursor/rules/page-scaffold.mdc`). Sin esto, los componentes de §3 salen SIN estilo.
+**PASO 1 (OBLIGATORIO en scope nuevo)** — pega el scaffolding OPE de `DESIGN-ONE-PIECE-ETERNAL.md` §5.4 (o `.cursor/rules/page-scaffold.mdc`). Sin esto, los componentes de §3 salen SIN estilo.
 
 **PASO 2** — tus reglas propias, **SIEMPRE** scopeadas bajo `body.ope-pg-mi-pagina`:
 

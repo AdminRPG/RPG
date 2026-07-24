@@ -1,13 +1,13 @@
-
+﻿
 /* ============================================================
-   GRANBLUE FANTASY: ETERNAL — TEMA CIELO (default)
+   ONE PIECE: ETERNAL — TEMA CIELO (default)
    Paleta amanecer / cielo índigo-dorado (DESIGN §3.1).
    Tipos: Cinzel (marca) · Cormorant Garamond (mark) · Spectral (cuerpo) · Space Mono (datos)
-   Diseño de referencia: docs/DESIGN-GRANBLUE-ETERNAL.md
+   Diseño de referencia: docs/DESIGN-ONE-PIECE-ETERNAL.md
    ============================================================ */
 :root{
   /* ── TOKENS GBE CIELO (claro) mapeados a nombres legacy de ope.css ──
-     Fuente: DESIGN-GRANBLUE-ETERNAL.md §3.1 + §4 */
+     Fuente: DESIGN-ONE-PIECE-ETERNAL.md §3.1 + §4 */
   --ope-bg:#eef4f8;--ope-bg-2:#f6f3ea;--ope-wash:#dce8f2;--ope-card:#fff;--ope-card-2:#f7f9fb;
   --ope-ink:#2f4256;--ope-ink-soft:#5b6f83;--ope-ink-dim:#8ba0b3;
   --ope-gold:#b7924e;--ope-gold-hi:#d8b76b;--ope-gold-deep:#8f6f34;
@@ -26,7 +26,7 @@
   --ink:#2f4256; --ink-2:#1c314a; --ash:#8ba0b3; --paper:#2f4256; --paper-dim:#5b6f83;
   /* Acento primario: oro amanecer */
   --ember:#b7924e; --ember-hi:#d8b76b;
-  /* Acento secundario: cielo azul / éter turquesa */
+  /* Acento secundario: cielo azul / esencia turquesa */
   --patina:#5ba3d0; --patina-hi:#3bb3ab;
   /* Peligro */
   --crack:#cf3f2b;
@@ -1042,7 +1042,7 @@ legend{font-family:var(--disp);font-weight:800;font-size:1rem;text-transform:upp
    body.ope-pg-<pagina>. Fuente ÚNICA: NO reintroducir <style> en PHP.
    ============================================================ */
 
-/* ---- personajes.php — formación Relink ---- */
+/* ---- personajes.php — formación Referencia Visual ---- */
 body.ope-pg-personajes{
   --pj-cyan:#5ec8ff;
   --pj-cyan-glow:rgba(94,200,255,.55);
@@ -2561,7 +2561,7 @@ body.ope-pg-zona-staff .zs-badge.borrador{background:rgba(139,148,158,.2);color:
 body.ope-pg-zona-staff .zs-pj-meta{display:flex;gap:12px;font-size:.8rem;color:var(--paper-dim);border-top:1px solid var(--rivet);border-bottom:1px solid var(--rivet);padding:8px 0}
 body.ope-pg-zona-staff .zs-pj-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 
-/* ---- crear-personaje.php — Relink / ficha / formacion ---- */
+/* ---- crear-personaje.php — Referencia Visual / ficha / formacion ---- */
 body.ope-pg-crear-personaje{--wiz-aura:var(--ope-sky)}
 body.ope-pg-crear-personaje .wrap{max-width:1280px;margin:0 auto;padding:0 18px 48px}
 
@@ -4605,7 +4605,7 @@ html[data-theme="noche"] #ope-navbar .ope-nav-logo b{color:var(--ope-gold-hi)}
 .rol-char-selector{margin-bottom:12px}
 
 /* ============================================================
-   GRANBLUE FANTASY: ETERNAL — index hero + ficha v4
+   ONE PIECE: ETERNAL — index hero + ficha v4
    Tokens --ope-* definidos en :root / [data-theme="noche"] (ver inicio del fichero)
    ============================================================ */
 
@@ -4657,15 +4657,15 @@ html[data-theme="noche"] .ope-btn-hot,.ope-btn-hot:link,.ope-btn-hot:visited{bac
 .ope-btn-ghost:hover{border-color:var(--ope-gold);color:var(--ope-gold-deep);transform:translateY(-1px)}
 html[data-theme="noche"] .ope-btn-ghost:hover{color:var(--ope-gold-hi)}
 
-/* Skydoms bento (El Cielo) */
+/* Cielos bento (El Cielo) */
 .ope-skydom-bento{display:grid;gap:12px;grid-template-columns:repeat(4,1fr);grid-auto-rows:158px;
   grid-template-areas:"pg pg nh nh" "zp zp au au" "es es es es" "es es es es"}
 .ope-skydom-bento .ope-region{min-height:0;height:100%;border-radius:14px;border:1px solid var(--ope-line)}
 .ope-skydom-bento .ope-region-n{font-size:1.35rem;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.45)}
-.ope-skydom-bento .ope-region--phantagrande-skydom{grid-area:pg}
-.ope-skydom-bento .ope-region--nalhegrande-skydom{grid-area:nh}
-.ope-skydom-bento .ope-region--zeephone-skydom{grid-area:zp}
-.ope-skydom-bento .ope-region--auguste-skydom{grid-area:au}
+.ope-skydom-bento .ope-region--verdepuerto-skydom{grid-area:pg}
+.ope-skydom-bento .ope-region--ventisquero-skydom{grid-area:nh}
+.ope-skydom-bento .ope-region--cielo eléctrico-skydom{grid-area:zp}
+.ope-skydom-bento .ope-region--solsticio-skydom{grid-area:au}
 .ope-skydom-bento .ope-region--estalucia{grid-area:es}
 .ope-skydom-bento .ope-region--estalucia .ope-region-n{font-size:clamp(1.5rem,3vw,2rem)}
 .ope-skydom-bento .ope-region-veil{background:linear-gradient(to top,rgba(47,66,86,.82) 8%,rgba(47,66,86,.28) 58%,transparent)}
@@ -4873,7 +4873,7 @@ body.ope-pg-ficha .ope-gview-bar{
 body.ope-pg-ficha .ope-gview-title{font-family:var(--ope-disp);font-weight:700;font-size:1.35rem;color:var(--ope-gold-deep)}
 body.ope-pg-ficha .ope-gview-back{cursor:pointer}
 
-/* Stage izquierdo — cielo + PNG personaje (Relink) */
+/* Stage izquierdo — cielo + PNG personaje (Referencia Visual) */
 body.ope-pg-ficha .ope-ficha-stage{
   --stage-aura:var(--fac,var(--ope-sky-deep));
   position:relative;
@@ -4916,7 +4916,7 @@ body.ope-pg-ficha .ope-ficha-facpill{
   border:1px solid rgba(255,255,255,.55);box-shadow:0 4px 12px rgba(20,40,60,.28)
 }
 
-/* PNG full-body: contain, anclado abajo (como Relink) */
+/* PNG full-body: contain, anclado abajo (como Referencia Visual) */
 body.ope-pg-ficha .ope-ficha-stage-art{
   position:relative;z-index:2;flex:1;display:flex;align-items:flex-end;justify-content:center;
   min-height:380px;padding:8px 6px 0;margin-top:-4px
@@ -5219,7 +5219,7 @@ body.ope-index .ope-staff-discord{display:flex;align-items:center;gap:8px;margin
 body.ope-index .ope-staff-discord svg{color:#5865f2;flex:0 0 auto}
 body.ope-index .ope-staff-discord:hover{border-color:var(--ope-gold);color:var(--ope-gold-deep)}
 
-/* Skydoms + Off Topic en portada */
+/* Cielos + Off Topic en portada */
 body.ope-index .ope-cat .ope-region{border-radius:14px;border:1px solid var(--ope-line)}
 body.ope-index .ope-slab{background:var(--ope-card);border:1px solid var(--ope-line);border-radius:14px;overflow:hidden;box-shadow:var(--ope-shadow-sm)}
 body.ope-index .ope-forum{color:var(--ope-ink);border-bottom:1px solid var(--ope-line-soft)}
@@ -6158,7 +6158,7 @@ body.ope-pg-progresion .ope-prog-log-pp {
   font-family: var(--ope-disp) !important;
 }
 
-/* Haki Dots / Progresión de éter */
+/* Haki Dots / Progresión de esencia */
 body.ope-pg-progresion .ope-haki-dot {
   background: var(--ope-card-2) !important;
   border: 1px solid var(--ope-line-soft) !important;
@@ -7173,6 +7173,31 @@ body[data-ope-page="newthread"] .ope-rpg-note b,
 body[data-ope-page="newreply"] .ope-rpg-note b,
 body[data-ope-page="editpost"] .ope-rpg-note b{color:var(--ope-gold-deep)!important}
 
+/* Thread review (newreply): narrativa limpia, sin chrome RPG System */
+body[data-ope-page="newreply"] .ope-threadreview{
+  margin:18px 0 0;padding:0;border:1px solid var(--ope-line);border-radius:14px;
+  background:var(--ope-card);box-shadow:var(--ope-shadow-sm);overflow:hidden}
+body[data-ope-page="newreply"] .ope-threadreview-title{
+  margin:0;padding:12px 16px;font-family:var(--ope-disp);font-size:1.05rem;font-weight:700;
+  color:var(--ope-gold-deep);background:linear-gradient(120deg,var(--ope-wash),var(--ope-card));
+  border-bottom:1px solid var(--ope-line-soft)}
+body[data-ope-page="newreply"] .ope-threadreview-posts{display:flex;flex-direction:column;gap:0}
+body[data-ope-page="newreply"] .ope-threadreview-post{
+  padding:14px 16px;border-bottom:1px solid var(--ope-line-soft)}
+body[data-ope-page="newreply"] .ope-threadreview-post:last-child{border-bottom:none}
+body[data-ope-page="newreply"] .ope-threadreview-post-author{
+  font-family:var(--ope-mono);font-size:.68rem;font-weight:700;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--ope-ink-dim);margin:0 0 8px}
+body[data-ope-page="newreply"] .ope-threadreview-post-body{
+  font-family:var(--ope-body);font-size:.95rem;line-height:1.55;color:var(--ope-ink)}
+body[data-ope-page="newreply"] .ope-threadreview-post-body img{max-width:100%;height:auto;border-radius:8px}
+body[data-ope-page="newreply"] .ope-threadreview-more{
+  padding:12px 16px;font-family:var(--ope-body);font-size:.85rem;color:var(--ope-ink-soft);
+  background:var(--ope-wash);border-top:1px solid var(--ope-line-soft)}
+body[data-ope-page="newreply"] .ope-threadreview .ope-rpgsys,
+body[data-ope-page="newreply"] .ope-threadreview .ope-tk-deck,
+body[data-ope-page="newreply"] .ope-threadreview style{display:none!important}
+
 /* ==========================================================================
    GBE Eternal Custom Enlace and Identidad styles (No Inline Styles)
    ========================================================================== */
@@ -7256,7 +7281,7 @@ body[data-ope-page="editpost"] .ope-rpg-note b{color:var(--ope-gold-deep)!import
 }
 
 /* ==========================================================================
-   GBE Eternal - Prototype Ficha Styles (Renombre, Vitals, Pacto Primal)
+   GBE Eternal - Prototype Ficha Styles (Renombre, Vitals, Pacto Primordial)
    ========================================================================== */
 .reno {
   margin-top: 14px;
@@ -7935,27 +7960,170 @@ body.ope-pg-barco .c-crack{color:var(--crack)!important}
 body.ope-pg-barco .c-patina{color:var(--patina)!important}
 
 /* ─────────────────────────────────────────────────────────────
-   Efecto 3D Card Flip — Ficha del Post (Snapshot Congelado)
+   Efecto 3D Card Flip — HUD RPG SYSTEM (estilo ficha / barco)
+   Tokens: --ope-card, --ope-gold-deep, --ope-ink, --ope-wash
    ───────────────────────────────────────────────────────────── */
-.ope-postbit-container{perspective:1400px;margin-bottom:24px;width:100%}
-.ope-postbit-card{position:relative;width:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.4,0,.2,1)}
+.ope-postbit-container{perspective:1600px;margin-bottom:28px;width:100%}
+.ope-postbit-card{
+  position:relative;width:100%;
+  transform-style:preserve-3d;
+  transition:transform .65s cubic-bezier(.22,1,.36,1), height .65s cubic-bezier(.22,1,.36,1);
+}
 .ope-postbit-card.is-flipped{transform:rotateY(180deg)}
-.ope-postbit-front,.ope-postbit-back{width:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.ope-postbit-front,.ope-postbit-back{
+  width:100%;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  box-sizing:border-box;
+}
+/* Cara visible en flujo = define altura. La otra es absolute y no abre hueco. */
 .ope-postbit-front{position:relative;z-index:2}
-.ope-postbit-back{position:absolute;top:0;left:0;right:0;bottom:0;transform:rotateY(180deg);z-index:1;background:var(--iron-hi);border:1px solid var(--gold-deep);border-radius:12px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.5);overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.ope-postbit-back{
+  position:absolute;left:0;right:0;top:0;
+  transform:rotateY(180deg);z-index:1;
+  background:
+    radial-gradient(120% 80% at 8% 0%, color-mix(in srgb, var(--ope-gold) 18%, transparent), transparent 55%),
+    linear-gradient(165deg, var(--ope-card) 0%, var(--ope-card-2) 55%, var(--ope-wash) 100%);
+  border:1px solid var(--ope-line);
+  border-radius:14px;
+  padding:0;
+  box-shadow:var(--ope-shadow);
+  overflow:hidden;
+  color:var(--ope-ink);
+  pointer-events:none;
+}
+.ope-postbit-card.is-flipped .ope-postbit-front{
+  position:absolute;left:0;right:0;top:0;
+  pointer-events:none;
+}
+.ope-postbit-card.is-flipped .ope-postbit-back{
+  position:relative;
+  pointer-events:auto;
+}
 
-.ope-flip-back-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line-soft);padding-bottom:10px}
-.ope-flip-back-header .back-kicker{font-family:var(--mono);font-size:.68rem;color:var(--ash);text-transform:uppercase;display:block}
-.ope-flip-back-header h3{font-family:var(--disp);font-size:1.15rem;color:var(--gold-deep);margin:0}
+/* —— HUD (misma lengua visual que ficha.php) —— */
+.ope-hud{display:flex;flex-direction:column;gap:12px;padding:18px 18px 14px;color:var(--ope-ink);font-family:var(--ope-body)}
+.ope-hud-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:12px 14px;background:linear-gradient(120deg,var(--ope-wash),var(--ope-card));border:1px solid var(--ope-line-soft);border-radius:14px;box-shadow:var(--ope-shadow-sm)}
+.ope-hud-identity{display:flex;gap:14px;align-items:center;min-width:0}
+.ope-hud-avatar{width:72px;height:72px;border-radius:12px;overflow:hidden;border:1px solid var(--ope-line);background:var(--ope-card-2);flex:0 0 auto;box-shadow:var(--ope-shadow-sm)}
+.ope-hud-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.ope-hud-avatar-ph{display:grid;place-items:center;width:100%;height:100%;font-family:var(--ope-disp);font-size:1.6rem;font-weight:800;color:var(--ope-gold-deep);background:var(--ope-wash)}
+.ope-hud-idtext{min-width:0}
+.ope-hud-kicker{display:block;font-family:var(--mono);font-size:.62rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--ope-ink-dim);margin-bottom:4px}
+.ope-hud-name{margin:0;font-family:var(--ope-disp);font-size:1.35rem;line-height:1.15;color:var(--ope-gold-deep);font-weight:800;word-break:break-word}
+.ope-hud-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ope-hud-pill{font-family:var(--mono);font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:4px 9px;border-radius:6px;border:1px solid var(--ope-line-soft);background:var(--ope-card);color:var(--ope-ink-soft)}
+.ope-hud-pill--lvl{background:color-mix(in srgb,var(--ope-gold) 16%,var(--ope-card));border-color:var(--ope-line);color:var(--ope-gold-deep)}
+.ope-hud-pill--dim{color:var(--ope-ink-dim)}
+.ope-hud-backbtn{flex:0 0 auto;white-space:nowrap}
 
-.ope-flip-back-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.ope-flip-card-box{background:var(--concrete);border:1px solid var(--line-soft);border-radius:8px;padding:12px}
-.ope-flip-card-box.full-width{grid-column:1/-1}
-.ope-flip-card-box h4{font-family:var(--disp);font-size:.85rem;color:var(--paper);margin:0 0 8px 0;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--line-soft);padding-bottom:4px}
-.ope-flip-stat-row{display:flex;justify-content:space-between;font-size:.78rem;padding:4px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
-.ope-flip-stat-row:last-child{border-bottom:none}
-.ope-flip-stat-label{color:var(--paper-dim)}
-.ope-flip-stat-val{font-family:var(--mono);font-weight:700;color:var(--gold-deep)}
+.ope-hud-vitals{display:grid;grid-template-columns:1.4fr 1.4fr .7fr;gap:10px}
+.ope-hud-vital{background:var(--ope-card);border:1px solid var(--ope-line);border-radius:12px;padding:10px 12px;box-shadow:var(--ope-shadow-sm)}
+.ope-hud-vital-top{display:flex;align-items:baseline;gap:6px;margin-bottom:8px}
+.ope-hud-vital-top span{font-family:var(--mono);font-size:.62rem;letter-spacing:1px;text-transform:uppercase;color:var(--ope-ink-dim)}
+.ope-hud-vital-top b{font-family:var(--ope-disp);font-size:1.25rem;font-weight:900;line-height:1}
+.ope-hud-vital-top i{font-style:normal;font-family:var(--mono);font-size:.68rem;color:var(--ope-ink-dim)}
+.ope-hud-vital-track{height:9px;border-radius:999px;background:var(--ope-line-soft);overflow:hidden}
+.ope-hud-vital-track span{display:block;height:100%;border-radius:inherit;transition:width .35s ease}
+.ope-hud-vital--pv .ope-hud-vital-top b{color:#b94438}
+.ope-hud-vital--pv .ope-hud-vital-track span{background:linear-gradient(90deg,#d96a5c,#b94438)}
+.ope-hud-vital--en .ope-hud-vital-top b{color:#1f7f7f}
+.ope-hud-vital--en .ope-hud-vital-track span{background:linear-gradient(90deg,var(--ope-eter),#1f7f7f)}
+.ope-hud-vital--pa .ope-hud-vital-top b{color:var(--ope-gold-deep)}
+.ope-hud-pa-dots{display:flex;gap:5px;margin-top:2px}
+.ope-hud-pa-dots i{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--ope-gold-deep);background:transparent;display:block}
+.ope-hud-pa-dots i.on{background:var(--ope-gold);border-color:var(--ope-gold-deep)}
+
+.ope-hud-panel{background:var(--ope-card);border:1px solid var(--ope-line);border-radius:14px;padding:12px 14px;box-shadow:var(--ope-shadow-sm)}
+.ope-hud-panel-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 10px;padding:0 0 8px;border-bottom:1px solid var(--ope-line-soft);background:transparent}
+.ope-hud-panel-h>span:first-child{font-family:var(--ope-disp);font-size:.95rem;letter-spacing:.3px;text-transform:none;color:var(--ope-gold-deep);font-weight:700}
+.ope-hud-panel-sub{font-family:var(--mono);font-size:.62rem;color:var(--ope-ink-dim);text-transform:uppercase}
+
+.ope-hud-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ope-hud-stat{padding:8px;border-radius:10px;background:var(--ope-card-2);border:1px solid var(--ope-line-soft)}
+.ope-hud-stat-top{display:flex;justify-content:space-between;align-items:center;gap:4px;margin-bottom:6px}
+.ope-hud-stat-top abbr{font-family:var(--mono);font-size:.68rem;font-weight:800;letter-spacing:.8px;text-decoration:none;color:var(--ope-ink-dim)}
+.ope-hud-stat-val{font-family:var(--mono);font-weight:800;font-size:.9rem;color:var(--ope-gold-deep);display:inline-flex;align-items:center;gap:4px}
+.ope-hud-stat-bar{height:6px;border-radius:999px;background:var(--ope-line-soft);overflow:hidden}
+.ope-hud-stat-bar i{display:block;height:100%;border-radius:inherit;background:var(--ope-gold)}
+.ope-hud-stat.heat-h9 .ope-hud-stat-bar i{background:linear-gradient(90deg,#d8b76b,#b7924e)}
+.ope-hud-stat.heat-h9 .ope-hud-stat-val{color:var(--ope-gold-deep)}
+.ope-hud-stat.heat-h8 .ope-hud-stat-bar i,.ope-hud-stat.heat-h6 .ope-hud-stat-bar i{background:var(--ope-gold)}
+.ope-hud-stat.heat-h4 .ope-hud-stat-bar i{background:color-mix(in srgb,var(--ope-gold) 70%,#8ba0b3)}
+.ope-hud-stat.heat-h2 .ope-hud-stat-bar i{background:#8ba0b3}
+.ope-hud-mod{font-style:normal;font-size:.68rem;font-weight:800;padding:1px 5px;border-radius:4px;line-height:1.2}
+.ope-hud-mod.up{background:color-mix(in srgb,var(--ope-eter) 22%,transparent);color:#1f7f7f}
+.ope-hud-mod.down{background:color-mix(in srgb,#b94438 18%,transparent);color:#b94438}
+
+.ope-hud-powers{display:grid;grid-template-columns:1.2fr .8fr;gap:10px}
+.ope-hud-fruta-card{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;border:1px solid var(--ope-line-soft);background:var(--ope-card-2)}
+.ope-hud-fruta-card.tipo-logia{border-color:color-mix(in srgb,var(--ope-sky) 45%,var(--ope-line-soft))}
+.ope-hud-fruta-card.tipo-zoa{border-color:color-mix(in srgb,var(--ope-eter) 45%,var(--ope-line-soft))}
+.ope-hud-fruta-card.tipo-paramecia{border-color:color-mix(in srgb,var(--ope-gold) 45%,var(--ope-line-soft))}
+.ope-hud-fruta-thumb{width:52px;height:52px;border-radius:10px;overflow:hidden;background:var(--ope-wash);display:grid;place-items:center;flex:0 0 auto;border:1px solid var(--ope-line-soft)}
+.ope-hud-fruta-thumb img{width:100%;height:100%;object-fit:cover}
+.ope-hud-fruta-ph{font-size:1.2rem;opacity:.55;color:var(--ope-gold-deep)}
+.ope-hud-fruta-body{min-width:0;display:flex;flex-direction:column;gap:3px}
+.ope-hud-fruta-body b{font-family:var(--ope-disp);font-size:.95rem;color:var(--ope-ink);line-height:1.15}
+.ope-hud-fruta-body span{font-family:var(--mono);font-size:.66rem;color:var(--ope-ink-dim)}
+.ope-hud-haki-row{display:flex;flex-direction:column;gap:6px}
+.ope-hud-haki-chip{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:8px;border:1px dashed var(--ope-line-soft);opacity:.5;background:var(--ope-card-2)}
+.ope-hud-haki-chip.is-on{opacity:1;border-style:solid;border-color:var(--ope-line)}
+.ope-hud-haki-chip b{font-family:var(--mono);font-size:.72rem;letter-spacing:.5px;text-transform:uppercase;color:var(--ope-ink-soft)}
+.ope-hud-haki-chip span{font-family:var(--mono);font-size:.72rem;color:var(--ope-gold-deep);font-weight:700}
+.ope-hud-haki--ken.is-on{border-color:color-mix(in srgb,var(--ope-sky) 50%,var(--ope-line))}
+.ope-hud-haki--buso.is-on{border-color:color-mix(in srgb,#8b7cc9 50%,var(--ope-line))}
+.ope-hud-haki--hao.is-on{border-color:color-mix(in srgb,#b94438 50%,var(--ope-line))}
+
+.ope-hud-sidegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ope-hud-berries{font-family:var(--ope-disp);margin-bottom:8px}
+.ope-hud-berries b{font-size:1.2rem;color:var(--ope-gold-deep)}
+.ope-hud-berries span{font-family:var(--mono);font-size:.68rem;color:var(--ope-ink-dim);margin-left:4px}
+.ope-hud-loot{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.ope-hud-loot li{font-size:.78rem;padding:5px 8px;border-radius:8px;background:var(--ope-card-2);border:1px solid var(--ope-line-soft);color:var(--ope-ink)}
+.ope-hud-kv{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--ope-line-soft);font-size:.78rem}
+.ope-hud-kv:last-child{border-bottom:0}
+.ope-hud-kv span{color:var(--ope-ink-dim)}
+.ope-hud-kv b{font-family:var(--mono);font-weight:700;color:var(--ope-ink);text-align:right}
+.ope-hud-empty{margin:4px 0 0;font-family:var(--mono);font-size:.72rem;color:var(--ope-ink-dim)}
+
+.ope-hud-tags{display:flex;flex-wrap:wrap;gap:6px}
+.ope-hud-tag{font-family:var(--mono);font-size:.66rem;font-weight:700;text-transform:uppercase;padding:4px 8px;border-radius:5px;border:1px solid var(--ope-line-soft)}
+.ope-hud-tag.alert{background:color-mix(in srgb,#b94438 12%,var(--ope-card));border-color:#b94438;color:#b94438}
+.ope-hud-tag.mod{background:color-mix(in srgb,var(--ope-gold) 14%,var(--ope-card));border-color:var(--ope-line);color:var(--ope-gold-deep)}
+
+/* Acciones del post = expandible propio (sin caja RPG SYSTEM anidada) */
+.ope-hud-actions{background:var(--ope-card);border:1px solid var(--ope-line);border-radius:14px;box-shadow:var(--ope-shadow-sm);overflow:hidden}
+.ope-hud-actions-h{width:100%;display:flex;align-items:center;gap:10px;background:linear-gradient(120deg,var(--ope-wash),var(--ope-card));border:none;border-bottom:1px solid var(--ope-line-soft);padding:12px 14px;cursor:pointer;text-align:left;font:inherit;color:var(--ope-ink)}
+.ope-hud-actions.is-collapsed .ope-hud-actions-h{border-bottom:none}
+.ope-hud-actions-h:hover{background:linear-gradient(120deg,var(--ope-wash),var(--ope-card-2))}
+.ope-hud-actions-title{font-family:var(--ope-disp);font-weight:700;font-size:.95rem;color:var(--ope-gold-deep)}
+.ope-hud-actions-meta{font-family:var(--mono);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ope-ink-dim)}
+.ope-hud-actions-toggle{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ope-ink);background:var(--ope-card);border:1px solid var(--ope-line);border-radius:6px;padding:4px 10px}
+.ope-hud-actions-toggle::after{content:"\25BC";font-size:.55rem;transition:transform .15s ease}
+.ope-hud-actions-h[aria-expanded="true"] .ope-hud-actions-toggle::after{transform:rotate(180deg)}
+.ope-hud-actions-b[hidden]{display:none}
+.ope-hud-actions-b{padding:14px}
+.ope-hud-actions-b .ope-rpgsys{display:none!important}
+.ope-hud-actions-b .ope-rpgsys-vitals{display:none!important}
+
+.ope-hud-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:8px;border-top:1px solid var(--ope-line-soft);margin-top:2px}
+.ope-hud-ficha{font-family:var(--mono);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ope-gold-deep);text-decoration:none}
+.ope-hud-ficha:hover{color:var(--ope-gold);text-decoration:underline}
+.ope-hud-foot-acts{display:flex;gap:6px;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .ope-hud-vitals{grid-template-columns:1fr 1fr}
+  .ope-hud-vital--pa{grid-column:1/-1}
+  .ope-hud-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ope-hud-powers,.ope-hud-sidegrid{grid-template-columns:1fr}
+  .ope-hud-hero{flex-direction:column}
+  .ope-hud-backbtn{align-self:stretch}
+}
+@media (max-width:560px){
+  .ope-hud{padding:14px}
+  .ope-hud-name{font-size:1.15rem}
+  .ope-hud-avatar{width:58px;height:58px}
+}
 
 /* Avatar Sidebar adjustments (Columna Izquierda Limpia) */
 .ope-post-author{width:240px!important;min-width:240px!important;max-width:240px!important;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;padding:16px!important}

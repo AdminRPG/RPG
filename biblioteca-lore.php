@@ -95,33 +95,15 @@ ob_start();
 
         <p>Pero los sabios del Gran Reino, previendo su propia destrucción, grabaron la verdad en piedra indestructible. Los <strong>Poneglyphs</strong> —monolitos de un material desconocido que ni el fuego ni el acero ni el paso de los milenios puede dañar— fueron dispersados por todo el mundo. En ellos, en una lengua que solo unos pocos elegidos pueden leer, está escrita la <em>Verdadera Historia</em>.</p>
 
-        <p>Novecientos años después, una mujer con la inicial <strong>D.</strong> en su nombre —heredera involuntaria de la voluntad que desafía a los dioses— se alzó desde la nada hasta convertirse en la dueña indiscutible de los mares.</p>
+        <p>Novecientos años después, un hombre con la inicial <strong>D.</strong> en su nombre —heredero involuntario de la voluntad que desafía a los dioses— se alzó desde la nada hasta conquistar el <strong>Grand Line</strong> y ser coronado <strong>Rey de los Piratas</strong>. Durante años, su bandera fue sinónimo de libertad para unos y de caos para otros.</p>
 
-        <p>Esa mujer es {npc:isabella-d-vega}.</p>
+        <p>Pero hace poco, lo imposible ocurrió: el Rey Pirata <strong>fue capturado</strong>. Hoy aguarda, encadenado, su ejecución pública en el corazón mismo de la Marina.</p>
 
-        <p>Nacida en la miseria de una isla olvidada por los mapas y explotada por nobles que se creían intocables, Isabella escapó de las cadenas de la tiranía a una edad en la que otros niños aún aprenden a leer. Durante <strong>treinta años</strong>, forjó su leyenda ola a ola, combate a combate, aliado a aliado y traición a traición. Fundó los legendarios <strong>Piratas Carmesí</strong> —así llamados por el rastro carmesí que dejaban en el horizonte al zarpar al amanecer— y reunió a su alrededor a una tripulación de monstruos, soñadores y almas perdidas que encontraron en su bandera un hogar.</p>
+        <p>Y aquí reside la ironía que estremece al mundo: quien debe garantizar esa ejecución es la <strong>Almirante de Flota</strong> conocida como <strong>«El Puño de la Marina»</strong>… su propia madre. Deber contra sangre, sobre el filo de una decisión imposible.</p>
 
-        <p>A su lado, como su sombra y su escudo, navega {npc:jack-el-inmortal}, el vice-capitán que ha sobrevivido a heridas que habrían matado a cualquier otro mortal diez veces. Y en la enfermería del barco, {npc:aurelian-lira} —una mujer que un día caminó por los pasillos de Mary Geoise como <strong>Dragón Celestial</strong> y que renunció a todo para curar a aquellos a los que su sangre debería despreciar— venda las heridas de la tripulación y con ellas, quizás, las suyas propias.</p>
+        <p>El mundo contiene la respiración. Porque todos saben —los Cuatro Emperadores, la Marina, el Ejército Revolucionario, el Gobierno Mundial— que la ejecución del Rey de los Piratas no será el final de nada. Será el prólogo. El disparo de salida. La chispa que encenderá la mayor guerra que estos mares hayan visto jamás.</p>
 
-        <p>Pero el destino de Isabella —como el de todos los que portan la <strong>D.</strong>— estaba sellado desde el momento en que nació.</p>
-
-        <p>Hace cinco años, los Piratas Carmesí lograron lo imposible: alcanzaron <strong>La Última Isla</strong>. Allí, en el confín del mundo, Isabella contempló la verdad que el Gobierno Mundial lleva siglos tratando de ocultar. Lo que vio en aquella isla —lo que comprendió en aquel instante— jamás ha sido revelado a nadie. Pero quienes la conocen aseguran que, al regresar, sus ojos —esos ojos que le habían ganado el epíteto de <strong>Ojos Carmesí</strong>— ya no miraban al presente. Miraban al futuro. O quizás al pasado.</p>
-
-        <p>No atacó. No reveló lo que sabía. Simplemente... esperó.</p>
-
-        <p>Y entonces llegó la traición.</p>
-
-        <p>{npc:balgor-titan-de-chatarra}, el colosal gigante que una vez fue su aliado más formidable —un titán de hierro y carne que asimiló flotas enteras para convertirse en una máquina de guerra viviente—, vendió las coordenadas de su antigua capitana a cambio de armamento. La que fue confianza se convirtió en humo. Y mientras Isabella descansaba en una isla remota, creyéndose a salvo, la <strong>Almirante de Flota {npc:valyria-almirante-de-flota}</strong> —«El Filo de la Marina», la mujer cuya espada partió una isla en dos y cuyo sentido de la justicia es tan absoluto como aterrador— cayó sobre ella como un halcón sobre su presa.</p>
-
-        <p>El duelo fue legendario. Dos mujeres. Dos voluntades. Dos filos. El cielo se partió. El mar rugió. Y al final, la Reina de los Piratas cayó.</p>
-
-        <p>Ahora, Isabella D. Vega espera en una celda de <strong>Impel Down</strong>, custodiada por los tres Almirantes: {npc:ken-dragon-azul}, cuyo aliento de dragón congela el mismo tiempo; {npc:flint-balas-de-plata}, que prefiere la comodidad de su hamaca pero cuyo gatillo es más rápido que el pensamiento; y {npc:nereida-el-abismo}, la sirena que gobierna las profundidades y cuyo concepto de la justicia no admite matices.</p>
-
-        <p>En <strong>30 días</strong>, a plena vista del mundo entero, en la plaza central de Marineford, Isabella D. Vega será ejecutada.</p>
-
-        <p>El mundo contiene la respiración. Porque todos saben —los Cuatro Emperadores, la Marina, el Ejército Revolucionario, los Señores de la Guerra— que la ejecución de la Reina de los Piratas no es el final de la historia. Es el prólogo. El disparo de salida. La chispa que encenderá la mayor guerra que este mundo haya visto jamás.</p>
-
-        <p>Porque cuando muera Isabella D. Vega... <strong>¿quién reclamará su trono?</strong></p>
+        <p><em>La crónica de esta era se está escribiendo. Sus protagonistas se revelarán pronto.</em></p>
       </div><!-- /#g-historia -->
 
       <!-- II · Cronología -->
@@ -140,16 +122,12 @@ ob_start();
           <li class="tomo-tl-item"><span class="tomo-tl-year">Hace 800 años</span><span class="tomo-tl-text">Las <strong>16 Familias Fundadoras</strong> ascienden al Red Line y establecen <strong>Mary Geoise</strong>. Se funda el Gobierno Mundial. Nace el sistema de los <strong>Dragones Celestiales</strong>. La censura histórica se convierte en política de estado.</span></li>
           <li class="tomo-tl-item"><span class="tomo-tl-year">Hace 400 años</span><span class="tomo-tl-text">La <strong>Gran Exploración</strong> cartografía el Grand Line. Se establecen las siete rutas principales. Los <strong>Log Pose</strong> se convierten en herramienta indispensable de navegación.</span></li>
           <li class="tomo-tl-item"><span class="tomo-tl-year">Hace 50 años</span><span class="tomo-tl-text">En Elbaf, el joven guerrero que se hará llamar <strong>Grog «Rompe-Cielos»</strong> despierta su poder latente. La era de los gigantes como fuerza militar indiscutible alcanza su cénit.</span></li>
-          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace 30 años</span><span class="tomo-tl-text">{npc:isabella-d-vega} escapa de la tiranía de su isla natal. Nace un odio eterno hacia la nobleza que marcará el resto de su vida.</span></li>
-          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace 25 años</span><span class="tomo-tl-text">Isabella funda los <strong>Piratas Carmesí</strong>. Se asocia temporalmente con {npc:balgor-titan-de-chatarra}, un colosal gigante con ambiciones mecánicas. {npc:jack-el-inmortal} se une como primer oficial.</span></li>
-          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace 20 años</span><span class="tomo-tl-text">{npc:sekhmet-reina-leona} —majestuosa Mink leona del reino de Zou— y {npc:shura-dios-de-la-ira} —terrorífica Oni portadora de una Zoan Mitica— emergen como fuerzas imparables en el Nuevo Mundo.</span></li>
-          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace 15 años</span><span class="tomo-tl-text">{npc:valyria-almirante-de-flota} asciende meteóricamente a Almirante de Flota tras partir una isla entera por la mitad con un solo golpe de su espada. La Marina entra en una nueva era de poder absoluto.</span></li>
-          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace 12 años</span><span class="tomo-tl-text">{npc:aurelian-lira}, nacida como Dragón Celestial, renuncia a su título y a su familia para unirse a los Piratas Carmesí como médica. Mary Geoise declara su nombre <em>maldito</em>.</span></li>
-          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace 10 años</span><span class="tomo-tl-text">{npc:balgor-titan-de-chatarra} completa su transformación en un Mecha gigante tras asimilar los restos de varias flotas derrotadas. Se autoproclama <strong>Yonko</strong>. {npc:ezekiel-el-arcangel}, híbrido Skypiean/Lunarian, comienza a cazar piratas desde los cielos con su rifle de Diales y es catalogado como el cuarto Emperador.</span></li>
-          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace 8 años</span><span class="tomo-tl-text">{npc:ignis-llama-del-sur} es nombrado Comandante del <strong>Ejército Revolucionario</strong>, liderando operaciones de liberación en islas oprimidas por el Gobierno Mundial.</span></li>
-          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace 5 años</span><span class="tomo-tl-text">Isabella y los Piratas Carmesí alcanzan <strong>La Última Isla</strong>. Descubre la verdad del mundo. Es coronada <strong>Reina de los Piratas</strong>. Decide no atacar.</span></li>
-          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace 1 mes</span><span class="tomo-tl-text">{npc:balgor-titan-de-chatarra} traiciona a Isabella, vendiendo sus coordenadas. {npc:valyria-almirante-de-flota} intercepta a la Reina Pirata en una isla remota. <strong>Duelo de espadas legendario</strong>. Isabella es capturada y encarcelada en Impel Down, Nivel 6.</span></li>
-          <li class="tomo-tl-item"><span class="tomo-tl-year">Día 0 — AHORA</span><span class="tomo-tl-text">Faltan <strong>30 días</strong> para la ejecución pública de Isabella D. Vega en Marineford. Los Yonko —{npc:shura-dios-de-la-ira}, {npc:sekhmet-reina-leona}, {npc:ezekiel-el-arcangel} y {npc:balgor-titan-de-chatarra}— mueven ficha. La Marina se prepara para la guerra total. El mundo se asoma al abismo de una nueva era.</span></li>
+          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace ~40 años</span><span class="tomo-tl-text">Nace, en una hermandad <strong>Buccaneer</strong> apartada del mundo, quien un día será <strong>«El Puño de la Marina»</strong>.</span></li>
+          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace ~28 años</span><span class="tomo-tl-text">Nace su hijo, portador de la voluntad de la <strong>D.</strong> Madre e hijo tomarán caminos opuestos: ella, el deber; él, la libertad.</span></li>
+          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace ~10 años</span><span class="tomo-tl-text">Cuatro <strong>Emperadores</strong> consolidan su dominio sobre el Nuevo Mundo. El equilibrio de poder de la era queda fijado.</span></li>
+          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace ~5 años</span><span class="tomo-tl-text">El futuro Rey Pirata alcanza <strong>La Última Isla</strong> y es reconocido como <strong>Rey de los Piratas</strong>.</span></li>
+          <li class="tomo-tl-item"><span class="tomo-tl-year">Hace ~1 mes</span><span class="tomo-tl-text">Lo imposible: el <strong>Rey Pirata es capturado</strong> y encerrado en la prisión de máxima seguridad de la Marina.</span></li>
+          <li class="tomo-tl-item"><span class="tomo-tl-year">Día 0 — AHORA</span><span class="tomo-tl-text">Cuenta atrás para la <strong>ejecución pública del Rey Pirata</strong>. Su madre, la Almirante de Flota, debe presidirla. Los Cuatro Emperadores mueven ficha. El mundo se asoma al abismo de una nueva guerra.</span></li>
         </ul>
       </div><!-- /#g-cronologia -->
 
@@ -166,32 +144,30 @@ ob_start();
           <span class="tomo-era-sub">Cuando los dioses borraron un siglo y los sabios grabaron la verdad en piedra</span>
           <p>Hace 900 años, estalla la Gran Guerra entre el Gran Reino y una alianza de reinos menores por razones perdidas en el tiempo. Un siglo después, el Gran Reino es completamente borrado de la historia en lo que se conoce como el <strong>Siglo Vacío</strong>.</p>
           <p>Las <strong>16 Familias Fundadoras</strong> suben al Red Line y establecen <strong>Mary Geoise</strong>, coronándose como Dioses Mundiales y censurando todo el conocimiento antiguo. Los <strong>Poneglyphs</strong> son creados como única fuente de verdad histórica indestructible, dispersados por todo el mundo para preservar lo que el Gobierno Mundial intentó destruir.</p>
-          <p>Entre esas familias, los <strong>Oakhaven</strong> se consolidan como una de las más influyentes. Siglos después, un heredero de ese linaje —{npc:principe-oakhaven}— recorrerá los pasillos de Mary Geoise con la arrogancia de quien cree que la historia la escriben los vencedores. Pero como demuestra el tiempo una y otra vez... <em>los vencedores nunca tienen la última palabra</em>.</p>
+          <p>Desde entonces, las familias fundadoras y sus herederos recorren los pasillos de Mary Geoise con la arrogancia de quien cree que la historia la escriben los vencedores. Pero como demuestra el tiempo una y otra vez... <em>los vencedores nunca tienen la última palabra</em>.</p>
         </div>
 
         <div class="tomo-era">
           <h3 class="tomo-era-title">Era II — La Edad de las Bestias</h3>
           <span class="tomo-era-sub">Cuando los colosos cartografiaron el mundo y los gigantes despertaron</span>
           <p>Hace 400 años, la <strong>Gran Exploración</strong> cartografía el Grand Line, estableciendo las rutas y la geografía actual del mundo que todos conocen. Los Log Pose se convierten en la herramienta indispensable de navegación.</p>
-          <p>Hace 50 años, <strong>Grog «Rompe-Cielos»</strong> despierta como el guerrero más formidable y aterrador de la nueva generación de Elbaf, llevando la gloria a la raza de los gigantes y demostrando que el poder bruto puede rivalizar con cualquier Fruta del Diablo. Es en esta era cuando se forjan las alianzas tribales que siglos después permitirán a criaturas como {npc:balgor-titan-de-chatarra} alcanzar un poder que roza lo divino.</p>
+          <p>Hace 50 años, <strong>Grog «Rompe-Cielos»</strong> despierta como el guerrero más formidable y aterrador de la nueva generación de Elbaf, llevando la gloria a la raza de los gigantes y demostrando que el poder bruto puede rivalizar con cualquier Fruta del Diablo. Es en esta era cuando se forjan las alianzas tribales que siglos después alzarán a colosos capaces de rozar lo divino.</p>
         </div>
 
         <div class="tomo-era">
-          <h3 class="tomo-era-title">Era III — El Ascenso de los Nuevos Emperadores</h3>
-          <span class="tomo-era-sub">Cuando una mujer escapó de sus cadenas y cuatro monstruos reclamaron el mar</span>
-          <p>Hace 30 años, {npc:isabella-d-vega} escapa de la tiranía de su isla natal, forjando un odio eterno hacia el mundo noble. Cinco años después funda los <strong>Piratas Carmesí</strong> y se asocia temporalmente con el colosal gigante {npc:balgor-titan-de-chatarra}. A su lado, {npc:jack-el-inmortal} —un hombre cuya lealtad es tan inquebrantable como su capacidad para sobrevivir a lo imposible— jura proteger la bandera carmesí con su vida.</p>
-          <p>Hace 20 años se consolida como amenaza mundial al chocar contra otros monstruos, mientras {npc:sekhmet-reina-leona} —una majestuosa Mink leona cuyo rugido hace temblar las islas— y {npc:shura-dios-de-la-ira} —una terrorífica Oni cuyo poder trasciende la comprensión humana— emergen en el Nuevo Mundo.</p>
-          <p>Hace 15 años, {npc:valyria-almirante-de-flota} asciende meteóricamente a Almirante de Flota tras cortar una isla por la mitad, imponiendo el respeto absoluto. Bajo su mando, tres oficiales de talento excepcional —{npc:ken-dragon-azul}, {npc:flint-balas-de-plata} y {npc:nereida-el-abismo}— son elevados al rango de Almirantes, formando el cuarteto más temible que la Marina haya conocido jamás.</p>
-          <p>Hace 10 años, {npc:balgor-titan-de-chatarra} asimila varias flotas enteras para convertirse en un Mecha gigante, deserta y se corona Yonko como <strong>«Titán de Chatarra»</strong>. Ese mismo año, {npc:ezekiel-el-arcangel} —un híbrido Skypiean/Lunarian— comienza a cazar piratas desde los cielos con su rifle de Diales, siendo catalogado como el cuarto Emperador. En las sombras del mundo, {npc:ignis-llama-del-sur} organiza células revolucionarias en docenas de islas.</p>
-          <p>En los bajos fondos, figuras como {npc:cara-de-moneda-gils} —corredor del mercado negro con contactos en todas las facciones— y {npc:perro-rabioso-varg} —cyborg cazarrecompensas de instintos implacables— prosperan en el caos de una era definida por la ambición.</p>
+          <h3 class="tomo-era-title">Era III — El Ascenso de los Emperadores</h3>
+          <span class="tomo-era-sub">Cuando cuatro monstruos reclamaron el mar y un rey se alzó sobre todos</span>
+          <p>En las últimas décadas, cuatro fuerzas colosales —los <strong>Cuatro Emperadores (Yonko)</strong>— se repartieron el dominio del <strong>Nuevo Mundo</strong>, imponiendo un frágil equilibrio de terror y ambición que ninguna nación se atrevía a desafiar.</p>
+          <p>Fue en ese tablero donde un hombre con la voluntad de la <strong>D.</strong> reunió una tripulación de soñadores y monstruos, cruzó el Grand Line de punta a punta y, cinco años atrás, fue reconocido como <strong>Rey de los Piratas</strong> tras alcanzar La Última Isla. Su bandera se convirtió en el símbolo de una libertad que el Gobierno Mundial no podía tolerar.</p>
+          <p><em>La crónica detallada de esta era —sus Emperadores, sus Almirantes y sus revolucionarios— se está escribiendo.</em></p>
         </div>
 
         <div class="tomo-era">
-          <h3 class="tomo-era-title">Era IV — La Caída de la Reina</h3>
-          <span class="tomo-era-sub">Cuando la Reina cayó y el mundo contuvo la respiración</span>
-          <p>Hace 5 años, Isabella y sus leales —{npc:jack-el-inmortal} y {npc:aurelian-lira} entre ellos— llegan a <strong>La Última Isla</strong>. Descubre la verdad del mundo pero opta por no atacar aún, siendo coronada <strong>«Reina de los Piratas»</strong>.</p>
-          <p>Hace un mes, {npc:balgor-titan-de-chatarra} traiciona su antiguo pacto vendiendo las coordenadas de Isabella a cambio de armamento. La Almirante de Flota {npc:valyria-almirante-de-flota} intercepta a Isabella y, tras un duelo de espadas legendario, la captura.</p>
-          <p><strong>En la actualidad (Día 0):</strong> Faltan exactamente <strong>30 días</strong> para la ejecución pública de Isabella D. Vega en Marineford. Las fuerzas mundiales se preparan para la Guerra Total. Los Cuatro Emperadores mueven ficha. El mundo entra en su era más caótica y decisiva.</p>
+          <h3 class="tomo-era-title">Era IV — La Cuenta Atrás</h3>
+          <span class="tomo-era-sub">Cuando el Rey cayó y el mundo contuvo la respiración</span>
+          <p>Hace apenas un mes, lo imposible se hizo realidad: el <strong>Rey Pirata fue capturado</strong> y encerrado en la prisión de máxima seguridad de la Marina.</p>
+          <p>Quien debe garantizar su ejecución es la <strong>Almirante de Flota «El Puño de la Marina»</strong>… su propia madre. Un deber que le exige matar a su sangre ante los ojos del mundo entero.</p>
+          <p><strong>En la actualidad (Día 0):</strong> corre la cuenta atrás para la ejecución pública del Rey de los Piratas. Las fuerzas mundiales se preparan para la Guerra Total. Los Cuatro Emperadores mueven ficha. El mundo entra en su era más caótica y decisiva.</p>
         </div>
       </div><!-- /#g-eras -->
 

@@ -298,8 +298,8 @@ header('Content-Type: text/html; charset=utf-8');
 <div class="wrap">
 
   <div class="shead">
-    <h1>Crear Skyfarer</h1>
-    <span class="code">// granblue fantasy eternal</span>
+    <h1>Crear Aventurero</h1>
+    <span class="code">// one piece eternal</span>
     <span class="rule"></span>
   </div>
 
@@ -309,7 +309,7 @@ header('Content-Type: text/html; charset=utf-8');
     <div class="plate-b">
       <div class="pj-empty">
         <span class="anvil"><svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M6 20v-5h5v5"/><path d="M4 15l8-4 4 3"/><path d="M14 11l3-6 4 2-2 5"/><circle cx="9" cy="7" r="2.4"/></svg></span>
-        <div class="big">Accede para crear un Skyfarer</div>
+        <div class="big">Accede para crear un Aventurero</div>
         <p>Necesitas una cuenta en el foro para crear un personaje.</p>
         <div class="acts">
           <a href="<?php echo $bburl; ?>/member.php?action=register" class="btn btn-hot">RegÃ­strate</a>
@@ -342,7 +342,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endif; ?>
 
   <p class="wiz-lead">
-    Forja tu Skyfarer en <b>9 pasos</b>: raza, elemento, arma, Enlace, atributos, facciÃ³n, dotes, historia y pack.
+    Forja tu Aventurero en <b>9 pasos</b>: raza, elemento, arma, Enlace, atributos, facciÃ³n, dotes, historia y pack.
     Al enviar, tu ficha entra en <b>revisiÃ³n</b> del staff.
   </p>
 
@@ -571,7 +571,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div class="plate-h"><span class="t">8. Historia y equipo</span><span class="c">// quiÃ©n eres</span></div>
             <div class="plate-b">
               <div class="grid2">
-                <div class="field"><label class="flabel">Nombre del Skyfarer *</label><input type="text" name="nombre" id="wizNombreInput" maxlength="120" required value="<?php echo htmlspecialchars_uni($old['nombre'] ?? ''); ?>"></div>
+                <div class="field"><label class="flabel">Nombre del Aventurero *</label><input type="text" name="nombre" id="wizNombreInput" maxlength="120" required value="<?php echo htmlspecialchars_uni($old['nombre'] ?? ''); ?>"></div>
                 <div class="field"><label class="flabel">Apodo (opcional)</label><input type="text" name="apodo" maxlength="60" value="<?php echo htmlspecialchars_uni($old['apodo'] ?? ''); ?>"></div>
                 <div class="field"><label class="flabel">Edad</label><input type="text" name="edad" maxlength="20" value="<?php echo htmlspecialchars_uni($old['edad'] ?? ''); ?>"></div>
                 <div class="field"><label class="flabel">GÃ©nero</label><input type="text" name="genero" maxlength="40" value="<?php echo htmlspecialchars_uni($old['genero'] ?? ''); ?>"></div>

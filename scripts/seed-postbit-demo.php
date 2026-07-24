@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Hilo de prueba para verificar postbit GBE (showthread).
  * Ejecutar: php scripts/seed-postbit-demo.php
@@ -48,7 +48,7 @@ if ($r && ($row = $r->fetch_assoc())) {
 $username = $db->real_escape_string($user['username']);
 $subjectEsc = $db->real_escape_string($SUBJECT);
 $message = <<<'MSG'
-Este hilo es una **prueba visual** del postbit Granblue Eternal.
+Este hilo es una **prueba visual** del postbit One Piece: Eternal.
 
 Comprueba que:
 - La cajetilla del autor no tiene borde negro OP

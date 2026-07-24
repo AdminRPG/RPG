@@ -1,4 +1,4 @@
-# OpenCode — One Piece: Eternal
+﻿# OpenCode — One Piece: Eternal
 
 ## Instrucciones del agente
 

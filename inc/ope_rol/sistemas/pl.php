@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * One Piece: Eternal · Sistema de Puntos de Leyenda (PL).
  *
@@ -72,9 +72,9 @@ function ope_pl_spend($pid, $cost, $tipo = '', $notas = '') {
 function ope_pl_tienda() {
     return array(
         'linaje_notable' => array('nombre' => 'Linaje notable', 'coste' => 5, 'desc' => 'Pertenencia a una rama menor de una Gran Casa (contactos, ganchos de historia y estatus social).'),
-        'pacto_primal' => array('nombre' => 'Pacto Primal menor', 'coste' => 3, 'desc' => 'Forja un vínculo con un Primal menor (sujeto a disponibilidad y aprobación del staff).'),
-        'sangre_astral' => array('nombre' => 'Sangre Astral antigua', 'coste' => 5, 'desc' => 'Tu personaje posee un linaje con vestigios de sangre Astral, aumentando la afinidad con el Éter.'),
+        'pacto_primal' => array('nombre' => 'Vínculo Primordial menor', 'coste' => 3, 'desc' => 'Forja un vínculo con un Primordial menor (sujeto a disponibilidad y aprobación del staff).'),
+        'sangre_astral' => array('nombre' => 'Sangre Ancestral antigua', 'coste' => 5, 'desc' => 'Tu personaje posee un linaje con vestigios de sangre Astral, aumentando la afinidad con la Esencia.'),
         'arma_suprema' => array('nombre' => 'Arma de Grado Celestial', 'coste' => 10, 'desc' => 'Un arma legendaria forjada con materiales celestes por un maestro artesano.'),
-        'enlace_primal_subir' => array('nombre' => 'Subir Enlace Primal +1 nivel', 'coste' => 3, 'desc' => 'Incrementa en +1 el nivel de tu Enlace Primal (requiere tener el Pacto Primal activo).'),
+        'enlace_primal_subir' => array('nombre' => 'Subir Enlace Primal +1 nivel', 'coste' => 3, 'desc' => 'Incrementa en +1 el nivel de tu Enlace Primal (requiere tener el Vínculo Primordial activo).'),
     );
 }

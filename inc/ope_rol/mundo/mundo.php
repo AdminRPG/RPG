@@ -677,7 +677,7 @@ function ope_rol_mv_build_prompt($ciclo)
 
     $L = array();
     $L[] = "###############################################################################";
-    $L[] = "#  MUNDO VIVO · \"LA BALANZA\" v3  —  MOTOR NARRATIVO DE GRANBLUE FANTASY: ETERNAL";
+    $L[] = "#  MUNDO VIVO · \"LA BALANZA\" v3  —  MOTOR NARRATIVO DE ONE PIECE: ETERNAL";
     $L[] = "###############################################################################";
     $L[] = "";
     $L[] = "======================================================================";

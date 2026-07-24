@@ -1,10 +1,10 @@
-# DESIGN — One Piece: Eternal
+﻿# DESIGN — One Piece: Eternal
 
 > **Fuente de verdad del diseño** para el foro de rol *One Piece: Eternal* (migración desde *One Piece: Eternal*).
 >
-> **Estado:** v1 — derivado de prototipos aprobados (`docs/Prototypes/Granblue/index.html` v3.2, `ficha.html` v4) y `docs/PLAN-MAESTRO-GRANBLUE-ETERNAL.md` v3.
+> **Estado:** v1 — derivado de prototipos aprobados (`docs/Prototypes/Granblue/index.html` v3.2, `ficha.html` v4) y `docs/PLAN-MAESTRO-ONE-PIECE-ETERNAL.md` v3.
 >
-> **Documentos hermanos:** `docs/PLAN-MAESTRO-GRANBLUE-ETERNAL.md` (visión/fases), `docs/DIRECCION-LORE-Y-SISTEMAS.md` (lore + sistemas), `docs/PRODUCT.md`.
+> **Documentos hermanos:** `docs/PLAN-MAESTRO-ONE-PIECE-ETERNAL.md` (visión/fases), `docs/DIRECCION-LORE-Y-SISTEMAS.md` (lore + sistemas), `docs/PRODUCT.md`.
 >
 > **CSS en producción:** `docs/themes/ope.css` → servido desde `cache/themes/theme13/ope.css`.
 >
@@ -62,7 +62,7 @@ Portar un prototipo (`docs/Prototypes/Granblue/`) = implementar **todas** las ca
 
 ### 1.1 Qué es
 
-Foro de rol play-by-post ambientado en el **universo de Granblue Fantasy** (Skydoms, Skyfarers, Primal Beasts, aeronaves), con **historia, cronología y personajes originales**. El motor técnico (combate, snapshots, mundo vivo, wizard) se conserva; cambian skin, terminología y ambientación.
+Foro de rol play-by-post ambientado en el **universo de los Cielos** (Cielos, Aventureros, Primordial Beasts, aeronaves), con **historia, cronología y personajes originales**. El motor técnico (combate, snapshots, mundo vivo, wizard) se conserva; cambian skin, terminología y ambientación.
 
 ### 1.2 Tagline
 
@@ -75,11 +75,11 @@ Tema emocional: de *Libertad* (mar, OP) → **Horizonte** (cielo, OPE). La escen
 | Pilar | Sistema en código | Reskin OPE |
 |---|---|---|
 | **Personalización** | `crear-personaje.php`, ficha, stats 12×3 | Razas OPE, clase, elemento, arma, cuádrupla visual |
-| **Combate** | `inc/ope_rol_system.php` (PV/EN/PA, heridas, estados) | Éter, ventaja elemental, técnicas por arma |
-| **Tramas** | `rol_mv_*`, tags `--tag-trama/mision/viaje/fic` | "El Equilibrio del Cielo", Astrales/Primals |
-| **Misiones** | `tablon-misiones.php` | Órdenes de Gremio, tiers por Skydom |
+| **Combate** | `inc/ope_rol_system.php` (PV/EN/PA, heridas, estados) | Esencia, ventaja elemental, técnicas por arma |
+| **Tramas** | `rol_mv_*`, tags `--tag-trama/mision/viaje/fic` | "El Equilibrio del Cielo", Ancestrales/Primordiales |
+| **Misiones** | `tablon-misiones.php` | Órdenes del Cielo, tiers por Cielo |
 | **Social** | `rol_tripulaciones`, acompañantes, relaciones | Crews, aeronave, summons, renombre |
-| **Aventuras** | Skydoms/islas, `inc/ope_rol_viajes.php` | Rutas de aeronave, progresión geográfica |
+| **Aventuras** | Cielos/islas, `inc/ope_rol_viajes.php` | Rutas de aeronave, progresión geográfica |
 
 **Regla de oro:** el motor se conserva, el skin cambia.
 
@@ -87,7 +87,7 @@ Tema emocional: de *Libertad* (mar, OP) → **Horizonte** (cielo, OPE). La escen
 
 1. **El cielo es horizonte.** El whitespace es aire, no mar.
 2. **Luz cálida sobre índigo profundo.** Contraste amanecer, no noche pirata.
-3. **Cada elemento tiene referente OPE.** Éter, Primals, aeronaves, Skydoms.
+3. **Cada elemento tiene referente OPE.** Esencia, Primordiales, aeronaves, Cielos.
 4. **Tipografía de aventura clásica.** Épica y legible, no wanted-poster.
 5. **Identidad CSS-first.** Funciona sin imágenes; las imágenes elevan, no sustituyen tokens.
 
@@ -103,7 +103,7 @@ Tema emocional: de *Libertad* (mar, OP) → **Horizonte** (cielo, OPE). La escen
 | **Prefijo CSS actual (transición)** | `ope-*`, `body.ope-pg-*` — **no eliminar hasta F1** |
 | **Logo** | `images/gbe/crest-eternal.png` |
 | **Bot cronista** | Lyria (sustituye OPE Eternal) |
-| **Moneda** | Rupies |
+| **Moneda** | Monedas |
 | **Disclaimer footer** | Foro no oficial; sin afiliación Cygames; personajes originales |
 
 > CSS canónico: `docs/themes/ope.css` → `cache/themes/theme13/ope.css`. Codename activo: `gbe`.
@@ -112,7 +112,7 @@ Tema emocional: de *Libertad* (mar, OP) → **Horizonte** (cielo, OPE). La escen
 
 ## 3. Sistema de dos temas (tokens)
 
-Conmutación vía `html[data-theme="cielo"|"noche"]`. **Por defecto: `cielo`** (claro/acuarela, dirección Relink). El botón de tema alterna entre ambos.
+Conmutación vía `html[data-theme="cielo"|"noche"]`. **Por defecto: `cielo`** (claro/acuarela, dirección Referencia Visual). El botón de tema alterna entre ambos.
 
 Los prototipos usan tokens semánticos propios (`--bg`, `--card`, `--gold`…). En `ope.css` se **mapean a los nombres heredados** (`--iron`, `--paper`, `--ember`…) para no reescribir miles de reglas. Durante el portado, cambiar valores en `:root` y añadir el selector `[data-theme="noche"]`.
 
@@ -133,7 +133,7 @@ Los prototipos usan tokens semánticos propios (`--bg`, `--card`, `--gold`…). 
 | `--gold-deep` | `#8f6f34` | `--gold-deep` | Enlaces, énfasis |
 | `--sky` | `#5ba3d0` | `--sky`, `--patina` | Acción secundaria |
 | `--sky-deep` | `#2f6fa0` | `--sea-deep` | Eyebrows, labels |
-| `--eter` | `#3bb3ab` | `--patina-hi` | Éter, chips OK |
+| `--eter` | `#3bb3ab` | `--patina-hi` | Esencia, chips OK |
 | `--line` | `rgba(183,146,78,.35)` | bordes dorados | Filetes de panel |
 | `--line-soft` | `rgba(90,111,131,.16)` | bordes sutiles | Separadores |
 | `--watermark` | `#cdd8e2` | texto decorativo `.wm` | Watermarks de sección |
@@ -157,7 +157,7 @@ Los prototipos usan tokens semánticos propios (`--bg`, `--card`, `--gold`…). 
 | `--gold-deep` | `#b48f3f` | `--gold-deep` | Enlaces |
 | `--sky` | `#5aa9ff` | `--sky`, `--patina` | Cielo frío |
 | `--sky-deep` | `#2f74b5` | `--sea-deep` | Labels |
-| `--eter` | `#63e6dd` | `--patina-hi` | Brillos Éter |
+| `--eter` | `#63e6dd` | `--patina-hi` | Brillos Esencia |
 | `--line` | `rgba(226,189,107,.32)` | bordes | Filetes |
 | `--line-soft` | `rgba(185,198,221,.14)` | separadores | Bordes sutiles |
 | `--watermark` | `rgba(202,214,232,.10)` | decorativo | Watermarks |
@@ -184,11 +184,11 @@ Se conservan nombres legacy para compatibilidad durante transición:
 --paper-dim:
 --ash:
 --ember / --ember-hi:  /* oro / acción primaria */
---patina / --patina-hi: /* turquesa Éter */
+--patina / --patina-hi: /* turquesa Esencia */
 --gold / --gold-hi / --gold-deep:
 --sky / --sky-hi:
 --sea / --sea-deep:
---crack / --red / --red-hi:  /* peligro, Primal hostil */
+--crack / --red / --red-hi:  /* peligro, Primordial hostil */
 ```
 
 #### Escala de calor / renombre (`--h1`…`--h9`)
@@ -224,7 +224,7 @@ Aura del PJ: `--aura` = color del elemento activo (borde avatar, chips, borde pa
 
 | Token | Facción |
 |---|---|
-| `--fac-skyfarer` | Aventureros libres |
+| `--fac-Aventurero` | Aventureros libres |
 | `--fac-imperio` | Imperio |
 | `--fac-sociedad` | Sociedad |
 | `--fac-orden` | Órdenes |
@@ -269,7 +269,7 @@ Declaración en `:root` (`ope.css` / `ope-index.xml` → `headerinclude`):
 
 | Elemento | Familia | Peso | Notas |
 |---|---|---|---|
-| Logo navbar | `--disp` | 700 | `Granblue Fantasy: **Eternal**` |
+| Logo navbar | `--disp` | 700 | `One Piece: **Eternal**` |
 | H1 hero / nombre PJ | `--disp` | 900 | `clamp()` responsive |
 | H2 sección (`.stitle`) | `--disp` | 700 | |
 | Eyebrow (`.eyebrow`, `.kick`) | `--mono` | 700 | uppercase, letter-spacing 2–3px |
@@ -390,7 +390,7 @@ PORTADA
 ├── HERO CARRUSEL (100vh, 4 slides, nav lateral + dots)
 ├── GACETA / BITÁCORA (bento, inmediatamente debajo del hero)
 ├── EL CIELO (categoría)
-│     └── Skydoms → paneles-región bento (como ope-world-bento)
+│     └── Cielos → paneles-región bento (como ope-world-bento)
 │           └── [clic] → forumdisplay.php → islas (subforos)
 ├── OFF TOPIC (categoría, debajo de El Cielo)
 │     └── Filas ope-forum / ope-forum en placa (ope-slab / ope-slab)
@@ -407,7 +407,7 @@ Reemplaza el `ope-hero` estático actual (`ope-index.xml` L76–86). Altura `100
 | 0 — Portada | `.g-portada` | `hero-mundo.jpg` | Emblema, tagline, CTAs "Zarpar" / "Explorar" |
 | 1 — El Cielo | `.g-mundo` | `hero-mundo.jpg` | Ambientación: mundo sobre las nubes |
 | 2 — Pueblos | `.g-pueblos` | `hero-pueblos.jpg` | Razas del cielo |
-| 3 — Primals | `.g-primal` | `hero-primal.jpg` | Bestias Primarias, pactos |
+| 3 — Primordiales | `.g-primal` | `hero-primal.jpg` | Bestias Legendarias, pactos |
 
 **Controles:** flechas laterales (`.hero-side`, 9% ancho), dots inferiores, teclado ←/→, swipe táctil. **Sin** scroll horizontal largo; **sin** pin GSAP en hero.
 
@@ -427,7 +427,7 @@ Grid equivalente a `ope-tablon` / `.bento` del prototipo:
 
 En OP el tablón comparte fila con el hero (`ope-top`); en OPE el tablón va **debajo** del carrusel full-viewport (un solo scroll vertical).
 
-### 6.4 Skydoms — bento de regiones
+### 6.4 Cielos — bento de regiones
 
 Misma mecánica que `ope-world-bento` (`ope.css` L719–756). Detección en `index.php`: categoría con islas hijas o nombre conteniendo "mundo"/"cielo" → `$isWorld`.
 
@@ -441,17 +441,17 @@ grid-template-areas:
   "es es es es"
 ```
 
-| Modifier | Skydom | Asset |
+| Modifier | Cielo | Asset |
 |---|---|---|
-| `--phantagrande` | Phantagrande | `hero-mundo.jpg` |
-| `--nalhegrande` | Nalhegrande | `hero-pueblos.jpg` |
-| `--zeephone` | Zeephone | `skydom-zeephone.jpg` (pendiente) |
-| `--auguste` | Auguste | `hero-primal.jpg` |
-| `--estalucia` | Estalucia | `skydom-estalucia.jpg` (pendiente) |
+| `--verdepuerto` | Verdepuerto | `hero-mundo.jpg` |
+| `--ventisquero` | Ventisquero | `hero-pueblos.jpg` |
+| `--cielo eléctrico` | Cielo Eléctrico | `Cielo-cielo eléctrico.jpg` (pendiente) |
+| `--solsticio` | Solsticio | `hero-primal.jpg` |
+| `--estalucia` | Thule | `Cielo-estalucia.jpg` (pendiente) |
 
 Cada panel: imagen 16:9, velo gradiente, nombre `--disp`, descripción expandible en hover, meta `<b>N</b> islas · <b>N</b> temas`.
 
-**Regla:** las islas **no** se listan en portada; viven dentro del Skydom (`forumdisplay.php`).
+**Regla:** las islas **no** se listan en portada; viven dentro del Cielo (`forumdisplay.php`).
 
 ### 6.7 Estado F2b (julio 2026)
 
@@ -462,12 +462,12 @@ El portado a MyBB exige el **sistema visual completo** del prototipo, no compone
 | Tokens `:root` cielo | `--ope-*` claros | `ope.css` `:root` remapeado | ✅ |
 | `body.ope-index` | Hero + gaceta bento | `ope-index.xml` + overrides | ✅ |
 | Navbar / breadcrumb | OPE global | `#ope-navbar`, `#ope-breadcrumb` | ✅ |
-| `ficha.php` Relink | Stage + tabs | `body.ope-pg-ficha` + modal Gestionar | ✅ |
-| `personajes.php` | Grid formación | Layout Relink sin barra PLAYER | ✅ |
+| `ficha.php` Referencia Visual | Stage + tabs | `body.ope-pg-ficha` + modal Gestionar | ✅ |
+| `personajes.php` | Grid formación | Layout Referencia Visual sin barra PLAYER | ✅ |
 | Tema cielo/noche | `html[data-theme]` | Toggle en `ope_rol.php` + cookie | ✅ |
 | `forumdisplay` / `showthread` / editor | Mismo lenguaje OPE | Overrides `body[data-ope-page]` | ✅ |
 | Páginas PHP core | Tokens OPE | `body[class*="ope-pg-"]` wave 4 + overrides | ✅ |
-| Assets Skydom | `images/gbe/skydom-*.jpg` | 5 paneles (3 hero + 2 GD) | ✅ |
+| Assets Cielo | `images/gbe/Cielo-*.jpg` | 5 paneles (3 hero + 2 GD) | ✅ |
 | Purga codename `ope`→`gbe` | — | Scripts listos, no aplicados | ⏳ F1 |
 
 **Fix jul-2026:** bloques `:root` sin scope en `alertas`/`mensajes`/`revisar-personaje` filtraban tokens OP al resto del sitio — movidos a `body.ope-pg-*`.
@@ -480,14 +480,14 @@ Categorías sin islas hijas → `$isWorld = false` → filas `.ope-forum` dentro
 
 ### 6.6 El Puerto (harbor / censo)
 
-Sección `ope-harbor` (`ope-index.xml` L160+). Cuatro contadores + último skyfarer:
+Sección `ope-harbor` (`ope-index.xml` L160+). Cuatro contadores + último Aventurero:
 
 | Métrica | Fuente |
 |---|---|
-| Skyfarers | `$stats['numusers']` |
+| Aventureros | `$stats['numusers']` |
 | Historias | `$stats['numthreads']` |
 | Mensajes | `$stats['numposts']` |
-| Último skyfarer | `$ope_last_char` (`index.php` L835–849) |
+| Último Aventurero | `$ope_last_char` (`index.php` L835–849) |
 
 Prototipo: count-up animado con GSAP + `[data-count]` (ver §11).
 
@@ -495,12 +495,12 @@ Prototipo: count-up animado con GSAP + `[data-count]` (ver §11).
 
 ## 7. Cuádrupla visual del personaje
 
-Cada Skyfarer tiene **cuatro assets propios**. Configurables por el dueño en **Gestionar** (`ficha.php`).
+Cada Aventurero tiene **cuatro assets propios**. Configurables por el dueño en **Gestionar** (`ficha.php`).
 
 | Asset | Campo BD | Uso | Ratio |
 |---|---|---|---|
 | **Banner** | `datos.banner` (JSON en `rol_personajes.datos`) | Cabecera full-bleed de la ficha | **16:9** (1920×1080 recomendado) |
-| **Retrato** | `datos.retrato` (JSON) | Columna izquierda ficha Relink + grid formación | PNG alto transparente (~280×450) |
+| **Retrato** | `datos.retrato` (JSON) | Columna izquierda ficha Referencia Visual + grid formación | PNG alto transparente (~280×450) |
 | **Avatar** | `rol_personajes.avatar` | **Postbit del foro** (cajetilla en cada post) | **280×450** |
 | **Icono** | `rol_personajes.icono` | Mini icono en postbit, feed portada, relaciones | 1:1 (64×64) |
 
@@ -547,14 +547,14 @@ bc (breadcrumb, debajo nav 66px)
 
 ### 8.3 Campos visibles en cabecera (OPE)
 
-**Mantener:** elemento, clase, arma, raza, renombre, nivel/rango, crew, PV/Éter/PA, estado.
+**Mantener:** elemento, clase, arma, raza, renombre, nivel/rango, crew, PV/Esencia/PA, estado.
 
-**Reskin copy:** berries→rupies, wanted→renombre, haki→clase, fruta→pacto (opcional), facción OP→gremio/crew.
+**Reskin copy:** berries→Monedas, wanted→renombre, haki→clase, fruta→pacto (opcional), facción OP→gremio/crew.
 
 ### 8.4 Descartado respecto a OP
 
 - Retrato grande 240×300 estilo bounty poster
-- Poster "WANTED" como layout principal (sustituido por carta de Skyfarer + banner)
+- Poster "WANTED" como layout principal (sustituido por carta de Aventurero + banner)
 
 ---
 
@@ -562,7 +562,7 @@ bc (breadcrumb, debajo nav 66px)
 
 ### 9.1 Reglas
 
-- Estilo base en prompts: *"Granblue Fantasy official art style, painterly anime fantasy, luminous sky, floating islands, sea of clouds, warm golden light, cel-shaded, high detail, Hidetaka Fukuchi / Minaba Hideo inspired"*.
+- Estilo base en prompts: *"painterly anime fantasy, luminous sky, floating islands, sea of clouds, warm golden light, cel-shaded, high detail"*.
 - Nomenclatura: `images/gbe/<seccion>-<detalle>.<ext>`
 - Referencia **solo** vía `background-image` en CSS o `<img>` — nunca `style` estático
 - Prompts se entregan en chat al tocar UI; no auto-generar salvo petición explícita
@@ -572,7 +572,7 @@ bc (breadcrumb, debajo nav 66px)
 | Tipo | Ratio | Ejemplo |
 |---|---|---|
 | Fondos sitio / hero slide | 16:9 | `hero-mundo.jpg` |
-| Panel Skydom | 16:9 | `skydom-phantagrande.jpg` |
+| Panel Cielo | 16:9 | `Cielo-verdepuerto.jpg` |
 | Banner PJ | 16:9 | URL externa por jugador |
 | Avatar PJ | 3:4 o 1:1 | URL externa |
 | Icono PJ | 1:1 | URL externa |
@@ -583,23 +583,23 @@ bc (breadcrumb, debajo nav 66px)
 | Archivo | Estado | Uso |
 |---|---|---|
 | `crest-eternal.png` | ✅ | Logo navbar, emblema hero |
-| `hero-mundo.jpg` | ✅ | Slide portada/mundo, Phantagrande |
-| `hero-pueblos.jpg` | ✅ | Slide pueblos, Nalhegrande |
-| `hero-primal.jpg` | ✅ | Slide primals, Auguste |
+| `hero-mundo.jpg` | ✅ | Slide portada/mundo, Verdepuerto |
+| `hero-pueblos.jpg` | ✅ | Slide pueblos, Ventisquero |
+| `hero-primal.jpg` | ✅ | Slide primals, Solsticio |
 | `cloud-layer-1.png` | ✅ reserva | No usado en hero v3.2 |
-| `skydom-zeephone-skydom.jpg` | ✅ | Panel Zeephone (gradiente GD) |
-| `skydom-estalucia.jpg` | ✅ | Panel Estalucia (gradiente GD) |
+| `Cielo-cielo eléctrico-Cielo.jpg` | ✅ | Panel Cielo Eléctrico (gradiente GD) |
+| `Cielo-estalucia.jpg` | ✅ | Panel Thule (gradiente GD) |
 | `fondo-amanecer.jpg` | ⏳ | Body background (sustituir `images/ope/fondo.jpg`) |
 
 ### 9.4 Prompt plantilla (nuevo asset)
 
 ```
-[subject específico], Granblue Fantasy official art style, painterly anime fantasy,
+[subject específico], painterly anime fantasy,
 luminous sky, floating islands, sea of clouds, warm golden light, cel-shaded,
-high detail, Hidetaka Fukuchi / Minaba Hideo inspired, 16:9, no text, no watermark
+high detail, 16:9, no text, no watermark
 ```
 
-Ejemplo Skydom: *"Zeephone Skydom, frozen archipelago with ether crystal spires rising from cloud sea, aurora borealis, Granblue Fantasy official art style…"*
+Ejemplo Cielo: *"Cielo Eléctrico Cielo, frozen archipelago with ether crystal spires rising from cloud sea, aurora borealis, painterly anime fantasy style…"*
 
 ---
 
@@ -609,29 +609,29 @@ Ejemplo Skydom: *"Zeephone Skydom, frozen archipelago with ether crystal spires 
 
 | Patrón OP (legado) | Reskin OPE | Página / componente |
 |---|---|---|
-| Bounty Poster (ficha) | **Carta de Skyfarer** (banner 16:9 + identidad compacta) | `ficha.php` |
+| Bounty Poster (ficha) | **Carta de Aventurero** (banner 16:9 + identidad compacta) | `ficha.php` |
 | Bitácora de navegación (posts) | **Diario de vuelo** | postbit, hilos RP |
-| Mapa del mundo (categorías) | **Carta celeste de Skydoms** | `index.php`, bento regiones |
+| Mapa del mundo (categorías) | **Carta celeste de Cielos** | `index.php`, bento regiones |
 | Documento World Government | **Edicto Imperial / Archivo de la Orden** | facciones, lore staff |
-| Tablón de contratos (misiones) | **Órdenes de Gremio** | `tablon-misiones.php` |
+| Tablón de contratos (misiones) | **Órdenes del Cielo** | `tablon-misiones.php` |
 
 ### 10.2 Terminología y sistemas
 
 | One Piece: Eternal | One Piece: Eternal |
 |---|---|
-| Bounty / recompensa | Renombre de Skyfarer |
-| Berries | Rupies |
-| Fruta del Diablo | Pacto Primal (opcional, raro) |
+| Bounty / recompensa | Renombre de Aventurero |
+| Berries | Monedas |
+| Fruta del Diablo | Pacto Primordial (opcional, raro) |
 | Haki | Clase / Job |
 | Tripulación | Crew |
 | Barco | Aeronave (`nave_json`) |
-| Yonko / Marines | Skydoms / Imperio / Órdenes |
-| Mar / Grand Line | Cielo / Skydoms / Estalucia |
-| Islas (mares) | Islas (dentro de Skydom) |
+| Yonko / Marines | Cielos / Imperio / Órdenes |
+| Mar / Grand Line | Cielo / Cielos / Thule |
+| Islas (mares) | Islas (dentro de Cielo) |
 | Calor (heat) | Renombre / fama |
 | OPE Eternal (bot) | Lyria |
 | `images/ope/` | `images/gbe/` |
-| `--fac-pirata`, `--fac-marine`… | `--fac-skyfarer`, `--fac-imperio`… |
+| `--fac-pirata`, `--fac-marine`… | `--fac-Aventurero`, `--fac-imperio`… |
 
 ### 10.3 Clases CSS (portado gradual)
 
@@ -639,7 +639,7 @@ Ejemplo Skydom: *"Zeephone Skydom, frozen archipelago with ether crystal spires 
 |---|---|---|
 | `ope-hero` | `ope-hero` + carrusel | Reestructura `ope-index.xml` |
 | `ope-world-bento` | `ope-regions` | Misma grid, nuevos modifiers |
-| `ope-region--east-blue` | `ope-region--phantagrande` | Por Skydom |
+| `ope-region--east-blue` | `ope-region--verdepuerto` | Por Cielo |
 | `ope-slab` / `ope-forum` | `ope-slab` / `ope-forum` | Off Topic |
 | `ope-harbor` / `ope-census-*` | conservar o alias `ope-*` | Censo |
 | `forge-banner` | `char-banner` | Alinear con prototipo v4 |
@@ -711,8 +711,8 @@ Toggle en navbar: alterna `document.documentElement.dataset.theme` entre `cielo`
 | `docs/Prototypes/Granblue/ficha.html` | Prototipo ficha v4 |
 | `docs/themes/ope.css` | Tema fuente (4215+ líneas) |
 | `docs/themes/ope-index.xml` | Plantilla MyBB portada |
-| `index.php` | Lógica categorías Skydom/Off Topic |
-| `ficha.php` | Ficha personaje, cuádrupla visual, tabs Relink |
+| `index.php` | Lógica categorías Cielo/Off Topic |
+| `ficha.php` | Ficha personaje, cuádrupla visual, tabs Referencia Visual |
 | `inc/plugins/ope_rol.php` | Navbar, hooks, helpers región |
 | `scripts/sync-theme.php` | Import/verify CSS → cache |
 | `scripts/check-inline-styles.php` | Linter estilos inline |

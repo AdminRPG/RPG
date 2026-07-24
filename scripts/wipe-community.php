@@ -1,6 +1,6 @@
 <?php
 /**
- * Granblue Eternal — Limpieza total de contenido comunitario
+ * One Piece: Eternal — Limpieza total de contenido comunitario
  * ------------------------------------------------------------
  * Borra posts, hilos, NPCs, lore, datos rol y cuentas excepto el admin.
  * La estructura de foros (Skydoms/islas) se conserva; solo se vacían contadores.
@@ -91,7 +91,7 @@ function truncate_table(mysqli $db, string $table, bool $apply): void
     }
 }
 
-echo "=== Wipe comunidad Granblue Eternal ===\n";
+echo "=== Wipe comunidad One Piece: Eternal ===\n";
 echo $apply ? "MODO: APPLY (destructivo)\n" : "MODO: dry-run (añade --apply para ejecutar)\n";
 echo "Admin conservado: uid={$adminUid}\n\n";
 

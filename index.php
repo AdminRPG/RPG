@@ -561,7 +561,7 @@ if (!is_array($ope_home) || empty($ope_home)) {
             'Cada historia deja huella en el mundo. Ninguna aventura pasa sin dejar marca.',
         ],
         'lore' => [
-            'titulo' => 'La Grieta de Éter se ensancha',
+            'titulo' => 'La Grieta de Esencia se ensancha',
             'texto'  => 'One Piece: Eternal abre el registro de aventureros. Los mares, las islas y la Gran Line te esperan. Crea tu personaje y zarpa en busca de tu leyenda.',
         ],
         // Instante OOC en el que arranca el día 1 · Primavera · Año I del calendario on-rol.
@@ -672,23 +672,57 @@ $ope_online_now_count = 0;
 $ope_online_24h = '';
 $ope_online_24h_count = 0;
 
+// ── helper: character links for a list of uids ──
+function _ope_presence_char_links(array $uids, $db): array
+{
+    $map = [];
+    if (empty($uids)) return $map;
+    $list = implode(',', array_map('intval', $uids));
+    $cq = $db->query("
+        SELECT pid, uid, nombre
+        FROM ".TABLE_PREFIX."rol_personajes
+        WHERE uid IN ({$list}) AND estado = 'aprobado'
+        ORDER BY pid ASC
+    ");
+    while ($ch = $db->fetch_array($cq)) {
+        $map[$ch['uid']][] = $ch;
+    }
+    return $map;
+}
+
 $now_cut = TIME_NOW - (int)$mybb->settings['wolcutoff'];
 $q_now = $db->query("
     SELECT u.uid, u.username, u.usergroup, u.displaygroup, u.invisible, MAX(s.time) AS lasttime
     FROM ".TABLE_PREFIX."sessions s
     INNER JOIN ".TABLE_PREFIX."users u ON (u.uid = s.uid)
     WHERE s.uid > 0 AND s.time > {$now_cut}
-    GROUP BY u.uid, u.username, u.usergroup, u.displaygroup, u.invisible
+    GROUP BY u.uid
     ORDER BY u.username ASC
 ");
+$online_uids = [];
+$online_rows = [];
 while ($ou = $db->fetch_array($q_now)) {
     if ($ou['invisible'] == 1 && $mybb->usergroup['canviewwolinvis'] != 1 && $ou['uid'] != $mybb->user['uid']) {
         continue;
     }
-    $name = format_name(htmlspecialchars_uni($ou['username']), $ou['usergroup'], $ou['displaygroup']);
-    $link = build_profile_link($name, $ou['uid']);
-    $ope_online_now .= '<span class="ope-ou">'.$link.'</span>';
-    $ope_online_now_count++;
+    $online_uids[] = (int)$ou['uid'];
+    $online_rows[$ou['uid']] = $ou;
+}
+$online_chars = _ope_presence_char_links($online_uids, $db);
+foreach ($online_rows as $uid => $ou) {
+    if (!empty($online_chars[$uid])) {
+        foreach ($online_chars[$uid] as $ch) {
+            $cname = htmlspecialchars_uni($ch['nombre']);
+            $link = '<a href="'.$mybb->settings['bburl'].'/ficha.php?pid='.(int)$ch['pid'].'">'.$cname.'</a>';
+            $ope_online_now .= '<span class="ope-ou">'.$link.'</span>';
+            $ope_online_now_count++;
+        }
+    } else {
+        $name = format_name(htmlspecialchars_uni($ou['username']), $ou['usergroup'], $ou['displaygroup']);
+        $link = build_profile_link($name, $ou['uid']);
+        $ope_online_now .= '<span class="ope-ou">'.$link.'</span>';
+        $ope_online_now_count++;
+    }
 }
 
 $day_cut = TIME_NOW - 86400;
@@ -699,11 +733,27 @@ $q_day = $db->query("
     ORDER BY lastactive DESC
     LIMIT 80
 ");
+$day_uids = [];
+$day_rows = [];
 while ($du = $db->fetch_array($q_day)) {
-    $name = format_name(htmlspecialchars_uni($du['username']), $du['usergroup'], $du['displaygroup']);
-    $link = build_profile_link($name, $du['uid']);
-    $ope_online_24h .= '<span class="ope-ou">'.$link.'</span>';
-    $ope_online_24h_count++;
+    $day_uids[] = (int)$du['uid'];
+    $day_rows[$du['uid']] = $du;
+}
+$day_chars = _ope_presence_char_links($day_uids, $db);
+foreach ($day_rows as $uid => $du) {
+    if (!empty($day_chars[$uid])) {
+        foreach ($day_chars[$uid] as $ch) {
+            $cname = htmlspecialchars_uni($ch['nombre']);
+            $link = '<a href="'.$mybb->settings['bburl'].'/ficha.php?pid='.(int)$ch['pid'].'">'.$cname.'</a>';
+            $ope_online_24h .= '<span class="ope-ou">'.$link.'</span>';
+            $ope_online_24h_count++;
+        }
+    } else {
+        $name = format_name(htmlspecialchars_uni($du['username']), $du['usergroup'], $du['displaygroup']);
+        $link = build_profile_link($name, $du['uid']);
+        $ope_online_24h .= '<span class="ope-ou">'.$link.'</span>';
+        $ope_online_24h_count++;
+    }
 }
 
 // One Piece: Eternal: Staff list (portraits with role + heat ring)

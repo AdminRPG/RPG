@@ -405,9 +405,14 @@ function ope_pp_buy_stat($pid, $stat_key)
     }
 
     $current = ope_rol_stat_num($stats, $stat_key, 1);
-    $cap = ope_rol_stat_cap_tramo($nivel);
-    if ($current >= $cap) {
-        return array('ok' => false, 'msg' => "Tope de {$stat_key} en Tramo " . ope_rol_tramo_romano(ope_rol_tramo($nivel)) . " ({$cap}).");
+    // El tope aplica al valor INVERTIDO (base + comprado). El bono/penalización de
+    // linaje va aparte y puede empujar el efectivo por encima del techo (99).
+    $raza_mods = (isset($datos['raza_mods']) && is_array($datos['raza_mods'])) ? $datos['raza_mods'] : array();
+    $racial = (int) ($raza_mods[$stat_key] ?? 0);
+    $cap = ope_rol_stat_cap_tramo($nivel);          // tope del invertido
+    $cap_stored = $cap + $racial;                    // tope del valor guardado (incluye racial)
+    if ($current >= $cap_stored) {
+        return array('ok' => false, 'msg' => "Tope de {$stat_key} en Tramo " . ope_rol_tramo_romano(ope_rol_tramo($nivel)) . " (base+comprado {$cap}).");
     }
 
     $cost = ope_rol_pp_cost_tramo($nivel);

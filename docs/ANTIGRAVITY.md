@@ -1,4 +1,4 @@
-# Antigravity (Gemini IDE) — One Piece: Eternal
+﻿# Antigravity (Gemini IDE) — One Piece: Eternal
 
 Antigravity **no** carga automáticamente las reglas de Cursor. Usa este documento para configurar sesiones de trabajo en el mismo repo.
 
@@ -12,7 +12,7 @@ Adjunta o fija en cada sesión de UI/RPG:
 |---|---|
 | `AGENTS.md` | Reglas base del proyecto |
 | `docs/AGENTES-Y-HERRAMIENTAS.md` | Protocolo anti-portado parcial (crítico) |
-| `docs/DESIGN-GRANBLUE-ETERNAL.md` | Fuente de verdad visual |
+| `docs/DESIGN-ONE-PIECE-ETERNAL.md` | Fuente de verdad visual |
 | `docs/Prototypes/Granblue/index.html` | Referencia portada (abrir en navegador) |
 
 ---
@@ -25,7 +25,7 @@ Proyecto One Piece: Eternal — foro MyBB + PHP en C:\Users\Fgonz\Documents\Proy
 OBLIGATORIO antes de código UI:
 - Leer AGENTS.md y docs/AGENTES-Y-HERRAMIENTAS.md
 - Portado visual = 5 capas completas (estructura, tokens, overrides OP, fuentes, datos). NUNCA solo un componente.
-- Fuente diseño: docs/DESIGN-GRANBLUE-ETERNAL.md
+- Fuente diseño: docs/DESIGN-ONE-PIECE-ETERNAL.md
 - Prototipo portada: docs/Prototypes/Granblue/index.html v3.2
 
 Tras editar CSS/plantillas:
@@ -37,7 +37,7 @@ Explorar código: py -m graphify query "pregunta"  (grafo en graphify-out/)
 
 PowerShell: separar comandos con ; no &&
 
-No estilo One Piece brutalista. Tokens OPE claros/acuarela (Relink).
+No estilo One Piece brutalista. Tokens OPE claros/acuarela (Referencia Visual).
 ```
 
 ---

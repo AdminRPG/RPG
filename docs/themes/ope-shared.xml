@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <theme name="One Piece: Eternal — shared templates" version="1839">
   <templates>
     <template name="newthread_postoptions" version="1839"><![CDATA[<div class="ope-postoptions-card">
@@ -21,10 +21,10 @@
 </div>]]></template>
     <template name="newreply_threadreview_more" version="1839"><![CDATA[<div class="ope-threadreview-more"><strong>{$lang->thread_review_more}</strong></div>]]></template>
     <template name="ope_banner" version="1839"><![CDATA[<div id="ope-banner" style="background-image: url('{$mybb->settings['bburl']}/images/banners/default-banner.svg')">
-<div class="ope-banner-seal" aria-hidden="true">GRANBLUE FANTASY: ETERNAL</div>
+<div class="ope-banner-seal" aria-hidden="true">ONE PIECE: ETERNAL</div>
 <div class="ope-banner-content">
-<h1 class="ope-banner-title">GRANBLUE FANTASY: ETERNAL</h1>
-<p class="ope-banner-subtitle">Un mundo de Cazadores</p>
+<h1 class="ope-banner-title">ONE PIECE: ETERNAL</h1>
+<p class="ope-banner-subtitle">Un mundo de Aventureros</p>
 </div>
 </div>
 <div id="ope-calendar-bar" onclick="window.location.href='{$mybb->settings['bburl']}/calendario.php'">

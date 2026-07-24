@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * One Piece: Eternal · Rebranding
  * --------------------------------------

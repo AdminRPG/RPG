@@ -18,7 +18,7 @@ Un prototipo aprobado = **sistema completo**. Copiar solo el hero/carrusel **no*
 2. **Tokens** — `:root` / `--ope-*` en `ope.css`
 3. **Overrides legacy** — bajo scope correcto, anular `.ope-panel`, `.ope-block-cat`, `#ope-navbar` OP
 4. **Head/fuentes** — `ope_rol_head_base()` + `headerinclude` (Cinzel/Cormorant/Spectral)
-5. **Datos** — `index.php` lore, títulos, slugs Skydom
+5. **Datos** — `index.php` lore, títulos, slugs Cielo
 
 ## Antes de marcar done
 

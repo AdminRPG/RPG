@@ -31,7 +31,7 @@
   {$ope_fhead}
   {$subforums}
   {$ope_stories}
-  <div class="ope-wrap ope-wrap-forum">{$rules}{$usersbrowsing}{$forumjump}</div>
+  <div class="ope-wrap ope-wrap-forum">{$rules}{$forumjump}</div>
 </div>
 {$footer}
 <script type="text/javascript">
@@ -148,10 +148,7 @@
 
     <template name="forumdisplay_newthread" version="1839"><![CDATA[<a href="newthread.php?fid={$fid}" class="ope-btn ope-btn-hot">Nueva historia</a>]]></template>
 
-    <template name="forumdisplay_usersbrowsing" version="1839"><![CDATA[<div class="ope-plate" style="margin-top:18px">
-  <div class="ope-plate-h"><span class="ope-plate-h-t">En este foro ahora</span></div>
-  <div class="ope-plate-b">{$onlinemembers} {$onlinesep} {$invisonline} {$invisiblesep} {$invisibles}</div>
-</div>]]></template>
+    <template name="forumdisplay_usersbrowsing" version="1839"><![CDATA[]]></template>
 
     <template name="forumdisplay_usersbrowsing_user" version="1839"><![CDATA[<a href="{$user['profilelink']}" class="ope-chip">{$user['username']}</a>{$comma}{$invisiblemark}]]></template>
 

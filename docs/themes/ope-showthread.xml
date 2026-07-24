@@ -33,9 +33,34 @@
 <script type="text/javascript">
 function opeFlipPostCard(pid) {
   var card = document.getElementById('post-card-' + pid);
-  if (card) {
+  if (!card) return;
+  var front = card.querySelector('.ope-postbit-front');
+  var back = card.querySelector('.ope-postbit-back');
+  if (!front || !back) {
     card.classList.toggle('is-flipped');
+    return;
   }
+  var toFlip = !card.classList.contains('is-flipped');
+  var fromH = card.offsetHeight;
+  var toH = toFlip ? back.scrollHeight : front.scrollHeight;
+  card.style.height = fromH + 'px';
+  void card.offsetHeight;
+  card.classList.toggle('is-flipped', toFlip);
+  card.style.height = Math.max(1, toH) + 'px';
+  var cleared = false;
+  var clearH = function () {
+    if (cleared) return;
+    cleared = true;
+    card.style.height = '';
+    card.removeEventListener('transitionend', onEnd);
+  };
+  var onEnd = function (ev) {
+    if (ev.target !== card) return;
+    if (ev.propertyName !== 'height' && ev.propertyName !== 'transform') return;
+    clearH();
+  };
+  card.addEventListener('transitionend', onEnd);
+  window.setTimeout(clearH, 850);
 }
 </script>
 </head>
@@ -122,7 +147,7 @@ function opeFlipPostCard(pid) {
           <div class="ope-pa-info">
             <div class="ope-pa-name">{$post['profilelink']}</div>
             <button type="button" class="btn btn-sm btn-ghost btn-block mt-8 mb-4" onclick="opeFlipPostCard({$post['pid']})">
-              Ver Ficha RPG SYSTEM
+              RPG SYSTEM
             </button>
           </div>
           {$post['ope_char_side']}
@@ -154,7 +179,6 @@ function opeFlipPostCard(pid) {
           {$post['editedmsg']}
         </div>
       </article>
-      {$post['ope_rpgsys']}
     </div>
 
     <!-- LADO TRASERO: FICHA CONGELADA DEL POST (3D CARD FLIP) -->
@@ -270,10 +294,7 @@ function opeFlipPostCard(pid) {
 
     <template name="showthread_poll_undovote" version="1839"><![CDATA[ [<a href="polls.php?action=do_undovote&amp;pid={$poll['pid']}&amp;my_post_key={$mybb->post_code}">{$lang->undo_vote}</a>]]></template>
 
-    <template name="showthread_usersbrowsing" version="1839"><![CDATA[<div class="ope-plate" style="margin-top:14px">
-  <div class="ope-plate-h"><span class="ope-plate-h-t">{$lang->users_browsing_thread}</span></div>
-  <div class="ope-plate-b">{$onlinemembers}</div>
-</div>]]></template>
+    <template name="showthread_usersbrowsing" version="1839"><![CDATA[]]></template>
 
     <template name="showthread_usersbrowsing_user" version="1839"><![CDATA[{$comma}<a href="{$user['profilelink']}" class="ope-chip" title="{$lang->users_browsing_thread_reading} ({$user['reading']})">{$user['username']}</a>{$invisiblemark}]]></template>
 
