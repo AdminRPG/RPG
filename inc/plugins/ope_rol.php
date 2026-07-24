@@ -392,14 +392,16 @@ function ope_rol_navbar_html()
     $links  .= '<a href="' . $bburl . '/barco.php" class="ope-nav-link' . $isOn(array('barco.php', 'barcos.php')) . '">Barco</a>';
     $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php')) . '">Trámites</a>';
 
-    // Zona Catálogo (dropdown). Por ahora solo Akuma no Mi.
-    $catScripts = array('biblioteca-akuma.php');
+    // Zona Catálogo (dropdown): Akuma no Mi, Lore & Cronología, Catálogo de NPCs.
+    $catScripts = array('biblioteca-akuma.php', 'biblioteca-lore.php', 'catalogo-npcs.php');
     $links  .= '<div class="ope-nav-drop">'
              . '<button type="button" class="ope-nav-link ope-nav-dd-btn' . $isOn($catScripts) . '"'
              . ' aria-haspopup="true" aria-expanded="false"'
              . ' onclick="var d=this.nextElementSibling;var o=d.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',o?\'true\':\'false\');">Catálogo</button>'
              . '<div class="ope-dropdown ope-nav-dropdown">'
              . '<a href="' . $bburl . '/biblioteca-akuma.php" class="ope-dropdown-item">Akuma no Mi</a>'
+             . '<a href="' . $bburl . '/biblioteca-lore.php" class="ope-dropdown-item">Lore y Cronología</a>'
+             . '<a href="' . $bburl . '/biblioteca-lore.php#npcs" class="ope-dropdown-item">Catálogo de NPCs</a>'
              . '</div></div>';
 
     $links  .= '<a href="' . $bburl . '/guias.php" class="ope-nav-link' . $isOn(array('guias.php')) . '">Guías</a>';
