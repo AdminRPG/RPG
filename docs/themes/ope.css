@@ -1,7 +1,3 @@
-
-/* FIX GLOBAL DE VISIBILIDAD DE CONTENIDO */
-.reveal, .reveal.vis { opacity: 1 !important; transform: none !important; visibility: visible !important; }
-
 /* ============================================================
    ONE PIECE: ETERNAL — TEMA CIELO (default)
    Paleta amanecer / cielo índigo-dorado (DESIGN §3.1).

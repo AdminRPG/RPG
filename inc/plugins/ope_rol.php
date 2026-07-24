@@ -543,7 +543,6 @@ function ope_rol_head_base()
     $html .= '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
     $html .= '<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&amp;family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=Spectral:ital,wght@0,400;0,500;0,600;1,400&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">' . "\n";
     $html .= '<link rel="stylesheet" href="' . htmlspecialchars_uni($href) . '">' . "\n";
-    $html .= '<style>.reveal{opacity:1!important;transform:none!important;visibility:visible!important}</style>' . "\n";
 
     return $html;
 }
