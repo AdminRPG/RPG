@@ -55,8 +55,8 @@ if ($mybb->request_method === 'post') {
                 if ($db->table_exists('rol_tramites')) {
                     $db->delete_query('rol_tramites', "pid = {$target_pid}");
                 }
-                if ($db->table_exists('rol_pj_eternal')) {
-                    $db->delete_query('rol_pj_eternal', "pid = {$target_pid}");
+                if ($db->table_exists('rol_pj_vocaciones')) {
+                    $db->delete_query('rol_pj_vocaciones', "pid = {$target_pid}");
                 }
 
                 // 4. Borrar personaje principal

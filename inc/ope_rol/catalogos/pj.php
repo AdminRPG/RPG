@@ -7,122 +7,13 @@ if (!defined('IN_MYBB')) { die('Direct initialization of this file is not allowe
  * Catálogo canónico de creación de PJ; se carga desde ope_rol_data.php.
  */
 
+/**
+ * @deprecated Armas legacy — Sustituida por ope_rol_armas_vocacionales() en vocaciones.php.
+ * Se mantiene un stub vacío por si algún caller legacy no migrado la invoca.
+ */
 function ope_rol_armas()
 {
-    return array(
-        'espada' => array(
-            'nombre' => 'Espada / Katana',
-            'familia' => 'filo',
-            'escala' => array('FUE'),
-            'tecnica' => 'Tajo Firme',
-            'efecto' => 'Daño equilibrado.',
-        ),
-        'hacha' => array(
-            'nombre' => 'Hacha',
-            'familia' => 'filo',
-            'escala' => array('FUE'),
-            'tecnica' => 'Golpe Demoledor',
-            'efecto' => 'Daño alto; ignora parte de Escudado.',
-        ),
-        'daga' => array(
-            'nombre' => 'Daga',
-            'familia' => 'filo',
-            'escala' => array('AGI'),
-            'tecnica' => 'Corte Rápido',
-            'efecto' => 'Bajo coste; Sangrado leve.',
-        ),
-        'ropera' => array(
-            'nombre' => 'Ropera / Estoque',
-            'familia' => 'filo',
-            'escala' => array('AGI'),
-            'tecnica' => 'Finta y Estocada',
-            'efecto' => 'Daño + puede aplicar Marcado.',
-        ),
-        'arma_pesada_corte' => array(
-            'nombre' => 'Arma pesada (corte)',
-            'familia' => 'filo',
-            'escala' => array('FUE'),
-            'tecnica' => 'Impacto Cortante',
-            'efecto' => 'Daño alto lento.',
-        ),
-        'maza' => array(
-            'nombre' => 'Maza / Martillo / Garrote',
-            'familia' => 'contundente',
-            'escala' => array('FUE'),
-            'tecnica' => 'Mazazo Firme',
-            'efecto' => 'Rotura de guardia.',
-        ),
-        'baston' => array(
-            'nombre' => 'Bastón de combate',
-            'familia' => 'contundente',
-            'escala' => array('FUE'),
-            'tecnica' => 'Golpe con Impulso',
-            'efecto' => 'Daño equilibrado.',
-        ),
-        'arma_pesada_impacto' => array(
-            'nombre' => 'Arma pesada (impacto)',
-            'familia' => 'contundente',
-            'escala' => array('FUE'),
-            'tecnica' => 'Impacto Sísmico',
-            'efecto' => 'Daño alto; puede Ralentizar.',
-        ),
-        'escudo' => array(
-            'nombre' => 'Escudo (como arma)',
-            'familia' => 'contundente',
-            'escala' => array('RES'),
-            'tecnica' => 'Embate de Escudo',
-            'efecto' => 'Daño bajo + auto-Escudado.',
-        ),
-        'lanza' => array(
-            'nombre' => 'Lanza / Alabarda',
-            'familia' => 'alcance',
-            'escala' => array('FUE'),
-            'tecnica' => 'Estocada Perforante',
-            'efecto' => 'Alcance medio; ignora 25% de mitigación.',
-        ),
-        'latigo' => array(
-            'nombre' => 'Látigo / Cadena',
-            'familia' => 'alcance',
-            'escala' => array('AGI'),
-            'tecnica' => 'Latigazo Envolvente',
-            'efecto' => 'Puede Enraizar.',
-        ),
-        'arco' => array(
-            'nombre' => 'Arco',
-            'familia' => 'distancia',
-            'escala' => array('PER'),
-            'tecnica' => 'Disparo Certero',
-            'efecto' => 'Daño a distancia.',
-        ),
-        'arma_fuego' => array(
-            'nombre' => 'Arma de fuego',
-            'familia' => 'distancia',
-            'escala' => array('PER'),
-            'tecnica' => 'Tiro Perforante',
-            'efecto' => 'Distancia; ignora 25% de mitigación.',
-        ),
-        'arrojadiza' => array(
-            'nombre' => 'Arrojadiza',
-            'familia' => 'distancia',
-            'escala' => array('PER'),
-            'tecnica' => 'Lanzamiento Múltiple',
-            'efecto' => 'Hasta 2 objetivos.',
-        ),
-        'punio' => array(
-            'nombre' => 'Puño / Marcial',
-            'familia' => 'cuerpo',
-            'escala' => array('AGI'),
-            'tecnica' => 'Ráfaga de Golpes',
-            'efecto' => 'Impactos pequeños; puede Potenciar.',
-        ),
-        'punio_hierro' => array(
-            'nombre' => 'Puño de Hierro',
-            'familia' => 'cuerpo',
-            'escala' => array('FUE'),
-            'tecnica' => 'Golpe de Yunque',
-            'efecto' => 'Daño alto por golpe, cadencia baja; ignora parte de Escudado.',
-        ),
-    );
+    return ope_rol_armas_vocacionales();
 }
 
 function ope_rol_facciones()
@@ -305,13 +196,3 @@ function ope_rol_find_defecto($id)
     return isset($all[$id]) ? $all[$id] : null;
 }
 
-function ope_rol_armas_de_familia($familia)
-{
-    $out = array();
-    foreach (ope_rol_armas() as $k => $a) {
-        if (($a['familia'] ?? '') === $familia) {
-            $out[$k] = $a;
-        }
-    }
-    return $out;
-}

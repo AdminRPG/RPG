@@ -109,9 +109,9 @@ if ($view_pid > 0) {
 }
 
 $RAZAS = ope_rol_razas();
-$IDENTIDADES = ope_rol_identidades();
-$FAMILIAS = ope_rol_familias_arma();
-$ARMAS = ope_rol_armas();
+$CLASES = ope_rol_clases();
+$OFICIOS = ope_rol_oficios();
+$ARMAS_VOC = ope_rol_armas_vocacionales();
 $FACCIONES = ope_rol_facciones();
 
 header('Content-Type: text/html; charset=utf-8');
@@ -181,15 +181,20 @@ header('Content-Type: text/html; charset=utf-8');
 
 <?php if ($detail):
     $pid = (int) $detail['pid'];
-    $id_key = (string) ($detail_datos['identidad'] ?? '');
-    $fam_key = (string) ($detail_datos['familia_arma'] ?? '');
+    $clase_key = (string) ($detail_datos['clase'] ?? '');
+    $oficios_keys = isset($detail_datos['oficios']) && is_array($detail_datos['oficios']) ? $detail_datos['oficios'] : array();
     $arma_key = (string) ($detail_datos['arma'] ?? '');
     $raza_key = (string) ($detail_datos['raza'] ?? '');
     $fac_key = (string) ($detail_datos['faccion'] ?? '');
-    $arbol_id = (string) ($detail_datos['arbol_identidad'] ?? ($IDENTIDADES[$id_key]['arbol'] ?? ''));
-    $arbol_arma = (string) ($detail_datos['arbol_arma'] ?? ($FAMILIAS[$fam_key]['arbol'] ?? ''));
-    $tree_id = ($arbol_id !== '' && function_exists('ope_eternal_load')) ? ope_eternal_load($arbol_id) : null;
-    $tree_arma = ($arbol_arma !== '' && function_exists('ope_eternal_load')) ? ope_eternal_load($arbol_arma) : null;
+
+    $oficios_names = array();
+    foreach ($oficios_keys as $ok) {
+        if (isset($OFICIOS[$ok])) {
+            $oficios_names[] = $OFICIOS[$ok]['nombre'];
+        }
+    }
+    $oficios_str = !empty($oficios_names) ? implode(', ', $oficios_names) : 'Ninguno';
+
     $dotes = isset($detail_datos['virtudes_defectos']) && is_array($detail_datos['virtudes_defectos'])
         ? $detail_datos['virtudes_defectos']
         : array();
@@ -204,9 +209,9 @@ header('Content-Type: text/html; charset=utf-8');
         <p class="zs-meta">
           Jugador: <b><?php echo htmlspecialchars_uni($owner_name !== '' ? $owner_name : 'uid ' . (int)$detail['uid']); ?></b>
           · Raza: <b><?php echo htmlspecialchars_uni(isset($RAZAS[$raza_key]) ? $RAZAS[$raza_key]['nombre'] : $raza_key); ?></b>
-          · Identidad: <b><?php echo htmlspecialchars_uni(isset($IDENTIDADES[$id_key]) ? $IDENTIDADES[$id_key]['nombre'] : $id_key); ?></b>
-          · Familia: <b><?php echo htmlspecialchars_uni(isset($FAMILIAS[$fam_key]) ? $FAMILIAS[$fam_key]['nombre'] : $fam_key); ?></b>
-          · Arma: <b><?php echo htmlspecialchars_uni(isset($ARMAS[$arma_key]) ? $ARMAS[$arma_key]['nombre'] : $arma_key); ?></b>
+          · Clase: <b><?php echo htmlspecialchars_uni(isset($CLASES[$clase_key]) ? $CLASES[$clase_key]['nombre'] : $clase_key); ?></b>
+          · Oficios: <b><?php echo htmlspecialchars_uni($oficios_str); ?></b>
+          · Arma: <b><?php echo htmlspecialchars_uni(isset($ARMAS_VOC[$arma_key]) ? $ARMAS_VOC[$arma_key]['nombre'] : $arma_key); ?></b>
           · Facción: <b><?php echo htmlspecialchars_uni(isset($FACCIONES[$fac_key]) ? $FACCIONES[$fac_key]['nombre'] : $fac_key); ?></b>
         </p>
         <h3 class="zs-subh">Stats</h3>
@@ -231,14 +236,6 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endif; ?>
 <?php if (!empty($detail_datos['cyborg'])): ?>
         <p class="zs-cyborg-flag">Mecánica <b>Cyborg</b> activa · slot Tier I: <b><?php echo htmlspecialchars_uni((string)($detail_datos['cyborg_slot'] ?? '—')); ?></b></p>
-<?php endif; ?>
-<?php if ($tree_id && function_exists('ope_eternal_render_tree')): ?>
-        <h3 class="zs-subh">Árbol Identidad (preview)</h3>
-        <div class="eternal-preview-wrap"><?php echo ope_eternal_render_tree($tree_id, 'preview'); ?></div>
-<?php endif; ?>
-<?php if ($tree_arma && function_exists('ope_eternal_render_tree')): ?>
-        <h3 class="zs-subh">Árbol Arma (preview)</h3>
-        <div class="eternal-preview-wrap"><?php echo ope_eternal_render_tree($tree_arma, 'preview'); ?></div>
 <?php endif; ?>
 <?php
         $pj_fruta = function_exists('ope_fruta_pj') ? ope_fruta_pj($pid) : null;

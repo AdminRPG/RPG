@@ -390,18 +390,19 @@ if ($puede_gestionar && $mybb->request_method === 'post'
     exit;
 }
 
-// ── Gestión: elegir / retirar un nodo Eternal ──
+// ── Gestión: guardar elecciones de Clase / Arquetipo ──
 if ($puede_gestionar && $mybb->request_method === 'post'
     && verify_post_check($mybb->get_input('my_post_key'), true)
-    && in_array($mybb->get_input('gaccion'), array('eternal_pick', 'eternal_unpick'), true)) {
+    && in_array($mybb->get_input('gaccion'), array('save_voc_eleccion', 'save_voc_arquetipo'), true)) {
 
-    $g_arbol = (string) $mybb->get_input('arbol');
-    $g_nodo  = (string) $mybb->get_input('nodo_id');
     $res = array('msg' => '');
-    if ($mybb->get_input('gaccion') === 'eternal_pick' && function_exists('ope_eternal_pick')) {
-        $res = ope_eternal_pick((int) $pj['pid'], $g_arbol, $g_nodo);
-    } elseif (function_exists('ope_eternal_unpick')) {
-        $res = ope_eternal_unpick((int) $pj['pid'], $g_arbol, $g_nodo);
+    if ($mybb->get_input('gaccion') === 'save_voc_eleccion' && function_exists('ope_rol_vocacion_guardar_eleccion')) {
+        $g_nivel  = (int) $mybb->get_input('nivel');
+        $g_opcion = (string) $mybb->get_input('opcion');
+        $res = ope_rol_vocacion_guardar_eleccion((int) $pj['pid'], $g_nivel, $g_opcion);
+    } elseif ($mybb->get_input('gaccion') === 'save_voc_arquetipo' && function_exists('ope_rol_vocacion_guardar_arquetipo')) {
+        $g_segunda = (string) $mybb->get_input('segunda_clase');
+        $res = ope_rol_vocacion_guardar_arquetipo((int) $pj['pid'], $g_segunda);
     }
     $fmsg = (string) ($res['msg'] ?? '');
     header('Location: ' . $bburl . '/ficha.php?pid=' . (int) $pj['pid'] . '&g=1&fmsg=' . rawurlencode($fmsg) . '#g-talentos');
@@ -956,18 +957,32 @@ header('Content-Type: text/html; charset=utf-8');
     if ($edad !== '') $alias_bits[] = $edad . (ctype_digit($edad) ? ' años' : '');
     $alias_line = implode(' · ', $alias_bits);
 
-    // ── Sistema Eternal: árboles del personaje, nodos elegidos y presupuesto PT ──
-    $arbol_identidad = (string) ($datos['arbol_identidad'] ?? '');
-    $arbol_arma      = (string) ($datos['arbol_arma'] ?? '');
-    $tree_identidad  = ($arbol_identidad !== '' && function_exists('ope_eternal_load')) ? ope_eternal_load($arbol_identidad) : null;
-    $tree_arma       = ($arbol_arma !== '' && function_exists('ope_eternal_load')) ? ope_eternal_load($arbol_arma) : null;
-    $eternal_picks   = function_exists('ope_eternal_picks') ? ope_eternal_picks((int) $pj['pid']) : array();
-    $picks_identidad = isset($eternal_picks[$arbol_identidad]) ? $eternal_picks[$arbol_identidad] : array();
-    $picks_arma      = isset($eternal_picks[$arbol_arma]) ? $eternal_picks[$arbol_arma] : array();
-    $eternal_budget  = function_exists('ope_eternal_pt_budget')
-        ? ope_eternal_pt_budget((int) $pj['pid'], $nivel, $arbol_identidad, $arbol_arma)
-        : null;
-    $tiene_eternal   = ($tree_identidad !== null || $tree_arma !== null);
+    // ── Vocaciones v4: Clase, Oficios, Arma e Hitos ──
+    $vocaciones_data = function_exists('ope_rol_pj_vocaciones') ? ope_rol_pj_vocaciones((int) $pj['pid']) : array();
+    $clase_key       = !empty($vocaciones_data['clase']) ? $vocaciones_data['clase'] : ($datos['clase'] ?? '');
+    $oficios_keys    = !empty($vocaciones_data['oficios']) ? $vocaciones_data['oficios'] : ($datos['oficios'] ?? array());
+    $arma_key        = !empty($vocaciones_data['arma']) ? $vocaciones_data['arma'] : ($datos['arma'] ?? '');
+    $elecciones_voc  = $vocaciones_data['elecciones'] ?? array();
+    $arquetipo_clase = $vocaciones_data['arquetipo_clase'] ?? '';
+
+    $CLASES_VOC      = function_exists('ope_rol_clases') ? ope_rol_clases() : array();
+    $OFICIOS_VOC     = function_exists('ope_rol_oficios') ? ope_rol_oficios() : array();
+    $ARMAS_VOC       = function_exists('ope_rol_armas_vocacionales') ? ope_rol_armas_vocacionales() : array();
+    $CADENCIA_VOC    = function_exists('ope_rol_voc_cadencia') ? ope_rol_voc_cadencia() : array();
+
+    $clase_info      = isset($CLASES_VOC[$clase_key]) ? $CLASES_VOC[$clase_key] : null;
+    $arma_info       = isset($ARMAS_VOC[$arma_key]) ? $ARMAS_VOC[$arma_key] : null;
+    $arquetipo_info  = ($arquetipo_clase !== '' && isset($CLASES_VOC[$arquetipo_clase])) ? $CLASES_VOC[$arquetipo_clase] : null;
+
+    $oficios_info = array();
+    if (is_array($oficios_keys)) {
+        foreach ($oficios_keys as $ok) {
+            if (isset($OFICIOS_VOC[$ok])) {
+                $oficios_info[$ok] = $OFICIOS_VOC[$ok];
+            }
+        }
+    }
+    $tiene_vocacion  = ($clase_info !== null);
 
     $haki_block = function_exists('ope_haki_ficha_block')
         ? ope_haki_ficha_block((int) $pj['pid'], $stats_ef, $nivel)
@@ -1401,47 +1416,70 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
       </div>
     </section>
-    <!-- TALENTOS ETERNAL (solo nodos poseídos) -->
+    <!-- CLASE Y OFICIOS -->
     <section class="panel on" id="tab-eternal" role="tabpanel">
-<?php if (!$tiene_eternal): ?>
-      <div class="plate"><div class="plate-b"><p class="mono fs-76 c-dim">Este personaje aún no tiene árboles Eternal asignados (Identidad y Familia de Arma se eligen en la creación).</p></div></div>
+<?php if (!$tiene_vocacion): ?>
+      <div class="plate"><div class="plate-b"><p class="mono fs-76 c-dim">Este personaje no tiene asignada una Clase Bélica ni Oficios.</p></div></div>
 <?php else: ?>
       <div class="plate">
-        <div class="plate-h"><span class="t">Sistema Eternal · Forja</span><span class="c">// solo nodos elegidos</span></div>
+        <div class="plate-h"><span class="t">Clase Bélica · <?php echo htmlspecialchars_uni($clase_info['nombre']); ?></span><span class="c">// <?php echo htmlspecialchars_uni($clase_info['prim'] . ' / ' . $clase_info['sec']); ?></span></div>
         <div class="plate-b">
-<?php if ($eternal_budget): ?>
-          <div class="ope-etbudget">
-            <div class="ope-etb">
-              <span class="ope-etb-l">Identidad</span>
-              <b class="ope-etb-v"><?php echo (int) $eternal_budget['identidad']['usados']; ?><span>/<?php echo (int) $eternal_budget['identidad']['disponibles']; ?></span></b>
-              <span class="ope-etb-s"><?php echo (int) $eternal_budget['identidad']['restantes']; ?> PT libres</span>
-            </div>
-            <div class="ope-etb">
-              <span class="ope-etb-l">Arma</span>
-              <b class="ope-etb-v"><?php echo (int) $eternal_budget['arma']['usados']; ?><span>/<?php echo (int) $eternal_budget['arma']['disponibles']; ?></span></b>
-              <span class="ope-etb-s"><?php echo (int) $eternal_budget['arma']['restantes']; ?> PT libres</span>
-            </div>
-          </div>
-<?php if ($puede_gestionar): ?>
-          <p class="mono fs-76 c-dim mt-8">Para elegir o cambiar nodos, ve a <b>Gestión &rsaquo; Talentos</b>. Aquí solo se listan los que ya posees.</p>
+          <p class="mb-8"><?php echo htmlspecialchars_uni($clase_info['filosofia']); ?></p>
+          <div class="mono fs-76 c-paper mb-4"><b>Pool Afín:</b> <?php echo htmlspecialchars_uni(implode(', ', $clase_info['pool'])); ?></div>
+<?php if ($arma_info): ?>
+          <div class="mono fs-76 c-paper mb-4"><b>Arma Vocacional:</b> <?php echo htmlspecialchars_uni($arma_info['nombre']); ?> (Escala: <?php echo htmlspecialchars_uni(implode('/', $arma_info['escala'])); ?>) — <em><?php echo htmlspecialchars_uni($arma_info['efecto']); ?></em></div>
 <?php endif; ?>
+<?php if ($arquetipo_info): ?>
+          <div class="mono fs-76 c-ember mt-8"><b>Arquetipo (2ª Clase):</b> <?php echo htmlspecialchars_uni($arquetipo_info['nombre']); ?> (<?php echo htmlspecialchars_uni($arquetipo_info['filosofia']); ?>)</div>
 <?php endif; ?>
         </div>
       </div>
+
+<?php if (!empty($oficios_info)): ?>
+      <div class="plate mt-12">
+        <div class="plate-h"><span class="t">Oficios</span><span class="c">// <?php echo count($oficios_info); ?> activo(s)</span></div>
+        <div class="plate-b">
+          <div class="grid2">
+<?php foreach ($oficios_info as $oid => $o): ?>
+            <div class="fl-col">
+              <div class="mono c-paper"><b><?php echo htmlspecialchars_uni($o['nombre']); ?></b> <small class="c-dim">(<?php echo htmlspecialchars_uni($o['prim'] . '/' . $o['sec']); ?>)</small></div>
+              <p class="fs-76 mb-4"><?php echo htmlspecialchars_uni($o['desc']); ?></p>
+              <div class="mono fs-76 c-dim"><b>Pool:</b> <?php echo htmlspecialchars_uni(implode(', ', $o['pool'])); ?></div>
+            </div>
+<?php endforeach; ?>
+          </div>
+        </div>
+      </div>
+<?php endif; ?>
+
+      <div class="plate mt-12">
+        <div class="plate-h"><span class="t">Desbloqueos e Hitos por Nivel</span><span class="c">// Nivel actual: <?php echo (int)$nivel; ?></span></div>
+        <div class="plate-b">
+          <ul class="zs-dotes">
 <?php
-    $owned_id_html = ($tree_identidad && !empty($picks_identidad)) ? ope_eternal_render_owned($tree_identidad, $picks_identidad) : '';
-    $owned_arma_html = ($tree_arma && !empty($picks_arma)) ? ope_eternal_render_owned($tree_arma, $picks_arma) : '';
+    $hitos_clase = $clase_info['hitos'] ?? array();
+    foreach ($CADENCIA_VOC as $nv_hito => $meta_cad):
+        $desbloqueado = ($nivel >= $nv_hito);
+        $hito_val = $hitos_clase[$nv_hito] ?? null;
+        if (!$hito_val) continue;
+
+        $badge_status = $desbloqueado ? '<span class="badge cost">Nv. ' . $nv_hito . '</span>' : '<span class="badge back">Nv. ' . $nv_hito . ' (Bloqueado)</span>';
+        
+        if (is_array($hito_val) && isset($hito_val['eleccion'])) {
+            $elec_hecha = $elecciones_voc[(string)$nv_hito] ?? null;
+            $txt_elec = $elec_hecha ? ('<b>Elección:</b> ' . htmlspecialchars_uni($elec_hecha)) : '<em>Pendiente de elegir en Gestión</em>';
+            echo '<li class="' . ($desbloqueado ? '' : 'c-dim') . '">' . $badge_status . ' ' . $txt_elec . '</li>';
+        } elseif (is_array($hito_val) && !empty($hito_val['arquetipo'])) {
+            $txt_arq = $arquetipo_info ? ('<b>Arquetipo Nv.30:</b> ' . htmlspecialchars_uni($arquetipo_info['nombre'])) : '<em>Desbloquea segunda clase a Nv.30</em>';
+            echo '<li class="' . ($desbloqueado ? '' : 'c-dim') . '">' . $badge_status . ' ' . $txt_arq . '</li>';
+        } else {
+            echo '<li class="' . ($desbloqueado ? '' : 'c-dim') . '">' . $badge_status . ' ' . htmlspecialchars_uni((string)$hito_val) . '</li>';
+        }
+    endforeach;
 ?>
-<?php if ($owned_id_html === '' && $owned_arma_html === ''): ?>
-      <div class="plate"><div class="plate-b"><p class="mono fs-76 c-dim">Aún no ha elegido ningún nodo Eternal. Los talentos aparecerán aquí conforme los vaya forjando.</p></div></div>
-<?php else: ?>
-<?php if ($owned_id_html !== ''): ?>
-      <div class="plate"><div class="plate-b"><?php echo $owned_id_html; ?></div></div>
-<?php endif; ?>
-<?php if ($owned_arma_html !== ''): ?>
-      <div class="plate"><div class="plate-b"><?php echo $owned_arma_html; ?></div></div>
-<?php endif; ?>
-<?php endif; ?>
+          </ul>
+        </div>
+      </div>
 <?php endif; ?>
     </section>
 
@@ -1745,38 +1783,83 @@ header('Content-Type: text/html; charset=utf-8');
           </div>
         </section>
 
-        <!-- Panel: Talentos Eternal (interactivo) -->
+        <!-- Panel: Elecciones de Clase y Arquetipo -->
         <section class="ope-mpanel" data-mpanel="talentos" role="tabpanel" id="g-talentos">
-          <div class="ope-field-help mb-12">Elige tus nodos del Sistema Eternal. Cada tier concede <b>1 PT</b> al alcanzar su nivel (1 / 10 / 20 / 30 / 45). Un nodo por tier; los pináculos se excluyen entre sí. Pulsa un nodo desbloqueado para elegirlo o retirarlo.</div>
-<?php if (!$tiene_eternal): ?>
-          <p class="mono fs-76 c-dim">Este personaje no tiene árboles Eternal asignados.</p>
+          <div class="ope-field-help mb-12">Gestiona las elecciones de hitos de tu Clase Bélica (Niveles 10, 20, 40, 50) y la selección de tu <b>Arquetipo / 2ª Clase</b> al alcanzar el Nivel 30.</div>
+<?php if (!$tiene_vocacion): ?>
+          <p class="mono fs-76 c-dim">Este personaje no tiene asignada una Clase Bélica.</p>
 <?php else: ?>
-<?php if ($eternal_budget): ?>
-          <div class="ope-etbudget">
-            <div class="ope-etb">
-              <span class="ope-etb-l">Identidad</span>
-              <b class="ope-etb-v"><?php echo (int) $eternal_budget['identidad']['usados']; ?><span>/<?php echo (int) $eternal_budget['identidad']['disponibles']; ?></span></b>
-              <span class="ope-etb-s"><?php echo (int) $eternal_budget['identidad']['restantes']; ?> PT libres</span>
+          <h4 class="mono c-paper mb-8">Elecciones de Hito (Clase: <?php echo htmlspecialchars_uni($clase_info['nombre']); ?>)</h4>
+<?php
+    $hitos_clase = $clase_info['hitos'] ?? array();
+    foreach ($CADENCIA_VOC as $nv_hito => $meta_cad):
+        if (empty($hitos_clase[$nv_hito]['eleccion']) || !is_array($hitos_clase[$nv_hito]['eleccion'])) continue;
+        $desbloqueado = ($nivel >= $nv_hito);
+        $opciones = $hitos_clase[$nv_hito]['eleccion'];
+        $elec_actual = $elecciones_voc[(string)$nv_hito] ?? '';
+?>
+          <div class="plate mb-8 p-12">
+            <div class="plate-h">
+              <span class="t">Hito Nivel <?php echo (int)$nv_hito; ?></span>
+              <span class="c">// <?php echo $desbloqueado ? 'Desbloqueado' : 'Requiere Nivel ' . (int)$nv_hito; ?></span>
             </div>
-            <div class="ope-etb">
-              <span class="ope-etb-l">Arma</span>
-              <b class="ope-etb-v"><?php echo (int) $eternal_budget['arma']['usados']; ?><span>/<?php echo (int) $eternal_budget['arma']['disponibles']; ?></span></b>
-              <span class="ope-etb-s"><?php echo (int) $eternal_budget['arma']['restantes']; ?> PT libres</span>
+            <div class="plate-b">
+<?php if (!$desbloqueado): ?>
+              <p class="mono fs-76 c-dim mb-0">Alcanza el nivel <?php echo (int)$nv_hito; ?> para elegir entre:</p>
+              <ul class="fs-76 c-dim mb-0 mt-4">
+<?php foreach ($opciones as $op_nombre => $op_desc): ?>
+                <li><b><?php echo htmlspecialchars_uni($op_nombre); ?>:</b> <?php echo htmlspecialchars_uni($op_desc); ?></li>
+<?php endforeach; ?>
+              </ul>
+<?php else: ?>
+              <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int)$pj['pid']; ?>" class="flex-wrap gap-8 align-center">
+                <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+                <input type="hidden" name="gaccion" value="save_voc_eleccion">
+                <input type="hidden" name="nivel" value="<?php echo (int)$nv_hito; ?>">
+                <select name="opcion" class="form-control" style="max-width: 320px;" required>
+                  <option value="">-- Selecciona una opción --</option>
+<?php foreach ($opciones as $op_nombre => $op_desc): ?>
+                  <option value="<?php echo htmlspecialchars_uni($op_nombre); ?>"<?php echo ($elec_actual === $op_nombre) ? ' selected' : ''; ?>>
+                    <?php echo htmlspecialchars_uni($op_nombre . ' — ' . $op_desc); ?>
+                  </option>
+<?php endforeach; ?>
+                </select>
+                <button type="submit" class="btn btn-sm btn-hot">Guardar Elección</button>
+              </form>
+<?php endif; ?>
             </div>
           </div>
+<?php endforeach; ?>
+
+          <!-- Nivel 30: Arquetipo (Segunda Clase) -->
+          <div class="plate mt-16 p-12">
+            <div class="plate-h">
+              <span class="t">Arquetipo (2ª Clase Bélica)</span>
+              <span class="c">// Nivel 30+</span>
+            </div>
+            <div class="plate-b">
+<?php if ($nivel < 30): ?>
+              <p class="mono fs-76 c-dim mb-0">Al alcanzar el Nivel 30 podrás seleccionar una segunda Clase Bélica como tu Arquetipo para expandir tu versatilidad táctica.</p>
+<?php else: ?>
+              <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int)$pj['pid']; ?>" class="flex-wrap gap-8 align-center">
+                <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+                <input type="hidden" name="gaccion" value="save_voc_arquetipo">
+                <select name="segunda_clase" class="form-control" style="max-width: 320px;">
+                  <option value="">-- Ninguna (Sin Arquetipo) --</option>
+<?php foreach ($CLASES_VOC as $ck => $cd): if ($ck === $clase_key) continue; ?>
+                  <option value="<?php echo htmlspecialchars_uni($ck); ?>"<?php echo ($arquetipo_clase === $ck) ? ' selected' : ''; ?>>
+                    <?php echo htmlspecialchars_uni($cd['nombre'] . ' (' . $cd['prim'] . '/' . $cd['sec'] . ')'); ?>
+                  </option>
+<?php endforeach; ?>
+                </select>
+                <button type="submit" class="btn btn-sm btn-hot">Guardar Arquetipo</button>
+              </form>
+<?php if ($arquetipo_info): ?>
+              <div class="mono fs-76 c-ember mt-8"><b>Arquetipo Actual:</b> <?php echo htmlspecialchars_uni($arquetipo_info['nombre']); ?> — <?php echo htmlspecialchars_uni($arquetipo_info['filosofia']); ?></div>
 <?php endif; ?>
-          <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int) $pj['pid']; ?>" id="ope-eternal-form">
-            <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
-            <input type="hidden" name="gaccion" value="eternal_pick" id="ope-eternal-gaccion">
-            <input type="hidden" name="arbol" value="" id="ope-eternal-arbol">
-            <input type="hidden" name="nodo_id" value="" id="ope-eternal-nodo">
-          </form>
-<?php if ($tree_identidad): ?>
-          <div class="ope-gtree" data-arbol="<?php echo htmlspecialchars_uni($arbol_identidad); ?>"><?php echo ope_eternal_render_tree($tree_identidad, 'interactivo', $picks_identidad); ?></div>
 <?php endif; ?>
-<?php if ($tree_arma): ?>
-          <div class="ope-gtree" data-arbol="<?php echo htmlspecialchars_uni($arbol_arma); ?>"><?php echo ope_eternal_render_tree($tree_arma, 'interactivo', $picks_arma); ?></div>
-<?php endif; ?>
+            </div>
+          </div>
 <?php endif; ?>
         </section>
 
@@ -2349,25 +2432,7 @@ document.querySelectorAll('.tl-tab').forEach(function (s) {
     try { ta.setSelectionRange(caret, caret); } catch (x) {}
   });
 
-  // Elegir / retirar nodos Eternal (submit del formulario oculto).
-  var etForm = document.getElementById('ope-eternal-form');
-  if (etForm) {
-    panel.querySelectorAll('.ope-gtree').forEach(function (wrap) {
-      var arbol = wrap.getAttribute('data-arbol') || '';
-      wrap.querySelectorAll('.eternal-node--interactivo').forEach(function (node) {
-        node.addEventListener('click', function () {
-          if (node.classList.contains('eternal-node--blocked')) return;
-          var nid = node.getAttribute('data-node-id') || '';
-          if (!nid) return;
-          document.getElementById('ope-eternal-arbol').value = arbol;
-          document.getElementById('ope-eternal-nodo').value = nid;
-          document.getElementById('ope-eternal-gaccion').value =
-            node.classList.contains('is-owned') ? 'eternal_unpick' : 'eternal_pick';
-          etForm.submit();
-        });
-      });
-    });
-  }
+
 
   // Si venimos de guardar (?g=1), abre el área Gestión y la sub-pestaña del hash.
   if (/[?&]g=1(&|$)/.test(location.search)) {

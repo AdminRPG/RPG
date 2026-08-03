@@ -91,4 +91,4 @@ No usa `body.ope-pg-*`. Usa **`body.ope-index`**.
 
 ## Producto (resumen)
 
-**One Piece: Eternal** — foro rol PBP en el universo One Piece (mares, islas, Haki, Akuma no Mi, Sistema Eternal Identidad+Arma). Motor MyBB + plugin `ope_rol`. Detalle: `docs/PRODUCT.md` y el repo hermano de sistemas.
+**One Piece: Eternal** — foro rol PBP en el universo One Piece (mares, islas, Haki, Akuma no Mi, Clases Bélicas + Oficios v4). Motor MyBB + plugin `ope_rol`. Detalle: `docs/PRODUCT.md` y el repo hermano de sistemas.

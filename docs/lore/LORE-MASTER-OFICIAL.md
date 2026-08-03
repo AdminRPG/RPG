@@ -1,96 +1,72 @@
-# 📜 ONE PIECE: ETERNAL — LA BIBLE OFICIAL DEL LORE (MASTER LORE BIBLE)
+# Lore Master Oficial — One Piece: Eternal
 
-Bienvenido a la fuente única de verdad del lore de **One Piece: Eternal**. Este documento contiene la cosmología, historia antigua, evento inaugural del foro, facciones, los Cuatro Emperadores, Armas Ancestrales y los sistemas del Mundo Vivo.
-
----
-
-## 🏛️ 1. El Evento Inaugural: La Ejecución del Rey Pirata
-
-### 1.1 El Patíbulo de Marineford (Año 25 E.P.)
-El rol de *One Piece: Eternal* inicia en la histórica plaza de **Marineford**. Presidido por la Almirante de Flota **Sigrun D. Basterra** y rodeado por la élite militar del mundo, el Rey de los Piratas, **Rolf D. Basterra**, aguarda encadenado en Kairoseki sobre el patíbulo.
-
-Los primeros usuarios del foro presencian este evento histórico entre la multitud de marineros, ciudadanos, periodistas e infiltrados de todo el océano.
-
-### 1.2 Las Últimas Palabras de Rolf D. Basterra
-Antes de que las hojas de los ejecutores caigan, Rolf alza la cabeza con una sonrisa indomable y proclama:
-
-> **«¡Mi legado no cabe en una horca! Romped el Tributo Celestial, surcad los mares prohibidos y desafiad los ochocientos años de tiranía... ¡Mi gran tesoro y la verdad oculta del mundo aguardan en el Nuevo Mundo a quienes tengan el valor de tomarlos!»**
-
-### 1.3 El Secreto detrás de la Rendición de Rolf
-Rolf no fue derrotado en combate. Se entregó en secreto a su propia madre, la Almirante de Flota Sigrun D. Basterra, como parte de un pacto privado para evitar un **Buster Call masivo** que el Gobierno Mundial había ordenado sobre la isla natal de su familia.
+> *"La historia no la escriben los vencedores. La escriben los que sobreviven lo suficiente para sostener la pluma."*
+> — inscripción anónima, Archivo Naval de Mariejois
 
 ---
 
-## 🧭 2. Inicio de Jugadores y El Gran Bloqueo de los Blues
+## 1. Premisa y Línea Temporal
 
-### 2.1 Los Cuatro Blues Desbloqueados
-Todos los nuevos jugadores inician su travesía en su mar de origen (**East Blue**, **West Blue**, **North Blue** o **South Blue**).
+### El Calendario Eternal
+El mundo entero cuenta el tiempo en **Era Eternal**, abreviado **E.E.** El año 0 E.E. marca el día en que quince monarcas de mares distintos firmaron un pacto que redefinió qué historia merecía ser recordada. Estamos en el **año 1522 E.E.**
 
-### 2.2 El Bloqueo Militar de Reverse Mountain y Calm Belt
-Tras el impacto de las palabras de Rolf, el **Alto Inquisidor Vaelen** y la Marina ordenaron el fortificamiento inmediato de los accesos a Grand Line:
-- **Reverse Mountain**: Bloqueada por baterías de cañones pesados, minas marinas y buques de la Marina.
-- **Calm Belt**: Patrullado por acorazados militares con quillas de Kairoseki.
+### La Ejecución del Ocaso
+**Selene Kestrel**, la Reina Pirata, ha sido capturada. No por su padre, el Almirante de Flota **Alaric Kestrel**, como el mundo entero esperaba — sino traicionada por alguien de su propia tripulación. Su identidad nunca se ha confirmado.
 
-**La Primera Gran Saga de los Jugadores** consiste en fortalecerse en los Blues, conseguir barco, tripulación y romper el bloqueo de la Marina para ingresar triunfalmente a Grand Line.
+Sentenciada a muerte, aguarda su ejecución en la plaza de **Marineford** para la próxima marea alta. El mundo entero — Yonkou, revolucionarios, reinos neutrales, cazarrecompensas y un padre que todavía no ha pronunciado una sola palabra en público — espera.
 
----
-
-## ⚔️ 3. Los Cuatro Emperadores (Yonkou) del Nuevo Mundo
-
-Los Cuatro Yonkou mantienen una **rivalidad feroz y un conflicto territorial abierto** por el dominio del mar. Cada uno de ellos custodia uno de los **4 Poneglyphs Rojos (Poneglyphs del Camino)** necesarios para trazar la ruta hacia La Última Isla.
-
-| Yonko | Título / Facción | Raza | Akuma no Mi | Poder & Estilo | Poneglyph Custodiado |
-|---|---|---|---|---|---|
-| **Kaiser Vaelgor** | *El Rey de la Ruina* / Imperio Asolador | Oni del Norte | *Gura Gura no Mi* (Terremoto) | Kanabō imbuido en Haki del Rey y ondas sísmicas destruye-islas | Poneglyph Rojo de la Ruina (Isla Skar) |
-| **Jarl Brogaz** | *El Tragahierro* / Flota Titánica | Gigante de Elbaf | *Baku Baku no Mi* (Fusión Metal) | Devora artillería y transfigura su cuerpo de gigante en fortaleza | Poneglyph Rojo del Acero (Isla Ironforge) |
-| **Princesa Rosette** | *La Masacre Diminuta* / Corte de Espinas | Tontatta | *Bat Bat: Vampiro* (Zoan Mitológica) | Absorción de vitalidad, agilidad invisible y dagas sangrientas | Poneglyph Rojo de Sangre (Isla Rosewood) |
-| **Sylphira** | *La Hoja Inmaculada* / Espadas Celestes | Skypean | *Sin Fruta (Diales + Presciencia)* | Espadachina celeste suprema con Haki de Observación avanzado | Poneglyph Rojo del Cielo (Isla Aethelgard) |
+### El Secreto de Vethmar
+Semanas antes de su captura, la tripulación de Selene interceptó un calco cubierto de coral procedente de un cargamento de la Marina. Al limpiarlo, apareció una palabra repetida en tres alfabetos muertos: **Vethmar** — el nombre de un reino que debería haber estado en la mesa del Concilio de las Quince Coronas y no lo estuvo. O, más precisamente, que estuvo y luego fue borrado.
 
 ---
 
-## 📜 4. El Sistema de Poneglyphs y Arqueología Ancestral
+## 2. Grandes Poderes y Cúpula Mundial
 
-Para alcanzar La Última Isla y descubrir la verdad del Siglo Vacío, las tripulaciones piratas deben localizar los 4 Poneglyphs Rojos y contar con los conocimientos necesarios para interpretarlos.
+### La Marina
+- **Almirante de Flota: Alaric Kestrel** — Ascendió de Capitán a Almirante de Flota en una carrera meteórica. Su campaña de pacificación de 1474 E.E. permanece clasificada. Desde 1520, el Gobierno Mundial cuestiona abiertamente su lealtad por su parentesco con la Reina Pirata.
+- **Los Tres Almirantes:** Por determinar.
 
-- **Requisito de Lectura**: Solo los personajes con la **Dote de Arqueólogo Ancestral** (Factor Linaje) o miembros del **Tribu del Tercer Ojo** pueden descifrar las inscripciones en piedra antigua.
-- **Traducción de Calcos**: Reunir los 4 calcos (*Rubbings*) traducidos permite al staff desbloquear las coordenadas finales de La Última Isla para la banda.
+### El Gobierno Mundial y el Silencio de las Quince Coronas
+La autoridad suprema del mundo reside en Mariejois, fundada sobre tierras que oficialmente "no pertenecían a nadie". El Trono Vacío — la decimoquinta silla del Concilio original — nunca se ha ocupado oficialmente. Algunos historiadores sostienen que es la silla de Vethmar.
 
----
+### Los Yonkou del Nuevo Mundo
+Los cuatro asientos de Emperador están ocupados por la nueva generación surgida del relevo silencioso de 1460–1472 E.E. Sus identidades están por definir.
 
-## 👑 5. El Trono Vacío Ocupado y las Armas Ancestrales
+### El Ejército Revolucionario
+- **Comandante Suprema: Nadira Vashti** — Ascendió en 1519 E.E. tras la muerte de su predecesor, en circunstancias que su propio movimiento no ha esclarecido.
 
-### 5.1 El Secreto Supremo de Mary Geoise
-Aunque el Gobierno Mundial predica que el *Trono Vacío* simboliza la igualdad entre los 20 reinos fundadores, en las sombras existe una **figura soberana absoluta** que gobierna desde la penumbra. Esta entidad dicta las purgas mundiales, dirige al Alto Inquisidor Vaelen y sostiene la tiranía del Tributo Celestial.
-
-### 5.2 Las Tres Armas Ancestrales
-- 🌊 **Poseidón**: El poder biológico de comunicarse y comandar a los Reyes Marinos, encarnado en la realeza de la Isla Gyojin.
-- ⚓ **Plutón**: El acorazado de guerra destructivo capaz de pulverizar islas de una salva, oculto bajo las profundidades entre Wano y Elbaf.
-- ⚡ **Urano**: El arma aérea devastadora custodiada en secreto por la cúpula suprema del Gobierno Mundial en los cielos de Mary Geoise.
-
----
-
-## 🏛️ 6. Las Facciones y sus Roles Jugables
-
-### 6.1 La Marina & Las Cuatro Justicias
-- **Almirante de Flota Sigrun D. Basterra**: *Justicia Heroica* — El deber moral inquebrantable.
-- **Almirante Halvar**: *Justicia Absoluta* — La ley helada e inflexible (Hie Hie no Mi).
-- **Almirante Ysolde**: *Justicia Pragmática* — Francotiradora Mink (Electro / Sulong).
-- **Almirante Draven**: *Justicia Guerrera* — Fuerza bruta submarina (Karate Gyojin).
-
-### 6.2 El Gobierno Mundial & La Inquisición
-- **Alto Inquisidor Vaelen**: Comisionado Supremo con la *Ito Ito no Mi*. Coordina a los Cipher Pol (CP0 a CP9) para erradicar cualquier disidencia y cobrar el Tributo Celestial.
-
-### 6.3 El Ejército Revolucionario
-- **Misión Principal**: Liberación de reinos oprimidos, destrucción del Tributo Celestial y abolición del régimen aristocrático de Mary Geoise.
-
-### 6.4 El Gremio de Cazarrecompensas
-- **Líderes**: *Valerius* (Tirador de Kairoseki) y *Morgana* (Mink Pantera).
-- **Mecánica Mercenaria**: Emiten **Contratos Semanales del Staff** con recompensas en Berries por cazar PJs piratas reales activos en el foro.
+### El Gremio de Cazarrecompensas
+Por determinar.
 
 ---
 
-## 🗺️ 7. Sistema de Conquista Dinámica de Territorios
+## 3. Registro Histórico de Eras
 
-Los jugadores no son meros espectadores:
-- **Conquista de Islas**: Las tripulaciones de jugadores pueden acumular **RF (Rango de Facción)** para desafiar la soberanía de las islas del Nuevo Mundo y arrebatárselas a los Yonkou o a la Marina.
-- **Cambio del Mapa Vivo**: Las victorias de los jugadores actualizan automáticamente la propiedad de las islas en el mapa interactivo ([viajes.php](file:///c:/Users/Fgonz/Documents/Proyectos/Op-Eternal/Eternal-RPG/viajes.php)).
+| Era | Periodo | Evento Clave |
+|---|---|---|
+| **Antes del Año 0** | — | La Marea Muda. El Concilio de las Quince Coronas. La desaparición de Vethmar. |
+| **Era del Silencio** | 0–40 E.E. | Fundación de Mariejois. Primera Ley del Silencio. La Quema de las Voces. |
+| **Era de las Rutas Trazadas** | 40–210 E.E. | Invención del Log Pose. Fundación de la Marina. Primeros avistamientos de Urano. |
+| **Era de los Reinos Errantes** | 210–440 E.E. | Guerras dinásticas. Auge de la Casa Vhoss. Primeras familias piratas. |
+| **Era Dorada de la Piratería** | 440–610 E.E. | Nacimiento de los Yonkou. Cassian Draeger, primer Rey Pirata. Cartel Real de recompensas. |
+| **Era de la Paz Fingida** | 610–1460 E.E. | Los Siglos de Hambre. Masacre de Puerto Ceniza. Guerra de los Cuatro Tronos. |
+| **Era de las Mareas Tensas** | 1460–1522 E.E. | El Gran Relevo. Ascenso de Selene Kestrel. La Década de la Reina sin Corona. Captura y Ejecución del Ocaso. |
+
+Para la cronología detallada año a año (1472–1522 E.E.), consultar [`Cronologia/cronologia_eras.json`](Cronologia/cronologia_eras.json).
+
+---
+
+## 4. Personajes Clave de la Era Actual
+
+### Selene Kestrel — La Reina Pirata
+- **Recompensa:** La más alta de la historia reciente
+- **Relación:** Hija del Almirante de Flota Alaric Kestrel
+- **Hazaña:** Derrotó a un Yonko en 1505. Reclamó el trono de Reina Pirata en 1511.
+- **Captura:** Traicionada por alguien de su tripulación en 1521 E.E.
+- **Estado:** Condenada a muerte. Aguarda ejecución en Marineford.
+
+### Alaric Kestrel — El Puño de la Marina
+- **Rango:** Almirante de Flota
+- **Carrera:** Capitán (1472) → Comodoro (1474) → Vicealmirante (1491) → Almirante (1502) → Almirante de Flota (1508)
+- **Conflicto:** Su propia hija es la pirata más buscada del mundo. El Gobierno Mundial cuestiona su lealtad desde 1520.
+- **Secreto:** Su campaña de pacificación de 1474 permanece clasificada.

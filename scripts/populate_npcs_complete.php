@@ -128,28 +128,23 @@ foreach ($npcs_data as $pid => $cfg) {
         'lastedit' => TIME_NOW
     ), "pid = {$pid}");
 
-    // 2. Actualizar rol_pj_eternal
-    if ($db->table_exists('rol_pj_eternal')) {
-        $db->delete_query('rol_pj_eternal', "pid = {$pid}");
-        
-        foreach ($cfg['nodos_identidad'] as $nid) {
-            $db->insert_query('rol_pj_eternal', array(
-                'pid' => $pid,
-                'arbol' => $cfg['arbol_identidad'],
-                'nodo_id' => $nid,
-                'dateline' => TIME_NOW
-            ));
-        }
+    // 2. Actualizar rol_pj_vocaciones
+    if ($db->table_exists('rol_pj_vocaciones')) {
+        $db->delete_query('rol_pj_vocaciones', "pid = {$pid}");
+        $clase_seed = $cfg['clase'] ?? 'luchador';
+        $arma_seed = $cfg['arma'] ?? 'guantelete';
+        $oficios_seed = json_encode($cfg['oficios'] ?? array(), JSON_UNESCAPED_UNICODE);
 
-        foreach ($cfg['nodos_arma'] as $nid) {
-            $db->insert_query('rol_pj_eternal', array(
-                'pid' => $pid,
-                'arbol' => $cfg['arbol_arma'],
-                'nodo_id' => $nid,
-                'dateline' => TIME_NOW
-            ));
-        }
-        echo "  - Nodos Eternal insertados en rol_pj_eternal.\n";
+        $db->insert_query('rol_pj_vocaciones', array(
+            'pid' => $pid,
+            'clase' => $clase_seed,
+            'oficios' => $oficios_seed,
+            'arma' => $arma_seed,
+            'elecciones' => '{}',
+            'arquetipo_clase' => '',
+            'dateline' => TIME_NOW
+        ));
+        echo "  - Vocaciones insertadas en rol_pj_vocaciones.\n";
     }
 
     // 3. Actualizar rol_pj_fruta

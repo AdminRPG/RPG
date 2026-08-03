@@ -217,6 +217,17 @@ function seed_master_npc(mysqli $db, array $n) {
     if ($st->execute()) { echo "  UPDATE LORE OK. pid={$pid}\n"; }
     else { echo "  ERROR execute: {$st->error}\n"; return; }
     $st->close();
+
+    if ($pid > 0 && $db->query("SHOW TABLES LIKE 'mybb_rol_pj_vocaciones'")->num_rows > 0) {
+        $db->query("DELETE FROM mybb_rol_pj_vocaciones WHERE pid = {$pid}");
+        $clase_seed = $n['datos']['clase'] ?? ($n['datos']['identidad'] ?? 'luchador');
+        $arma_seed = $n['datos']['arma'] ?? 'guantelete';
+        $oficios_seed = json_encode($n['datos']['oficios'] ?? array(), JSON_UNESCAPED_UNICODE);
+        $elecciones_seed = json_encode($n['datos']['elecciones'] ?? new stdClass(), JSON_UNESCAPED_UNICODE);
+        $arquetipo_seed = $n['datos']['arquetipo_clase'] ?? '';
+
+        $db->query("INSERT INTO mybb_rol_pj_vocaciones (pid, clase, oficios, arma, elecciones, arquetipo_clase, dateline) VALUES ({$pid}, '" . $db->real_escape_string($clase_seed) . "', '" . $db->real_escape_string($oficios_seed) . "', '" . $db->real_escape_string($arma_seed) . "', '" . $db->real_escape_string($elecciones_seed) . "', '" . $db->real_escape_string($arquetipo_seed) . "', " . time() . ")");
+    }
 }
 
 require_once __DIR__ . '/_db-config.php';

@@ -4,7 +4,7 @@
  * ------------------------------------------------
  * Fuente única para wizard (crear-personaje.php) y validación server-side.
  * Canon: Eternal-Sistema/docs/01-PERSONAJE (STATS, FACTOR-LINAJE, ARMAS)
- *        + 11-SISTEMA ETERNAL (Identidad + Familia Arma).
+ *        + Clases Bélicas / Oficios v4 (vocaciones.php).
  *
  * Arrays PHP planos → JSON para UI; validación en servidor al enviar.
  */
@@ -13,12 +13,11 @@ if (!defined('IN_MYBB')) {
     die('Direct initialization of this file is not allowed.');
 }
 
-// Catálogos + reglas + render Eternal (rutas relativas a core/).
-require_once __DIR__ . '/../catalogos/eternal.php';
+// Catálogos + reglas (rutas relativas a core/).
+require_once __DIR__ . '/../catalogos/vocaciones.php';
 require_once __DIR__ . '/../catalogos/pj.php';
 require_once __DIR__ . '/../catalogos/linaje.php';
 require_once __DIR__ . '/../dominio/creacion.php';
-require_once __DIR__ . '/eternal.php';
 
 if (!function_exists('ope_rol_stats')) {
     /** Las 8 stats OP, agrupadas en 3 pilares (STATS.md). */

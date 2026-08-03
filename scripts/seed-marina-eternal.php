@@ -93,17 +93,16 @@ function seed_npc(mysqli $db, array $n) {
         $st->close();
     }
 
-    // Seeding de Nodos Eternal en rol_pj_eternal
-    if (isset($n['datos']['arbol_identidad_nodos_ids']) && is_array($n['datos']['arbol_identidad_nodos_ids'])) {
-        $db->query("DELETE FROM mybb_rol_pj_eternal WHERE pid = {$pid}");
-        foreach ($n['datos']['arbol_identidad_nodos_ids'] as $nid) {
-            $db->query("INSERT INTO mybb_rol_pj_eternal (pid, arbol, nodo_id, dateline) VALUES ({$pid}, '" . $db->real_escape_string($n['datos']['arbol_identidad']) . "', '" . $db->real_escape_string($nid) . "', " . time() . ")");
-        }
-    }
-    if (isset($n['datos']['arbol_arma_nodos_ids']) && is_array($n['datos']['arbol_arma_nodos_ids'])) {
-        foreach ($n['datos']['arbol_arma_nodos_ids'] as $nid) {
-            $db->query("INSERT INTO mybb_rol_pj_eternal (pid, arbol, nodo_id, dateline) VALUES ({$pid}, '" . $db->real_escape_string($n['datos']['arbol_arma']) . "', '" . $db->real_escape_string($nid) . "', " . time() . ")");
-        }
+    // Seeding de Vocaciones en rol_pj_vocaciones
+    if ($db->table_exists('rol_pj_vocaciones')) {
+        $db->query("DELETE FROM mybb_rol_pj_vocaciones WHERE pid = {$pid}");
+        $clase_seed = $n['datos']['clase'] ?? ($n['datos']['identidad'] ?? 'luchador');
+        $arma_seed = $n['datos']['arma'] ?? 'guantelete';
+        $oficios_seed = json_encode($n['datos']['oficios'] ?? array(), JSON_UNESCAPED_UNICODE);
+        $elecciones_seed = json_encode($n['datos']['elecciones'] ?? new stdClass(), JSON_UNESCAPED_UNICODE);
+        $arquetipo_seed = $n['datos']['arquetipo_clase'] ?? '';
+
+        $db->query("INSERT INTO mybb_rol_pj_vocaciones (pid, clase, oficios, arma, elecciones, arquetipo_clase, dateline) VALUES ({$pid}, '" . $db->real_escape_string($clase_seed) . "', '" . $db->real_escape_string($oficios_seed) . "', '" . $db->real_escape_string($arma_seed) . "', '" . $db->real_escape_string($elecciones_seed) . "', '" . $db->real_escape_string($arquetipo_seed) . "', " . time() . ")");
     }
 
     // Seeding de Akuma no Mi en rol_pj_fruta

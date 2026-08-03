@@ -17,9 +17,9 @@ $initials    = ope_get_initials($mybb->user['username'] ?? '');
 $initials_e  = htmlspecialchars_uni($initials);
 
 $RAZAS       = ope_rol_razas();
-$IDENTIDADES = ope_rol_identidades();
-$FAMILIAS    = ope_rol_familias_arma();
-$ARMAS       = ope_rol_armas();
+$CLASES      = ope_rol_clases();
+$OFICIOS     = ope_rol_oficios();
+$ARMAS_VOC   = ope_rol_armas_vocacionales();
 $FACCIONES   = ope_rol_facciones();
 $RASGOS_GENERALES = ope_rol_rasgos_generales();
 $RASGOS_RACIALES  = ope_rol_rasgos_raciales();
@@ -110,23 +110,36 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         $errores[] = 'La sesión del formulario caducó. Vuelve a intentarlo.';
     } else {
         $raza = $mybb->get_input('raza');
-        $identidad = $mybb->get_input('identidad');
-        $familia_arma = $mybb->get_input('familia_arma');
+        $clase = $mybb->get_input('clase');
         $arma = $mybb->get_input('arma');
+        $oficios_raw = $mybb->get_input('oficios', MyBB::INPUT_ARRAY);
+        $oficios_clean = array();
+        if (is_array($oficios_raw)) {
+            foreach ($oficios_raw as $ov) {
+                $ov = (string) $ov;
+                if (isset($OFICIOS[$ov]) && !in_array($ov, $oficios_clean, true)) {
+                    $oficios_clean[] = $ov;
+                }
+            }
+        }
 
         if (!isset($RAZAS[$raza])) {
             $errores[] = 'Elige un linaje válido.';
         }
-        if (!isset($IDENTIDADES[$identidad])) {
-            $errores[] = 'Elige una Identidad Eternal válida.';
+        if (!isset($CLASES[$clase])) {
+            $errores[] = 'Elige una Clase Bélica válida.';
         }
-        if (!isset($FAMILIAS[$familia_arma])) {
-            $errores[] = 'Elige una Familia de Arma válida.';
-        }
-        if (!isset($ARMAS[$arma])) {
+        $armas_permitidas = isset($CLASES[$clase]) ? ope_rol_armas_de_clase($clase) : array();
+        if (!isset($ARMAS_VOC[$arma])) {
             $errores[] = 'Elige un arma válida.';
-        } elseif (isset($FAMILIAS[$familia_arma]) && ($ARMAS[$arma]['familia'] ?? '') !== $familia_arma) {
-            $errores[] = 'El arma debe pertenecer a la familia Eternal elegida.';
+        } elseif (!empty($armas_permitidas) && !isset($armas_permitidas[$arma])) {
+            $errores[] = 'El arma debe pertenecer a la Clase Bélica elegida.';
+        }
+        if (count($oficios_clean) < 1) {
+            $errores[] = 'Elige al menos 1 Oficio.';
+        }
+        if (count($oficios_clean) > 2) {
+            $errores[] = 'Puedes elegir un máximo de 2 Oficios.';
         }
 
         $nombre = ope_rol_clean($mybb->get_input('nombre'), 120);
@@ -255,11 +268,9 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
                 'pureza' => $pureza,
                 'linaje2' => ($pureza === 'hibrida') ? $linaje2 : '',
                 'linajes' => $fl['linajes'],
-                'identidad' => $identidad,
-                'familia_arma' => $familia_arma,
+                'clase' => $clase,
+                'oficios' => $oficios_clean,
                 'arma' => $arma,
-                'arbol_identidad' => $IDENTIDADES[$identidad]['arbol'] ?? '',
-                'arbol_arma' => $FAMILIAS[$familia_arma]['arbol'] ?? '',
                 'faccion' => $faccion,
                 'factor_linaje' => $dotes_sel,
                 'virtudes_defectos' => $dotes_sel, // alias compat (ficha/legacy)
@@ -308,12 +319,6 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             if ($db->field_exists('isla_actual', 'rol_personajes')) {
                 $ins['isla_actual'] = 'isla_dawn';
             }
-            if ($db->field_exists('pt_disponibles', 'rol_personajes')) {
-                $ins['pt_disponibles'] = 0;
-            }
-            if ($db->field_exists('pt_gastados', 'rol_personajes')) {
-                $ins['pt_gastados'] = 0;
-            }
             $pid = $db->insert_query('rol_personajes', $ins);
 
             if ($pid > 0) {
@@ -322,6 +327,18 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
                 }
                 if (function_exists('ope_nav_item_defecto')) {
                     ope_nav_item_defecto((int)$pid, 'isla_dawn');
+                }
+                // Vocaciones v4: insertar clase/oficios/arma
+                if ($db->table_exists('rol_pj_vocaciones')) {
+                    $db->insert_query('rol_pj_vocaciones', array(
+                        'pid' => (int)$pid,
+                        'clase' => $db->escape_string($clase),
+                        'oficios' => $db->escape_string(json_encode($oficios_clean, JSON_UNESCAPED_UNICODE)),
+                        'arma' => $db->escape_string($arma),
+                        'elecciones' => '{}',
+                        'arquetipo_clase' => '',
+                        'dateline' => TIME_NOW,
+                    ));
                 }
             }
 
@@ -352,8 +369,8 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
                             'raza' => $raza,
                             'pureza' => $pureza,
                             'linaje2' => ($pureza === 'hibrida') ? $linaje2 : '',
-                            'identidad' => $identidad,
-                            'familia_arma' => $familia_arma,
+                            'clase' => $clase,
+                            'oficios' => $oficios_clean,
                             'arma' => $arma,
                             'faccion' => $faccion,
                         ), JSON_UNESCAPED_UNICODE)),
@@ -442,7 +459,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endif; ?>
 
   <p class="wiz-lead">
-    Forja tu personaje en <b>10 pasos</b>: identidad personal, linaje (Factor Linaje), Identidad Eternal, familia de arma, atributos, facción, virtudes/defectos, Akuma no Mi (opcional), equipo y revisión.
+    Forja tu personaje en <b>10 pasos</b>: identidad personal, linaje (Factor Linaje), Clase Bélica, arma y oficios, atributos, facción, virtudes/defectos, Akuma no Mi (opcional), equipo y revisión.
     Al enviar, tu ficha entra en <b>revisión</b> del staff.
   </p>
 
@@ -468,10 +485,9 @@ header('Content-Type: text/html; charset=utf-8');
           </div>
         </div>
         <div class="wiz-card-foot">
-          <div class="wiz-card-line"><b>Linaje</b><span id="wizLineRaza">—</span></div>
-          <div class="wiz-card-line"><b>Identidad</b><span id="wizLineId">—</span></div>
+          <div class="wiz-card-line"><b>Clase</b><span id="wizLineClase">—</span></div>
           <div class="wiz-card-line"><b>Arma</b><span id="wizLineArma">—</span></div>
-          <div class="wiz-card-line"><b>Familia</b><span id="wizLineFam">—</span></div>
+          <div class="wiz-card-line"><b>Oficios</b><span id="wizLineOficios">—</span></div>
           <div class="wiz-card-line"><b>Facción</b><span id="wizLineFac">—</span></div>
         </div>
       </div>
@@ -557,94 +573,75 @@ header('Content-Type: text/html; charset=utf-8');
           </div>
         </div>
 
-        <!-- PASO 3: IDENTIDAD ETERNAL -->
+        <!-- PASO 3: CLASE BÉLICA -->
         <div class="wiz-step" data-step="3">
           <div class="plate">
-            <div class="plate-h"><span class="t">3. Identidad</span><span class="c">// filosofía de combate</span></div>
+            <div class="plate-h"><span class="t">3. Clase Bélica</span><span class="c">// cómo combates</span></div>
             <div class="plate-b">
-              <p class="hint mb-12">Tu Identidad es el <b class="c-paper">porqué</b> combates. Explora el árbol completo (solo lectura) antes de decidir; puedes volver atrás sin perder datos. <button type="button" class="ope-help-btn" data-ope-help="identidad" title="Ayuda">?</button></p>
-              <div class="race-grid" id="idGrid">
-<?php foreach ($IDENTIDADES as $iid => $idat): ?>
+              <p class="hint mb-12">Tu Clase define tu <b class="c-paper">estilo de combate</b>, tu pool afín y las armas que puedes empuñar. <button type="button" class="ope-help-btn" data-ope-help="clase" title="Ayuda">?</button></p>
+              <div class="race-grid" id="claseGrid">
+<?php foreach ($CLASES as $cid => $cdat): ?>
                 <label class="race-card">
-                  <input type="radio" name="identidad" value="<?php echo htmlspecialchars_uni($iid); ?>"
-                    data-nombre="<?php echo htmlspecialchars_uni($idat['nombre']); ?>"
-                    data-arbol="<?php echo htmlspecialchars_uni($idat['arbol']); ?>"
-                    data-rol="<?php echo htmlspecialchars_uni($idat['rol']); ?>"
+                  <input type="radio" name="clase" value="<?php echo htmlspecialchars_uni($cid); ?>"
+                    data-nombre="<?php echo htmlspecialchars_uni($cdat['nombre']); ?>"
+                    data-armas='<?php echo htmlspecialchars_uni(json_encode($cdat['armas'], JSON_UNESCAPED_UNICODE)); ?>'
                     required>
                   <div class="rc-body">
-                    <div class="rc-name"><?php echo htmlspecialchars_uni($idat['nombre']); ?></div>
-                    <div class="rc-pas"><b>Rol:</b> <?php echo htmlspecialchars_uni($idat['rol']); ?> · <b>Recurso:</b> <?php echo htmlspecialchars_uni($idat['recurso']); ?></div>
-                    <div class="rc-resumen"><?php echo htmlspecialchars_uni($idat['resumen']); ?></div>
+                    <div class="rc-name"><?php echo htmlspecialchars_uni($cdat['nombre']); ?></div>
+                    <div class="rc-pas"><b>Prim:</b> <?php echo htmlspecialchars_uni($cdat['prim']); ?> · <b>Sec:</b> <?php echo htmlspecialchars_uni($cdat['sec']); ?></div>
+                    <div class="rc-pas"><b>Pool:</b> <?php echo htmlspecialchars_uni(implode(', ', $cdat['pool'])); ?></div>
+                    <div class="rc-resumen"><?php echo htmlspecialchars_uni($cdat['filosofia']); ?></div>
                   </div>
                 </label>
-<?php endforeach; ?>
-              </div>
-              <div id="idTreePreview" class="eternal-preview-wrap" hidden>
-<?php foreach ($IDENTIDADES as $iid => $idat):
-    $tree = ope_eternal_load($idat['arbol']);
-    if (!$tree) {
-        continue;
-    }
-?>
-                <div class="eternal-preview-pane" data-arbol="<?php echo htmlspecialchars_uni($idat['arbol']); ?>" hidden>
-                  <?php echo ope_eternal_render_tree($tree, 'preview'); ?>
-                </div>
 <?php endforeach; ?>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- PASO 4: FAMILIA DE ARMA + ARMA T1 -->
+        <!-- PASO 4: ARMA + OFICIOS -->
         <div class="wiz-step" data-step="4">
           <div class="plate">
-            <div class="plate-h"><span class="t">4. Familia de Arma</span><span class="c">// árbol Eternal</span></div>
+            <div class="plate-h"><span class="t">4. Arma y Oficios</span><span class="c">// herramientas</span></div>
             <div class="plate-b">
-              <p class="hint mb-12">La familia fija tu <b class="c-paper">árbol de Arma</b>. Después eliges el arma física Tier 1 de esa familia. <button type="button" class="ope-help-btn" data-ope-help="familia-arma" title="Ayuda">?</button></p>
-              <div class="race-grid" id="famGrid">
-<?php foreach ($FAMILIAS as $fid => $f): ?>
-                <label class="race-card">
-                  <input type="radio" name="familia_arma" value="<?php echo htmlspecialchars_uni($fid); ?>"
-                    data-nombre="<?php echo htmlspecialchars_uni($f['nombre']); ?>"
-                    data-arbol="<?php echo htmlspecialchars_uni($f['arbol']); ?>"
-                    data-armas='<?php echo htmlspecialchars_uni(json_encode($f['armas'], JSON_UNESCAPED_UNICODE)); ?>'
-                    required>
-                  <div class="rc-body">
-                    <div class="rc-name"><?php echo htmlspecialchars_uni($f['nombre']); ?></div>
-                    <div class="rc-pas"><b>Efecto inherente:</b> <?php echo htmlspecialchars_uni($f['efecto']); ?></div>
-                    <div class="rc-resumen"><?php echo htmlspecialchars_uni($f['resumen']); ?></div>
-                  </div>
-                </label>
-<?php endforeach; ?>
-              </div>
-              <div id="famTreePreview" class="eternal-preview-wrap" hidden>
-<?php foreach ($FAMILIAS as $fid => $f):
-    $tree = ope_eternal_load($f['arbol']);
-    if (!$tree) {
-        continue;
-    }
-?>
-                <div class="eternal-preview-pane" data-arbol="<?php echo htmlspecialchars_uni($f['arbol']); ?>" hidden>
-                  <?php echo ope_eternal_render_tree($tree, 'preview'); ?>
-                </div>
-<?php endforeach; ?>
-              </div>
+              <p class="hint mb-12">Elige el <b class="c-paper">arma</b> de tu Clase (1–2 opciones) y entre <b class="c-paper">1 y 2 Oficios</b> que definen tu rol fuera del combate. <button type="button" class="ope-help-btn" data-ope-help="arma-oficio" title="Ayuda">?</button></p>
 
-              <div class="field mt-18" id="armaWrap" hidden>
-                <label class="flabel">Arma física (Tier 1)</label>
+              <div class="field" id="armaWrap" hidden>
+                <label class="flabel">Arma de la Clase</label>
                 <div class="arm-grid" id="armGrid">
-<?php foreach ($ARMAS as $aid => $a): ?>
-                  <label class="race-card arma-opt" data-familia="<?php echo htmlspecialchars_uni($a['familia'] ?? ''); ?>" hidden>
+<?php foreach ($ARMAS_VOC as $aid => $a):
+    $clases_arr = (array)($a['clases'] ?? ($a['clase'] ?? array()));
+    $clases_str = implode(',', $clases_arr);
+?>
+                  <label class="race-card arma-opt" data-clases="<?php echo htmlspecialchars_uni($clases_str); ?>" hidden>
                     <input type="radio" name="arma" value="<?php echo htmlspecialchars_uni($aid); ?>"
                       data-nombre="<?php echo htmlspecialchars_uni($a['nombre']); ?>"
-                      data-familia="<?php echo htmlspecialchars_uni($a['familia'] ?? ''); ?>">
+                      data-clases="<?php echo htmlspecialchars_uni($clases_str); ?>">
                     <div class="rc-body">
                       <div class="rc-name"><?php echo htmlspecialchars_uni($a['nombre']); ?></div>
                       <div class="rc-pas">
                         <b>Escala:</b> <?php echo htmlspecialchars_uni(implode(' / ', (array)$a['escala'])); ?><br>
-                        <b>Técnica:</b> <?php echo htmlspecialchars_uni($a['tecnica']); ?><br>
+                        <b>Tags:</b> <?php echo htmlspecialchars_uni(implode(', ', (array)$a['tags'])); ?><br>
                         <?php echo htmlspecialchars_uni($a['efecto']); ?>
                       </div>
+                    </div>
+                  </label>
+<?php endforeach; ?>
+                </div>
+              </div>
+
+              <div class="field mt-18">
+                <label class="flabel">Oficios (elige 1 o 2)</label>
+                <div class="race-grid" id="oficioGrid">
+<?php foreach ($OFICIOS as $oid => $odat): ?>
+                  <label class="race-card">
+                    <input type="checkbox" name="oficios[]" value="<?php echo htmlspecialchars_uni($oid); ?>"
+                      data-nombre="<?php echo htmlspecialchars_uni($odat['nombre']); ?>">
+                    <div class="rc-body">
+                      <div class="rc-name"><?php echo htmlspecialchars_uni($odat['nombre']); ?></div>
+                      <div class="rc-pas"><b>Prim:</b> <?php echo htmlspecialchars_uni($odat['prim']); ?> · <b>Sec:</b> <?php echo htmlspecialchars_uni($odat['sec']); ?></div>
+                      <div class="rc-pas"><b>Pool:</b> <?php echo htmlspecialchars_uni(implode(', ', $odat['pool'])); ?></div>
+                      <div class="rc-resumen"><?php echo htmlspecialchars_uni($odat['desc']); ?></div>
                     </div>
                   </label>
 <?php endforeach; ?>
@@ -653,6 +650,8 @@ header('Content-Type: text/html; charset=utf-8');
             </div>
           </div>
         </div>
+
+
 
         <!-- PASO 5: STATS -->
         <div class="wiz-step" data-step="5">
@@ -850,7 +849,7 @@ header('Content-Type: text/html; charset=utf-8');
   var STAT_BASE = <?php echo (int)$STAT_BASE; ?>;
   var STAT_CAP = <?php echo (int)$STAT_CAP; ?>;
   var BERRIES = <?php echo (int)$BERRIES_BASE; ?>;
-  var STEP_NAMES = ['Qui\u00e9n eres','Linaje','Identidad','Arma','Atributos','Facci\u00f3n','Factor Linaje','Fruta','Equipo','Resumen'];
+  var STEP_NAMES = ['Qui\u00e9n eres','Linaje','Clase','Arma y Oficios','Atributos','Facci\u00f3n','Factor Linaje','Fruta','Equipo','Resumen'];
   var steps = Array.prototype.slice.call(document.querySelectorAll('.wiz-step'));
   var cur = 1;
   var form = document.getElementById('wizForm');
@@ -870,15 +869,6 @@ header('Content-Type: text/html; charset=utf-8');
       dots[i].classList.toggle('on', i+1 === cur);
       dots[i].classList.toggle('done', i+1 < cur);
     }
-  }
-
-  function showTreePreview(wrapId, arbol){
-    var wrap = document.getElementById(wrapId);
-    if (!wrap) return;
-    wrap.hidden = !arbol;
-    wrap.querySelectorAll('.eternal-preview-pane').forEach(function(p){
-      p.hidden = p.getAttribute('data-arbol') !== arbol;
-    });
   }
 
   function showStep(n){
@@ -909,11 +899,15 @@ header('Content-Type: text/html; charset=utf-8');
       }
     }
     if (n === 3){
-      if (!document.querySelector('input[name=identidad]:checked')) return 'Elige una Identidad Eternal.';
+      if (!document.querySelector('input[name=clase]:checked')) return 'Elige una Clase B\u00e9lica.';
     }
     if (n === 4){
-      if (!document.querySelector('input[name=familia_arma]:checked')) return 'Elige una Familia de Arma.';
-      if (!document.querySelector('input[name=arma]:checked')) return 'Elige un arma física de esa familia.';
+      if (!document.querySelector('input[name=arma]:checked')) return 'Elige un arma de tu Clase.';
+      var oficiosSel = document.querySelectorAll('input[name="oficios[]"]');
+      var oficioCount = 0;
+      oficiosSel.forEach(function(c){ if (c.checked) oficioCount++; });
+      if (oficioCount < 1) return 'Elige al menos 1 Oficio.';
+      if (oficioCount > 2) return 'M\u00e1ximo 2 Oficios.';
     }
     if (n === 5){
       var totalPs = 0;
@@ -971,23 +965,15 @@ header('Content-Type: text/html; charset=utf-8');
     showStep(cur);
   });
 
-  // ---- Identidad Eternal (preview árbol) ----
-  document.querySelectorAll('input[name=identidad]').forEach(function(r){
+  // ---- Clase Bélica → filtrar armas ----
+  document.querySelectorAll('input[name=clase]').forEach(function(r){
     r.addEventListener('change', function(){
-      showTreePreview('idTreePreview', r.dataset.arbol || '');
-      updatePreview();
-    });
-  });
-
-  // ---- Familia de arma + filtrar armas T1 ----
-  document.querySelectorAll('input[name=familia_arma]').forEach(function(r){
-    r.addEventListener('change', function(){
-      var fam = r.value;
-      showTreePreview('famTreePreview', r.dataset.arbol || '');
+      var claseKey = r.value;
       var wrap = document.getElementById('armaWrap');
       wrap.hidden = false;
       document.querySelectorAll('.arma-opt').forEach(function(lab){
-        var match = lab.getAttribute('data-familia') === fam;
+        var rawClases = lab.getAttribute('data-clases') || lab.getAttribute('data-clase') || '';
+        var match = rawClases.split(',').indexOf(claseKey) !== -1;
         lab.hidden = !match;
         var inp = lab.querySelector('input[name=arma]');
         if (inp && !match) inp.checked = false;
@@ -996,8 +982,17 @@ header('Content-Type: text/html; charset=utf-8');
       updatePreview();
     });
   });
+
+  // ---- Arma + Oficios (max 2) ----
   document.querySelectorAll('input[name=arma]').forEach(function(r){
     r.addEventListener('change', updatePreview);
+  });
+  document.querySelectorAll('input[name="oficios[]"]').forEach(function(c){
+    c.addEventListener('change', function(){
+      var checked = document.querySelectorAll('input[name="oficios[]"]:checked').length;
+      if (checked > 2) { c.checked = false; }
+      updatePreview();
+    });
   });
 
   // ---- Stats en vivo con perfil racial fijo (sin elección) ----
@@ -1130,24 +1125,28 @@ header('Content-Type: text/html; charset=utf-8');
     document.getElementById('wizNamePrev').textContent = nombre || 'Sin nombre';
     document.getElementById('wizInitial').textContent = nombre ? nombre.charAt(0).toUpperCase() : '?';
 
-    var idSel = document.querySelector('input[name=identidad]:checked');
-    card.setAttribute('data-element', idSel ? idSel.value : '');
+    var claseSel = document.querySelector('input[name=clase]:checked');
+    card.setAttribute('data-element', claseSel ? claseSel.value : '');
 
     var raza = selectedNombre('raza');
-    var idN = selectedNombre('identidad');
-    var fam = selectedNombre('familia_arma');
+    var claseN = selectedNombre('clase');
     var arma = selectedNombre('arma');
     var fac = selectedNombre('faccion');
 
-    document.getElementById('wizLineRaza').textContent = raza || dash;
-    document.getElementById('wizLineId').textContent = idN || dash;
+    // Oficios (checkboxes)
+    var oficioNames = [];
+    document.querySelectorAll('input[name="oficios[]"]:checked').forEach(function(c){
+      oficioNames.push(c.dataset.nombre || c.value);
+    });
+
+    document.getElementById('wizLineClase').textContent = claseN || dash;
     document.getElementById('wizLineArma').textContent = arma || dash;
-    document.getElementById('wizLineFam').textContent = fam || dash;
+    document.getElementById('wizLineOficios').textContent = oficioNames.length ? oficioNames.join(', ') : dash;
     document.getElementById('wizLineFac').textContent = fac || dash;
 
     var chips = document.getElementById('wizChips');
     var parts = [];
-    if (idN) parts.push(idN);
+    if (claseN) parts.push(claseN);
     if (raza) parts.push(raza);
     if (fac) parts.push(fac);
     if (!parts.length) parts.push('Borrador');
