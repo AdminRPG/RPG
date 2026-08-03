@@ -112,15 +112,16 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         $raza = $mybb->get_input('raza');
         $clase = $mybb->get_input('clase');
         $arma = $mybb->get_input('arma');
-        $oficios_raw = $mybb->get_input('oficios', MyBB::INPUT_ARRAY);
+        $oficio = $mybb->get_input('oficio');
         $oficios_clean = array();
-        if (is_array($oficios_raw)) {
-            foreach ($oficios_raw as $ov) {
-                $ov = (string) $ov;
-                if (isset($OFICIOS[$ov]) && !in_array($ov, $oficios_clean, true)) {
-                    $oficios_clean[] = $ov;
-                }
-            }
+        if (isset($OFICIOS[$oficio])) {
+            $oficios_clean[] = $oficio;
+        }
+
+        $elecciones_clean = array();
+        if ($clase === 'domador') {
+            $dom_enfoque = $mybb->get_input('domador_enfoque');
+            $elecciones_clean['1'] = ($dom_enfoque === 'Dominio Esclavista') ? 'Dominio Esclavista' : 'Vínculo Bestial';
         }
 
         if (!isset($RAZAS[$raza])) {
@@ -135,11 +136,8 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         } elseif (!empty($armas_permitidas) && !isset($armas_permitidas[$arma])) {
             $errores[] = 'El arma debe pertenecer a la Clase Bélica elegida.';
         }
-        if (count($oficios_clean) < 1) {
-            $errores[] = 'Elige al menos 1 Oficio.';
-        }
-        if (count($oficios_clean) > 2) {
-            $errores[] = 'Puedes elegir un máximo de 2 Oficios.';
+        if (count($oficios_clean) !== 1) {
+            $errores[] = 'Elige exactamente 1 Oficio para tu personaje.';
         }
 
         $nombre = ope_rol_clean($mybb->get_input('nombre'), 120);
@@ -335,7 +333,7 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
                         'clase' => $db->escape_string($clase),
                         'oficios' => $db->escape_string(json_encode($oficios_clean, JSON_UNESCAPED_UNICODE)),
                         'arma' => $db->escape_string($arma),
-                        'elecciones' => '{}',
+                        'elecciones' => $db->escape_string(json_encode($elecciones_clean, JSON_UNESCAPED_UNICODE)),
                         'arquetipo_clase' => '',
                         'dateline' => TIME_NOW,
                     ));
@@ -595,6 +593,26 @@ header('Content-Type: text/html; charset=utf-8');
                 </label>
 <?php endforeach; ?>
               </div>
+
+              <div id="domadorSubchoice" class="mt-14 p-12 plate" style="border-color:var(--ope-gold,#f59e0b);background:color-mix(in srgb,var(--ope-gold,#f59e0b) 6%,var(--ope-card,#1a1a24));" hidden>
+                <label class="flabel mb-8" style="color:var(--ope-gold,#f59e0b);">Vínculo Inicial de Domador (Nivel 1) *</label>
+                <div class="race-grid">
+                  <label class="race-card subchoice-card">
+                    <input type="radio" name="domador_enfoque" value="Vínculo Bestial" checked>
+                    <div class="rc-body">
+                      <div class="rc-name">Vínculo Bestial</div>
+                      <div class="rc-resumen">Bestia o criatura animal externa con PV/EN/PA propios criada en lealtad natural.</div>
+                    </div>
+                  </label>
+                  <label class="race-card subchoice-card">
+                    <input type="radio" name="domador_enfoque" value="Dominio Esclavista">
+                    <div class="rc-body">
+                      <div class="rc-name">Dominio Esclavista</div>
+                      <div class="rc-resumen">NPC menor subordinado (miembro de una raza del foro) sometido como sirviente.</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -604,7 +622,7 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="plate">
             <div class="plate-h"><span class="t">4. Arma y Oficios</span><span class="c">// herramientas</span></div>
             <div class="plate-b">
-              <p class="hint mb-12">Elige el <b class="c-paper">arma</b> de tu Clase (1–2 opciones) y entre <b class="c-paper">1 y 2 Oficios</b> que definen tu rol fuera del combate. <button type="button" class="ope-help-btn" data-ope-help="arma-oficio" title="Ayuda">?</button></p>
+              <p class="hint mb-12">Elige el <b class="c-paper">arma</b> de tu Clase y el <b class="c-paper">Oficio</b> que define tu rol fuera del combate. <button type="button" class="ope-help-btn" data-ope-help="arma-oficio" title="Ayuda">?</button></p>
 
               <div class="field" id="armaWrap" hidden>
                 <label class="flabel">Arma de la Clase</label>
@@ -631,12 +649,12 @@ header('Content-Type: text/html; charset=utf-8');
               </div>
 
               <div class="field mt-18">
-                <label class="flabel">Oficios (elige 1 o 2)</label>
+                <label class="flabel">Oficio de la Tripulación (elige 1) *</label>
                 <div class="race-grid" id="oficioGrid">
 <?php foreach ($OFICIOS as $oid => $odat): ?>
                   <label class="race-card">
-                    <input type="checkbox" name="oficios[]" value="<?php echo htmlspecialchars_uni($oid); ?>"
-                      data-nombre="<?php echo htmlspecialchars_uni($odat['nombre']); ?>">
+                    <input type="radio" name="oficio" value="<?php echo htmlspecialchars_uni($oid); ?>"
+                      data-nombre="<?php echo htmlspecialchars_uni($odat['nombre']); ?>" required>
                     <div class="rc-body">
                       <div class="rc-name"><?php echo htmlspecialchars_uni($odat['nombre']); ?></div>
                       <div class="rc-pas"><b>Prim:</b> <?php echo htmlspecialchars_uni($odat['prim']); ?> · <b>Sec:</b> <?php echo htmlspecialchars_uni($odat['sec']); ?></div>
@@ -903,11 +921,7 @@ header('Content-Type: text/html; charset=utf-8');
     }
     if (n === 4){
       if (!document.querySelector('input[name=arma]:checked')) return 'Elige un arma de tu Clase.';
-      var oficiosSel = document.querySelectorAll('input[name="oficios[]"]');
-      var oficioCount = 0;
-      oficiosSel.forEach(function(c){ if (c.checked) oficioCount++; });
-      if (oficioCount < 1) return 'Elige al menos 1 Oficio.';
-      if (oficioCount > 2) return 'M\u00e1ximo 2 Oficios.';
+      if (!document.querySelector('input[name=oficio]:checked')) return 'Elige 1 Oficio.';
     }
     if (n === 5){
       var totalPs = 0;
@@ -965,10 +979,13 @@ header('Content-Type: text/html; charset=utf-8');
     showStep(cur);
   });
 
-  // ---- Clase Bélica → filtrar armas ----
+  // ---- Clase Bélica → filtrar armas y mostrar subopción Domador ----
   document.querySelectorAll('input[name=clase]').forEach(function(r){
     r.addEventListener('change', function(){
       var claseKey = r.value;
+      var domWrap = document.getElementById('domadorSubchoice');
+      if (domWrap) domWrap.hidden = (claseKey !== 'domador');
+
       var wrap = document.getElementById('armaWrap');
       wrap.hidden = false;
       document.querySelectorAll('.arma-opt').forEach(function(lab){
@@ -983,16 +1000,9 @@ header('Content-Type: text/html; charset=utf-8');
     });
   });
 
-  // ---- Arma + Oficios (max 2) ----
-  document.querySelectorAll('input[name=arma]').forEach(function(r){
+  // ---- Arma + Oficio (1 único) ----
+  document.querySelectorAll('input[name=arma], input[name=oficio], input[name=domador_enfoque]').forEach(function(r){
     r.addEventListener('change', updatePreview);
-  });
-  document.querySelectorAll('input[name="oficios[]"]').forEach(function(c){
-    c.addEventListener('change', function(){
-      var checked = document.querySelectorAll('input[name="oficios[]"]:checked').length;
-      if (checked > 2) { c.checked = false; }
-      updatePreview();
-    });
   });
 
   // ---- Stats en vivo con perfil racial fijo (sin elección) ----
@@ -1118,7 +1128,18 @@ header('Content-Type: text/html; charset=utf-8');
     return String(getStatEff(parseInt(inp.value, 10) || 0, sig, getRazaMods()));
   }
 
+  function updateCardSelections() {
+    document.querySelectorAll('.race-card, .fac-card, .pack-card, .subchoice-card, .fl-pureza-opt').forEach(function(card) {
+      var inp = card.querySelector('input');
+      if (inp) {
+        card.classList.toggle('selected', !!inp.checked);
+      }
+    });
+  }
+
   function updatePreview(){
+    updateCardSelections();
+
     var card = document.getElementById('wizCard');
     var nombre = (form.querySelector('[name=nombre]') || {}).value || '';
     nombre = nombre.trim();
@@ -1131,17 +1152,12 @@ header('Content-Type: text/html; charset=utf-8');
     var raza = selectedNombre('raza');
     var claseN = selectedNombre('clase');
     var arma = selectedNombre('arma');
+    var oficioN = selectedNombre('oficio');
     var fac = selectedNombre('faccion');
-
-    // Oficios (checkboxes)
-    var oficioNames = [];
-    document.querySelectorAll('input[name="oficios[]"]:checked').forEach(function(c){
-      oficioNames.push(c.dataset.nombre || c.value);
-    });
 
     document.getElementById('wizLineClase').textContent = claseN || dash;
     document.getElementById('wizLineArma').textContent = arma || dash;
-    document.getElementById('wizLineOficios').textContent = oficioNames.length ? oficioNames.join(', ') : dash;
+    document.getElementById('wizLineOficios').textContent = oficioN || dash;
     document.getElementById('wizLineFac').textContent = fac || dash;
 
     var chips = document.getElementById('wizChips');
@@ -1149,7 +1165,6 @@ header('Content-Type: text/html; charset=utf-8');
     if (claseN) parts.push(claseN);
     if (raza) parts.push(raza);
     if (fac) parts.push(fac);
-    if (!parts.length) parts.push('Borrador');
     chips.innerHTML = parts.map(function(t){ return '<span class="wiz-chip">' + t + '</span>'; }).join('');
 
     document.getElementById('wizStatFue').textContent = effOrDash('FUE');
