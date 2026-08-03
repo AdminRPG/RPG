@@ -196,3 +196,46 @@ function ope_rol_find_defecto($id)
     return isset($all[$id]) ? $all[$id] : null;
 }
 
+function ope_rol_mechanics_help()
+{
+    return array(
+        'raza' => array(
+            'title' => 'Linajes y Razas',
+            'body' => '<p>Tu linaje determina tu origen biológico en el mundo de One Piece. Puedes elegir un linaje puro o una hibridación (mezcla de dos linajes).</p>',
+        ),
+        'pureza' => array(
+            'title' => 'Pureza de Linaje',
+            'body' => '<p><b>Puro:</b> Recibes el rasgo racial completo de tu linaje.<br><b>Híbrido:</b> Combinas dos linajes ajustando sus modificadores raciales.</p>',
+        ),
+        'clase' => array(
+            'title' => 'Clases Bélicas',
+            'body' => '<p>Define tu estilo de combate en batalla, tu pool afín de técnicas y las armas que puedes empuñar. Cada clase otorga hitos y especializaciones por nivel.</p>',
+        ),
+        'arma-oficio' => array(
+            'title' => 'Arma y Oficios',
+            'body' => '<p>Elige 1 arma de tu Clase Bélica y entre 1 y 2 Oficios que definen tu utilidad y rol dentro de la tripulación o en el mundo.</p>',
+        ),
+        'stats' => array(
+            'title' => 'Atributos (Stats)',
+            'body' => '<p>Reparte 20 Puntos de Stat entre FUE, RES, AGI, INT, PER, TEM, VOL y CAR. Los modificadores raciales se aplican encima de esta asignación.</p>',
+        ),
+        'faccion' => array(
+            'title' => 'Facciones',
+            'body' => '<p>Tu bando en los mares: Piratas, Marina, Gobierno Mundial, Ejército Revolucionario o Civiles / Independientes.</p>',
+        ),
+        'factor-linaje' => array(
+            'title' => 'Factor Linaje y Dotes',
+            'body' => '<p>Selecciona virtudes, defectos y dotes especiales que personalizan tus habilidades únicas.</p>',
+        ),
+        'fruta' => array(
+            'title' => 'Akuma no Mi',
+            'body' => '<p>Opcionalmente puedes empezar sin fruta o tirar para obtener una Akuma no Mi inicial si lo deseas.</p>',
+        ),
+        'equipo' => array(
+            'title' => 'Pack de Equipo Inicial',
+            'body' => '<p>Conjunto de pertrechos iniciales para tu viaje por los mares.</p>',
+        ),
+    );
+}
+
+
