@@ -44,37 +44,7 @@ header('Content-Type: text/html; charset=utf-8');
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Catálogo de Personajes (NPCs)</title>
 <?php echo ope_rol_head_base(); ?>
-<!-- estilos en docs/themes/ope.css (scope: ope-pg-guias + .ope-pg-npcs) -->
-<style>
-.npc-page-hero { margin-bottom: 24px; }
-.npc-cat-toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 10px; border: 1px solid var(--rivet); }
-.npc-cat-btn { padding: 8px 16px; border-radius: 20px; background: var(--iron-hi); border: 1px solid var(--rivet); color: var(--paper-dim); font-family: var(--disp); font-size: 0.82rem; cursor: pointer; transition: all .2s; }
-.npc-cat-btn:hover, .npc-cat-btn.active { background: var(--ember-dim); border-color: var(--ember); color: var(--paper-hi); box-shadow: 0 0 10px rgba(226,114,39,0.2); }
-
-.npc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
-.npc-card { background: var(--iron); border: 1px solid var(--rivet); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, border-color .2s, box-shadow .2s; }
-.npc-card:hover { transform: translateY(-4px); border-color: var(--ember-hi); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-
-.npc-card-head { display: flex; gap: 14px; padding: 18px; background: rgba(0,0,0,0.25); border-bottom: 1px solid var(--rivet); align-items: center; }
-.npc-avatar-box { width: 70px; height: 70px; border-radius: 50%; overflow: hidden; background: var(--iron-hi); border: 2px solid var(--fac, var(--ember)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 12px rgba(0,0,0,0.5); }
-.npc-avatar-box img { width: 100%; height: 100%; object-fit: cover; }
-.npc-avatar-ph { font-family: var(--disp); font-size: 1.8rem; font-weight: bold; color: var(--paper-hi); }
-
-.npc-meta { flex-grow: 1; }
-.npc-name { font-family: var(--disp); font-size: 1.2rem; color: var(--paper-hi); font-weight: bold; line-height: 1.25; }
-.npc-rank { font-size: 0.78rem; color: var(--paper-dim); font-family: var(--mono); margin-top: 3px; }
-.npc-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-.npc-badge { font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.06); border: 1px solid var(--rivet); color: var(--paper); }
-
-.npc-card-body { padding: 18px; font-size: 0.85rem; color: var(--paper-dim); line-height: 1.5; flex-grow: 1; display: flex; flex-direction: column; gap: 14px; }
-.npc-desc-sec { border-left: 3px solid var(--fac, var(--ember)); padding-left: 12px; }
-.npc-desc-sec-h { font-family: var(--disp); font-size: 0.78rem; font-weight: bold; color: var(--paper-hi); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-.npc-desc-sec-p { color: var(--paper-dim); font-size: 0.83rem; margin: 0; }
-
-.npc-card-foot { padding: 14px 18px; background: rgba(0,0,0,0.18); border-top: 1px solid var(--rivet); display: flex; justify-content: space-between; align-items: center; }
-.npc-btn-link { padding: 6px 14px; border-radius: 6px; background: var(--ember-hi); color: var(--iron-dark); font-family: var(--disp); font-size: 0.78rem; font-weight: bold; text-decoration: none; transition: filter .2s, transform .1s; }
-.npc-btn-link:hover { filter: brightness(1.25); transform: scale(1.03); }
-</style>
+<!-- estilos en docs/themes/ope.css (scope: body.ope-pg-npcs) -->
 </head>
 <body class="ope-pg-guias ope-pg-npcs">
 <?php echo ope_rol_navbar_html(); ?>
@@ -145,7 +115,7 @@ header('Content-Type: text/html; charset=utf-8');
             <span class="npc-badge">Lvl <?php echo $level; ?></span>
             <span class="npc-badge"><?php echo htmlspecialchars_uni($raza_n); ?></span>
 <?php if ($fruta_n): ?>
-            <span class="npc-badge" style="border-color:var(--ember);color:var(--ember-hi);"><?php echo htmlspecialchars_uni($fruta_n); ?></span>
+            <span class="npc-badge"><?php echo htmlspecialchars_uni($fruta_n); ?></span>
 <?php endif; ?>
           </div>
         </div>

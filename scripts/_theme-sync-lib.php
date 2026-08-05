@@ -35,7 +35,7 @@ function ope_db_connect(): mysqli
 
 function ope_resolve_theme(mysqli $db): array
 {
-    $result = $db->query("SELECT tid, name, properties FROM mybb_themes WHERE name IN ('One Piece: Eternal','RPG','I-Forge RPG') ORDER BY tid DESC LIMIT 1");
+    $result = $db->query("SELECT tid, name, properties FROM mybb_themes WHERE name IN ('One Piece: Eternal','RPG') ORDER BY tid DESC LIMIT 1");
     $theme = $result ? $result->fetch_assoc() : null;
     if (!$theme) {
         fwrite(STDERR, "Theme 'One Piece: Eternal' (o legado RPG) not found. Create it first via Admin CP or scripts/import-theme.php install.\n");

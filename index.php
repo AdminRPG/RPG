@@ -498,13 +498,15 @@ if ($mybb->user['uid']) {
     '.$ope_register_link;
 }
 
-// One Piece: Eternal: Random banner
-$banner_url = $mybb->settings['bburl'] . '/images/banners/default-banner.svg';
-$bannerDir = MYBB_ROOT . 'images/banners/';
-$banners = glob($bannerDir . '*.{svg,jpg,jpeg,png,gif,webp}', GLOB_BRACE);
-if (!empty($banners)) {
-    $randomBanner = $banners[array_rand($banners)];
-    $banner_url = $mybb->settings['bburl'] . '/images/banners/' . basename($randomBanner);
+// One Piece: Eternal: Random hero banner from images/ope/portada/
+$ope_hero_banner = $mybb->settings['bburl'] . '/images/ope/hero-mundo.svg';
+$bannerDir = MYBB_ROOT . 'images/ope/portada/';
+if (is_dir($bannerDir)) {
+    $banners = glob($bannerDir . '*.{svg,jpg,jpeg,png,gif,webp}', GLOB_BRACE);
+    if (!empty($banners)) {
+        $randomBanner = $banners[array_rand($banners)];
+        $ope_hero_banner = $mybb->settings['bburl'] . '/images/ope/portada/' . basename($randomBanner);
+    }
 }
 
 // One Piece: Eternal: Calendario (placeholder until real calendar is built)
@@ -577,11 +579,7 @@ if (!isset($ope_home['hermanos'])) { $ope_home['hermanos'] = []; }
 $ope_hermanos = is_array($ope_home['hermanos']) ? $ope_home['hermanos'] : [];
 $ope_afiliados = is_array($ope_home['afiliados']) ? $ope_home['afiliados'] : [];
 
-// Banner del hero — images/ope/hero-mundo.jpg
-$ope_hero_banner = $mybb->settings['bburl'] . '/images/ope/hero-mundo.jpg';
-if (!is_file(MYBB_ROOT . 'images/ope/hero-mundo.jpg')) {
-    $ope_hero_banner = '';
-}
+// Banner del hero — se genera arriba con lógica aleatoria desde images/ope/portada/
 
 // Construye los botones de afiliados/hermanos (HTML) para el template.
 $ope_hermanos_html = '';

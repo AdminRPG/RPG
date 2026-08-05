@@ -11,13 +11,11 @@ inc/ope_rol/
 │
 ├── core/                  Motor compartido
 │   ├── data.php           Stats, razas/linajes, bootstrap de catálogos
-│   ├── system.php         Combate / PP / Eternal (motor)
-│   └── eternal.php        Árboles: load, render, picks
+│   └── system.php         Combate / PP / motor
 │
 ├── catalogos/             Datos puros (arrays, sin SQL/HTML)
 │   ├── linaje.php         Factor Linaje (rasgos, defectos, dotes)
 │   ├── pj.php             Armas, facciones, packs, berries
-│   ├── eternal.php        Identidades + familias de arma
 │   └── gestion.php        Tienda, tripulaciones, bibliotecas (staff)
 │
 ├── dominio/               Reglas / use-cases (puros, testeables)
@@ -35,7 +33,20 @@ inc/ope_rol/
 │   ├── mundo.php
 │   ├── oraculo.php
 │   ├── oraculo_post.php
-│   └── viajes.php
+│   ├── oraculo_v2.php
+│   ├── viajes.php
+│   ├── viaje_ai.php
+│   ├── viaje_cola.php
+│   ├── viaje_revision.php
+│   ├── viaje_revision_ai.php
+│   ├── misiones.php
+│   ├── mision_oraculo.php
+│   ├── mision_ai.php
+│   ├── mision_post.php
+│   ├── islas_cat.php
+│   ├── matriz_rutas.php
+│   ├── barcos.php
+│   └── nav_items.php
 │
 └── tramites/
     └── tramites.php
@@ -62,6 +73,6 @@ require_once MYBB_ROOT . 'inc/ope_rol/sistemas/haki.php'; // ruta nueva directa
 |---|---|---|---|
 | `catalogos/*` | Datos | No | No |
 | `dominio/*` | Validación / cálculo | No | No |
-| `core/*` | Motor + helpers | a veces | render Eternal sí |
+| `core/*` | Motor + helpers | a veces | No |
 | `sistemas/*` `mundo/*` `tramites/*` | Lógica de dominio + BD | Sí | No |
 | Páginas `*.php` | Controller / vista | Sí | Sí |

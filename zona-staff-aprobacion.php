@@ -113,6 +113,8 @@ $CLASES = ope_rol_clases();
 $OFICIOS = ope_rol_oficios();
 $ARMAS_VOC = ope_rol_armas_vocacionales();
 $FACCIONES = ope_rol_facciones();
+$IDENTIDADES = array();
+$FAMILIAS = array();
 
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
@@ -182,6 +184,9 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if ($detail):
     $pid = (int) $detail['pid'];
     $clase_key = (string) ($detail_datos['clase'] ?? '');
+    $clase_eleccion_key = (string) ($detail_datos['clase_eleccion'] ?? '');
+    $clase_variante = ($clase_eleccion_key !== '' && isset($CLASES[$clase_key]['eleccion'][$clase_eleccion_key]))
+        ? $CLASES[$clase_key]['eleccion'][$clase_eleccion_key]['nombre'] : '';
     $oficios_keys = isset($detail_datos['oficios']) && is_array($detail_datos['oficios']) ? $detail_datos['oficios'] : array();
     $arma_key = (string) ($detail_datos['arma'] ?? '');
     $raza_key = (string) ($detail_datos['raza'] ?? '');
@@ -209,7 +214,7 @@ header('Content-Type: text/html; charset=utf-8');
         <p class="zs-meta">
           Jugador: <b><?php echo htmlspecialchars_uni($owner_name !== '' ? $owner_name : 'uid ' . (int)$detail['uid']); ?></b>
           · Raza: <b><?php echo htmlspecialchars_uni(isset($RAZAS[$raza_key]) ? $RAZAS[$raza_key]['nombre'] : $raza_key); ?></b>
-          · Clase: <b><?php echo htmlspecialchars_uni(isset($CLASES[$clase_key]) ? $CLASES[$clase_key]['nombre'] : $clase_key); ?></b>
+          · Clase: <b><?php echo htmlspecialchars_uni(isset($CLASES[$clase_key]) ? $CLASES[$clase_key]['nombre'] : $clase_key); ?></b><?php if ($clase_variante !== ''): ?> <span class="c-dim">(<?php echo htmlspecialchars_uni($clase_variante); ?>)</span><?php endif; ?>
           · Oficios: <b><?php echo htmlspecialchars_uni($oficios_str); ?></b>
           · Arma: <b><?php echo htmlspecialchars_uni(isset($ARMAS_VOC[$arma_key]) ? $ARMAS_VOC[$arma_key]['nombre'] : $arma_key); ?></b>
           · Facción: <b><?php echo htmlspecialchars_uni(isset($FACCIONES[$fac_key]) ? $FACCIONES[$fac_key]['nombre'] : $fac_key); ?></b>

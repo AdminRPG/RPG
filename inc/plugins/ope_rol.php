@@ -65,6 +65,12 @@ $plugins->add_hook('parse_message', 'ope_rol_parse_rpg');
 // Oráculo de Viaje: [viaje=ID] y [viaje-cierre=ID] → HTML visual OPE Eternal.
 $plugins->add_hook('parse_message', 'ope_rol_parse_viaje');
 
+// Mision: [mision=TOMA_ID] → HTML visual del oraculo de mision.
+$plugins->add_hook('parse_message', 'ope_rol_parse_mision');
+
+// Panel de mision activo en showthread (como viaje, oculta primer post de Narrador).
+$plugins->add_hook('showthread_end', 'ope_rol_mision_showthread_end');
+
 // Panel de viaje activo en showthread (cierre manual).
 $plugins->add_hook('showthread_end', 'ope_rol_viaje_showthread_end');
 
@@ -390,7 +396,7 @@ function ope_rol_navbar_html()
     // Tripulación, Mundo Vivo y Bibliotecas fuera del menú; páginas conservadas.
     $links   = '<a href="' . $bburl . '/personajes.php" class="ope-nav-link' . $isOn(array('personajes.php', 'ficha.php', 'crear-personaje.php')) . '">Personaje</a>';
     $links  .= '<a href="' . $bburl . '/barco.php" class="ope-nav-link' . $isOn(array('barco.php', 'barcos.php')) . '">Barco</a>';
-    $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php')) . '">Trámites</a>';
+$links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php')) . '">Trámites</a>';
 
     // Zona Catálogo (dropdown): Akuma no Mi, Lore & Cronología, Catálogo de NPCs.
     $catScripts = array('biblioteca-akuma.php', 'biblioteca-lore.php', 'catalogo-npcs.php');
@@ -474,6 +480,21 @@ function ope_rol_navbar_html()
     $html .= '<div class="ope-nav-right">' . $right . '</div>';
     $html .= '</div></nav>';
 
+    // Toasts flash one-time (p.ej. "¡Te avisaremos cuando zarpe!" tras encolar el viaje).
+    if ($loggedin) {
+        $toasts = function_exists('ope_flash_pull') ? ope_flash_pull($uid) : array();
+        if (!empty($toasts)) {
+            $html .= '<div class="ope-toasts" role="status" aria-live="polite">';
+            foreach ($toasts as $tf) {
+                $html .= '<div class="ope-toast ope-toast-' . htmlspecialchars_uni((string) ($tf['tipo'] ?? 'ok')) . '">'
+                       . '<span class="ope-toast-msg">' . htmlspecialchars_uni((string) ($tf['mensaje'] ?? '')) . '</span>'
+                       . '<button type="button" class="ope-toast-close" aria-label="Cerrar">&times;</button>'
+                       . '</div>';
+            }
+            $html .= '</div><script>(function(){var t=document.querySelectorAll(".ope-toasts .ope-toast");t.forEach(function(el){var kill=function(){el.classList.add("out");setTimeout(function(){el.remove();},400);};el.querySelector(".ope-toast-close").addEventListener("click",kill);setTimeout(kill,8000);});})();</script>';
+        }
+    }
+
     // JS del tema (aplicar al click en los puntos, cerrar popovers, spoilers)
     // va SIEMPRE pegado a la navbar: páginas propias en PHP puro (ficha.php,
     // personajes.php, etc.) llaman a esta función directamente y nunca pasan
@@ -551,7 +572,7 @@ function ope_rol_head_base()
 
 /**
  * Devuelve la URL pública de una imagen decorativa si el archivo existe.
- * $rel es la ruta relativa SIN extensión desde images/ (p.ej. 'gbe/deco/tramites').
+ * $rel es la ruta relativa SIN extensión desde images/ (p.ej. 'ope/deco/tramites').
  * Prueba webp/avif/jpg/jpeg/png y devuelve '' si no hay ninguna.
  */
 function ope_rol_deco_url($rel)
@@ -576,7 +597,7 @@ function ope_rol_deco_url($rel)
  * Renderiza un banner decorativo ancho (masthead) con fallback a placeholder.
  * Sin dependencias de iconos externos: usa un SVG inline.
  *
- * @param string $rel    ruta relativa sin extensión desde images/ (p.ej. 'gbe/deco/tramites')
+ * @param string $rel    ruta relativa sin extensión desde images/ (p.ej. 'ope/deco/tramites')
  * @param string $alt    texto alternativo de la imagen
  * @param string $kicker etiqueta mono opcional mostrada en el placeholder
  */
@@ -605,7 +626,7 @@ function ope_rol_deco_banner($rel, $alt = '', $kicker = '')
  * Renderiza una imagen decorativa vertical 4:5 para usar como columna lateral
  * (patrón "imagen a la izquierda, información a la derecha"). Fallback a placeholder.
  *
- * @param string $rel    ruta relativa sin extensión desde images/ (p.ej. 'gbe/deco/guias')
+ * @param string $rel    ruta relativa sin extensión desde images/ (p.ej. 'ope/deco/guias')
  * @param string $alt    texto alternativo de la imagen
  * @param string $kicker etiqueta mono opcional mostrada en el placeholder
  */
@@ -1553,7 +1574,7 @@ function ope_rol_rpgsys_embed_body($html)
 }
 
 /**
- * Genera el HTML HUD de la espalda 3D Card Flip (RPG SYSTEM).
+  * Genera el HTML HUD de la espalda 3D Card Flip (ETERNAL SYSTEM).
  * Identidad/atributos = misma verdad que ficha.php; vitals/mods/acciones = del post.
  */
 function ope_rol_build_post_back_html(array $char, array $post)
@@ -1701,7 +1722,7 @@ function ope_rol_build_post_back_html(array $char, array $post)
                     : '<span class="ope-hud-avatar-ph">' . htmlspecialchars_uni($av_initial) . '</span>')
           .       '</div>'
           .       '<div class="ope-hud-idtext">'
-          .         '<span class="ope-hud-kicker">RPG SYSTEM · Post #' . $pid_post . ($approx ? ' · approx' : '') . '</span>'
+           .         '<span class="ope-hud-kicker">ETERNAL SYSTEM · Post #' . $pid_post . ($approx ? ' · approx' : '') . '</span>'
           .         '<h3 class="ope-hud-name">' . $nombre . '</h3>'
           .         '<div class="ope-hud-meta">'
           .           '<span class="ope-hud-pill ope-hud-pill--lvl">' . htmlspecialchars_uni($nivel_label) . '</span>'
@@ -1978,16 +1999,16 @@ function ope_rol_postbit_side(array $char, array $post)
 
     $rows = '';
     if ($fac_slug !== '') {
-        $rows .= '<div class="ope-pa-srow"><span class="ope-pa-srow-l">Facción</span><span class="ope-pa-srow-v fac-' . $fac_slug . '">' . htmlspecialchars_uni($fac_lbl) . '</span></div>'
-               . '<div class="ope-pa-srow"><span class="ope-pa-srow-l">Rango facción</span><span class="ope-pa-srow-v">' . ($rango_fac !== '' ? htmlspecialchars_uni($rango_fac) : '&mdash;') . '</span></div>';
+        $rows .= '<div class="ope-pa-srow"><span class="ope-pa-srow-l">Faccion</span><span class="ope-pa-srow-v fac-' . $fac_slug . '">' . htmlspecialchars_uni($fac_lbl) . '</span></div>'
+               . '<div class="ope-pa-srow"><span class="ope-pa-srow-l">Rango faccion</span><span class="ope-pa-srow-v">' . ($rango_fac !== '' ? htmlspecialchars_uni($rango_fac) : '&mdash;') . '</span></div>';
     }
     if ($tripulacion) {
         $trip_url = $bburl . '/ficha.php?pid=' . (int) $tripulacion['pid'];
-        $rows .= '<div class="ope-pa-srow"><span class="ope-pa-srow-l">Tripulación</span><span class="ope-pa-srow-v"><a href="' . $trip_url . '" class="ope-char-link">' . htmlspecialchars_uni($tripulacion['nombre']) . '</a></span></div>';
+        $rows .= '<div class="ope-pa-srow"><span class="ope-pa-srow-l">Tripulacion</span><span class="ope-pa-srow-v"><a href="' . $trip_url . '" class="ope-char-link">' . htmlspecialchars_uni($tripulacion['nombre']) . '</a></span></div>';
     }
-    $org_html = $rows !== '' ? '<div class="ope-pa-stats ope-pa-org">' . $rows . '</div>' : '';
+    if ($rows === '') return '';
 
-    return $org_html;
+    return '<div class="ope-pa-stats ope-pa-org"><div class="ope-hud-kicker">AFILIACION</div>' . $rows . '</div>';
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -2710,9 +2731,12 @@ function ope_rol_cu_on_post(&$dh)
 }
 
 /**
- * Renderiza shortcodes del Oráculo de Viaje al mostrar posts.
- *   [viaje=123]         → bloque completo del oráculo (primer post)
- *   [viaje-cierre=123]  → post de llegada solicitada por el jugador
+ * Renderiza shortcodes del Oraculo de Viaje al mostrar posts.
+ *   [viaje=123]                    → bloque completo del oraculo (primer post)
+ *   [viaje-cierre=123]             → post de llegada solicitada por el jugador (aprobado)
+ *   [viaje-solicitud-cierre=123]   → aviso de que el cierre esta pendiente de revision
+ *   [viaje-rechazo=123]            → cierre rechazado (1er intento, vuelve a activo)
+ *   [viaje-rechazo-cancelado=123]  → cierre rechazado (2do intento, viaje cancelado)
  */
 function ope_rol_parse_viaje($message)
 {
@@ -2760,6 +2784,76 @@ function ope_rol_parse_viaje($message)
         return ope_oraculo_cierre_post_html($v, $cap);
     }, $message);
 
+    // Solicitud de cierre pendiente
+    $message = preg_replace_callback('#\[viaje-solicitud-cierre=(\d+)\]#i', function ($m) {
+        $vid = (int) $m[1];
+        if ($vid < 1 || !function_exists('ope_viaje_por_id')) return '';
+        $v = ope_viaje_por_id($vid);
+        if (!$v) return '';
+        return ope_viaje_revision_solicitud_post_html($v);
+    }, $message);
+
+    // Rechazo primer intento
+    $message = preg_replace_callback('#\[viaje-rechazo=(\d+)\]#i', function ($m) {
+        $vid = (int) $m[1];
+        if ($vid < 1 || !function_exists('ope_viaje_por_id')) return '';
+        $v = ope_viaje_por_id($vid);
+        if (!$v) return '';
+        return ope_viaje_revision_rechazo_post_html($v, false);
+    }, $message);
+
+    // Rechazo definitivo (cancelado)
+    $message = preg_replace_callback('#\[viaje-rechazo-cancelado=(\d+)\]#i', function ($m) {
+        $vid = (int) $m[1];
+        if ($vid < 1 || !function_exists('ope_viaje_por_id')) return '';
+        $v = ope_viaje_por_id($vid);
+        if (!$v) return '';
+        return ope_viaje_revision_rechazo_post_html($v, true);
+    }, $message);
+
+    return $message;
+}
+
+/** Renderiza [mision=TOMA_ID] en posts. */
+function ope_rol_parse_mision($message)
+{
+    if (stripos($message, '[mision') === false) {
+        return $message;
+    }
+    $message = preg_replace_callback('#\[mision=(\d+)\]#i', function ($m) {
+        if (defined('THIS_SCRIPT') && THIS_SCRIPT === 'showthread.php') {
+            return '';
+        }
+        $toma_id = (int)$m[1];
+        if ($toma_id < 1 || !function_exists('ope_mision_post_html')) return (string)$m[0];
+
+        global $db;
+        $q = $db->simple_select('rol_mision_tomas', '*', "toma_id = {$toma_id}", array('limit' => 1));
+        if (!$db->num_rows($q)) return (string)$m[0];
+        $toma = $db->fetch_array($q);
+
+        // Enriquecer con datos de mision y PJ
+        $pid = (int)($toma['pid'] ?? 0);
+        $toma['pj_nombre'] = function_exists('ope_rol_cat_nombre_pid') ? ope_rol_cat_nombre_pid($pid) : '';
+        $mid = (int)($toma['mision_id'] ?? 0);
+        if ($mid > 0 && function_exists('ope_mision_por_id')) {
+            $mision = ope_mision_por_id($mid);
+            if ($mision) {
+                $toma['mision_titulo'] = (string)($mision['titulo'] ?? '');
+                $toma['rango'] = (string)($mision['rango'] ?? 'D');
+                $toma['peligrosidad'] = (int)($mision['peligrosidad'] ?? 1);
+                $zslug = (string)($mision['zona_slug'] ?? '');
+                $toma['mision_zona'] = $zslug !== '' && function_exists('ope_isla_nombre')
+                                       ? ope_isla_nombre($zslug) : $zslug;
+            }
+        }
+
+        $oraculo = json_decode((string)($toma['oraculo_json'] ?? ''), true);
+        if (!is_array($oraculo)) {
+            $oraculo = array('cartas' => array(), 'narrativa' => '');
+        }
+        return ope_mision_post_html($toma, $oraculo);
+    }, $message);
     return $message;
 }
 
@@ -2791,11 +2885,7 @@ function ope_rol_viaje_showthread_end()
         $card = '<div class="ope-viaje-header">' . ope_oraculo_post_html($v, $oracle) . '</div>';
     }
 
-    $panel = function_exists('ope_viaje_panel_showthread')
-        ? ope_viaje_panel_showthread((int) $tid, $uid, $active_pid)
-        : '';
-
-    $GLOBALS['ope_viaje_panel'] = $card . $panel;
+    $GLOBALS['ope_viaje_panel'] = $card;
 
     // Oculta el primer post (OPE Eternal) para que el oráculo no se vea como post.
     $first_pid = (int) ($thread['firstpost'] ?? 0);
@@ -2817,6 +2907,52 @@ function ope_rol_viaje_showthread_end()
 
     if (function_exists('ope_oraculo_showthread_scripts')) {
         $GLOBALS['ope_viaje_scripts'] = ope_oraculo_showthread_scripts();
+    }
+}
+
+/** Panel de mision activo en showthread: cabecera + ocultar post Narrador. */
+function ope_rol_mision_showthread_end()
+{
+    global $tid, $mybb, $thread, $posts;
+
+    $GLOBALS['ope_mision_panel'] = '';
+
+    $toma = function_exists('ope_mision_por_tid') ? ope_mision_por_tid((int) $tid) : null;
+    if (!$toma) {
+        return;
+    }
+
+    // Enriquecer con datos de mision y PJ
+    $pid = (int)($toma['pid'] ?? 0);
+    $toma['pj_nombre'] = function_exists('ope_rol_cat_nombre_pid') ? ope_rol_cat_nombre_pid($pid) : '';
+    $mid = (int)($toma['mision_id'] ?? 0);
+    if ($mid > 0 && function_exists('ope_mision_por_id')) {
+        $mision_data = ope_mision_por_id($mid);
+        if ($mision_data) {
+            $toma['mision_titulo']  = (string)($mision_data['titulo'] ?? '');
+            $toma['rango']          = (string)($mision_data['rango'] ?? 'D');
+            $toma['peligrosidad']   = (int)($mision_data['peligrosidad'] ?? 1);
+            $zslug = (string)($mision_data['zona_slug'] ?? '');
+            $toma['mision_zona']    = $zslug !== '' && function_exists('ope_isla_nombre')
+                                      ? ope_isla_nombre($zslug) : $zslug;
+        }
+    }
+
+    $panel = '';
+    if (function_exists('ope_mision_post_html')) {
+        $oraculo = json_decode((string)($toma['oraculo_json'] ?? ''), true);
+        if (!is_array($oraculo)) {
+            $oraculo = array('cartas' => array(), 'narrativa' => '');
+        }
+        $panel = '<div class="ope-viaje-header ope-mision-header">' . ope_mision_post_html($toma, $oraculo) . '</div>';
+    }
+    $GLOBALS['ope_mision_panel'] = $panel;
+
+    // Ocultar el primer post del Narrador
+    $first_pid = (int)($thread['firstpost'] ?? 0);
+    if ($first_pid > 0 && !empty($posts) && is_string($posts)) {
+        $pattern = '#<a\s+name="pid' . $first_pid . '"[^>]*></a>\s*<div\s+class="ope-postbit-container"\s+id="post-container-' . $first_pid . '">[\s\S]*?</div>\s*</div>\s*</div>#i';
+        $posts = preg_replace($pattern, '', $posts, 1);
     }
 }
 

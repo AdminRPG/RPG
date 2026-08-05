@@ -21,14 +21,3 @@ if ($db->table_exists('rol_pj_fruta')) {
         echo "PID: {$r['pid']} | Fruta ID: {$r['fruta_id']} | Nivel: {$r['nivel']} | CU: {$r['cu']}\n";
     }
 }
-
-echo "\n=== ETERNAL TREES ARCHIVOS / SISTEMA ===\n";
-require_once MYBB_ROOT . 'inc/ope_rol_eternal.php';
-$trees = ope_eternal_tree_ids();
-foreach ($trees as $tid) {
-    $t = ope_eternal_load($tid);
-    echo "\nÁrbol '{$tid}' ({$t['nombre']}):\n";
-    foreach ($t['nodos'] as $n) {
-        echo "   - [{$n['id']}] {$n['label']} (Nivel: {$n['nivel']}, Pos: {$n['pos']})\n";
-    }
-}

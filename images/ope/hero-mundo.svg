@@ -6,7 +6,4 @@
     </linearGradient>
   </defs>
   <rect width="800" height="450" fill="url(#bg)"/>
-  <circle cx="400" cy="160" r="50" fill="none" stroke="#f4bd51" stroke-width="1.5" opacity="0.4"/>
-  <text x="400" y="280" font-family="Cinzel,Georgia,serif" font-size="26" fill="#f4bd51" text-anchor="middle">El Mundo</text>
-  <text x="400" y="320" font-family="Spectral,Georgia,serif" font-size="14" fill="#8ba0b3" text-anchor="middle">Placeholder — reemplazar con imagen propia</text>
 </svg>

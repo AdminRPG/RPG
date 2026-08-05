@@ -390,10 +390,10 @@ if ($puede_gestionar && $mybb->request_method === 'post'
     exit;
 }
 
-// ── Gestión: guardar elecciones de Clase / Arquetipo ──
+// ── Gestión: guardar elecciones de Clase / Arquetipo / Oficio ──
 if ($puede_gestionar && $mybb->request_method === 'post'
     && verify_post_check($mybb->get_input('my_post_key'), true)
-    && in_array($mybb->get_input('gaccion'), array('save_voc_eleccion', 'save_voc_arquetipo'), true)) {
+    && in_array($mybb->get_input('gaccion'), array('save_voc_eleccion', 'save_voc_arquetipo', 'save_voc_eleccion_oficio'), true)) {
 
     $res = array('msg' => '');
     if ($mybb->get_input('gaccion') === 'save_voc_eleccion' && function_exists('ope_rol_vocacion_guardar_eleccion')) {
@@ -403,6 +403,11 @@ if ($puede_gestionar && $mybb->request_method === 'post'
     } elseif ($mybb->get_input('gaccion') === 'save_voc_arquetipo' && function_exists('ope_rol_vocacion_guardar_arquetipo')) {
         $g_segunda = (string) $mybb->get_input('segunda_clase');
         $res = ope_rol_vocacion_guardar_arquetipo((int) $pj['pid'], $g_segunda);
+    } elseif ($mybb->get_input('gaccion') === 'save_voc_eleccion_oficio' && function_exists('ope_rol_vocacion_guardar_eleccion_oficio')) {
+        $g_oficio = (string) $mybb->get_input('oficio');
+        $g_nivel  = (int) $mybb->get_input('nivel');
+        $g_opcion = (string) $mybb->get_input('opcion');
+        $res = ope_rol_vocacion_guardar_eleccion_oficio((int) $pj['pid'], $g_oficio, $g_nivel, $g_opcion);
     }
     $fmsg = (string) ($res['msg'] ?? '');
     header('Location: ' . $bburl . '/ficha.php?pid=' . (int) $pj['pid'] . '&g=1&fmsg=' . rawurlencode($fmsg) . '#g-talentos');
@@ -492,20 +497,6 @@ function ope_rel_tipos(): array
     );
 }
 
-function ope_heat_var(string $rango): string
-{
-    $map = array(
-        'F' => '--h1', 'E' => '--h1', 'D' => '--h2', 'C' => '--h3', 'B' => '--h4',
-        'A' => '--h5', 'S' => '--h6', 'SS' => '--h7', 'M' => '--h8', 'M+' => '--h9',
-    );
-    return $map[strtoupper(trim($rango))] ?? '--h1';
-}
-function ope_heat_val(int $v): string
-{
-    if ($v < 1) $v = 1;
-    if ($v > 9) $v = 9;
-    return '--h' . $v;
-}
 /** Convierte texto con \n\n en párrafos <p> HTML, escapando y respetando saltos simples. */
 function ope_nl2p(string $text): string
 {
@@ -521,18 +512,6 @@ function ope_nl2p(string $text): string
     }
     return $out;
 }
-/** Formato corto para cifras grandes de berries (4.850.000 → "4.9M"). */
-function ope_short_money(int $n): string
-{
-    $abs = abs($n);
-    if ($abs >= 1000000) {
-        return rtrim(rtrim(number_format($n / 1000000, 1), '0'), '.') . 'M';
-    }
-    if ($abs >= 1000) {
-        return rtrim(rtrim(number_format($n / 1000, 1), '0'), '.') . 'K';
-    }
-    return number_format($n, 0, ',', '.');
-}
 
 // Decodifica los JSON del personaje.
 $datos      = $pj ? (json_decode((string) $pj['datos'], true) ?: array()) : array();
@@ -543,21 +522,6 @@ $bio        = $pj ? (json_decode((string) $pj['bio'], true) ?: array()) : array(
 // Color por facción: slug canónico para teñir el expediente (fuente: plugin ope_rol).
 $fac_slug  = $pj ? ope_rol_faccion_slug($datos['faccion'] ?? '') : '';
 $fac_class = $fac_slug !== '' ? ' fac-' . $fac_slug : '';
-
-// Aura de elemento (teñe banner / avatar / chips).
-$el_raw_early = trim((string) ($datos['elemento'] ?? ($datos['element'] ?? '')));
-$el_slug_body = 'none';
-if ($el_raw_early !== '') {
-    $el_low_early = function_exists('mb_strtolower') ? mb_strtolower($el_raw_early, 'UTF-8') : strtolower($el_raw_early);
-    if ($el_low_early !== 'ninguno' && $el_low_early !== 'none') {
-        if (strpos($el_low_early, 'fuego') !== false) $el_slug_body = 'fuego';
-        elseif (strpos($el_low_early, 'agua') !== false) $el_slug_body = 'agua';
-        elseif (strpos($el_low_early, 'tierra') !== false) $el_slug_body = 'tierra';
-        elseif (strpos($el_low_early, 'viento') !== false || strpos($el_low_early, 'aire') !== false) $el_slug_body = 'viento';
-        elseif (strpos($el_low_early, 'luz') !== false) $el_slug_body = 'luz';
-        elseif (strpos($el_low_early, 'oscur') !== false) $el_slug_body = 'oscuridad';
-    }
-}
 
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
@@ -604,7 +568,6 @@ header('Content-Type: text/html; charset=utf-8');
     // ── Datos derivados para el render ──
     $nombre_e   = htmlspecialchars_uni($pj['nombre']);
     $rango      = (string) $pj['rango'];
-    $heat_rank  = ope_heat_var($rango);
     $stats_ganados_early = (int) ($pj['stats_ganados'] ?? ($datos['stats_ganados'] ?? 0));
     $nivel      = function_exists('ope_rol_nivel_from_stats_comprados')
         ? (int) ope_rol_nivel_from_stats_comprados($stats_ganados_early)
@@ -616,7 +579,7 @@ header('Content-Type: text/html; charset=utf-8');
     $retrato    = trim((string) ($datos['retrato'] ?? ''));
     $av_initial = function_exists('mb_substr') ? mb_strtoupper(mb_substr($pj['nombre'], 0, 1, 'UTF-8'), 'UTF-8') : strtoupper(substr($pj['nombre'], 0, 1));
 
-    $raza1_key = $datos['raza_principal'] ?? '';
+    $raza1_key = $datos['raza_principal'] ?? ($datos['raza'] ?? '');
     $raza2_key = $datos['raza_secundaria'] ?? '';
     $hibrido   = !empty($datos['hibrido']);
     $raza1_lbl = isset($RAZAS[$raza1_key]) ? $RAZAS[$raza1_key]['nombre'] : ucfirst((string) $raza1_key);
@@ -652,27 +615,14 @@ header('Content-Type: text/html; charset=utf-8');
     $stats_ef = (is_array($stats_json_d) && !empty($stats_json_d))
         ? $stats_json_d
         : (is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array());
-    $stats_base_d = is_array($datos['stats_base'] ?? null) ? $datos['stats_base'] : $stats_ef;
-    $suma     = (int) ($datos['rango_suma'] ?? array_sum($stats_ef));
-
-    $virtudes = is_array($datos['virtudes'] ?? null) ? $datos['virtudes'] : array();
-    $defectos = is_array($datos['defectos'] ?? null) ? $datos['defectos'] : array();
-    $pc_bal   = (int) ($datos['pc_balance'] ?? 0);
-    $pc_gas   = (int) ($datos['pc_gastado'] ?? 0);
-    $pc_dev   = (int) ($datos['pc_devuelto'] ?? 0);
 
     // Pack de Equipo Inicial (INI-01, Paso 6). Fichas viejas (previas a este
     // sistema) pueden seguir teniendo 'arma'/'objeto_personal' sueltos: se
     // muestran igualmente como texto libre para no perder esa información.
     $pack_key    = $inventario['pack_equipo'] ?? '';
     $pack_def    = isset($PACKS[$pack_key]) ? $PACKS[$pack_key] : null;
-    $arma_key    = trim((string) ($datos['arma'] ?? ($inventario['arma'] ?? '')));
-    $arma_lbl    = ($arma_key !== '' && isset($ARMAS[$arma_key])) ? $ARMAS[$arma_key]['nombre'] : $arma_key;
     $arma_legacy_key = trim((string) ($inventario['arma'] ?? ''));
     $arma_legacy = isset($ARMAS[$arma_legacy_key]) ? $ARMAS[$arma_legacy_key]['nombre'] : $arma_legacy_key;
-    if ($arma_lbl === '' && $arma_legacy !== '') {
-        $arma_lbl = $arma_legacy;
-    }
     $obj_legacy  = trim((string) ($inventario['objeto_personal'] ?? ''));
     $berries     = (int) ($economia['rupies'] ?? $economia['berries'] ?? 0);
 
@@ -936,9 +886,6 @@ header('Content-Type: text/html; charset=utf-8');
         }
     })((string) $pj['estado']);
 
-    $el_raw = trim((string) ($datos['elemento'] ?? ($datos['element'] ?? '')));
-    $el_slug = $el_slug_body;
-    $el_lbl = $el_raw !== '' ? $el_raw : 'Ninguno';
     $stats_ganados = $stats_ganados_early;
     $xp_floor = function_exists('ope_rol_stats_para_nivel') ? (int) ope_rol_stats_para_nivel(max(1, $nivel)) : ($nivel - 1) * 20;
     $xp_ceil  = function_exists('ope_rol_stats_para_nivel') ? (int) ope_rol_stats_para_nivel(max(1, $nivel) + 1) : $nivel * 20;
@@ -1070,22 +1017,6 @@ header('Content-Type: text/html; charset=utf-8');
       </div>
 
       <div class="rk-section">
-        <header class="rk-section-h"><span>Vía Eternal</span></header>
-        <div class="rk-section-b">
-          <dl class="ope-deflist">
-            <div><dt>Identidad</dt><dd><?php echo htmlspecialchars_uni($tree_identidad['nombre'] ?? ($tree_identidad['label'] ?? ($arbol_identidad !== '' ? ucfirst($arbol_identidad) : '—'))); ?></dd></div>
-            <div><dt>Arma</dt><dd><?php
-              $fam = $tree_arma['nombre'] ?? ($tree_arma['label'] ?? ($arbol_arma !== '' ? ucfirst($arbol_arma) : ''));
-              $arma_line = trim(($fam !== '' ? $fam : '') . ($arma_lbl !== '' ? ($fam !== '' ? ' · ' : '') . $arma_lbl : ''));
-              echo htmlspecialchars_uni($arma_line !== '' ? $arma_line : '—');
-            ?></dd></div>
-          </dl>
-        </div>
-      </div>
-
-
-
-      <div class="rk-section">
         <header class="rk-section-h"><span>Haki</span></header>
         <div class="rk-section-b">
           <dl class="ope-deflist">
@@ -1104,12 +1035,12 @@ header('Content-Type: text/html; charset=utf-8');
 
       <div class="rk-section rk-section--compact">
         <header class="rk-section-h"><span>Oficios</span></header>
-        <div class="rk-section-b"><p class="ope-empty">Sin oficios</p></div>
+        <div class="rk-section-b"><p class="ope-empty"><?php echo !empty($oficios_info) ? htmlspecialchars_uni(implode(' · ', array_map(function($o){ return $o['nombre']; }, $oficios_info))) : 'Sin oficios'; ?></p></div>
       </div>
 
       <div class="rk-section rk-section--compact">
-        <header class="rk-section-h"><span>Tripulación</span></header>
-        <div class="rk-section-b"><p class="ope-empty">Sin tripulación</p></div>
+        <header class="rk-section-h"><span>Clase</span></header>
+        <div class="rk-section-b"><p class="ope-empty"><?php echo $tiene_vocacion ? htmlspecialchars_uni($clase_info['nombre']) : 'Sin clase'; ?></p></div>
       </div>
     </aside>
 
@@ -1205,11 +1136,6 @@ header('Content-Type: text/html; charset=utf-8');
           <p class="ope-empty">Sin fruta</p>
 <?php endif; ?>
         </div>
-      </div>
-
-      <div class="rk-section rk-section--compact">
-        <header class="rk-section-h"><span>Dotes de Poder</span><small>0/4</small></header>
-        <div class="rk-section-b"><p class="ope-empty">Sin dotes</p></div>
       </div>
     </aside>
 
@@ -1422,64 +1348,68 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="plate"><div class="plate-b"><p class="mono fs-76 c-dim">Este personaje no tiene asignada una Clase Bélica ni Oficios.</p></div></div>
 <?php else: ?>
       <div class="plate">
-        <div class="plate-h"><span class="t">Clase Bélica · <?php echo htmlspecialchars_uni($clase_info['nombre']); ?></span><span class="c">// <?php echo htmlspecialchars_uni($clase_info['prim'] . ' / ' . $clase_info['sec']); ?></span></div>
+        <div class="plate-h"><span class="t"><?php echo htmlspecialchars_uni(strtoupper($clase_info['nombre'])); ?></span><span class="c">// <?php echo htmlspecialchars_uni($clase_info['prim'] . ' / ' . $clase_info['sec']); ?></span></div>
         <div class="plate-b">
-          <p class="mb-8"><?php echo htmlspecialchars_uni($clase_info['filosofia']); ?></p>
-          <div class="mono fs-76 c-paper mb-4"><b>Pool Afín:</b> <?php echo htmlspecialchars_uni(implode(', ', $clase_info['pool'])); ?></div>
-<?php if ($arma_info): ?>
-          <div class="mono fs-76 c-paper mb-4"><b>Arma Vocacional:</b> <?php echo htmlspecialchars_uni($arma_info['nombre']); ?> (Escala: <?php echo htmlspecialchars_uni(implode('/', $arma_info['escala'])); ?>) — <em><?php echo htmlspecialchars_uni($arma_info['efecto']); ?></em></div>
-<?php endif; ?>
-<?php if ($arquetipo_info): ?>
-          <div class="mono fs-76 c-ember mt-8"><b>Arquetipo (2ª Clase):</b> <?php echo htmlspecialchars_uni($arquetipo_info['nombre']); ?> (<?php echo htmlspecialchars_uni($arquetipo_info['filosofia']); ?>)</div>
-<?php endif; ?>
-        </div>
-      </div>
-
-<?php if (!empty($oficios_info)): ?>
-      <div class="plate mt-12">
-        <div class="plate-h"><span class="t">Oficios</span><span class="c">// <?php echo count($oficios_info); ?> activo(s)</span></div>
-        <div class="plate-b">
-          <div class="grid2">
-<?php foreach ($oficios_info as $oid => $o): ?>
-            <div class="fl-col">
-              <div class="mono c-paper"><b><?php echo htmlspecialchars_uni($o['nombre']); ?></b> <small class="c-dim">(<?php echo htmlspecialchars_uni($o['prim'] . '/' . $o['sec']); ?>)</small></div>
-              <p class="fs-76 mb-4"><?php echo htmlspecialchars_uni($o['desc']); ?></p>
-              <div class="mono fs-76 c-dim"><b>Pool:</b> <?php echo htmlspecialchars_uni(implode(', ', $o['pool'])); ?></div>
-            </div>
-<?php endforeach; ?>
-          </div>
-        </div>
-      </div>
-<?php endif; ?>
-
-      <div class="plate mt-12">
-        <div class="plate-h"><span class="t">Desbloqueos e Hitos por Nivel</span><span class="c">// Nivel actual: <?php echo (int)$nivel; ?></span></div>
-        <div class="plate-b">
-          <ul class="zs-dotes">
+          <ul class="ope-hitos-list">
 <?php
     $hitos_clase = $clase_info['hitos'] ?? array();
     foreach ($CADENCIA_VOC as $nv_hito => $meta_cad):
         $desbloqueado = ($nivel >= $nv_hito);
         $hito_val = $hitos_clase[$nv_hito] ?? null;
         if (!$hito_val) continue;
+        if (!$desbloqueado) continue;
 
-        $badge_status = $desbloqueado ? '<span class="badge cost">Nv. ' . $nv_hito . '</span>' : '<span class="badge back">Nv. ' . $nv_hito . ' (Bloqueado)</span>';
+        $badge_status = '<span class="badge cost">Nv. ' . $nv_hito . '</span>';
         
         if (is_array($hito_val) && isset($hito_val['eleccion'])) {
             $elec_hecha = $elecciones_voc[(string)$nv_hito] ?? null;
             $txt_elec = $elec_hecha ? ('<b>Elección:</b> ' . htmlspecialchars_uni($elec_hecha)) : '<em>Pendiente de elegir en Gestión</em>';
-            echo '<li class="' . ($desbloqueado ? '' : 'c-dim') . '">' . $badge_status . ' ' . $txt_elec . '</li>';
+            echo '<li>' . $badge_status . ' ' . $txt_elec . '</li>';
         } elseif (is_array($hito_val) && !empty($hito_val['arquetipo'])) {
             $txt_arq = $arquetipo_info ? ('<b>Arquetipo Nv.30:</b> ' . htmlspecialchars_uni($arquetipo_info['nombre'])) : '<em>Desbloquea segunda clase a Nv.30</em>';
-            echo '<li class="' . ($desbloqueado ? '' : 'c-dim') . '">' . $badge_status . ' ' . $txt_arq . '</li>';
+            echo '<li>' . $badge_status . ' ' . $txt_arq . '</li>';
         } else {
-            echo '<li class="' . ($desbloqueado ? '' : 'c-dim') . '">' . $badge_status . ' ' . htmlspecialchars_uni((string)$hito_val) . '</li>';
+            echo '<li>' . $badge_status . ' ' . htmlspecialchars_uni((string)$hito_val) . '</li>';
         }
     endforeach;
 ?>
           </ul>
         </div>
       </div>
+<?php foreach ($oficios_info as $oid => $o):
+    if (empty($o['hitos']) || !is_array($o['hitos'])) continue;
+    $elec_of = (isset($elecciones_voc['_oficios'][$oid]) && is_array($elecciones_voc['_oficios'][$oid])) ? $elecciones_voc['_oficios'][$oid] : array();
+?>
+      <div class="plate mt-12">
+        <div class="plate-h"><span class="t"><?php echo htmlspecialchars_uni(strtoupper($o['nombre'])); ?></span><span class="c">// Oficio · <?php echo htmlspecialchars_uni($o['prim'] . ' / ' . $o['sec']); ?></span></div>
+        <div class="plate-b">
+          <ul class="ope-hitos-list">
+<?php
+    foreach ($CADENCIA_VOC as $nv_hito => $meta_cad):
+        $desbloqueado = ($nivel >= $nv_hito);
+        $hito_val = $o['hitos'][$nv_hito] ?? null;
+        if (!$hito_val) continue;
+        if (!$desbloqueado) continue;
+
+        $badge_status = '<span class="badge cost">Nv. ' . $nv_hito . '</span>';
+
+        if (is_array($hito_val) && isset($hito_val['eleccion'])) {
+            $elec_hecha = $elec_of[(string)$nv_hito] ?? null;
+            $txt_elec = $elec_hecha ? ('<b>Elección:</b> ' . htmlspecialchars_uni($elec_hecha)) : '<em>Pendiente de elegir en Gestión</em>';
+            echo '<li>' . $badge_status . ' ' . $txt_elec . '</li>';
+        } elseif (is_array($hito_val) && isset($hito_val['especializacion'])) {
+            $esp_hecha = $elec_of[(string)$nv_hito] ?? null;
+            $txt_esp = $esp_hecha ? ('<b>Especialización:</b> ' . htmlspecialchars_uni($esp_hecha)) : '<em>Pendiente de elegir en Gestión</em>';
+            echo '<li>' . $badge_status . ' ' . $txt_esp . '</li>';
+        } else {
+            echo '<li>' . $badge_status . ' ' . htmlspecialchars_uni((string)$hito_val) . '</li>';
+        }
+    endforeach;
+?>
+          </ul>
+        </div>
+      </div>
+<?php endforeach; ?>
 <?php endif; ?>
     </section>
 
@@ -1711,7 +1641,7 @@ header('Content-Type: text/html; charset=utf-8');
           </button>
           <button type="button" class="ope-mtab" role="tab" aria-selected="false" data-mtab="talentos">
             <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v6m0 0-3 3m3-3 3 3M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm12 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg></span>
-            <span>Talentos Eternal</span>
+            <span>Clase y Arquetipo</span>
           </button>
           <button type="button" class="ope-mtab" role="tab" aria-selected="false" data-mtab="haki">
             <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg></span>
@@ -1793,14 +1723,16 @@ header('Content-Type: text/html; charset=utf-8');
 <?php
     $hitos_clase = $clase_info['hitos'] ?? array();
     foreach ($CADENCIA_VOC as $nv_hito => $meta_cad):
-        if (empty($hitos_clase[$nv_hito]['eleccion']) || !is_array($hitos_clase[$nv_hito]['eleccion'])) continue;
+        $hito_val = $hitos_clase[$nv_hito] ?? null;
+        if (!is_array($hito_val) || empty($hito_val['eleccion']) || !is_array($hito_val['eleccion'])) continue;
         $desbloqueado = ($nivel >= $nv_hito);
-        $opciones = $hitos_clase[$nv_hito]['eleccion'];
+        $opciones = $hito_val['eleccion'];
         $elec_actual = $elecciones_voc[(string)$nv_hito] ?? '';
+        $titulo_hito = ($nv_hito === 1) ? 'Variante de Clase · Nivel 1' : ('Hito Nivel ' . (int)$nv_hito);
 ?>
           <div class="plate mb-8 p-12">
             <div class="plate-h">
-              <span class="t">Hito Nivel <?php echo (int)$nv_hito; ?></span>
+              <span class="t"><?php echo $titulo_hito; ?></span>
               <span class="c">// <?php echo $desbloqueado ? 'Desbloqueado' : 'Requiere Nivel ' . (int)$nv_hito; ?></span>
             </div>
             <div class="plate-b">
@@ -1816,7 +1748,7 @@ header('Content-Type: text/html; charset=utf-8');
                 <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
                 <input type="hidden" name="gaccion" value="save_voc_eleccion">
                 <input type="hidden" name="nivel" value="<?php echo (int)$nv_hito; ?>">
-                <select name="opcion" class="form-control" style="max-width: 320px;" required>
+                <select name="opcion" class="form-control ope-select-mid" required>
                   <option value="">-- Selecciona una opción --</option>
 <?php foreach ($opciones as $op_nombre => $op_desc): ?>
                   <option value="<?php echo htmlspecialchars_uni($op_nombre); ?>"<?php echo ($elec_actual === $op_nombre) ? ' selected' : ''; ?>>
@@ -1844,7 +1776,7 @@ header('Content-Type: text/html; charset=utf-8');
               <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int)$pj['pid']; ?>" class="flex-wrap gap-8 align-center">
                 <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
                 <input type="hidden" name="gaccion" value="save_voc_arquetipo">
-                <select name="segunda_clase" class="form-control" style="max-width: 320px;">
+                <select name="segunda_clase" class="form-control ope-select-mid">
                   <option value="">-- Ninguna (Sin Arquetipo) --</option>
 <?php foreach ($CLASES_VOC as $ck => $cd): if ($ck === $clase_key) continue; ?>
                   <option value="<?php echo htmlspecialchars_uni($ck); ?>"<?php echo ($arquetipo_clase === $ck) ? ' selected' : ''; ?>>
@@ -1860,6 +1792,70 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endif; ?>
             </div>
           </div>
+
+<?php if (!empty($oficios_info)): ?>
+          <h4 class="mono c-paper mb-8 mt-16">Elecciones y Especialización de Oficios</h4>
+<?php foreach ($oficios_info as $oid => $o):
+    if (empty($o['hitos']) || !is_array($o['hitos'])) continue;
+    $elec_of = (isset($elecciones_voc['_oficios'][$oid]) && is_array($elecciones_voc['_oficios'][$oid])) ? $elecciones_voc['_oficios'][$oid] : array();
+    $tiene_opciones_of = false;
+    foreach ($o['hitos'] as $hv) { if (is_array($hv) && (isset($hv['eleccion']) || isset($hv['especializacion']))) { $tiene_opciones_of = true; break; } }
+    if (!$tiene_opciones_of) continue;
+?>
+          <div class="plate mt-12 p-12">
+            <div class="plate-h">
+              <span class="t"><?php echo htmlspecialchars_uni($o['nombre']); ?></span>
+              <span class="c">// Oficio · Especialización a Nv.30</span>
+            </div>
+            <div class="plate-b">
+<?php foreach ($CADENCIA_VOC as $nv_hito => $meta_cad):
+        $hito_val = $o['hitos'][$nv_hito] ?? null;
+        if (!is_array($hito_val)) continue;
+        $es_esp = isset($hito_val['especializacion']);
+        $es_elec = isset($hito_val['eleccion']);
+        if (!$es_esp && !$es_elec) continue;
+        $opciones = $es_esp ? $hito_val['especializacion'] : $hito_val['eleccion'];
+        $desbloqueado = ($nivel >= $nv_hito);
+        $elec_actual = $elec_of[(string)$nv_hito] ?? '';
+        $lbl_tipo = $es_esp ? 'Especialización' : 'Elección';
+?>
+              <div class="plate mt-8">
+                <div class="plate-h">
+                  <span class="t"><?php echo $lbl_tipo; ?> · Nivel <?php echo (int)$nv_hito; ?></span>
+                  <span class="c">// <?php echo $desbloqueado ? 'Desbloqueado' : 'Requiere Nivel ' . (int)$nv_hito; ?></span>
+                </div>
+                <div class="plate-b">
+<?php if (!$desbloqueado): ?>
+                  <p class="mono fs-76 c-dim mb-0">Alcanza el nivel <?php echo (int)$nv_hito; ?> para elegir entre:</p>
+                  <ul class="fs-76 c-dim mb-0 mt-4">
+<?php foreach ($opciones as $op_nombre => $op_desc): ?>
+                    <li><b><?php echo htmlspecialchars_uni($op_nombre); ?>:</b> <?php echo htmlspecialchars_uni($op_desc); ?></li>
+<?php endforeach; ?>
+                  </ul>
+<?php else: ?>
+                  <form method="post" action="<?php echo $bburl; ?>/ficha.php?pid=<?php echo (int)$pj['pid']; ?>" class="flex-wrap gap-8 align-center">
+                    <input type="hidden" name="my_post_key" value="<?php echo htmlspecialchars_uni($mybb->post_code); ?>">
+                    <input type="hidden" name="gaccion" value="save_voc_eleccion_oficio">
+                    <input type="hidden" name="oficio" value="<?php echo htmlspecialchars_uni($oid); ?>">
+                    <input type="hidden" name="nivel" value="<?php echo (int)$nv_hito; ?>">
+                    <select name="opcion" class="form-control ope-select-mid" required>
+                      <option value="">-- Selecciona una opción --</option>
+<?php foreach ($opciones as $op_nombre => $op_desc): ?>
+                      <option value="<?php echo htmlspecialchars_uni($op_nombre); ?>"<?php echo ($elec_actual === $op_nombre) ? ' selected' : ''; ?>>
+                        <?php echo htmlspecialchars_uni($op_nombre . ' — ' . $op_desc); ?>
+                      </option>
+<?php endforeach; ?>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-hot">Guardar <?php echo $lbl_tipo; ?></button>
+                  </form>
+<?php endif; ?>
+                </div>
+              </div>
+<?php endforeach; ?>
+            </div>
+          </div>
+<?php endforeach; ?>
+<?php endif; ?>
 <?php endif; ?>
         </section>
 

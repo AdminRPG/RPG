@@ -6,7 +6,7 @@ Lee **en este orden** al trabajar en UI o PHP del RPG:
 
 1. `AGENTS.md` (raíz del repo)
 2. `docs/AGENTES-Y-HERRAMIENTAS.md` — protocolo anti-portado parcial
-3. `docs/DESIGN-GRANBLUE-ETERNAL.md` §5 (PHP) o §6 (portada)
+3. `docs/DESIGN-ONE-PIECE-ETERNAL.md` §5 (PHP) o §6 (portada)
 
 ## Plugin graphify
 

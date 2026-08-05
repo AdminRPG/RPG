@@ -238,7 +238,7 @@ if (!function_exists('ope_rol_razas')) {
     {
         return array(
             'humanos' => array(
-                'nombre' => 'Humanos',
+                'nombre' => 'Humano',
                 'resumen' => 'La raza más numerosa y diversa de los mares. Sin stats de raza, fuertes de espíritu.',
                 'tamano' => '1,50–1,95 m',
                 'cultura' => 'La civilización más extendida de los mares: nobles, piratas, científicos y comerciantes bajo una infinidad de valores distintos. No tienen una cultura única, sino la suma de todas.',
@@ -254,7 +254,7 @@ if (!function_exists('ope_rol_razas')) {
                 'rasgo' => array('nombre' => 'Sangre Hirviente', 'efecto' => 'Ganas 1 carga de Furia (máx. 3) al golpear o recibir ≥10% de tu PV máx. en daño bruto. Al atacar puedes gastar cargas: +8 daño bruto por carga, pero −5% mitigación ese turno por carga. Ebrio (haber bebido de verdad en la ficción): máx. Furia sube a 5 y desaparece la penalización de mitigación. Recurso propio, se resetea al fin del combate.'),
             ),
             'gigantes' => array(
-                'nombre' => 'Gigantes',
+                'nombre' => 'Gigante',
                 'resumen' => 'La raza físicamente más grande y dura del catálogo (neto +8); su tamaño cambia el campo.',
                 'tamano' => '15–30 m (jugables); adultos de Elbaf 13–24 m',
                 'cultura' => 'Orgullosos hasta el extremo, con un código de honor guerrero inquebrantable. Viven hasta 300 años. Mentir o huir de un duelo aceptado es la peor falta imaginable.',
@@ -262,7 +262,7 @@ if (!function_exists('ope_rol_razas')) {
                 'rasgo' => array('nombre' => 'Presencia Colosal', 'efecto' => 'No derribable por Gap de FUE si tu RES ≥ atacante. Ignoras la penalización de Terreno difícil en tu movimiento. Categoría de Tamaño (declaras altura 15–30 m en ficha): Pequeño (15–20 m) +2 m alcance / +1 Rotura / −1 PA rival; Mediano (21–25 m) +3 m / +1 / −2; Grande (26–30 m) +4 m / +2 / −3. La reducción de PA solo afecta a rivales menores y nunca los baja de 3 PA.'),
             ),
             'buccaneers' => array(
-                'nombre' => 'Buccaneers',
+                'nombre' => 'Buccaneer',
                 'resumen' => 'Sangre de gigante en cuerpo humano; un cuerpo que se niega a rendirse.',
                 'tamano' => '2–6 m',
                 'cultura' => 'Supervivientes estoicos y leales, históricamente perseguidos por su linaje. Hermandades pequeñas y muy unidas; generaciones ocultando su origen los han hecho difíciles de leer.',
@@ -270,7 +270,7 @@ if (!function_exists('ope_rol_razas')) {
                 'rasgo' => array('nombre' => 'Voluntad que no se Quiebra', 'efecto' => 'PV máximo +10%. Los estados que te aplican con Gap ≥+6 nunca duran más que su duración base contigo (el ×1,25 de daño sí aplica). Una vez por combate, al caer bajo 20% PV recuperas 5% PV máx. Bajo 30% PV, el daño físico recibido se reduce un 10% adicional.'),
             ),
             'minks' => array(
-                'nombre' => 'Minks',
+                'nombre' => 'Mink',
                 'resumen' => 'Pueblo animal de Zou; Electro en la sangre y Sulong bajo la luna llena.',
                 'tamano' => '1,50–2,00 m',
                 'cultura' => 'Tribus profundamente unidas por especie/clan, liderazgo compartido (Guardianes). La luna llena es un evento espiritual y cultural central en su calendario.',
@@ -278,7 +278,7 @@ if (!function_exists('ope_rol_razas')) {
                 'rasgo' => array('nombre' => 'Latido Salvaje', 'efecto' => 'Rasgos Raciales accesibles (se compran con PL): Latido Salvaje (EN→PV: 1 PV por cada 10 EN de una técnica, máx. 10) y Sulong Incontrolado (Nv.21+, luna llena real). Dote innata accesible: "Electro Bestial" (opcional, se compra con PL; ocupa 1 de las 4 dotes).'),
             ),
             'gyojins' => array(
-                'nombre' => 'Gyojins',
+                'nombre' => 'Gyojin',
                 'resumen' => 'Hombres-pez; más fuertes que un humano, por debajo de un Oni, con piel-armadura de abismo.',
                 'tamano' => '1,80–3,20 m (según especie de origen)',
                 'cultura' => 'Tradiciones marciales muy ricas (Karate Gyojin en escuelas y dojos). Históricamente marginados en superficie; defienden con orgullo el Reino de Ryugu.',
@@ -286,7 +286,7 @@ if (!function_exists('ope_rol_razas')) {
                 'rasgo' => array('nombre' => 'Piel de Abismo', 'efecto' => 'Rasgos Raciales accesibles (se compran con PL): Piel de Abismo (+3 Armadura flat física) e Hijo del Mar (sumergido respiras sin límite y +2 Gap de FUE en Karate Gyojin). Dote innata accesible: "Karate Gyojin" (opcional, se compra con PL; ocupa 1 de las 4 dotes).'),
             ),
             'lunarians' => array(
-                'nombre' => 'Lunarians',
+                'nombre' => 'Lunarian',
                 'resumen' => 'Llama dorsal que alterna entre tanque atado al suelo y cuerpo de vuelo.',
                 'tamano' => '3–5 m',
                 'cultura' => 'Raza casi extinta, perseguida por el Gobierno Mundial por los secretos de su linaje. Estoicos y misteriosos, a menudo ocultos bajo otra identidad.',
@@ -294,7 +294,7 @@ if (!function_exists('ope_rol_razas')) {
                 'rasgo' => array('nombre' => 'Llama Dorsal', 'efecto' => 'Rasgo Racial accesible (se compra con PL): Llama Dorsal — Encender/Apagar es acción libre (1×/turno). Encendida: −20% daño recibido, −2 AGI, 5 EN/turno. Apagada: +2 AGI de movimiento y vuelo sostenido Tier 2. Dote innata accesible: "Sangre de Lunarian" (opcional, se compra con PL; ocupa 1 de las 4 dotes).'),
             ),
             'skypeans' => array(
-                'nombre' => 'Skypeans',
+                'nombre' => 'Skypean',
                 'resumen' => 'Gente del cielo; ligeros y perceptivos, maestros de los Diales y de la caída.',
                 'tamano' => '1,40–1,75 m',
                 'cultura' => 'Habitantes de las islas del cielo (Skypiea, Birka). Guardianes de ruinas y templos de nubes; crecen desmontando, cargando y reparando Diales antes de leer y escribir.',
@@ -302,7 +302,7 @@ if (!function_exists('ope_rol_razas')) {
                 'rasgo' => array('nombre' => 'Maestros del Dial', 'efecto' => 'Rasgos Raciales accesibles (se compran con PL): Dominio del Dial (cualquier Dial cuesta 1 EN menos, mín. 1, sin Oficio de Ingeniería para su carga básica) y Dominio de la Caída (sin daño de caída, aterrizas de pie, desvías 5 m por cada 10 m). Dote innata accesible: "Maestro del Dial" (opcional, se compra con PL; ocupa 1 de las 4 dotes).'),
             ),
             'tontattas' => array(
-                'nombre' => 'Tontattas',
+                'nombre' => 'Tontatta',
                 'resumen' => 'Enanos imposibles de calcular; nadie los anticipa bien, ni en la mesa ni en el papel.',
                 'tamano' => '20–50 cm',
                 'cultura' => 'Reinos ocultos (como Tontatta bajo Dressrosa), camuflados entre plantas y raíces. Expertos cultivadores; protegen ferozmente la naturaleza.',

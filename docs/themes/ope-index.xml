@@ -71,45 +71,13 @@
 
 {$header}
 
-<!-- ===== HERO CARRUSEL (full-bleed) ===== -->
+<!-- ===== HERO PORTADA (una imagen aleatoria por carga) ===== -->
 <div class="ope-hero-wrap">
-  <header class="ope-hero" id="ope-hero">
-    <div class="ope-slides">
-      <section class="ope-slide ope-slide-portada on" data-slide="0">
-        <div class="ope-slide-bg ope-bg-portada" style="background-image:url('{$mybb->settings['bburl']}/images/ope/hero-mundo.jpg')"></div>
-        <div class="ope-slide-in">
-          <img class="ope-hero-crest" src="{$mybb->settings['bburl']}/images/ope/crest-eternal.png" alt="">
-          <span class="ope-hero-eye">Foro de rol &middot; Play-by-Post</span>
-          <h1 class="ope-hero-title">El cielo no tiene fin.<br><b>Tu leyenda, tampoco.</b></h1>
-          <p class="ope-hero-sub">Un mar de nubes infinito. Islas flotantes, aeronaves y Bestias Legendarias. Usa las flechas para conocer el mundo.</p>
-          <div class="ope-hero-cta">
-            <a href="{$mybb->settings['bburl']}/crear-personaje.php" class="ope-btn ope-btn-hot">Crear personaje</a>
-            <a href="{$mybb->settings['bburl']}/index.php#cat_el-cielo" class="ope-btn ope-btn-ghost">Explorar el Cielo</a>
-          </div>
-        </div>
-      </section>
-      <section class="ope-slide" data-slide="1">
-        <div class="ope-slide-bg" style="background-image:url('{$mybb->settings['bburl']}/images/ope/hero-mundo.jpg')"></div>
-        <div class="ope-amb"><span class="ope-amb-tag">Ambientación &middot; El Cielo</span><h2>Un mundo sobre las nubes</h2><p>Islas flotantes en un mar de nubes. Hace 500 años los Ancestrales quisieron dominarlo; los pueblos del cielo los repelieron. Ahora el horizonte vuelve a agitarse.</p><a href="{$mybb->settings['bburl']}/guias.php" class="ope-btn ope-btn-hot">Leer la ambientación</a></div>
-      </section>
-      <section class="ope-slide" data-slide="2">
-        <div class="ope-slide-bg" style="background-image:url('{$mybb->settings['bburl']}/images/ope/hero-pueblos.jpg')"></div>
-        <div class="ope-amb"><span class="ope-amb-tag">Los pueblos del cielo</span><h2>Nacidos entre las nubes</h2><p>Humanos, Elfos, Bestianos, Gnomos y Dracónidos. Cinco pueblos, un mismo cielo por conquistar.</p><a href="{$mybb->settings['bburl']}/crear-personaje.php" class="ope-btn ope-btn-hot">Crear personaje</a></div>
-      </section>
-      <section class="ope-slide" data-slide="3">
-        <div class="ope-slide-bg" style="background-image:url('{$mybb->settings['bburl']}/images/ope/hero-primal.jpg')"></div>
-        <div class="ope-amb"><span class="ope-amb-tag">Bestias Legendarias</span><h2>Armas vivientes de los Ancestrales</h2><p>Sellar un Vínculo es el poder más raro que un usuario puede alcanzar. No todos lo consiguen.</p><a href="{$mybb->settings['bburl']}/guias.php" class="ope-btn ope-btn-hot">El Bestiario</a></div>
-      </section>
+  <header class="ope-hero ope-hero--portada" id="ope-hero">
+    <div class="ope-slide-bg ope-bg-portada" style="background-image:url('{$ope_hero_banner}')"></div>
+    <div class="ope-slide-in">
+      <h1 class="ope-hero-title">One Piece: <b>Eternal</b></h1>
     </div>
-    <button type="button" class="ope-hero-side ope-hs-left" id="ope-prev" aria-label="Anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <button type="button" class="ope-hero-side ope-hs-right" id="ope-next" aria-label="Siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></button>
-    <div class="ope-hero-dots" id="ope-dots">
-      <button type="button" class="ope-dot on" data-go="0"></button>
-      <button type="button" class="ope-dot" data-go="1"></button>
-      <button type="button" class="ope-dot" data-go="2"></button>
-      <button type="button" class="ope-dot" data-go="3"></button>
-    </div>
-    <div class="ope-scroll-hint"><div class="ope-scroll-m"></div>El puerto, abajo</div>
   </header>
 </div>
 
@@ -239,37 +207,6 @@
   </div>
 </div>
 
-<script type="text/javascript">
-(function(){
-  var hero = document.getElementById('ope-hero');
-  if (!hero) return;
-  var slides = hero.querySelectorAll('.ope-slide');
-  var dots = hero.querySelectorAll('.ope-dot');
-  var prev = document.getElementById('ope-prev');
-  var next = document.getElementById('ope-next');
-  var cur = 0, n = slides.length;
-  function go(i){
-    cur = (i + n) % n;
-    slides.forEach(function(s, j){ s.classList.toggle('on', j === cur); });
-    dots.forEach(function(d, j){ d.classList.toggle('on', j === cur); });
-  }
-  if (prev) prev.addEventListener('click', function(){ go(cur - 1); });
-  if (next) next.addEventListener('click', function(){ go(cur + 1); });
-  dots.forEach(function(d){
-    d.addEventListener('click', function(){ go(parseInt(d.getAttribute('data-go'), 10) || 0); });
-  });
-  document.addEventListener('keydown', function(e){
-    if (e.key === 'ArrowLeft') go(cur - 1);
-    if (e.key === 'ArrowRight') go(cur + 1);
-  });
-  var tx = 0;
-  hero.addEventListener('touchstart', function(e){ tx = e.changedTouches[0].clientX; }, {passive:true});
-  hero.addEventListener('touchend', function(e){
-    var dx = e.changedTouches[0].clientX - tx;
-    if (Math.abs(dx) > 48) go(dx < 0 ? cur + 1 : cur - 1);
-  }, {passive:true});
-})();
-</script>
 
 <script type="text/javascript">
 (function(){
@@ -338,7 +275,7 @@
   </div>
 </footer>
 </div></div></div>
-<debugstuff>]]></template>
+<debugstuff>{$task_image}]]></template>
 
     <template name="forumbit_depth1_cat" version="1839"><![CDATA[<section class="ope-block-cat" id="cat_{$forum['fid']}">
   <div class="ope-shead"><h2>{$forum['name']}</h2><span class="ope-shead-code">// zona</span><span class="ope-shead-rule"></span></div>

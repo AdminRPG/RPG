@@ -101,6 +101,7 @@ function opeFlipPostCard(pid) {
   {$pollbox}
 
   {$ope_viaje_panel}
+  {$ope_mision_panel}
 
   <div id="posts">{$posts}</div>
 
@@ -147,10 +148,9 @@ function opeFlipPostCard(pid) {
           <div class="ope-pa-info">
             <div class="ope-pa-name">{$post['profilelink']}</div>
             <button type="button" class="btn btn-sm btn-ghost btn-block mt-8 mb-4" onclick="opeFlipPostCard({$post['pid']})">
-              RPG SYSTEM
+              ETERNAL SYSTEM
             </button>
           </div>
-          {$post['ope_char_side']}
         </div>
 
         <div class="ope-post-body">

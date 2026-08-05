@@ -13,24 +13,36 @@ jobs:
     - name: Obtener el código
       uses: actions/checkout@v4
 
+    - name: Ensamblar docroot (back/forum)
+      run: |
+        mkdir -p back/forum
+        rsync -a --delete \
+          --exclude '/docs' --exclude '/scripts' --exclude '/cache' \
+          --exclude '/install' --exclude '/back' --exclude '/graphify-out' \
+          --exclude '/node_modules' --exclude '/test-results' \
+          --exclude '/.git' --exclude '/.github' --exclude '/.agents' \
+          --exclude '/.codex' --exclude '/.cursor' --exclude '/.impeccable' \
+          --exclude '/.opencode' --exclude '/.playwright-mcp' --exclude '/.tmp' \
+          --exclude '/.scripts' --exclude '/.gitignore' --exclude '/.graphifyignore' \
+          --exclude '/AGENTS.md' --exclude '/README.md' --exclude '/opencode.json' \
+          --exclude '/skills-lock.json' \
+          --exclude '/*.png' --exclude '/*.html' --exclude '/*.txt' --exclude '/*.md' \
+          --exclude '/inc/ope_rol/config/viaje_ai.php' \
+          ./ back/forum/
+        rm -rf back/forum/back back/forum/docs back/forum/scripts back/forum/cache
+
     - name: Subir archivos al servidor
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./
+        local-dir: ./back/forum
         server-dir: /htdocs/
         dangerous-clean-slate: true
         exclude: |
+          config/
           .git/
           .gitattributes
           .github/
           .gitignore
-          .agents/
-          .htaccess.disabled
-          .DS_Store
-          mybb-plugin-rol/
-          README.md
-          skills-lock.json
-          install/

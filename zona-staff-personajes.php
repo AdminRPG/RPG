@@ -165,161 +165,7 @@ header('Content-Type: text/html; charset=utf-8');
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $bbname; ?> · Gestión de Personajes</title>
 <?php echo ope_rol_head_base(); ?>
-<style>
-.reveal {
-  opacity: 1 !important;
-  transform: none !important;
-  visibility: visible !important;
-}
-.zs-table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  margin-top: 20px;
-}
-.zs-pj-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 8px;
-  font-family: inherit;
-  font-size: 14px;
-}
-.zs-pj-table th {
-  padding: 12px 16px;
-  color: var(--gold-light, #d4af37);
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 11px;
-  letter-spacing: 1px;
-  border-bottom: 2px solid rgba(212, 175, 55, 0.2);
-  text-align: left;
-}
-.zs-pj-row {
-  background: var(--iron-hi, rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--rivet, rgba(255, 255, 255, 0.08));
-  transition: all 0.2s ease;
-}
-.zs-pj-row:hover {
-  background: rgba(212, 175, 55, 0.08);
-  transform: translateY(-1px);
-}
-.zs-pj-row td {
-  padding: 14px 16px;
-  vertical-align: middle;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-.zs-pj-row td:first-child {
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
-  border-left: 1px solid rgba(255, 255, 255, 0.05);
-}
-.zs-pj-row td:last-child {
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-}
-.zs-tbl-pj-cell {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.zs-tbl-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid var(--gold, #c5a059);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--paper, #f0f0f0);
-  flex-shrink: 0;
-}
-.zs-tbl-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.zs-tbl-pj-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.zs-tbl-pj-name {
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--paper, #ffffff);
-}
-.zs-tbl-pj-sub {
-  font-size: 12px;
-  color: var(--gold-light, #d4af37);
-  font-style: italic;
-}
-.zs-tag-fac {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: capitalize;
-  letter-spacing: 0.3px;
-}
-.fac-marines { background: rgba(30, 144, 255, 0.18); border: 1px solid #1e90ff; color: #70a1ff; }
-.fac-piratas { background: rgba(220, 20, 60, 0.18); border: 1px solid #dc143c; color: #ff6b81; }
-.fac-gobierno-mundial { background: rgba(212, 175, 55, 0.18); border: 1px solid #d4af37; color: #eccc68; }
-.fac-cazarrecompensas { background: rgba(255, 127, 80, 0.18); border: 1px solid #ff7f50; color: #ffa502; }
-.fac-civiles { background: rgba(169, 169, 169, 0.18); border: 1px solid #a9a9a9; color: #ced6e0; }
 
-.zs-level-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--paper, #f0f0f0);
-}
-.zs-tag-fruit {
-  display: inline-block;
-  padding: 4px 10px;
-  background: rgba(155, 89, 182, 0.18);
-  border: 1px solid #9b59b6;
-  border-radius: 20px;
-  font-size: 12px;
-  color: #d8a7ca;
-  font-weight: 600;
-}
-.zs-tag-nofruit {
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 12px;
-  font-style: italic;
-}
-.zs-tbl-owner {
-  display: flex;
-  flex-direction: column;
-  font-size: 13px;
-}
-.zs-tbl-pid {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-}
-.zs-tbl-actions {
-  display: flex;
-  gap: 6px;
-  justify-content: flex-end;
-}
-.btn-xs {
-  padding: 5px 10px;
-  font-size: 12px;
-  border-radius: 6px;
-}
-.zs-pj-table .zs-th-actions {
-  text-align: right;
-}
-</style>
 </head>
 <body class="ope-pg-zona-staff">
 <?php echo ope_rol_navbar_html(); ?>
@@ -339,7 +185,7 @@ header('Content-Type: text/html; charset=utf-8');
   </section>
 
 <?php if ($flash !== ''): ?>
-  <div class="flash <?php echo $flash_ok ? 'flash-ok' : 'flash-err'; ?>" style="margin-bottom:20px;padding:12px 16px;border-radius:10px;background:<?php echo $flash_ok ? 'rgba(46,160,67,0.15)' : 'rgba(248,81,73,0.15)'; ?>;border:1px solid <?php echo $flash_ok ? '#3fb950' : '#f85149'; ?>;color:var(--paper);">
+  <div class="flash <?php echo $flash_ok ? 'ok' : 'error'; ?>">
     <?php echo htmlspecialchars_uni($flash); ?>
   </div>
 <?php endif; ?>
@@ -395,6 +241,7 @@ header('Content-Type: text/html; charset=utf-8');
         'marine' => 'marines', 'marina' => 'marines',
         'pirata' => 'piratas',
         'gobierno' => 'gobierno-mundial',
+        'revolucionario' => 'revolucionarios',
         'civil' => 'civiles'
     );
     if (isset($aliases[$raw_fac])) {
@@ -628,7 +475,14 @@ header('Content-Type: text/html; charset=utf-8');
     });
   });
 
-  document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('vis'); });
+  if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
+    var io = new IntersectionObserver(function(es) {
+      es.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); } });
+    }, { threshold: .08 });
+    document.querySelectorAll('.reveal').forEach(function(el) { io.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('vis'); });
+  }
 })();
 
 function submitEstado() {

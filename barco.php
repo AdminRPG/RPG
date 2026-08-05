@@ -194,6 +194,9 @@ $tripulantes = $pid > 0 ? ope_viaje_tripulantes_data($pid, array()) : array();
 // Logs de movimientos del Cofre de la Nave
 $cofre_logs = ($barco && function_exists('ope_barco_cofre_obtener_logs')) ? ope_barco_cofre_obtener_logs($barco['barco_id']) : array();
 
+// Historial de viajes del barco (Bitácora)
+$historial_viajes = ($barco && function_exists('ope_viaje_historial_por_barco')) ? ope_viaje_historial_por_barco($barco['barco_id']) : array();
+
 // Lista de todos los personajes aprobados para el selector de invitación
 $personajes_disponibles = array();
 if ($db->table_exists('rol_personajes')) {
@@ -666,7 +669,6 @@ $mejoras_instaladas = $barco['mejoras'] ?? array();
                   <span class="b-status b-status--<?php echo htmlspecialchars_uni($v_hist['estado']); ?>"><?php echo strtoupper(htmlspecialchars_uni($v_hist['estado'])); ?></span>
                 </div>
                 <div class="b-meta">
-                  <span><?php echo (int)$v_hist['tramos']; ?> tramos</span> &middot;
                   <span>Peligro: <?php echo htmlspecialchars_uni(ucfirst($v_hist['nivel_peligro'] ?? 'bajo')); ?></span> &middot;
                   <span class="c-dim"><?php echo my_date('relative', (int)$v_hist['dateline']); ?></span>
                 </div>

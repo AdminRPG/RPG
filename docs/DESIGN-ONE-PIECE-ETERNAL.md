@@ -24,7 +24,7 @@
 7. [Cuádrupla visual del personaje](#7-cuádrupla-visual-del-personaje)
 8. [Ficha (`ficha.php`) — layout v4](#8-ficha-fichaphp--layout-v4)
 9. [Convención de imágenes (`images/gbe/`)](#9-convención-de-imágenes-imagesgbe)
-10. [Patrones de reskin (OP → OPE)](#10-patrones-de-reskin-op--gbf)
+10. [Patrones de reskin (OP → OPE)](#10-patrones-de-reskin-op--ope)
 11. [Librerías JS y animación](#11-librerías-js-y-animación)
 
 ---

@@ -20,23 +20,23 @@ function ope_rol_facciones()
 {
     return array(
         'piratas' => array(
-            'nombre' => 'Piratas',
+            'nombre' => 'Pirata',
             'desc' => 'Buscadores de libertad, riquezas, poder o nakamas. Operan al margen de la ley del Gobierno Mundial y surcan los mares persiguiendo el One Piece o sus propios sueños.',
             'ventaja' => 'Acceso a refugios de banda y, con RF, a mercados negros y rutas de contrabando en el Grand Line.',
         ),
         'marines' => array(
-            'nombre' => 'Marines',
+            'nombre' => 'Marine',
             'desc' => 'Fuerza militar marítima del Gobierno Mundial. Hacen cumplir la ley y defienden la Justicia frente a piratería y revolución.',
             'ventaja' => 'Acceso a cuarteles de la Marina y, con RF, patrullas y descuentos en almacenes oficiales.',
         ),
         'revolucionarios' => array(
-            'nombre' => 'Revolucionarios',
+            'nombre' => 'Revolucionario',
             'desc' => 'Ejército clandestino que conspira para derrocar la tiranía del Gobierno Mundial y liberar reinos oprimidos por el Tributo Celestial.',
             'ventaja' => 'Acceso a casas seguras y células ocultas; con RF, contrabando médico e inteligencia de la Marina.',
         ),
         'gobierno-mundial' => array(
             'nombre' => 'Gobierno Mundial',
-            'desc' => 'Élite política y de espionaje (Cipher Pol, Nobles Mundiales, Gorosei) que gobierna en la sombra y silencia la verdad.',
+            'desc' => 'Élite política y de espionaje (Cipher Pol, Nobles Mundiales, Cúpula Suprema) que gobierna en la sombra y silencia la verdad.',
             'ventaja' => 'Acceso a inteligencia básica de CP y, con RF, artilugios gubernamentales y autoridad en zonas aliadas.',
         ),
         'cazarrecompensas' => array(
@@ -45,7 +45,7 @@ function ope_rol_facciones()
             'ventaja' => 'Registro en el sindicato y acceso a tablones de carteles; con RF, rutas de piratas novatos y armas de Kairoseki menores.',
         ),
         'civiles' => array(
-            'nombre' => 'Civiles',
+            'nombre' => 'Civil',
             'desc' => 'Comerciantes, científicos, médicos, artesanos y ciudadanos que sobreviven en una era de guerras y piratería.',
             'ventaja' => 'Sin enemigos declarados al inicio; con RF, créditos, precios reducidos y acceso a gremios de oficio.',
         ),
@@ -166,7 +166,7 @@ function ope_rol_packs_equipo()
 
 function ope_rol_berries_iniciales()
 {
-    return 2000;
+    return 50000;
 }
 
 function ope_rol_rupies_iniciales()

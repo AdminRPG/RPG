@@ -90,6 +90,28 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endif; ?>
         </div>
       </article>
+      <article class="card">
+        <div class="card-top">
+          <div>
+            <div class="card-title">Tablon de Misiones</div>
+            <div class="card-code">mision</div>
+          </div>
+        </div>
+        <div class="card-body">Explora el tablon de misiones. Solicita una mision con tu personaje activo para que el staff la apruebe y comience tu aventura.</div>
+        <div class="card-foot">
+<?php $n_disponibles_ms = 0;
+if ($db->table_exists('rol_misiones')) {
+    $qm = $db->simple_select('rol_misiones', 'COUNT(*) AS c', "estado = 'publicada'");
+    $n_disponibles_ms = (int) $db->fetch_field($qm, 'c');
+} ?>
+          <span class="card-meta"><?php echo $n_disponibles_ms; ?> disponibles</span>
+<?php if ($pid < 1): ?>
+          <span class="chip">Sin PJ activo</span>
+<?php else: ?>
+          <a class="btn btn-hot btn-sm" href="<?php echo $bburl; ?>/misiones.php">Acceder</a>
+<?php endif; ?>
+        </div>
+      </article>
 <?php foreach ($catalogo as $tipo => $info): ?>
       <article class="card">
         <div class="card-top">

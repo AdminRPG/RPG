@@ -7,6 +7,9 @@ install/lock
 rol-backend/.env
 .env
 
+# Claves locales (viaje AI)
+inc/ope_rol/config/viaje_ai.php
+
 # OS files
 Thumbs.db
 .DS_Store
@@ -46,6 +49,9 @@ backups/
 
 # Graphify generated graph (rebuild with: py -m graphify extract . --code-only)
 graphify-out/
+
+# Docroot ensamblado por scripts/build-docroot.php o el CI
+back/
 
 # Large source images
 images/ope/_source/

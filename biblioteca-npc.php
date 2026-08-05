@@ -39,7 +39,7 @@ header('Content-Type: text/html; charset=utf-8');
     <div class="bib-filters" id="bibFilters">
       <button class="bib-filter on" data-filt="todas">Todos</button>
 <?php foreach ($FACCIONES as $slug => $f): ?>
-      <button class="bib-filter" data-filt="<?php echo htmlspecialchars_uni($slug); ?>"><?php echo htmlspecialchars_uni($f['nombre']); ?></button>
+      <button class="bib-filter" data-filt="<?php echo htmlspecialchars_uni(ope_rol_faccion_slug($slug)); ?>"><?php echo htmlspecialchars_uni($f['nombre']); ?></button>
 <?php endforeach; ?>
     </div>
   </div>

@@ -15,7 +15,7 @@ if (!defined('IN_MYBB')) {
 
 $dir = __DIR__;
 
-// Core (data arrastra catalogos + dominio/creacion + eternal)
+// Core (data arrastra catalogos + dominio/creacion)
 require_once $dir . '/core/data.php';
 require_once $dir . '/core/system.php';
 
@@ -42,6 +42,14 @@ require_once $dir . '/mundo/matriz_rutas.php';
 require_once $dir . '/mundo/barcos.php';
 require_once $dir . '/mundo/nav_items.php';
 require_once $dir . '/mundo/oraculo_v2.php';
+require_once $dir . '/mundo/viaje_ai.php';
+require_once $dir . '/mundo/viaje_cola.php';
+require_once $dir . '/mundo/viaje_revision.php';
+require_once $dir . '/mundo/misiones.php';
+require_once $dir . '/mundo/mision_oraculo.php';
+require_once $dir . '/mundo/mision_ai.php';
+require_once $dir . '/mundo/mision_post.php';
+require_once $dir . '/mundo/viaje_revision_ai.php';
 
 // Trámites
 require_once $dir . '/tramites/tramites.php';

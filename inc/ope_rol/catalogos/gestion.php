@@ -317,6 +317,51 @@ if (!function_exists('ope_rol_pid_activo')) {
     }
 }
 
+if (!function_exists('ope_rol_cat_tripulacion_miembros')) {
+    /**
+     * Tripulantes compañeros del personaje (otros miembros aprobados en su misma tripulación).
+     * Devuelve array con claves: pid, nombre, avatar, nivel, isla_actual.
+     */
+    function ope_rol_cat_tripulacion_miembros($pid)
+    {
+        global $db;
+        $pid = (int) $pid;
+        $out = array();
+        if ($pid < 1 || !$db->table_exists('rol_tripulacion_miembros') || !$db->table_exists('rol_personajes')) {
+            return $out;
+        }
+        $q = $db->simple_select('rol_tripulacion_miembros', 'tripulacion_id', "pid = {$pid} AND estado = 'activo'", array('limit' => 1));
+        if (!$db->num_rows($q)) {
+            return $out;
+        }
+        $tid = (int) $db->fetch_field($q, 'tripulacion_id');
+        if ($tid < 1) {
+            return $out;
+        }
+        $pref = TABLE_PREFIX;
+        $q2 = $db->query("
+            SELECT rp.pid, rp.nombre, rp.avatar, rp.nivel, rp.isla_actual
+            FROM {$pref}rol_tripulacion_miembros tm
+            INNER JOIN {$pref}rol_personajes rp ON (rp.pid = tm.pid)
+            WHERE tm.tripulacion_id = {$tid}
+              AND tm.pid != {$pid}
+              AND tm.estado = 'aprobado'
+              AND rp.estado = 'aprobado'
+            ORDER BY rp.nivel DESC, rp.nombre ASC
+        ");
+        while ($row = $db->fetch_array($q2)) {
+            $out[] = array(
+                'pid'         => (int) $row['pid'],
+                'nombre'      => (string) $row['nombre'],
+                'avatar'      => (string) $row['avatar'],
+                'nivel'       => (int) $row['nivel'],
+                'isla_actual' => (string) $row['isla_actual'],
+            );
+        }
+        return $out;
+    }
+}
+
 if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
     /** Membresía activa de un personaje, o null. */
     function ope_rol_cat_tripulacion_miembro($pid)

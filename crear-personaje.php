@@ -12,10 +12,6 @@ $username = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
 require_once MYBB_ROOT . 'inc/ope_user_init.php';
 
-$staff_level = ope_get_staff_level($uid);
-$initials    = ope_get_initials($mybb->user['username'] ?? '');
-$initials_e  = htmlspecialchars_uni($initials);
-
 $RAZAS       = ope_rol_razas();
 $CLASES      = ope_rol_clases();
 $OFICIOS     = ope_rol_oficios();
@@ -35,7 +31,6 @@ $PS_TOTAL    = 20;
 $STAT_BASE   = 1;
 $STAT_CAP    = 5; // antes del perfil de linaje (positivo o negativo)
 $BERRIES_BASE = ope_rol_berries_iniciales();
-$RUPIES_BASE  = $BERRIES_BASE; // alias legacy
 $MECH_HELP    = ope_rol_mechanics_help();
 
 $slots = 1;
@@ -112,17 +107,18 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         $raza = $mybb->get_input('raza');
         $clase = $mybb->get_input('clase');
         $arma = $mybb->get_input('arma');
-        $oficio = $mybb->get_input('oficio');
+        $oficios_raw = $mybb->get_input('oficios', MyBB::INPUT_ARRAY);
         $oficios_clean = array();
-        if (isset($OFICIOS[$oficio])) {
-            $oficios_clean[] = $oficio;
+        if (is_array($oficios_raw)) {
+            foreach ($oficios_raw as $ov) {
+                $ov = (string) $ov;
+                if (isset($OFICIOS[$ov]) && !in_array($ov, $oficios_clean, true)) {
+                    $oficios_clean[] = $ov;
+                }
+            }
         }
-
-        $elecciones_clean = array();
-        if ($clase === 'domador') {
-            $dom_enfoque = $mybb->get_input('domador_enfoque');
-            $elecciones_clean['1'] = ($dom_enfoque === 'Dominio Esclavista') ? 'Dominio Esclavista' : 'Vínculo Bestial';
-        }
+        // La variante de la Clase (p. ej. Domador: Vínculo Bestial / Esclavista)
+        // se elige desde Gestión, no durante la creación.
 
         if (!isset($RAZAS[$raza])) {
             $errores[] = 'Elige un linaje válido.';
@@ -136,8 +132,11 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         } elseif (!empty($armas_permitidas) && !isset($armas_permitidas[$arma])) {
             $errores[] = 'El arma debe pertenecer a la Clase Bélica elegida.';
         }
-        if (count($oficios_clean) !== 1) {
-            $errores[] = 'Elige exactamente 1 Oficio para tu personaje.';
+        if (count($oficios_clean) < 1) {
+            $errores[] = 'Elige 1 Oficio.';
+        }
+        if (count($oficios_clean) > 1) {
+            $errores[] = 'Puedes elegir solo 1 Oficio en la creación.';
         }
 
         $nombre = ope_rol_clean($mybb->get_input('nombre'), 120);
@@ -148,6 +147,10 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
         $desc_fisica = ope_rol_clean($mybb->get_input('desc_fisica'), 3000);
                 $desc_psicologica = ope_rol_clean($mybb->get_input('desc_psicologica'), 3000);
         $notas = ope_rol_clean($mybb->get_input('notas'), 3000);
+
+        if ($genero === 'Otro' && $notas === '') {
+            $errores[] = 'Elegiste "Otro" como género: especifícalo en el campo Notas.';
+        }
 
         if ($nombre === '' || (function_exists('mb_strlen') ? mb_strlen($nombre, 'UTF-8') : strlen($nombre)) < 3) {
             $errores[] = 'El nombre del personaje debe tener al menos 3 caracteres.';
@@ -240,10 +243,7 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
             }
         }
 
-        $pack_equipo = $mybb->get_input('pack_equipo');
-        if (!isset($PACKS[$pack_equipo])) {
-            $errores[] = 'Elige un Pack de Equipo Inicial válido.';
-        }
+        $pack_equipo = 'explorador'; // auto-otorgado
 
         $historia_pasado = ope_rol_clean($mybb->get_input('historia_pasado'), 6000);
         $min_len = function_exists('mb_strlen') ? mb_strlen($historia_pasado, 'UTF-8') : strlen($historia_pasado);
@@ -283,7 +283,7 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
                     ? ope_rol_clean($mybb->get_input('cyborg_slot'), 20)
                     : '',
             );
-            $inventario = array('pack_equipo' => $pack_equipo);
+            $inventario = array('pack_equipo' => $pack_equipo, 'bote' => true);
             $economia = array('berries' => $BERRIES_BASE, 'rupies' => $BERRIES_BASE);
                         $bio = array(
                 'historia' => $historia_pasado,
@@ -333,7 +333,7 @@ if ($loggedin && $mybb->request_method === 'post' && $hay_hueco) {
                         'clase' => $db->escape_string($clase),
                         'oficios' => $db->escape_string(json_encode($oficios_clean, JSON_UNESCAPED_UNICODE)),
                         'arma' => $db->escape_string($arma),
-                        'elecciones' => $db->escape_string(json_encode($elecciones_clean, JSON_UNESCAPED_UNICODE)),
+                        'elecciones' => '{}',
                         'arquetipo_clase' => '',
                         'dateline' => TIME_NOW,
                     ));
@@ -457,13 +457,13 @@ header('Content-Type: text/html; charset=utf-8');
 <?php endif; ?>
 
   <p class="wiz-lead">
-    Forja tu personaje en <b>10 pasos</b>: identidad personal, linaje (Factor Linaje), Clase Bélica, arma y oficios, atributos, facción, virtudes/defectos, Akuma no Mi (opcional), equipo y revisión.
+    Forja tu personaje en <b>9 pasos</b>: identidad personal, linaje (Factor Linaje), Clase Bélica, arma y oficios, atributos, facción, virtudes/defectos, Akuma no Mi (opcional) y revisión.
     Al enviar, tu ficha entra en <b>revisión</b> del staff.
   </p>
 
   <div class="wiz-forge">
     <aside class="wiz-preview" aria-label="Vista previa del personaje">
-      <div class="wiz-card" id="wizCard" data-element="">
+      <div class="wiz-card" id="wizCard">
         <div class="wiz-card-art">
           <div class="wiz-card-ph" id="wizInitial">?</div>
           <div class="wiz-card-veil"></div>
@@ -472,17 +472,8 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
         <div class="wiz-card-meta">
           <h2 class="wiz-card-name" id="wizNamePrev">Sin nombre</h2>
-          <div class="wiz-card-chips" id="wizChips">
-            <span class="wiz-chip">Borrador</span>
-          </div>
-          <div class="wiz-card-stats">
-            <div class="wiz-st"><span>FUE</span><b id="wizStatFue">—</b></div>
-            <div class="wiz-st"><span>RES</span><b id="wizStatRes">—</b></div>
-            <div class="wiz-st"><span>AGI</span><b id="wizStatAgi">—</b></div>
-            <div class="wiz-st"><span>VOL</span><b id="wizStatVol">—</b></div>
-          </div>
-        </div>
-        <div class="wiz-card-foot">
+          <div class="wiz-card-chips" id="wizChips"></div>
+          <div class="wiz-card-foot">
           <div class="wiz-card-line"><b>Clase</b><span id="wizLineClase">—</span></div>
           <div class="wiz-card-line"><b>Arma</b><span id="wizLineArma">—</span></div>
           <div class="wiz-card-line"><b>Oficios</b><span id="wizLineOficios">—</span></div>
@@ -506,7 +497,12 @@ header('Content-Type: text/html; charset=utf-8');
                 <div class="field"><label class="flabel">Nombre del personaje *</label><input type="text" name="nombre" id="wizNombreInput" maxlength="120" required value="<?php echo htmlspecialchars_uni($old['nombre'] ?? ''); ?>"></div>
                 <div class="field"><label class="flabel">Apodo (opcional)</label><input type="text" name="apodo" maxlength="60" value="<?php echo htmlspecialchars_uni($old['apodo'] ?? ''); ?>"></div>
                 <div class="field"><label class="flabel">Edad</label><input type="text" name="edad" maxlength="20" value="<?php echo htmlspecialchars_uni($old['edad'] ?? ''); ?>"></div>
-                <div class="field"><label class="flabel">Género</label><input type="text" name="genero" maxlength="40" value="<?php echo htmlspecialchars_uni($old['genero'] ?? ''); ?>"></div>
+                <div class="field"><label class="flabel">Género</label><select name="genero" id="generoSel">
+                    <option value="">— elige —</option>
+                    <option value="Masculino"<?php echo (($old['genero'] ?? '') === 'Masculino') ? ' selected' : ''; ?>>Masculino</option>
+                    <option value="Femenino"<?php echo (($old['genero'] ?? '') === 'Femenino') ? ' selected' : ''; ?>>Femenino</option>
+                    <option value="Otro"<?php echo (($old['genero'] ?? '') === 'Otro') ? ' selected' : ''; ?>>Otro</option>
+                  </select><span class="fl-hint">Si eliges <b>Otro</b>, especifícalo en <b>Notas</b>.</span></div>
                 <div class="field"><label class="flabel">Player By (Origen del físico)</label><input type="text" name="pb" maxlength="120" value="<?php echo htmlspecialchars_uni($old['pb'] ?? ''); ?>"></div>
               </div>
               
@@ -579,39 +575,21 @@ header('Content-Type: text/html; charset=utf-8');
               <p class="hint mb-12">Tu Clase define tu <b class="c-paper">estilo de combate</b>, tu pool afín y las armas que puedes empuñar. <button type="button" class="ope-help-btn" data-ope-help="clase" title="Ayuda">?</button></p>
               <div class="race-grid" id="claseGrid">
 <?php foreach ($CLASES as $cid => $cdat): ?>
-                <label class="race-card">
-                  <input type="radio" name="clase" value="<?php echo htmlspecialchars_uni($cid); ?>"
-                    data-nombre="<?php echo htmlspecialchars_uni($cdat['nombre']); ?>"
-                    data-armas='<?php echo htmlspecialchars_uni(json_encode($cdat['armas'], JSON_UNESCAPED_UNICODE)); ?>'
-                    required>
-                  <div class="rc-body">
-                    <div class="rc-name"><?php echo htmlspecialchars_uni($cdat['nombre']); ?></div>
-                    <div class="rc-pas"><b>Prim:</b> <?php echo htmlspecialchars_uni($cdat['prim']); ?> · <b>Sec:</b> <?php echo htmlspecialchars_uni($cdat['sec']); ?></div>
-                    <div class="rc-pas"><b>Pool:</b> <?php echo htmlspecialchars_uni(implode(', ', $cdat['pool'])); ?></div>
-                    <div class="rc-resumen"><?php echo htmlspecialchars_uni($cdat['filosofia']); ?></div>
-                  </div>
-                </label>
-<?php endforeach; ?>
-              </div>
-
-              <div id="domadorSubchoice" class="mt-14 p-12 plate" style="border-color:var(--ope-gold,#f59e0b);background:color-mix(in srgb,var(--ope-gold,#f59e0b) 6%,var(--ope-card,#1a1a24));" hidden>
-                <label class="flabel mb-8" style="color:var(--ope-gold,#f59e0b);">Vínculo Inicial de Domador (Nivel 1) *</label>
-                <div class="race-grid">
-                  <label class="race-card subchoice-card">
-                    <input type="radio" name="domador_enfoque" value="Vínculo Bestial" checked>
+                <div class="voc-card" data-voc="<?php echo htmlspecialchars_uni($cid); ?>">
+                  <label class="race-card">
+                    <input type="radio" name="clase" value="<?php echo htmlspecialchars_uni($cid); ?>"
+                      data-nombre="<?php echo htmlspecialchars_uni($cdat['nombre']); ?>"
+                      data-armas='<?php echo htmlspecialchars_uni(json_encode($cdat['armas'], JSON_UNESCAPED_UNICODE)); ?>'
+                      required>
                     <div class="rc-body">
-                      <div class="rc-name">Vínculo Bestial</div>
-                      <div class="rc-resumen">Bestia o criatura animal externa con PV/EN/PA propios criada en lealtad natural.</div>
-                    </div>
-                  </label>
-                  <label class="race-card subchoice-card">
-                    <input type="radio" name="domador_enfoque" value="Dominio Esclavista">
-                    <div class="rc-body">
-                      <div class="rc-name">Dominio Esclavista</div>
-                      <div class="rc-resumen">NPC menor subordinado (miembro de una raza del foro) sometido como sirviente.</div>
+                      <div class="rc-name"><?php echo htmlspecialchars_uni($cdat['nombre']); ?></div>
+                      <div class="rc-pas"><b>Prim:</b> <?php echo htmlspecialchars_uni($cdat['prim']); ?> · <b>Sec:</b> <?php echo htmlspecialchars_uni($cdat['sec']); ?></div>
+                      <div class="rc-pas"><b>Pool:</b> <?php echo htmlspecialchars_uni(implode(', ', $cdat['pool'])); ?></div>
+                      <div class="rc-resumen"><?php echo htmlspecialchars_uni($cdat['filosofia']); ?></div>
                     </div>
                   </label>
                 </div>
+<?php endforeach; ?>
               </div>
             </div>
           </div>
@@ -622,7 +600,7 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="plate">
             <div class="plate-h"><span class="t">4. Arma y Oficios</span><span class="c">// herramientas</span></div>
             <div class="plate-b">
-              <p class="hint mb-12">Elige el <b class="c-paper">arma</b> de tu Clase y el <b class="c-paper">Oficio</b> que define tu rol fuera del combate. <button type="button" class="ope-help-btn" data-ope-help="arma-oficio" title="Ayuda">?</button></p>
+              <p class="hint mb-12"><b class="c-paper">Arma Inicial</b>: puedes usar todas las armas de tu Clase. Elige <b>una</b> para empezar con ella equipada. Las demás podrás comprarlas más adelante. <button type="button" class="ope-help-btn" data-ope-help="arma-oficio" title="Ayuda">?</button></p>
 
               <div class="field" id="armaWrap" hidden>
                 <label class="flabel">Arma de la Clase</label>
@@ -649,12 +627,12 @@ header('Content-Type: text/html; charset=utf-8');
               </div>
 
               <div class="field mt-18">
-                <label class="flabel">Oficio de la Tripulación (elige 1) *</label>
+                <label class="flabel">Oficios (elige 1)</label>
                 <div class="race-grid" id="oficioGrid">
 <?php foreach ($OFICIOS as $oid => $odat): ?>
                   <label class="race-card">
-                    <input type="radio" name="oficio" value="<?php echo htmlspecialchars_uni($oid); ?>"
-                      data-nombre="<?php echo htmlspecialchars_uni($odat['nombre']); ?>" required>
+                    <input type="checkbox" name="oficios[]" value="<?php echo htmlspecialchars_uni($oid); ?>"
+                      data-nombre="<?php echo htmlspecialchars_uni($odat['nombre']); ?>">
                     <div class="rc-body">
                       <div class="rc-name"><?php echo htmlspecialchars_uni($odat['nombre']); ?></div>
                       <div class="rc-pas"><b>Prim:</b> <?php echo htmlspecialchars_uni($odat['prim']); ?> · <b>Sec:</b> <?php echo htmlspecialchars_uni($odat['sec']); ?></div>
@@ -813,32 +791,10 @@ header('Content-Type: text/html; charset=utf-8');
           </div>
         </div>
 
-        <!-- PASO 9: EQUIPO -->
+<!-- PASO 9: RESUMEN -->
         <div class="wiz-step" data-step="9">
           <div class="plate">
-            <div class="plate-h"><span class="t">9. Equipo Inicial</span><span class="c">// prepárate</span></div>
-            <div class="plate-b">
-              <p class="hint mb-12">Elige tu <b class="c-paper">Pack de Equipo Inicial</b>. Empiezas con <b class="c-ember"><?php echo number_format((int)$BERRIES_BASE, 0, ',', '.'); ?> Berries</b>.</p>
-              <div class="pack-grid" id="packGrid">
-<?php foreach ($PACKS as $pack_id => $p): ?>
-                <label class="pack-card">
-                  <input type="radio" name="pack_equipo" value="<?php echo htmlspecialchars_uni($pack_id); ?>" data-nombre="<?php echo htmlspecialchars_uni($p['nombre']); ?>" required<?php echo (($old['pack_equipo'] ?? '') === $pack_id) ? ' checked' : ''; ?>>
-                  <div class="rc-body">
-                    <div class="rc-name"><?php echo htmlspecialchars_uni($p['nombre']); ?></div>
-                    <div class="rc-resumen"><?php echo htmlspecialchars_uni($p['resumen']); ?></div>
-                    <div class="rc-pas"><?php echo implode('<br>', array_map('htmlspecialchars_uni', $p['contenido'])); ?></div>
-                  </div>
-                </label>
-<?php endforeach; ?>
-              </div>
-            </div>
-          </div>
-        </div>
-
-<!-- PASO 10: RESUMEN -->
-        <div class="wiz-step" data-step="10">
-          <div class="plate">
-            <div class="plate-h"><span class="t">10. Revisión final</span><span class="c">// antes de enviar</span></div>
+            <div class="plate-h"><span class="t">9. Revisión final</span><span class="c">// antes de enviar</span></div>
             <div class="plate-b" id="wizSummary"></div>
           </div>
         </div>
@@ -867,7 +823,7 @@ header('Content-Type: text/html; charset=utf-8');
   var STAT_BASE = <?php echo (int)$STAT_BASE; ?>;
   var STAT_CAP = <?php echo (int)$STAT_CAP; ?>;
   var BERRIES = <?php echo (int)$BERRIES_BASE; ?>;
-  var STEP_NAMES = ['Qui\u00e9n eres','Linaje','Clase','Arma y Oficios','Atributos','Facci\u00f3n','Factor Linaje','Fruta','Equipo','Resumen'];
+  var STEP_NAMES = ['Qui\u00e9n eres','Linaje','Clase','Arma y Oficios','Atributos','Facci\u00f3n','Factor Linaje','Fruta','Resumen'];
   var steps = Array.prototype.slice.call(document.querySelectorAll('.wiz-step'));
   var cur = 1;
   var form = document.getElementById('wizForm');
@@ -906,6 +862,7 @@ header('Content-Type: text/html; charset=utf-8');
     if (n === 1){
       if (form.querySelector('[name=nombre]').value.trim().length < 3) return 'Escribe un nombre de al menos 3 caracteres.';
       if (form.querySelector('[name=historia_pasado]').value.trim().length < 80) return 'Cuenta la historia de tu personaje con más detalle (mínimo ~80 caracteres).';
+      if (form.querySelector('[name=genero]').value === 'Otro' && !form.querySelector('[name=notas]').value.trim()) return 'Elegiste "Otro" como género: especifícalo en el campo Notas.';
     }
     if (n === 2){
       if (!document.querySelector('input[name=raza]:checked')) return 'Elige un linaje.';
@@ -917,11 +874,16 @@ header('Content-Type: text/html; charset=utf-8');
       }
     }
     if (n === 3){
-      if (!document.querySelector('input[name=clase]:checked')) return 'Elige una Clase B\u00e9lica.';
+      var claseChecked = document.querySelector('input[name=clase]:checked');
+      if (!claseChecked) return 'Elige una Clase B\u00e9lica.';
     }
     if (n === 4){
       if (!document.querySelector('input[name=arma]:checked')) return 'Elige un arma de tu Clase.';
-      if (!document.querySelector('input[name=oficio]:checked')) return 'Elige 1 Oficio.';
+      var oficiosSel = document.querySelectorAll('input[name="oficios[]"]');
+      var oficioCount = 0;
+      oficiosSel.forEach(function(c){ if (c.checked) oficioCount++; });
+      if (oficioCount < 1) return 'Elige 1 Oficio.';
+      if (oficioCount > 1) return 'M\u00e1ximo 1 Oficio en la creaci\u00f3n.';
     }
     if (n === 5){
       var totalPs = 0;
@@ -962,9 +924,7 @@ header('Content-Type: text/html; charset=utf-8');
     if (n === 8){
       // Fruta opcional: ninguna o tirar (radio siempre checked por default).
     }
-    if (n === 9){
-      if (!document.querySelector('input[name=pack_equipo]:checked')) return 'Elige un Pack de Equipo Inicial.';
-    }
+
     return '';
   }
 
@@ -979,13 +939,10 @@ header('Content-Type: text/html; charset=utf-8');
     showStep(cur);
   });
 
-  // ---- Clase Bélica → filtrar armas y mostrar subopción Domador ----
+  // ---- Clase Bélica → filtrar armas ----
   document.querySelectorAll('input[name=clase]').forEach(function(r){
     r.addEventListener('change', function(){
       var claseKey = r.value;
-      var domWrap = document.getElementById('domadorSubchoice');
-      if (domWrap) domWrap.hidden = (claseKey !== 'domador');
-
       var wrap = document.getElementById('armaWrap');
       wrap.hidden = false;
       document.querySelectorAll('.arma-opt').forEach(function(lab){
@@ -1000,9 +957,16 @@ header('Content-Type: text/html; charset=utf-8');
     });
   });
 
-  // ---- Arma + Oficio (1 único) ----
-  document.querySelectorAll('input[name=arma], input[name=oficio], input[name=domador_enfoque]').forEach(function(r){
+  // ---- Arma + Oficios (max 1) ----
+  document.querySelectorAll('input[name=arma]').forEach(function(r){
     r.addEventListener('change', updatePreview);
+  });
+  document.querySelectorAll('input[name="oficios[]"]').forEach(function(c){
+    c.addEventListener('change', function(){
+      var checked = document.querySelectorAll('input[name="oficios[]"]:checked').length;
+      if (checked > 1) { c.checked = false; }
+      updatePreview();
+    });
   });
 
   // ---- Stats en vivo con perfil racial fijo (sin elección) ----
@@ -1122,42 +1086,27 @@ header('Content-Type: text/html; charset=utf-8');
     return el.dataset.nombre || '';
   }
 
-  function effOrDash(sig){
-    var inp = document.getElementById('ps_' + sig);
-    if (!inp) return dash;
-    return String(getStatEff(parseInt(inp.value, 10) || 0, sig, getRazaMods()));
-  }
-
-  function updateCardSelections() {
-    document.querySelectorAll('.race-card, .fac-card, .pack-card, .subchoice-card, .fl-pureza-opt').forEach(function(card) {
-      var inp = card.querySelector('input');
-      if (inp) {
-        card.classList.toggle('selected', !!inp.checked);
-      }
-    });
-  }
-
   function updatePreview(){
-    updateCardSelections();
-
     var card = document.getElementById('wizCard');
     var nombre = (form.querySelector('[name=nombre]') || {}).value || '';
     nombre = nombre.trim();
     document.getElementById('wizNamePrev').textContent = nombre || 'Sin nombre';
     document.getElementById('wizInitial').textContent = nombre ? nombre.charAt(0).toUpperCase() : '?';
 
-    var claseSel = document.querySelector('input[name=clase]:checked');
-    card.setAttribute('data-element', claseSel ? claseSel.value : '');
-
     var raza = selectedNombre('raza');
     var claseN = selectedNombre('clase');
     var arma = selectedNombre('arma');
-    var oficioN = selectedNombre('oficio');
     var fac = selectedNombre('faccion');
+
+    // Oficios (checkboxes)
+    var oficioNames = [];
+    document.querySelectorAll('input[name="oficios[]"]:checked').forEach(function(c){
+      oficioNames.push(c.dataset.nombre || c.value);
+    });
 
     document.getElementById('wizLineClase').textContent = claseN || dash;
     document.getElementById('wizLineArma').textContent = arma || dash;
-    document.getElementById('wizLineOficios').textContent = oficioN || dash;
+    document.getElementById('wizLineOficios').textContent = oficioNames.length ? oficioNames.join(', ') : dash;
     document.getElementById('wizLineFac').textContent = fac || dash;
 
     var chips = document.getElementById('wizChips');
@@ -1166,11 +1115,6 @@ header('Content-Type: text/html; charset=utf-8');
     if (raza) parts.push(raza);
     if (fac) parts.push(fac);
     chips.innerHTML = parts.map(function(t){ return '<span class="wiz-chip">' + t + '</span>'; }).join('');
-
-    document.getElementById('wizStatFue').textContent = effOrDash('FUE');
-    document.getElementById('wizStatRes').textContent = effOrDash('RES');
-    document.getElementById('wizStatAgi').textContent = effOrDash('AGI');
-    document.getElementById('wizStatVol').textContent = effOrDash('VOL');
   }
 
   form.addEventListener('change', updatePreview);
@@ -1327,7 +1271,6 @@ header('Content-Type: text/html; charset=utf-8');
     var famTxt = selectedNombre('familia_arma') || dash;
     var armaTxt = selectedNombre('arma') || dash;
     var faccionTxt = selectedNombre('faccion') || dash;
-    var packTxt = selectedNombre('pack_equipo') || dash;
     var nombre = form.querySelector('[name=nombre]').value || dash;
 
     function flNames(sel){
@@ -1366,6 +1309,14 @@ header('Content-Type: text/html; charset=utf-8');
     var berriesTxt = BERRIES.toLocaleString('es-ES');
     var sumTotal = document.getElementById('statSum') ? document.getElementById('statSum').textContent : '0';
 
+    // Oficios + variante de Clase (p. ej. Domador: Vínculo Bestial).
+    var oficioSummary = [];
+    document.querySelectorAll('input[name="oficios[]"]:checked').forEach(function(c){
+      oficioSummary.push(c.dataset.nombre || c.value);
+    });
+    var oficioTxt = oficioSummary.length ? oficioSummary.join(', ') : dash;
+    var claseSummary2 = selectedNombre('clase') || dash;
+
     out.innerHTML =
       '<div class="sum-block"><h4>Personaje</h4>' +
       '<div class="line"><b>Nombre</b>' + nombre + '</div>' +
@@ -1373,6 +1324,8 @@ header('Content-Type: text/html; charset=utf-8');
       '<div class="line"><b>Sangre</b>' + purezaTxt + '</div>' +
       '<div class="line"><b>Identidad</b>' + idTxt + '</div>' +
       '<div class="line"><b>Familia</b>' + famTxt + '</div>' +
+      '<div class="line"><b>Clase</b>' + claseSummary2 + '</div>' +
+      '<div class="line"><b>Oficio</b>' + oficioTxt + '</div>' +
       '<div class="line"><b>Arma</b>' + armaTxt + '</div>' +
       '<div class="line"><b>Facción</b>' + faccionTxt + '</div></div>' +
       '<div class="sum-block"><h4>Atributos</h4>' +
@@ -1385,9 +1338,10 @@ header('Content-Type: text/html; charset=utf-8');
         : '') +
       '</div>' +
       '<div class="sum-block"><h4>Akuma no Mi</h4><div class="line"><b>Opción</b>' + ((document.querySelector('input[name=fruta_opcion]:checked') || {}).value === 'tirar' ? 'Tirar (aleatoria)' : 'Sin fruta') + '</div></div>' +
-      '<div class="sum-block"><h4>Equipo</h4><div class="line"><b>Pack</b>' + packTxt + '</div>' +
-      '<div class="line"><b>Berries iniciales</b>' + berriesTxt + '</div></div>' +
-      '<p class="hint">Al enviar, el personaje queda en <b>revisión</b>. Cuando el staff lo apruebe recibirás 1 PT para empezar a comprar nodos Eternal.</p>';
+      '<div class="sum-block"><h4>Equipo Inicial</h4><div class="line"><b>Arma</b>' + armaTxt + '</div>' +
+      '<div class="line"><b>Bote</b>Sí</div>' +
+      '<div class="line"><b>Berries</b>' + berriesTxt + '</div></div>' +
+      '<p class="hint">Al enviar, el personaje queda en <b>revisión</b>. Cuando el staff lo apruebe podrás gestionar tu Clase Bélica, Oficios y técnicas desde la ficha.</p>';
   }
 
   showStep(1);
@@ -1395,7 +1349,7 @@ header('Content-Type: text/html; charset=utf-8');
   refreshFactorLinaje();
   updateHibAviso();
 
-  // ---- Modales de mecánicas + nodos Eternal ----
+  // ---- Modales de mecánicas ----
   var MECH_HELP = <?php echo json_encode($MECH_HELP, JSON_UNESCAPED_UNICODE); ?>;
   var modal = document.getElementById('opeMechModal');
   var modalTitle = document.getElementById('opeMechTitle');
@@ -1422,64 +1376,6 @@ header('Content-Type: text/html; charset=utf-8');
     });
   }
 
-  function buildEternalNodeModalHtml(data){
-    var tipoLabel = data.tipo_label || data.tipo || '';
-    if (data.pinaculo) tipoLabel = 'Pináculo';
-    var nivel = data.nivel ? (' · Nv ' + escHtml(data.nivel)) : '';
-    var codigo = data.codigo ? ('<span class="ope-mech-codigo">' + escHtml(data.codigo) + '</span> ') : '';
-    var html = '<p class="ope-mech-meta">' + codigo + '<b>' + escHtml(tipoLabel) + '</b> · Corriente ' + escHtml(data.foco || '') +
-      ' · Tier ' + escHtml(data.tier || '') + nivel + ' · Coste <b>' + (data.coste_pt || 1) + ' PT</b></p>';
-
-    html += '<p class="ope-mech-efecto">' + escHtml(data.efecto || 'Sin descripción.') + '</p>';
-
-    if (data.tipo === 'habilitador') {
-      html += '<p class="hint">Este nodo es un <b>habilitador</b>: no te da una técnica hecha, sino el <b>derecho a crear</b> técnicas de este tipo y pagarlas con PP.</p>';
-    }
-    if (data.profundidad) {
-      html += '<p class="ope-mech-profundidad"><b>Profundidad:</b> ' + escHtml(data.profundidad) + '</p>';
-    }
-    if (data.afinidad_bonus) {
-      html += '<p class="ope-mech-afinidad"><b>Afinidad</b>' + (data.afinidad ? (' (' + escHtml(data.afinidad) + ')') : '') + ': ' + escHtml(data.afinidad_bonus) + '</p>';
-    }
-
-    var excluyeNombres = (data.excluye_nombres && data.excluye_nombres.length) ? data.excluye_nombres : (data.excluye || []);
-    if (excluyeNombres.length) {
-      html += '<p class="ope-mech-excluye"><b>Excluye:</b> ' + excluyeNombres.map(escHtml).join(', ') + ' (eliges 1 de 3 pináculos)</p>';
-    }
-    if (data.blocked) {
-      html += '<p class="ope-mech-bloqueo"><b>Bloqueado:</b> ya elegiste ' + escHtml(data.blocked_by_nombre || 'otro pináculo') + '. No puedes elegir este.</p>';
-    }
-    if (data.pinaculo) html += '<p class="ope-mech-tag">Pináculo de la corriente' + (data.afinidad ? (' ' + escHtml(data.afinidad)) : '') + '</p>';
-    html += '<p class="hint">En creación solo exploras. Tras la aprobación del staff elegirás nodos con PT (1 PT por tier: Nv 1/10/20/30/45).</p>';
-    return html;
-  }
-
-  // ---- Modal "Ver árbol completo" (SVG entero con zoom, sin scroll a ciegas) ----
-  function eternalScaleEl(dlg){ return dlg.querySelector('[data-eternal-tree-scale]'); }
-  function eternalBoardEl(dlg){ return dlg.querySelector('[data-eternal-tree-board]'); }
-  function applyEternalZoom(dlg, zoom){
-    var scaleEl = eternalScaleEl(dlg), board = eternalBoardEl(dlg);
-    if (!scaleEl || !board) return;
-    zoom = Math.max(0.25, Math.min(2, zoom));
-    dlg._etZoom = zoom;
-    var w = parseFloat(board.getAttribute('data-board-w')) || board.offsetWidth;
-    var h = parseFloat(board.getAttribute('data-board-h')) || board.offsetHeight;
-    scaleEl.style.transform = 'scale(' + zoom + ')';
-    scaleEl.style.width = (w * zoom) + 'px';
-    scaleEl.style.height = (h * zoom) + 'px';
-    var lvl = dlg.querySelector('[data-eternal-zoom-level]');
-    if (lvl) lvl.textContent = Math.round(zoom * 100) + '%';
-  }
-  function fitEternalTree(dlg){
-    var viewport = dlg.querySelector('[data-eternal-tree-viewport]');
-    var board = eternalBoardEl(dlg);
-    if (!viewport || !board) return;
-    var w = parseFloat(board.getAttribute('data-board-w')) || 1;
-    var h = parseFloat(board.getAttribute('data-board-h')) || 1;
-    var scale = Math.min(1, (viewport.clientWidth - 24) / w, (viewport.clientHeight - 24) / h);
-    applyEternalZoom(dlg, isFinite(scale) && scale > 0 ? scale : 1);
-  }
-
   document.addEventListener('click', function(ev){
     var helpBtn = ev.target.closest('[data-ope-help]');
     if (helpBtn) {
@@ -1487,43 +1383,6 @@ header('Content-Type: text/html; charset=utf-8');
       openHelpKey(helpBtn.getAttribute('data-ope-help'));
       return;
     }
-    var openBtn = ev.target.closest('[data-eternal-tree-open]');
-    if (openBtn) {
-      ev.preventDefault();
-      var dlg = document.getElementById('eternal-tree-modal-' + openBtn.getAttribute('data-eternal-tree-open'));
-      if (dlg) {
-        if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', 'open');
-        requestAnimationFrame(function(){ fitEternalTree(dlg); });
-      }
-      return;
-    }
-    var closeBtn = ev.target.closest('[data-eternal-tree-close]');
-    if (closeBtn) {
-      ev.preventDefault();
-      var dlgc = closeBtn.closest('dialog.eternal-tree-modal');
-      if (dlgc) { if (dlgc.close) dlgc.close(); else dlgc.removeAttribute('open'); }
-      return;
-    }
-    var zoomBtn = ev.target.closest('[data-eternal-zoom]');
-    if (zoomBtn) {
-      ev.preventDefault();
-      var dlgz = zoomBtn.closest('dialog.eternal-tree-modal');
-      if (!dlgz) return;
-      var action = zoomBtn.getAttribute('data-eternal-zoom');
-      if (action === 'fit') fitEternalTree(dlgz);
-      else applyEternalZoom(dlgz, (dlgz._etZoom || 1) + (action === 'in' ? 0.15 : -0.15));
-      return;
-    }
-    var nodeBtn = ev.target.closest('.eternal-node[data-ope-node]');
-    if (nodeBtn) {
-      ev.preventDefault();
-      var data;
-      try { data = JSON.parse(nodeBtn.getAttribute('data-ope-node')); } catch (e) { return; }
-      openMechModal(data.nombre || 'Nodo', buildEternalNodeModalHtml(data));
-    }
-  });
-  window.addEventListener('resize', function(){
-    document.querySelectorAll('dialog.eternal-tree-modal[open]').forEach(fitEternalTree);
   });
 
   function syncCyborgBanner(){

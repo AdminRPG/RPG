@@ -30,7 +30,7 @@ php scripts/check-inline-styles.php
 
 - Hard refresh navegador (`cache/themes/theme13/ope.css`)
 - Comparar lado a lado con `docs/Prototypes/Granblue/index.html` (scroll completo)
-- Actualizar `DESIGN-GRANBLUE-ETERNAL.md` §6.7 si cambia estado
+- Actualizar `DESIGN-ONE-PIECE-ETERNAL.md` §6.7 si cambia estado
 
 ## Anti-patrones
 

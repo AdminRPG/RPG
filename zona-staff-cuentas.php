@@ -149,7 +149,7 @@ header('Content-Type: text/html; charset=utf-8');
   </section>
 
 <?php if ($flash !== ''): ?>
-  <div class="flash <?php echo $flash_ok ? 'flash-ok' : 'flash-err'; ?>" style="margin-bottom:20px;padding:12px 16px;border-radius:10px;background:<?php echo $flash_ok ? 'rgba(46,160,67,0.15)' : 'rgba(248,81,73,0.15)'; ?>;border:1px solid <?php echo $flash_ok ? '#3fb950' : '#f85149'; ?>;color:var(--paper);">
+  <div class="flash <?php echo $flash_ok ? 'ok' : 'error'; ?>">
     <?php echo htmlspecialchars_uni($flash); ?>
   </div>
 <?php endif; ?>

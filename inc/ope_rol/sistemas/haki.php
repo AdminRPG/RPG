@@ -14,7 +14,7 @@ function ope_haki_catalogo()
     if ($cat !== null) {
         return $cat;
     }
-    $path = dirname(__FILE__) . '/ope_haki/catalogo.json';
+    $path = dirname(__FILE__) . '/../../ope_haki/catalogo.json';
     $raw = is_file($path) ? file_get_contents($path) : false;
     $cat = ($raw !== false) ? json_decode($raw, true) : array();
     if (!is_array($cat)) {

@@ -68,6 +68,7 @@ $tipo_iconos = [
     'personaje_rechazado'  => '✕',
     'personaje_moderado'   => '↻',
     'staff_asignado'       => '⚑',
+    'viaje_publicado'      => '⛵',
 ];
 $tipo_colores = [
     'mensaje_nuevo'        => 'var(--patina)',
@@ -75,6 +76,7 @@ $tipo_colores = [
     'personaje_rechazado'  => 'var(--crack)',
     'personaje_moderado'   => 'var(--h6)',
     'staff_asignado'       => 'var(--ember)',
+    'viaje_publicado'      => 'var(--op-ocean)',
 ];
 
 header('Content-Type: text/html; charset=utf-8');

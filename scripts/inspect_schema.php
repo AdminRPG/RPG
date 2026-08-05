@@ -22,19 +22,6 @@ if ($db->table_exists('rol_eternal_picks')) {
     echo "NO EXISTE rol_eternal_picks\n";
 }
 
-echo "\n=== CATALOGO ETERNAL TREES & NODES ===\n";
-require_once MYBB_ROOT . 'inc/ope_rol_eternal.php';
-$tree_ids = ope_eternal_tree_ids();
-foreach ($tree_ids as $tid) {
-    $t = ope_eternal_load($tid);
-    echo "Árbol ID: {$tid} | Nombre: {$t['nombre']}\n";
-    if (isset($t['nodos'])) {
-        foreach ($t['nodos'] as $nid => $nodo) {
-            echo "   - Node ID: {$nid} | Label: {$nodo['label']} | Coste: {$nodo['coste']}\n";
-        }
-    }
-}
-
 echo "\n=== CATALOGO AKUMA NO MI ===\n";
 require_once MYBB_ROOT . 'inc/ope_rol_frutas.php';
 if (function_exists('ope_fruta_catalogo')) {

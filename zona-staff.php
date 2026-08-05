@@ -85,9 +85,29 @@ $paneles = array(
         'count_key' => 'cards',
         'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>',
     ),
+    array(
+        'id' => 'viajes',
+        'titulo' => 'Revisión de Cierres de Viaje',
+        'code' => 'STF-06',
+        'desc' => 'Revisa las solicitudes de cierre de viaje. Analiza el roleo con IA, verifica eventos del oráculo y aprueba o rechaza llegadas.',
+        'rank_min' => 3,
+        'href' => 'zona-staff-viajes.php',
+        'count_key' => 'cola_viajes',
+        'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/><circle cx="12" cy="12" r="3"/></svg>',
+    ),
+    array(
+        'id' => 'misiones',
+        'titulo' => 'Tablon de Misiones',
+        'code' => 'STF-07',
+        'desc' => 'Escribe y gestiona las misiones del tablon. Aprueba tomas de jugadores y cierra las misiones en curso como completadas o fallidas.',
+        'rank_min' => 1,
+        'href' => 'zona-staff-misiones.php',
+        'count_key' => 'cola_misiones',
+        'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+    ),
 );
 
-$counts = array('cola_pj' => 0, 'cola_tram' => 0, 'cards' => 0);
+$counts = array('cola_pj' => 0, 'cola_tram' => 0, 'cards' => 0, 'cola_viajes' => 0, 'cola_misiones' => 0);
 if ($is_staff && $db->table_exists('rol_personajes')) {
     $q = $db->simple_select('rol_personajes', 'COUNT(*) AS c', "estado = 'revision'");
     $counts['cola_pj'] = (int) $db->fetch_field($q, 'c');
@@ -102,6 +122,12 @@ if ($is_staff && $staff_rank >= 1 && $db->table_exists('rol_tramites')) {
 }
 if ($is_staff && $db->table_exists('rol_cards')) {
     $counts['cards'] = (int) $db->fetch_field($db->simple_select('rol_cards', 'COUNT(*) AS c', 'activo = 1'), 'c');
+}
+if ($is_staff && $staff_rank >= 3 && $db->table_exists('rol_viajes')) {
+    $counts['cola_viajes'] = (int) $db->fetch_field($db->simple_select('rol_viajes', 'COUNT(*) AS c', "estado = 'pendiente_cierre'"), 'c');
+}
+if ($is_staff && $staff_rank >= 1 && $db->table_exists('rol_mision_tomas')) {
+    $counts['cola_misiones'] = (int) $db->fetch_field($db->simple_select('rol_mision_tomas', 'COUNT(*) AS c', "estado = 'pendiente'"), 'c');
 }
 
 $by_rank = array();

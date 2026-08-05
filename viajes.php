@@ -46,7 +46,14 @@ if (!$isla_origen) {
 }
 
 // Comprobar viaje activo
-$viaje_activo = $pid > 0 ? ope_viaje_por_capitan_activo($pid) : null;
+$viaje_activo    = $pid > 0 ? ope_viaje_por_capitan_activo($pid) : null;
+$viaje_pendiente = null;
+if ($pid > 0 && !$viaje_activo && $db->table_exists('rol_viajes')) {
+    $q_pend = $db->simple_select('rol_viajes', '*', "pid_capitan = {$pid} AND estado = 'pendiente_cierre'", array('limit' => 1));
+    if ($db->num_rows($q_pend)) {
+        $viaje_pendiente = $db->fetch_array($q_pend);
+    }
+}
 
 // Barcos del personaje
 $barcos = $pid > 0 ? ope_barco_lista($pid) : array();
@@ -83,8 +90,8 @@ if ($mybb->request_method === 'post') {
             $flash_error = $res['msg'];
         }
     } elseif ($action === 'zarpar') {
-        if ($viaje_activo) {
-            $flash_error = 'Ya tienes un viaje activo. Debes llegar a tu destino antes de zarpar de nuevo.';
+        if ($viaje_activo || $viaje_pendiente) {
+            $flash_error = 'Ya tienes un viaje activo o pendiente de revision. Debes llegar a tu destino antes de zarpar de nuevo.';
         } elseif ($pid < 1) {
             $flash_error = 'Debes tener un personaje activo para zarpar.';
         } else {
@@ -107,9 +114,12 @@ if ($mybb->request_method === 'post') {
                 'notas'        => $notas,
             );
 
-            $res = ope_viaje_solicitar($data_sol);
+            // Publicación ASÍNCRONA: se encola, se vuelve al índice al instante y
+            // una tarea programada publica el hilo y avisa por la campana.
+            $res = ope_viaje_encolar($data_sol);
             if ($res['ok']) {
-                header('Location: ' . $res['url']);
+                ope_flash_set($uid, 'ok', $res['msg']);
+                header('Location: ' . $bburl . '/index.php');
                 exit;
             } else {
                 $flash_error = $res['msg'];
@@ -198,7 +208,6 @@ header('Content-Type: text/html; charset=utf-8');
           <h3><?php echo htmlspecialchars_uni($viaje_activo['origen_nombre']); ?> &rarr; <?php echo htmlspecialchars_uni($viaje_activo['destino_nombre']); ?></h3>
           <p>Actualmente te encuentras navegando a bordo de <strong><?php echo htmlspecialchars_uni($viaje_activo['barco_nombre']); ?></strong>.</p>
           <div class="viaje-stats-grid">
-            <div class="vstat"><span class="vval"><?php echo (int)$viaje_activo['tramos']; ?></span><span class="vlbl">Tramos</span></div>
             <div class="vstat"><span class="vval"><?php echo (int)($viaje_activo['dias_onrol'] ?? 2); ?>d</span><span class="vlbl">Días On-Rol</span></div>
             <div class="vstat"><span class="vval"><?php echo htmlspecialchars_uni(ucfirst($viaje_activo['nivel_peligro'] ?? 'bajo')); ?></span><span class="vlbl">Escala Peligro</span></div>
             <div class="vstat"><span class="vval"><?php echo (int)$viaje_activo['posts_min']; ?></span><span class="vlbl">Posts Mínimos</span></div>
@@ -213,6 +222,31 @@ header('Content-Type: text/html; charset=utf-8');
               <button type="submit" class="btn btn-ghost" onclick="return confirm('¿Confirmar la llegada al puerto de destino?');">Solicitar Llegada</button>
             </form>
 <?php endif; ?>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<?php elseif ($viaje_pendiente): ?>
+  <!-- PANEL DE VIAJE PENDIENTE DE REVISIÓN -->
+  <section class="reveal">
+    <div class="plate">
+      <div class="plate-h">
+        <span class="t">Travesía en Revisión</span>
+        <span class="c">// estado: pendiente de cierre</span>
+      </div>
+      <div class="plate-b">
+        <div class="viaje-activo-card">
+          <h3><?php echo htmlspecialchars_uni($viaje_pendiente['origen_nombre']); ?> &rarr; <?php echo htmlspecialchars_uni($viaje_pendiente['destino_nombre']); ?></h3>
+          <p>Has solicitado el cierre de esta travesía a bordo de <strong><?php echo htmlspecialchars_uni($viaje_pendiente['barco_nombre']); ?></strong>. El staff está revisando el roleo.</p>
+          <div class="viaje-stats-grid">
+            <div class="vstat"><span class="vval"><?php echo (int)($viaje_pendiente['dias_onrol'] ?? 2); ?>d</span><span class="vlbl">Días On-Rol</span></div>
+            <div class="vstat"><span class="vval"><?php echo htmlspecialchars_uni(ucfirst($viaje_pendiente['nivel_peligro'] ?? 'bajo')); ?></span><span class="vlbl">Escala Peligro</span></div>
+            <div class="vstat"><span class="vval"><?php echo (int)$viaje_pendiente['posts_min']; ?></span><span class="vlbl">Posts Mínimos</span></div>
+          </div>
+          <div class="viaje-actions">
+            <a href="<?php echo $bburl; ?>/showthread.php?tid=<?php echo (int)$viaje_pendiente['tid']; ?>" class="btn btn-hot">Ir al Hilo en Alta Mar</a>
+            <p class="viaje-pending-note">Recibirás una notificación cuando el staff apruebe o rechace el cierre. Si es rechazado, podrás corregir el roleo y volver a solicitar el cierre.</p>
           </div>
         </div>
       </div>
@@ -361,7 +395,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php if ($preview_ruta && $preview_ruta['ok']): ?>
               <div class="route-summary">
                 <div class="route-header">
-                  <div class="route-tramos"><?php echo (int)$preview_ruta['tramos_total']; ?> Tramos</div>
+                  <div class="route-tramos"><?php echo htmlspecialchars_uni($preview_ruta['nivel_peligro_label']); ?></div>
                   <div class="route-dias"><?php echo (int)$preview_ruta['dias_onrol']; ?> Días On-Rol</div>
                 </div>
 

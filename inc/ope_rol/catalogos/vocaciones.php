@@ -6,7 +6,8 @@
  *   1 Clase Bélica + hasta 2 Oficios + 1 arma PROHIBIDA según la Clase.
  * Las Clases/Oficios NUNCA dan activas con coste EN/PA: solo Mecánicos pasivos,
  * Permisos de Pool y desbloqueos narrativos. Cadencia única:
- *   hitos fijos 1·3·5·15·25·35·45  y  elecciones 10·20·30·40·50 (30 = Arquetipo).
+ *   hitos fijos 1·3·5·15·25·35·45  y  elecciones 10·20·40·50.
+ *   Nivel 30: Clase = Arquetipo (2ª Clase) · Oficio = Especialización (2 ramas).
  */
 
 if (!defined('IN_MYBB')) {
@@ -252,6 +253,10 @@ function ope_rol_clases()
             'filosofia'=> 'Vínculo con bestias de combate y armas de guía, látigo o mando.',
             'pool'     => array('Daño', 'Buff', 'Control de Movimiento'),
             'armas'    => array('latigo', 'lanza', 'tridente', 'bo', 'arco'),
+            'eleccion' => array(
+                'bestial'    => array('nombre' => 'Vínculo Bestial',    'desc' => 'Bestia o criatura animal externa con PV/EN/PA propios criada en lealtad natural.'),
+                'esclavista' => array('nombre' => 'Dominio Esclavista', 'desc' => 'NPC menor subordinado (miembro de una raza del foro) sometido como sirviente de combate.'),
+            ),
             'hitos'    => array(
                 1  => array('eleccion' => array(
                     'Vínculo Bestial'   => 'Bestia o criatura animal externa con PV/EN/PA propios criada en lealtad natural.',
@@ -364,6 +369,34 @@ function ope_rol_oficios()
             'pool'   => array('Buff', 'Curación', 'Información'),
             'armas'  => array(), // ningún arma: los Oficios no restringen arma
             'desc'   => 'Sustento y Cocina de Combate. Alimenta en descanso, buffs de pel y cocina ofensiva.',
+            'hitos'  => array(
+                1  => 'Prepara platos básicos: buff de comida de +5% a una stat durante 1 escena.',
+                3  => 'Raciones de mar: la tripulación no sufre penalizaciones por mala comida en travesías.',
+                5  => 'Cocina exprés: aplicas un buff de comida a 1 aliado sin gastar su acción (1×/combate).',
+                10 => array('eleccion' => array(
+                    'Mano Ligera'   => 'prepara el doble de raciones con los mismos ingredientes.',
+                    'Sazón Precisa' => 'tus buffs de comida otorgan +2% adicional al efecto principal.',
+                )),
+                15 => 'Curry de mariscos: tus platos de batalla escalan a +10% de daño.',
+                20 => array('eleccion' => array(
+                    'Festín Rápido'  => 'alimentas a todo el grupo con un solo plato.',
+                    'Receta Secreta' => 'copias un plato que hayas probado una vez (1×/arco).',
+                )),
+                25 => 'Estómago de acero: tu grupo ignora efectos de comida envenenada o contaminada.',
+                30 => array('especializacion' => array(
+                    'Banquete'    => 'tus platos alimentan a toda la tripulación a la vez, sin coste extra.',
+                    'Alta Cocina' => 'tus buffs de comida duran 2 combates o escenas en lugar de 1.',
+                )),
+                35 => 'Festín de la tripulación: +15% a todas las stats del grupo durante 1 escena (1×/arco).',
+                40 => array('eleccion' => array(
+                    'Banquete Real'  => 'regeneración masiva al grupo durante 3 turnos (1×/combate).',
+                    'Chef de Guerra' => 'cocinas en pleno combate sin gastar acción (1×/combate).',
+                )),
+                45 => 'Maestro de ingredientes: tus ingredientes comunes rinden como raros.',
+                50 => array('eleccion' => array(
+                    'Capstone: Todo-En-Uno' => '1×/arco, un plato legendario: buff completo y curación total del grupo.',
+                )),
+            ),
         ),
         'medico' => array(
             'nombre' => 'Médico',
@@ -372,6 +405,34 @@ function ope_rol_oficios()
             'pool'   => array('Curación', 'Información', 'Veneno'),
             'armas'  => array(),
             'desc'   => 'Cirujano y farmacéutico. Estabiliza en combate, antídotos y venenos.',
+            'hitos'  => array(
+                1  => 'Vendaje básico: curas PV fuera de combate a 1 aliado (1×/escena).',
+                3  => 'Diagnóstico rápido: identificas venenos, enfermedades y sustancias al instante.',
+                5  => 'Antídoto de campaña: curas estados leves (envenenado, quemado) fuera de combate.',
+                10 => array('eleccion' => array(
+                    'Bisturí Firme'    => 'tus curaciones no se interrumpen por movimiento o daño leve.',
+                    'Químico de Campo' => 'fabricas pólvora y gases simples con materiales comunes.',
+                )),
+                15 => 'Poción de EN: tus elixires restauran EN además de PV.',
+                20 => array('eleccion' => array(
+                    'Gas Somnífero'      => 'fabricas gas que duerme en área (1×/escena).',
+                    'Veneno Paralizante' => 'aplicas parálisis a un arma o proyectil (1×/combate).',
+                )),
+                25 => 'Mano de cirujano: estabilizas a un aliado a 0 PV sin tirada.',
+                30 => array('especializacion' => array(
+                    'Cirugía'          => 'curas estados críticos: parálisis, petrificación y similares.',
+                    'Química Refinada' => 'tus compuestos no se degradan ni caducan con el tiempo.',
+                )),
+                35 => 'Elixir de resistencia: inmunidad a estados durante 1 escena (1×/arco).',
+                40 => array('eleccion' => array(
+                    'Explosivo Mayor' => 'bomba de daño masivo en área (1×/combate).',
+                    'Estimulante'     => 'droga de combate: +2 a una stat física de un aliado por 3 turnos (1×/combate).',
+                )),
+                45 => 'Farmacopea maestra: tus dosis y mezclas tienen doble duración.',
+                50 => array('eleccion' => array(
+                    'Capstone: Milky Dial' => '1×/arco: curación total del grupo, o gas mortal (DoT + parálisis en área).',
+                )),
+            ),
         ),
         'navegante' => array(
             'nombre' => 'Navegante',
@@ -380,6 +441,34 @@ function ope_rol_oficios()
             'pool'   => array('Información', 'Clima', 'Control del barco'),
             'armas'  => array(),
             'desc'   => 'Meteorología, cartografía y navegación. Pilota, lee el mar y avisa de tormentas.',
+            'hitos'  => array(
+                1  => 'Lectura de vientos: evitas retrasos menores en las travesías.',
+                3  => 'Oficio de timonel: +1 a pruebas de pilotaje con mal tiempo.',
+                5  => 'Cartografía básica: trazas rutas seguras entre islas conocidas.',
+                10 => array('eleccion' => array(
+                    'Ojo de Tormenta' => 'anticipas tormentas con una escena de ventaja.',
+                    'Ruta Corta'      => 'descubres un atajo que reduce 1 tramo de viaje (1×/travesía).',
+                )),
+                15 => 'Predicción climática: lees fenómenos (Calm Belt, Knock Up Stream) antes de entrar.',
+                20 => array('eleccion' => array(
+                    'Sentido de Rumbo' => 'detectas islas cercanas sin Log Pose a corto radio.',
+                    'Manos al Timón'   => 'el barco no sufre daño por maniobra fallida mientras pilotes.',
+                )),
+                25 => 'Estrella fija: el barco gana velocidad efectiva en todas las travesías.',
+                30 => array('especializacion' => array(
+                    'Clima Total'    => 'predices cualquier fenómeno climático con exactitud.',
+                    'Rutas Secretas' => 'conoces corrientes y atajos legendarios ocultos.',
+                )),
+                35 => 'Navegación del Nuevo Mundo: navegas sin Log Pose estable en mares caóticos.',
+                40 => array('eleccion' => array(
+                    'Contra el Temporal' => 'el barco ignora 1 efecto de tormenta por travesía.',
+                    'Ruta del Tesoro'    => 'detectas corrientes hacia islas no registradas (1×/arco).',
+                )),
+                45 => 'Maestro de la ruta: tu reputación abre puertos y escoltas.',
+                50 => array('eleccion' => array(
+                    'Capstone: Camino de los Reyes' => '1×/arco: trazas una ruta legendaria y segura hacia cualquier destino conocido.',
+                )),
+            ),
         ),
         'carpintero' => array(
             'nombre' => 'Carpintero',
@@ -388,6 +477,34 @@ function ope_rol_oficios()
             'pool'   => array('Reparación', 'Modular'),
             'armas'  => array(),
             'desc'   => 'Reparación e ingeniería. Salva el barco en combate naval y construye.',
+            'hitos'  => array(
+                1  => 'Parche de casco: reparas PV al barco fuera de combate (1×/escena).',
+                3  => 'Mano firme: +1 a pruebas de reparación y construcción.',
+                5  => 'Vela reforzada: instalas mejoras permanentes menores de velocidad en el barco.',
+                10 => array('eleccion' => array(
+                    'Astillero Improvisado' => 'reparas en alta mar sin astillero (materiales al 50%).',
+                    'Ojo de Madera'         => 'identificas el material ideal: +1 de calidad en tus obras.',
+                )),
+                15 => 'Cañón de popa: instalas armamento naval menor en el barco.',
+                20 => array('eleccion' => array(
+                    'Quilla Reforzada' => 'el barco reduce daño por embestida o rocas.',
+                    'Modular'          => 'instalas módulos intercambiables (taller, enfermería, cocina).',
+                )),
+                25 => 'Casco de guerra: el barco gana mitigación estructural permanente.',
+                30 => array('especializacion' => array(
+                    'Astillero'     => 'construyes barcos completos desde cero (materiales y tiempo).',
+                    'Recubrimiento' => 'aplicas revestimiento a cualquier barco: navegación sumergida.',
+                )),
+                35 => 'Ingeniería naval: instalas mejoras mayores (propulsión, compartimentos estancos).',
+                40 => array('eleccion' => array(
+                    'Casco Adam'           => 'trabajas Adam Wood: máxima resistencia del foro.',
+                    'Reparación Relámpago' => 'reparas daño crítico en pleno combate naval (1×/combate).',
+                )),
+                45 => 'Carpintero de Water 7: tu reputación abre astilleros y contratos.',
+                50 => array('eleccion' => array(
+                    'Capstone: Nave Soñada' => '1×/arco: construyes o reconstruyes una nave legendaria a medida.',
+                )),
+            ),
         ),
         'armero' => array(
             'nombre' => 'Armero / Artesano',
@@ -396,6 +513,34 @@ function ope_rol_oficios()
             'pool'   => array('Buff (equipo)', 'Daño', 'Información'),
             'armas'  => array(),
             'desc'   => 'Forja y artefactos. Aplica o cambia tags de arma y modifica el equipo.',
+            'hitos'  => array(
+                1  => 'Forja básica: fabricas armas y herramientas simples de hierro.',
+                3  => 'Temple: +1 de calidad en tus forjas básicas.',
+                5  => 'Armadura de acero: fabricas protección física media.',
+                10 => array('eleccion' => array(
+                    'Afilado Maestro' => 'tus filos aplican +1 de potencia o sangrado.',
+                    'Martillo Pesado' => 'forjas el doble de rápido en trabajo bruto.',
+                )),
+                15 => 'Hoja superior: forjas filos de calidad superior con efecto inherente.',
+                20 => array('eleccion' => array(
+                    'Reforzado' => 'tus armas no se rompen al chocar con armas superiores.',
+                    'Grabado'   => 'marcas un arma con tu sello: +1 al portador (1 sello por arma).',
+                )),
+                25 => 'Fuego alto: trabajas metales raros (wapometal, aleaciones del Nuevo Mundo).',
+                30 => array('especializacion' => array(
+                    'Forja de Wano'   => 'forjas calidad Meito: armas con nombre propio.',
+                    'Armadura Pesada' => 'tus armaduras otorgan resistencia elemental.',
+                )),
+                35 => 'Filo de kairouseki: armas con kairouseki (daño extra contra usuarios de Fruta).',
+                40 => array('eleccion' => array(
+                    'Forja Viva'     => 'reasignas el efecto inherente de un arma tuya (1×/arco).',
+                    'Maestro Armero' => 'elevas un arma ajena a su techo de calidad (1×/arco).',
+                )),
+                45 => 'Herrero legendario: tu sello se cotiza; tus armas tienen reputación propia.',
+                50 => array('eleccion' => array(
+                    'Capstone: Meito Eterno' => '1×/arco: forjas un arma legendaria con stats únicos y efecto especial.',
+                )),
+            ),
         ),
         'arqueologo' => array(
             'nombre' => 'Arqueólogo / Historiador',
@@ -404,6 +549,34 @@ function ope_rol_oficios()
             'pool'   => array('Información', 'Marcado', 'Buff'),
             'armas'  => array(),
             'desc'   => 'Lee la escritura antigua, encuentra pistas ocultas y estudia Poneglyphs.',
+            'hitos'  => array(
+                1  => 'Ojo entrenado: identificas la época y el origen de ruinas y objetos antiguos.',
+                3  => 'Lectura de símbolos: descifras inscripciones comunes y mapas antiguos parciales.',
+                5  => 'Catalogación: registras hallazgos; ganas información extra al explorar ruinas.',
+                10 => array('eleccion' => array(
+                    'Memoria Fotográfica' => 'reproduces textos y mapas vistos una sola vez, sin error.',
+                    'Excavador'           => 'encuentras cámaras y pasadizos ocultos en ruinas.',
+                )),
+                15 => 'Poneglyph básico: lees fragmentos con ayuda, despacio (1 fragmento/escena).',
+                20 => array('eleccion' => array(
+                    'Historiador'       => 'deduces la historia de un lugar con 3 pistas menores.',
+                    'Marcado Ancestral' => 'dejas marcas de ruta que tu tripulación sigue sin fallo.',
+                )),
+                25 => 'Archivo mental: tu erudición abre bibliotecas, museos y archivos restringidos.',
+                30 => array('especializacion' => array(
+                    'Erudito de Poneglyphs' => 'descifras poneglyphs completos sin ayuda.',
+                    'Explorador de Ruinas'  => 'detectas trampas y tesoros antes de activarlos.',
+                )),
+                35 => 'Siglo Vacío: reconstruyes eventos de la historia perdida (información de trama).',
+                40 => array('eleccion' => array(
+                    'Guía de Expedición' => 'tu grupo ignora 1 penalización de exploración por ruinas.',
+                    'Relicario'          => 'identificas y activas reliquias antiguas (1×/escena).',
+                )),
+                45 => 'Sabio de Ohara: tu nombre pesa entre eruditos y coleccionistas del mundo.',
+                50 => array('eleccion' => array(
+                    'Capstone: Rio Poneglyph' => '1×/arco: interpretas un poneglyph completo al instante, revelando su secreto.',
+                )),
+            ),
         ),
         'musico' => array(
             'nombre' => 'Músico',
@@ -412,6 +585,34 @@ function ope_rol_oficios()
             'pool'   => array('Buff', 'Información', 'Debuff (música)'),
             'armas'  => array(),
             'desc'   => 'Moral de la tripulación y señales. Afecta la moral colectiva y comunica a distancia.',
+            'hitos'  => array(
+                1  => 'Canción marinera: +5% EN a los aliados durante 1 escena (1×/escena).',
+                3  => 'Ritmo de trabajo: tus actuaciones eliminan la fatiga narrativa del grupo en viajes.',
+                5  => 'Concierto: los aliados ignoran miedo e intimidación durante 1 turno (1×/combate).',
+                10 => array('eleccion' => array(
+                    'Virtuoso'   => 'dominas varios instrumentos: tus buffs duran 1 turno extra.',
+                    'Compositor' => 'creas temas propios: +renombre local tras actuaciones públicas.',
+                )),
+                15 => 'Sinfonía: +10% a la próxima acción de los aliados (1×/combate).',
+                20 => array('eleccion' => array(
+                    'Balada Heroica'  => 'una actuación narra las hazañas del grupo: +reputación en la isla.',
+                    'Solo Inspirador' => '1 aliado repite una acción narrativa fallida (1×/escena).',
+                )),
+                25 => 'Alma de la tripulación: el grupo no sufre desmoralización mientras actúas.',
+                30 => array('especializacion' => array(
+                    'Espectáculo'  => 'tus actuaciones afectan a todos los aliados y espectadores presentes.',
+                    'Obra Maestra' => 'tus obras valen el doble y perduran en el tiempo.',
+                )),
+                35 => 'Ópera de batalla: buff de grupo completo durante 1 combate (1×/arco).',
+                40 => array('eleccion' => array(
+                    'Himno de Victoria' => 'una actuación mejora la reputación de la tripulación en la región.',
+                    'Réquiem'           => 'canción solemne: niega 1 buff o moral enemiga (1×/combate).',
+                )),
+                45 => 'Leyenda del escenario: tu nombre atrae audiencias y mecenas en cualquier puerto.',
+                50 => array('eleccion' => array(
+                    'Capstone: Binks\' Sake' => '1×/arco: actuación legendaria, buff masivo de toda la tripulación en un momento clave.',
+                )),
+            ),
         ),
     );
 }
@@ -533,6 +734,41 @@ function ope_rol_vocacion_guardar_eleccion($pid, $nivel, $opcion)
     ), "pid = {$pid}");
 
     return array('ok' => true, 'msg' => 'Elección guardada correctamente.');
+}
+
+/**
+ * Guarda la elección de un hito de Oficio (niveles 10, 20, 40, 50) o su Especialización (nivel 30).
+ * Se almacena bajo elecciones._oficios[oficio][nivel] para no colisionar con los hitos de Clase.
+ */
+function ope_rol_vocacion_guardar_eleccion_oficio($pid, $oficio, $nivel, $opcion)
+{
+    global $db;
+    $pid = (int)$pid;
+    $nivel = (int)$nivel;
+    $oficio = trim((string)$oficio);
+    $opcion = trim((string)$opcion);
+    if ($pid <= 0 || $oficio === '' || !$db->table_exists('rol_pj_vocaciones')) {
+        return array('ok' => false, 'msg' => 'Personaje u oficio no encontrado.');
+    }
+
+    $data = ope_rol_pj_vocaciones($pid);
+    if (!in_array($oficio, (array)$data['oficios'], true)) {
+        return array('ok' => false, 'msg' => 'Este personaje no tiene ese oficio.');
+    }
+    $elecciones = $data['elecciones'];
+    if (!isset($elecciones['_oficios']) || !is_array($elecciones['_oficios'])) {
+        $elecciones['_oficios'] = array();
+    }
+    if (!isset($elecciones['_oficios'][$oficio]) || !is_array($elecciones['_oficios'][$oficio])) {
+        $elecciones['_oficios'][$oficio] = array();
+    }
+    $elecciones['_oficios'][$oficio][(string)$nivel] = $opcion;
+
+    $db->update_query('rol_pj_vocaciones', array(
+        'elecciones' => $db->escape_string(json_encode($elecciones, JSON_UNESCAPED_UNICODE))
+    ), "pid = {$pid}");
+
+    return array('ok' => true, 'msg' => 'Elección de oficio guardada correctamente.');
 }
 
 /**

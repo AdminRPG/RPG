@@ -6,9 +6,9 @@ alwaysApply: false
 
 # Páginas autónomas · scaffold y CSS
 
-Fuente de verdad: **`docs/DESIGN-GRANBLUE-ETERNAL.md` §5** y **`docs/AGENTES-Y-HERRAMIENTAS.md`** (portado visual). Léelos antes de crear o rediseñar una página `.php` del RPG.
+Fuente de verdad: **`docs/DESIGN-ONE-PIECE-ETERNAL.md` §5** y **`docs/AGENTES-Y-HERRAMIENTAS.md`** (portado visual). Léelos antes de crear o rediseñar una página `.php` del RPG.
 
-> **Portada MyBB** no usa este scaffold — usa `body.ope-index` (DESIGN §6). Ver `.cursor/rules/visual-port-gbe.mdc`.
+> **Portada MyBB** no usa este scaffold — usa `body.ope-index` (DESIGN §6). Ver `.cursor/rules/visual-port-ope.mdc`.
 
 ## Obligatorio en cada página nueva
 

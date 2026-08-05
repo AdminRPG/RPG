@@ -259,7 +259,7 @@ function ope_oraculo_v2_tramo($num, array $mods_total, $nivel_peligro_idx, $macr
     return $out;
 }
 
-/** Texto narrativo combinado para un tramo (sin emojis). */
+/** Texto narrativo combinado para el tramo unico (sin emojis). */
 function ope_oraculo_v2_narrativa_tramo($num, array $cartas)
 {
     $c = isset($cartas['clima']) ? $cartas['clima']['nombre'] : 'mar impredecible';
@@ -267,38 +267,121 @@ function ope_oraculo_v2_narrativa_tramo($num, array $cartas)
     $h = isset($cartas['hallazgo']) ? $cartas['hallazgo']['nombre'] : 'nada destacable';
     $p = isset($cartas['peligro']) ? $cartas['peligro']['nombre'] : 'calma relativa';
 
-    $txt = "Tramo {$num}: el cielo trae {$c}. En el horizonte aparece {$e}. "
-         . "Los vigias reportan {$h}, mientras a bordo acecha {$p}. "
-         . "La tripulacion debe decidir como responder en sus posts.";
+    $txt = "El cielo trae {$c}. En el horizonte aparece {$e}. "
+         . "Los vigias reportan {$h}, mientras a bordo acecha {$p}.";
 
-    // Misterio
     if (!empty($cartas['misterio'])) {
         $txt .= " Algo extranio ocurre: {$cartas['misterio']['nombre']}.";
     }
-    // Bonanza
     if (!empty($cartas['bonanza'])) {
         $txt .= " Un golpe de suerte: {$cartas['bonanza']['nombre']}.";
     }
 
+    // Cartas extra
+    $extra_nombres = array();
+    foreach ($cartas as $k => $c) {
+        if (!is_array($c)) continue;
+        if (strpos($k, 'extra_') === 0 && !empty($c['nombre'])) {
+            $extra_nombres[] = $c['nombre'];
+        }
+    }
+    if ($extra_nombres) {
+        $txt .= " Ademas: " . implode(', ', $extra_nombres) . '.';
+    }
+
+    $txt .= " La tripulacion debe decidir como responder en sus posts.";
+
     return $txt;
 }
 
+/** Genera una sola carta de oraculo para una mesa concreta. */
+function ope_oraculo_v2_roll_mesa($key, array $mods_total, $macro_dominante)
+{
+    $mesa_fn = array(
+        'clima'      => 'ope_oraculo_v2_mesa_clima',
+        'encuentro'  => 'ope_oraculo_v2_mesa_encuentros',
+        'peligro'    => 'ope_oraculo_v2_mesa_peligros',
+        'hallazgo'   => 'ope_oraculo_v2_mesa_hallazgos',
+        'misterio'   => 'ope_oraculo_v2_mesa_misterio',
+        'bonanza'    => 'ope_oraculo_v2_mesa_bonanza',
+    );
+    if (!isset($mesa_fn[$key])) return null;
+
+    $mesa = call_user_func($mesa_fn[$key]);
+    $raw  = random_int(1, 100);
+    $mod_trip  = (int)($mods_total[$key] ?? 0);
+    $macro_mods = ope_oraculo_v2_mods_macro((string)$macro_dominante);
+    $mod_macro = (int)($macro_mods[$key] ?? 0);
+
+    if (in_array($key, array('clima', 'encuentro', 'peligro'), true)) {
+        $total_mod = -($mod_trip + $mod_macro);
+    } elseif ($key === 'bonanza') {
+        $total_mod = $mod_trip;
+    } else {
+        $total_mod = $mod_trip + $mod_macro;
+    }
+
+    $adj = ope_oraculo_v2_roll_mod($raw, $total_mod);
+    $hit = ope_oraculo_v2_lookup($mesa, $adj);
+
+    return array(
+        'roll'     => $raw,
+        'roll_adj' => $adj,
+        'mod'      => $total_mod,
+        'key'      => (string)($hit['key'] ?? ''),
+        'nombre'   => (string)($hit['nombre'] ?? ''),
+        'ico'      => (string)($hit['ico'] ?? ''),
+        'efecto'   => (string)($hit['efecto'] ?? ''),
+        'tone'     => (string)($hit['tone'] ?? 'neutral'),
+        'mesa'     => $key,
+    );
+}
+
 /**
- * Ejecuta el Oraculo v2 para un viaje completo.
+ * Ejecuta el Oraculo v2: 1 solo tramo con 6 cartas base + 1 extra por tramo original.
  *
- * @param int    $tramos             Numero de tramos del viaje (1-6)
+ * @param int    $tramos_originales  Numero de tramos originales de la ruta
  * @param array  $mods_total         Modificadores totales (barco + trip + items)
  * @param int    $nivel_peligro_idx  Indice de peligro (0-6)
  * @param string $macro_dominante    Macro-mar predominante
- * @return array Con 'mods', 'tramos' (array de resultados por tramo)
+ * @return array Con 'mods', 'tramos' (1 tramo con cartas base + extras)
  */
-function ope_oraculo_v2_viaje($tramos, array $mods_total, $nivel_peligro_idx, $macro_dominante)
+function ope_oraculo_v2_viaje($tramos_originales, array $mods_total, $nivel_peligro_idx, $macro_dominante)
 {
-    $tramos = max(1, min(6, (int)$tramos));
+    $tramos_originales = max(1, min(6, (int)$tramos_originales));
+    $extras = $tramos_originales - 1;
+
     $result = array('mods' => $mods_total, 'tramos' => array());
-    for ($i = 1; $i <= $tramos; $i++) {
-        $result['tramos'][] = ope_oraculo_v2_tramo($i, $mods_total, $nivel_peligro_idx, $macro_dominante);
+
+    // Tramo unico con 6 mesas base
+    $tramo = ope_oraculo_v2_tramo(1, $mods_total, $nivel_peligro_idx, $macro_dominante);
+
+    // Cartas extra: 1 por cada tramo original adicional
+    $mesa_pool = array('clima', 'encuentro', 'peligro', 'hallazgo');
+    if ((int)$nivel_peligro_idx >= 2) {
+        $mesa_pool[] = 'misterio';
     }
+    if ((int)$nivel_peligro_idx <= 2) {
+        $mesa_pool[] = 'bonanza';
+    }
+
+    $any_natural_95 = false;
+    foreach ($tramo['cartas'] as $c) {
+        if (is_array($c) && ($c['roll'] ?? 0) >= 95) $any_natural_95 = true;
+    }
+
+    for ($i = 0; $i < $extras; $i++) {
+        $mesa_key = $mesa_pool[array_rand($mesa_pool)];
+        $extra = ope_oraculo_v2_roll_mesa($mesa_key, $mods_total, $macro_dominante);
+        if ($extra) {
+            $tramo['cartas']['extra_' . ($i + 1)] = $extra;
+        }
+    }
+
+    // Actualizar narrativa para reflejar cartas extra
+    $tramo['narrativa'] = ope_oraculo_v2_narrativa_tramo(1, $tramo['cartas']);
+
+    $result['tramos'][] = $tramo;
     return $result;
 }
 

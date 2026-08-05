@@ -56,7 +56,7 @@ No marcar hecho sin comparación visual lado a lado y sync-theme verify OK.
 ### Nueva página PHP
 
 ```
-Sigue DESIGN-GRANBLUE-ETERNAL.md §5 y docs/GUIA-ESTILOS-PHP.md.
+Sigue DESIGN-ONE-PIECE-ETERNAL.md §5 y docs/GUIA-ESTILOS-PHP.md.
 body.ope-pg-<slug> + scaffolding OPE en ope.css (sin bordes negros 2px OP).
 ```
 

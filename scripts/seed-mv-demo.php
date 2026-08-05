@@ -150,7 +150,7 @@ $npcs = array(
             'titulos' => array('La Bruja del Norte', 'Capitana de los Lobos de Escarcha'),
             'descripcion' => 'Pirata astuta y carismatica. Su tripulacion es leal hasta la muerte.',
             'historia' => 'Navegante nata, zarpo desde el North Blue buscando el One Piece.',
-            'relaciones' => array('Shanks - respetado', 'Kaido - enemistad'),
+            'relaciones' => array('Kaiser Vaelgor - respetado', 'Jarl Brogaz - enemistad'),
             'ubicacion_visible' => 'Isla Bruma, Nuevo Mundo',
         ),
         'datos_internos' => array(

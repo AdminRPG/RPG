@@ -189,15 +189,22 @@ function ope_viaje_solicitar(array $data)
     // Cargar personaje capitán para obtener nivel e isla_actual
     $pj_nivel = 1;
     $origen_slug = 'isla_dawn';
+    $pj_estado = '';
     if ($db->table_exists('rol_personajes') && $pid_capitan > 0) {
-        $pq = $db->simple_select('rol_personajes', 'nivel, isla_actual', "pid = {$pid_capitan}", array('limit' => 1));
+        $pq = $db->simple_select('rol_personajes', 'nivel, isla_actual, estado', "pid = {$pid_capitan}", array('limit' => 1));
         if ($db->num_rows($pq)) {
             $prow = $db->fetch_array($pq);
             $pj_nivel = (int) ($prow['nivel'] ?? 1);
+            $pj_estado = (string) ($prow['estado'] ?? '');
             if (!empty($prow['isla_actual'])) {
                 $origen_slug = (string) $prow['isla_actual'];
             }
         }
+    }
+    if ($pj_estado !== '' && $pj_estado !== 'aprobado') {
+        $estados = array('borrador' => 'en borrador', 'revision' => 'en revisión', 'rechazado' => 'rechazado', 'eliminado' => 'eliminado');
+        $lbl = $estados[$pj_estado] ?? $pj_estado;
+        return array('ok' => false, 'msg' => 'Tu personaje no está aprobado para navegar (estado: ' . $lbl . '). Espera a que el Staff lo valide.');
     }
 
     // Permitir sobreescribir origen si viene especificado como slug
@@ -267,19 +274,43 @@ function ope_viaje_solicitar(array $data)
         return array('ok' => false, 'msg' => 'Motor de rutas no cargado.');
     }
 
-    $tramos         = (int) $ruta_res['tramos_total'];
+    $tramos_orig    = (int) $ruta_res['tramos_total'];
+    $tramos         = 1;
     $nivel_peligro  = (string) $ruta_res['nivel_peligro'];
+    $peligro_idx    = (int) $ruta_res['nivel_peligro_idx'];
     $peligro_total  = (int) $ruta_res['peligro_acumulado'];
-    $dias_onrol     = (int) $ruta_res['dias_onrol'];
     $es_temeraria   = !empty($ruta_res['es_temeraria']);
-    $posts_sugeridos= (int) $ruta_res['posts_sugeridos'];
-    $plazo_offrol   = (int) $ruta_res['plazo_offrol_dias'];
 
-    // Generar Oráculo v2 con 6 mesas por tramo
+    // Posts y plazo según nivel de peligro (ya no dependen de tramos)
+    $posts_sugeridos = max(3, $peligro_idx * 3 + 3);
+    $plazo_offrol    = max(3, $peligro_idx * 2 + 3);
+    $dias_onrol      = (int) round($plazo_offrol * 1.5, 1);
+
+    // Generar Oráculo v2: 1 tramo con 6 cartas base + 1 extra por tramo original
     if (function_exists('ope_oraculo_v2_viaje')) {
-        $oraculo = ope_oraculo_v2_viaje($tramos, $ruta_res['mods_total'], $ruta_res['nivel_peligro_idx'], $isla_origen['macro'], $isla_destino['macro']);
+        $oraculo = ope_oraculo_v2_viaje($tramos_orig, $ruta_res['mods_total'], $peligro_idx, $isla_origen['macro']);
     } else {
         $oraculo = array('mods' => array(), 'tramos' => array());
+    }
+
+    // Introducción narrativa generada por IA (best effort, cadena de modelos con fallback en 429)
+    $viaje_intro_texto  = '';
+    $viaje_intro_modelo = '';
+    if (function_exists('ope_viaje_ai_generar') && ope_viaje_ai_activo()) {
+        $trip_nombres = array();
+        foreach ($trip as $tm) {
+            if (!empty($tm['nombre'])) $trip_nombres[] = (string) $tm['nombre'];
+        }
+        $res_ai = ope_viaje_ai_generar($isla_origen, $isla_destino, $oraculo, array(
+            'nivel_peligro' => $nivel_peligro,
+            'macro'         => $isla_origen['macro'] . ' → ' . $isla_destino['macro'],
+            'barco'         => $barco_nom,
+            'tripulacion'   => implode(', ', $trip_nombres),
+        ));
+        if (!empty($res_ai['ok']) && $res_ai['texto'] !== '') {
+            $viaje_intro_texto  = (string) $res_ai['texto'];
+            $viaje_intro_modelo = (string) ($res_ai['modelo'] ?? '');
+        }
     }
 
     $fid_alta = ope_viaje_alta_mar_fid($isla_destino['macro']);
@@ -319,6 +350,8 @@ function ope_viaje_solicitar(array $data)
         'plazo_dias'       => $plazo_offrol,
         'estado'           => 'activo',
         'resultado_json'   => $db->escape_string(json_encode($oraculo, JSON_UNESCAPED_UNICODE)),
+        'introduccion_api' => $db->escape_string($viaje_intro_texto),
+        'introduccion_ai_modelo' => $db->escape_string($viaje_intro_modelo),
         'mods_json'        => $db->escape_string(json_encode($ruta_res['mods_total'] ?? array(), JSON_UNESCAPED_UNICODE)),
         'suministros'      => $db->escape_string($suministros),
         'notas'            => $db->escape_string($notas),
@@ -359,7 +392,7 @@ function ope_viaje_por_capitan_activo($pid_capitan)
     return $db->num_rows($q) ? $db->fetch_array($q) : null;
 }
 
-/** Cierre manual a petición del jugador. Actualiza isla_actual de los tripulantes. */
+/** Solicitar cierre del viaje (jugador). Marca el viaje como pendiente de revision staff. */
 function ope_viaje_cerrar($viaje_id, $uid, $active_pid)
 {
     global $db;
@@ -372,10 +405,10 @@ function ope_viaje_cerrar($viaje_id, $uid, $active_pid)
         return array('ok' => false, 'msg' => 'No puedes cerrar este viaje.');
     }
     if (($viaje['estado'] ?? '') !== 'activo') {
-        return array('ok' => false, 'msg' => 'Este viaje ya está cerrado.');
+        return array('ok' => false, 'msg' => 'Este viaje ya esta cerrado o pendiente de revision.');
     }
 
-    $cap_nombre = 'Capitán';
+    $cap_nombre = 'Capitan';
     if ($db->table_exists('rol_personajes')) {
         $pq = $db->simple_select('rol_personajes', 'nombre', 'pid = ' . (int) $viaje['pid_capitan'], array('limit' => 1));
         if ($db->num_rows($pq)) {
@@ -383,24 +416,62 @@ function ope_viaje_cerrar($viaje_id, $uid, $active_pid)
         }
     }
 
+    $intentos = (int) ($viaje['revision_intentos'] ?? 0) + 1;
+    $bburl = rtrim((string) $GLOBALS['mybb']->settings['bburl'], '/');
+
+    // Publicar post de solicitud de cierre
+    $viajes_url = $bburl . '/viajes.php';
+    $post_msg = '[viaje-solicitud-cierre=' . (int) $viaje_id . ']';
+    $pid_post = ope_system_create_post((int) $viaje['tid'], $post_msg);
+    if ($pid_post < 1) {
+        return array('ok' => false, 'msg' => 'No se pudo publicar la solicitud de cierre.');
+    }
+
+    $db->update_query('rol_viajes', array(
+        'estado'            => 'pendiente_cierre',
+        'revision_intentos' => $intentos,
+        'cierre_pid'        => (int) $active_pid,
+        'cierre_dateline'   => TIME_NOW,
+    ), 'viaje_id = ' . (int) $viaje_id);
+
+    return array(
+        'ok'  => true,
+        'msg' => 'Solicitud de cierre enviada. El staff revisara tu travesia y confirmara la llegada.',
+        'url' => $bburl . '/showthread.php?tid=' . (int) $viaje['tid'],
+    );
+}
+
+/** Ejecuta el cierre real del viaje (llamado por el staff tras aprobar la revision). */
+function ope_viaje_cerrar_ejecutar(array $viaje)
+{
+    global $db;
+
+    $viaje_id = (int) ($viaje['viaje_id'] ?? 0);
+    $cap_nombre = 'Capitan';
+    if ($db->table_exists('rol_personajes')) {
+        $pq = $db->simple_select('rol_personajes', 'nombre', 'pid = ' . (int) $viaje['pid_capitan'], array('limit' => 1));
+        if ($db->num_rows($pq)) {
+            $cap_nombre = (string) $db->fetch_field($pq, 'nombre');
+        }
+    }
+
+    // Post de llegada
     $pid_post = ope_system_create_post((int) $viaje['tid'], '[viaje-cierre=' . (int) $viaje_id . ']');
     if ($pid_post < 1) {
         return array('ok' => false, 'msg' => 'No se pudo publicar el post de llegada.');
     }
 
     $db->update_query('rol_viajes', array(
-        'estado'          => 'cerrado',
-        'cierre_dateline' => TIME_NOW,
-        'cierre_pid'      => (int) $active_pid,
+        'estado' => 'cerrado',
     ), 'viaje_id = ' . (int) $viaje_id);
 
-    // Actualizar despensa y estado del casco del barco tras la travesía
-    $barco_id = (int) ($viaje['barco_id'] ?? 0);
-    $tramos   = max(1, (int) ($viaje['tramos'] ?? 1));
-    $trip     = json_decode((string) ($viaje['tripulantes_json'] ?? '[]'), true);
+    // Actualizar despensa y estado del casco del barco
+    $barco_id  = (int) ($viaje['barco_id'] ?? 0);
+    $ruta_data = json_decode((string) ($viaje['ruta_json'] ?? '{}'), true);
+    $tramos    = max(1, (int) ($ruta_data['tramos_total'] ?? 1));
+    $trip      = json_decode((string) ($viaje['tripulantes_json'] ?? '[]'), true);
     if (!is_array($trip)) $trip = array();
 
-    // Detectar si hay Cocinero o Carpintero en la tripulación
     $tiene_cocinero   = false;
     $tiene_carpintero = false;
     foreach ($trip as $t_member) {
@@ -412,12 +483,10 @@ function ope_viaje_cerrar($viaje_id, $uid, $active_pid)
     if ($barco_id > 0 && function_exists('ope_barco_obtener')) {
         $barco_data = ope_barco_obtener($barco_id);
         if ($barco_data) {
-            // Consumo de despensa: 10% por tramo (reducido a 5% si hay Cocinero)
             $consumo_por_tramo = $tiene_cocinero ? 5 : 10;
             $despensa_actual   = (int) ($barco_data['despensa'] ?? 100);
             $nueva_despensa    = max(0, $despensa_actual - ($tramos * $consumo_por_tramo));
 
-            // Desgaste de casco: 5% por tramo (+5% extra si fue temeraria), reducido a la mitad si hay Carpintero
             $desgaste_base   = !empty($viaje['es_temeraria']) ? 10 : 5;
             $desgaste_total  = $tramos * $desgaste_base;
             if ($tiene_carpintero) {
@@ -426,7 +495,6 @@ function ope_viaje_cerrar($viaje_id, $uid, $active_pid)
             $casco_actual = (int) ($barco_data['estado_casco'] ?? 100);
             $nuevo_casco  = max(0, $casco_actual - $desgaste_total);
 
-            // Guardar cambios en el barco
             if (function_exists('ope_barco_actualizar_despensa')) {
                 ope_barco_actualizar_despensa($barco_id, $nueva_despensa);
             }
@@ -446,12 +514,7 @@ function ope_viaje_cerrar($viaje_id, $uid, $active_pid)
         );
     }
 
-    $bburl = rtrim((string) $GLOBALS['mybb']->settings['bburl'], '/');
-    return array(
-        'ok'  => true,
-        'msg' => 'Llegada confirmada. El Narrador ha publicado el cierre.',
-        'url' => $bburl . '/showthread.php?tid=' . (int) $viaje['tid'],
-    );
+    return array('ok' => true);
 }
 
 function ope_viaje_actualizar_ubicacion_trip(array $trip, string $ubic, string $accion, string $isla_slug = '')
@@ -491,9 +554,8 @@ function ope_viaje_panel_showthread($tid, $uid, $active_pid)
     $bburl  = htmlspecialchars_uni(rtrim((string) $GLOBALS['mybb']->settings['bburl'], '/'));
     $dest   = htmlspecialchars_uni((string) $viaje['destino_nombre']);
     $orig   = htmlspecialchars_uni((string) $viaje['origen_nombre']);
-    $tramos = (int) ($viaje['tramos'] ?? 1);
     $posts  = (int) ($viaje['posts_min'] ?? 6);
-    $dias_onrol = (int) ($viaje['dias_onrol'] ?? ($tramos * 2));
+    $dias_onrol = (int) ($viaje['dias_onrol'] ?? 2);
     $peligro    = htmlspecialchars_uni((string) ($viaje['nivel_peligro'] ?? 'bajo'));
 
     $html  = '<aside class="ope-viaje-panel" id="ope-viaje-panel">';
@@ -501,26 +563,41 @@ function ope_viaje_panel_showthread($tid, $uid, $active_pid)
     $html .= '<span class="ope-viaje-panel-route">' . $orig . ' &rarr; ' . $dest . '</span></div>';
     $html .= '<div class="ope-viaje-panel-b">';
     $html .= '<div class="ope-viaje-panel-stats">';
-    $html .= '<span><b>' . $tramos . '</b><small>Tramos</small></span>';
     $html .= '<span><b>' . $dias_onrol . 'd</b><small>Días on-rol</small></span>';
     $html .= '<span><b>' . ucfirst($peligro) . '</b><small>Peligro</small></span>';
     $html .= '<span class="ope-viaje-st-' . ($estado === 'activo' ? 'on' : 'off') . '"><b>' . strtoupper($estado) . '</b><small>Estado</small></span>';
     $html .= '</div>';
 
-    if ($estado === 'activo' && ope_viaje_puede_cerrar($viaje, $uid, $active_pid)) {
-        global $mybb;
-        $html .= '<form class="ope-viaje-cerrar-form" method="post" action="' . $bburl . '/viajes.php">';
-        $html .= '<input type="hidden" name="my_post_key" value="' . htmlspecialchars_uni($mybb->post_code) . '">';
-        $html .= '<input type="hidden" name="action" value="cerrar">';
-        $html .= '<input type="hidden" name="viaje_id" value="' . (int) $viaje['viaje_id'] . '">';
-        $html .= '<p class="ope-viaje-panel-note">Cuando la tripulación haya roleado lo suficiente, solicita la <strong>llegada a ' . $dest . '</strong>. Lyria publicará el cierre.</p>';
-        $html .= '<button type="submit" class="ope-btn ope-btn-hot">Solicitar llegada</button>';
-        $html .= '</form>';
+    if ($estado === 'activo') {
+        $html .= '<p class="ope-viaje-panel-note">Narra con libertad como se desenvuelve la travesia. Cuando la tripulacion haya roleado lo suficiente, solicita la <strong>llegada</strong> desde el <a href="' . $bburl . '/viajes.php">Planificador de Navegacion</a>.</p>';
+    } elseif ($estado === 'pendiente_cierre') {
+        $html .= '<p class="ope-viaje-panel-note ope-viaje-panel-note--pending">Cierre solicitado. El staff esta revisando la travesia. Recibiras una notificacion cuando se apruebe o rechace.</p>';
     } elseif ($estado === 'cerrado') {
-        $html .= '<p class="ope-viaje-panel-note ope-viaje-panel-note--done">Travesía completada. Los personajes están amarrados en <strong>' . $dest . '</strong>.</p>';
+        $html .= '<p class="ope-viaje-panel-note ope-viaje-panel-note--done">Travesia completada. Los personajes estan amarrados en <strong>' . $dest . '</strong>.</p>';
     }
 
     $html .= '<a href="' . $bburl . '/tramites.php" class="ope-btn ope-btn-ghost ope-btn-sm">Trámites</a>';
     $html .= '</div></aside>';
     return $html;
+}
+
+function ope_viaje_historial_por_barco($barco_id, $limit = 15)
+{
+    global $db;
+    $barco_id = (int)$barco_id;
+    $limit = (int)$limit;
+    $out = array();
+    if ($barco_id < 1 || !$db->table_exists('rol_viajes')) return $out;
+
+    $q = $db->query("
+        SELECT viaje_id, origen_nombre, destino_nombre, estado, tramos, nivel_peligro, dateline
+        FROM {$db->table_prefix}rol_viajes
+        WHERE barco_id = {$barco_id}
+        ORDER BY dateline DESC
+        LIMIT {$limit}
+    ");
+    while ($row = $db->fetch_array($q)) {
+        $out[] = $row;
+    }
+    return $out;
 }
