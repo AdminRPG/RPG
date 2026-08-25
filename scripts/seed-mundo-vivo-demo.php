@@ -168,15 +168,16 @@ $raw = "===ESTADO_JSON===\n{$estadoJson}\n===FIN===\n"
     . "===NOTICIA===\n{$noticia}\n===FIN===\n"
     . "===IMAGENES===\n{$imagenes}\n===FIN===\n";
 
-// Guardar el "input" (super-prompt) y el "output" (raw) a disco para inspección.
-$outDir = dirname(__DIR__) . '/scripts';
+// Guardar el "input" (super-prompt) y el "output" (raw) para inspección.
+// Se escriben en el directorio temporal del sistema para no ensuciar el repo.
+$outDir = getenv('DEMO_MV_OUT_DIR') ?: sys_get_temp_dir();
 $prompt = ope_rol_mv_build_prompt($ciclo);
 @file_put_contents($outDir . '/_demo_mundo_vivo_INPUT.txt', $prompt);
 @file_put_contents($outDir . '/_demo_mundo_vivo_OUTPUT.txt', $raw);
 
 echo "Ciclo: {$ciclo['periodo']} (id {$ciclo_id})\n";
-echo "Prompt (input) len=" . strlen($prompt) . " -> scripts/_demo_mundo_vivo_INPUT.txt\n";
-echo "Resultado (output) len=" . strlen($raw) . " -> scripts/_demo_mundo_vivo_OUTPUT.txt\n";
+echo "Prompt (input) len=" . strlen($prompt) . " -> $outDir/_demo_mundo_vivo_INPUT.txt\n";
+echo "Resultado (output) len=" . strlen($raw) . " -> $outDir/_demo_mundo_vivo_OUTPUT.txt\n";
 
 // Limpieza de demo: quitar noticias previas de origen mundo_vivo para no duplicar en portada.
 $db->delete_query('rol_mv_noticias', "origen = 'mundo_vivo'");

@@ -15,10 +15,36 @@ ini_set('display_errors', '1');
 require __DIR__ . '/_db-config.php';
 
 $PREFIX = 'mybb_';
-$SISTEMA_ROOT = realpath(__DIR__ . '/../../One Piece: Eternal-Sistema');
-if (!$SISTEMA_ROOT || !is_dir($SISTEMA_ROOT)) {
-    die("Error: One Piece: Eternal-Sistema directory not found at expected location.\n");
+// Ruta del repo hermano de sistemas (fuente de los .md de lore).
+// Se puede apuntar con la env var ETERNAL_SISTEMA_ROOT; si no, se prueban
+// las ubicaciones locales conocidas.
+$candidatePaths = [
+    'ETERNAL_SISTEMA_ROOT (env var)' => getenv('ETERNAL_SISTEMA_ROOT') ?: null,
+    __DIR__ . '/../../One Piece: Eternal-Sistema' => __DIR__ . '/../../One Piece: Eternal-Sistema',
+    __DIR__ . '/../../Eternal-Sistema' => __DIR__ . '/../../Eternal-Sistema',
+    dirname(__DIR__) . '/../Op-Eternal/Eternal-Sistema' => dirname(__DIR__) . '/../Op-Eternal/Eternal-Sistema',
+];
+$SISTEMA_ROOT = null;
+foreach ($candidatePaths as $label => $cand) {
+    if (!$cand) {
+        continue;
+    }
+    $real = realpath($cand);
+    if ($real && is_dir($real)) {
+        $SISTEMA_ROOT = $real;
+        break;
+    }
 }
+if (!$SISTEMA_ROOT) {
+    fwrite(STDERR, "Error: no se encuentra el repo de sistemas con el lore (Eternal-Sistema).\n");
+    fwrite(STDERR, "Probadas:\n");
+    foreach ($candidatePaths as $label => $cand) {
+        fwrite(STDERR, "  - $label" . ($cand ? ": $cand" : ' (sin valor)') . "\n");
+    }
+    fwrite(STDERR, "Ejecuta con la ruta correcta, p. ej.:\n  ETERNAL_SISTEMA_ROOT='/ruta/a/Eternal-Sistema' php scripts/seed-lore.php\n");
+    exit(1);
+}
+echo "Fuente de lore: $SISTEMA_ROOT\n";
 $TABLE = "{$PREFIX}rol_lore";
 
 // ── Funciones helper ──
