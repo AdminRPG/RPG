@@ -5400,6 +5400,15 @@ body.ope-index .ope-section.ope-gaceta{background:linear-gradient(180deg,color-m
 body.ope-index .ope-bento{display:grid;grid-template-columns:1.5fr 1fr 1fr;grid-template-rows:220px 220px;gap:16px;align-items:stretch;
   grid-template-areas:"lore feed onrol" "lore news staff";min-height:456px}
 body.ope-index .ope-bento-grid{display:contents}
+/* Variante compacta: faltan paneles de contenido (foro recién creado, sin lore ni gaceta).
+   La rejilla pasa a una sola fila y los paneles fluyen en orden (onrol · feed · staff). */
+body.ope-index .ope-bento--core{grid-template-columns:1fr 1fr 1fr;grid-template-rows:220px;grid-template-areas:none;min-height:220px}
+body.ope-index .ope-bento--core .ope-p-onrol,
+body.ope-index .ope-bento--core .ope-panel-lore,
+body.ope-index .ope-bento--core .ope-panel-feed,
+body.ope-index .ope-bento--core .ope-panel-curio,
+body.ope-index .ope-bento--core .ope-panel-news,
+body.ope-index .ope-bento--core .ope-panel-staff{grid-area:auto;height:220px;min-height:220px;max-height:220px}
 body.ope-index .ope-p-onrol{grid-area:onrol;height:220px;min-height:220px;max-height:220px;box-sizing:border-box;overflow:hidden;text-align:center;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(160deg,var(--ope-card),var(--ope-card-2));border:1px solid var(--ope-line);border-radius:16px;padding:20px;color:inherit;text-decoration:none;box-shadow:var(--ope-shadow-sm);margin:0}
 body.ope-index .ope-p-onrol:hover{border-color:var(--ope-gold);transform:translateY(-2px)}
 body.ope-index .ope-onrol-season{font-family:var(--ope-disp);font-weight:700;font-size:1.4rem;color:var(--ope-gold-deep);display:block;margin:4px 0;text-transform:none;letter-spacing:0}
@@ -5784,6 +5793,13 @@ body.ope-index .ope-afil-btn:hover { transform: translateY(-2px); box-shadow: va
 @media(max-width:900px){
   body.ope-index .ope-bento{grid-template-columns:1fr 1fr;grid-template-rows:auto;grid-template-areas:"onrol onrol" "lore lore" "feed news" "staff staff";min-height:0}
   body.ope-index .ope-panel-lore,body.ope-index .ope-panel-feed,body.ope-index .ope-panel-curio,body.ope-index .ope-panel-news,body.ope-index .ope-panel-staff,body.ope-index .ope-p-onrol{height:auto;min-height:180px;max-height:none}
+  body.ope-index .ope-bento--core{grid-template-columns:1fr;grid-template-rows:auto;grid-template-areas:none;min-height:0}
+  body.ope-index .ope-bento--core .ope-p-onrol,
+  body.ope-index .ope-bento--core .ope-panel-lore,
+  body.ope-index .ope-bento--core .ope-panel-feed,
+  body.ope-index .ope-bento--core .ope-panel-curio,
+  body.ope-index .ope-bento--core .ope-panel-news,
+  body.ope-index .ope-bento--core .ope-panel-staff{height:auto;min-height:180px;max-height:none}
 }
 @media(max-width:560px){
   body.ope-index .ope-bento{grid-template-columns:1fr;grid-template-areas:"onrol" "lore" "feed" "news" "staff"}

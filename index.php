@@ -556,15 +556,11 @@ while ($post = $db->fetch_array($q)) {
 $ope_home = $cache->read('ope_home');
 if (!is_array($ope_home) || empty($ope_home)) {
     $ope_home = [
-        'curiosidades' => [
-            'En el Grand Line las brújulas normales no sirven: solo un Log Pose marca el rumbo entre islas.',
-            'La escala de poder mide fuerza, no tamaño. Un rango alto impone aunque el personaje parezca inofensivo.',
-            'Un personaje sin rumbo se estanca; el mundo premia a quien sigue navegando y arriesgando.',
-            'Cada historia deja huella en el mundo. Ninguna aventura pasa sin dejar marca.',
-        ],
+        // Sin contenido inicial: el foro arranca vacío. El staff lo rellena desde el ACP.
+        'curiosidades' => [],
         'lore' => [
-            'titulo' => 'La Grieta de Esencia se ensancha',
-            'texto'  => 'One Piece: Eternal abre el registro de aventureros. Los mares, las islas y la Gran Line te esperan. Crea tu personaje y zarpa en busca de tu leyenda.',
+            'titulo' => '',
+            'texto'  => '',
         ],
         // Instante OOC en el que arranca el día 1 · Primavera · Año I del calendario on-rol.
         'rol_epoch' => mktime(0, 0, 0, 1, 1, 2026),
@@ -664,6 +660,35 @@ $ope_lore_title = htmlspecialchars_uni($lore['titulo'] ?? '');
 $ope_lore_text = htmlspecialchars_uni($lore['texto'] ?? '');
 $ope_discord_url = htmlspecialchars_uni((string)($ope_home['discord_url'] ?? 'https://discord.gg/'));
 
+// Paneles de la Gaceta condicionales: sin contenido (foro recién creado) no se dibujan.
+// · "El mundo ahora" solo si hay lore relleno.
+$ope_lore_panel = '';
+if ($ope_lore_title !== '' || $ope_lore_text !== '') {
+    $ope_lore_panel = '
+    <article class="ope-panel ope-panel-lore">
+      <div class="ope-panel-kicker">// el mundo ahora</div>
+      <h3 class="ope-panel-title">'.$ope_lore_title.'</h3>
+      <p class="ope-panel-text">'.$ope_lore_text.'</p>
+      <a href="'.$mybb->settings['bburl'].'/guias.php" class="ope-btn ope-btn-hot">Leer más &rarr;</a>
+    </article>';
+}
+// · Gaceta (noticias + curiosidades) solo si hay alguna entrada.
+$ope_gaceta_panel = '';
+if (!empty($ope_noticias_data)) {
+    $ope_gaceta_panel = '
+    <article class="ope-panel ope-panel-curio ope-panel-news">
+      <div class="ope-panel-kicker">'.$ope_noticia_kicker.'</div>
+      <div id="ope-news-item" class="ope-news-item" role="button" tabindex="0">
+        <b id="ope-news-title" class="ope-news-title">'.$ope_noticia_first_title.'</b>
+        <p id="ope-curiosidad-text" class="ope-curio-text">'.$ope_noticia_first_text.'</p>
+        <span class="ope-news-more">Leer más &rarr;</span>
+      </div>
+      <span class="ope-curio-bar"><i id="ope-curio-bar"></i></span>
+    </article>';
+}
+// Si falta algún panel de contenido, la rejilla del bento pasa a la variante compacta.
+$ope_bento_mod = ($ope_lore_panel === '' || $ope_gaceta_panel === '') ? ' ope-bento--core' : '';
+
 // One Piece: Eternal: Presence — active now + last 24h (real MyBB session/user data)
 $ope_online_now = '';
 $ope_online_now_count = 0;
@@ -728,6 +753,7 @@ $q_day = $db->query("
     SELECT uid, username, usergroup, displaygroup
     FROM ".TABLE_PREFIX."users
     WHERE lastactive > {$day_cut}
+      AND username <> 'OPE Eternal'   -- el bot del sistema no cuenta como usuario activo
     ORDER BY lastactive DESC
     LIMIT 80
 ");
@@ -760,8 +786,9 @@ $staffQuery = $db->query("
     SELECT u.uid, u.username, u.usergroup, u.displaygroup, g.title AS grouptitle, g.issupermod, g.cancp
     FROM ".TABLE_PREFIX."users u
     LEFT JOIN ".TABLE_PREFIX."usergroups g ON (g.gid = u.usergroup)
-    WHERE u.usergroup IN (SELECT gid FROM ".TABLE_PREFIX."usergroups WHERE issupermod = 1 OR cancp = 1)
-       OR u.additionalgroups LIKE '%4%'
+    WHERE (u.usergroup IN (SELECT gid FROM ".TABLE_PREFIX."usergroups WHERE issupermod = 1 OR cancp = 1)
+       OR u.additionalgroups LIKE '%4%')
+       AND u.username <> 'OPE Eternal'   -- el bot del sistema no es staff
     ORDER BY g.cancp DESC, g.issupermod DESC, u.username ASC
     LIMIT 8
 ");
@@ -776,10 +803,6 @@ while ($staff = $db->fetch_array($staffQuery)) {
     $uname = htmlspecialchars_uni($staff['username']);
     $displayName = $uname;
     $roleOut = $role;
-    if (strcasecmp($staff['username'], 'OPE Eternal') === 0) {
-        $displayName = 'Lyria';
-        $roleOut = 'Cronista &middot; Bot';
-    }
     $initial = htmlspecialchars_uni(my_strtoupper(my_substr($displayName, 0, 1)));
     $ope_staff_list .= '
     <a href="'.$mybb->settings['bburl'].'/member.php?action=profile&amp;uid='.$staff['uid'].'" class="ope-staff-p" title="'.htmlspecialchars_uni(strip_tags($roleOut)).'">

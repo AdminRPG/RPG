@@ -14,6 +14,7 @@
 
 if (php_sapi_name() !== 'cli') { die("CLI only.\n"); }
 require_once __DIR__ . '/_db-config.php';
+require_once __DIR__ . '/_migrate-lib.php';
 
 function seed_npc(mysqli $db, array $n) {
     $slug = $n['slug'];
@@ -94,7 +95,7 @@ function seed_npc(mysqli $db, array $n) {
     }
 
     // Seeding de Vocaciones en rol_pj_vocaciones
-    if ($db->table_exists('rol_pj_vocaciones')) {
+    if (table_exists($db, 'mybb_rol_pj_vocaciones')) {
         $db->query("DELETE FROM mybb_rol_pj_vocaciones WHERE pid = {$pid}");
         $clase_seed = $n['datos']['clase'] ?? ($n['datos']['identidad'] ?? 'luchador');
         $arma_seed = $n['datos']['arma'] ?? 'guantelete';

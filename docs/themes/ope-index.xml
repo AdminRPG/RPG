@@ -88,7 +88,7 @@
     <span class="ope-eyebrow">El mundo ahora</span>
     <h2 class="ope-stitle">Bitácora del Puerto</h2>
     <div class="ope-gold-rule"></div>
-    <div class="ope-bento">
+    <div class="ope-bento{$ope_bento_mod}">
   <div class="ope-bento-grid">
 
     <!-- Calendario on-rol -->
@@ -99,13 +99,8 @@
       <span class="ope-onrol-bar"><i style="width:{$ope_rol_progress}%"></i></span>
     </a>
 
-    <!-- Panel destacado: lore -->
-    <article class="ope-panel ope-panel-lore">
-      <div class="ope-panel-kicker">// el mundo ahora</div>
-      <h3 class="ope-panel-title">{$ope_lore_title}</h3>
-      <p class="ope-panel-text">{$ope_lore_text}</p>
-      <a href="{$mybb->settings['bburl']}/guias.php" class="ope-btn ope-btn-hot">Leer más &rarr;</a>
-    </article>
+    <!-- Panel destacado: lore (se dibuja solo si hay contenido, desde index.php) -->
+    {$ope_lore_panel}
 
     <!-- Feed: últimas historias -->
     <article class="ope-panel ope-panel-feed">
@@ -117,16 +112,8 @@
       <div class="ope-feed">{$ope_latest_posts}</div>
     </article>
 
-    <!-- Gaceta del Cielo (Mundo Vivo) -->
-    <article class="ope-panel ope-panel-curio ope-panel-news">
-      <div class="ope-panel-kicker">{$ope_noticia_kicker}</div>
-      <div id="ope-news-item" class="ope-news-item" role="button" tabindex="0">
-        <b id="ope-news-title" class="ope-news-title">{$ope_noticia_first_title}</b>
-        <p id="ope-curiosidad-text" class="ope-curio-text">{$ope_noticia_first_text}</p>
-        <span class="ope-news-more">Leer más &rarr;</span>
-      </div>
-      <span class="ope-curio-bar"><i id="ope-curio-bar"></i></span>
-    </article>
+    <!-- Gaceta del Cielo (Mundo Vivo): se dibuja solo si hay noticias/curiosidades, desde index.php -->
+    {$ope_gaceta_panel}
 
     <!-- Staff -->
     <article class="ope-panel ope-panel-staff">
