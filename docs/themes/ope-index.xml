@@ -63,6 +63,7 @@
 
     <template name="index" version="1839"><![CDATA[<html>
 <head>
+<title>{$mybb->settings['bbname']}</title>
 {$headerinclude}
 </head>
 <body class="ope-index">
