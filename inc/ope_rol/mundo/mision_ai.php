@@ -41,7 +41,7 @@ function ope_mision_ai_generar_batch(array $misiones)
         return array('ok' => false, 'textos' => array(), 'modelo' => '', 'msg' => 'Sin misiones que generar.');
     }
 
-    $system = 'Eres la voz del Tablon de Misiones de One Piece: Eternal, un foro de rol por post en el universo One Piece. '
+    $system = 'Eres la voz del Tablon de Misiones de One Piece: 7 Seas, un foro de rol por post en el universo One Piece. '
         . 'Tu trabajo es escribir el ARRANQUE narrativo de una mision: la escena que abre el hilo. '
         . 'Debe sentirse One Piece: peligro, mar, islas unicas, facciones con agenda propia, y la promesa del botin. '
         . 'CADA MISION es un micro-mundo. Su DESCRIPCION (gancho, conflicto, NPCs) y la identidad de QUIEN LA TOMA '
@@ -66,7 +66,7 @@ function ope_mision_ai_generar_batch(array $misiones)
         . 'SEPARADOR: entrega cada introduccion separada por ===MISION=== en linea propia. '
         . 'Sin texto antes ni despues.';
 
-    $user = "{$n} misiones del Tablon de Misiones de One Piece: Eternal.\n\n";
+    $user = "{$n} misiones del Tablon de Misiones de One Piece: 7 Seas.\n\n";
     foreach ($misiones as $i => $m) {
         $num     = $i + 1;
         $titulo  = (string)($m['titulo'] ?? "Mision {$num}");

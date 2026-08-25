@@ -2,12 +2,10 @@ node_modules/
 cache/
 backups/
 test-results/
-.playwright-mcp/
 references/
 vendor/
 dist/
 graphify-out/
-.superpowers/
 .git/
 inc/config.php
 inc/settings.php

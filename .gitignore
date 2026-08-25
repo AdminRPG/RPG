@@ -29,9 +29,6 @@ admin/error.log
 # MyBB runtime cache
 cache/
 
-# OpenCode config (claves locales)
-opencode.json
-
 # Dependencies
 node_modules/
 
@@ -40,9 +37,6 @@ node_modules/
 
 # Test results
 test-results/
-
-# Playwright MCP logs (transitorios)
-.playwright-mcp/
 
 # Backups
 backups/

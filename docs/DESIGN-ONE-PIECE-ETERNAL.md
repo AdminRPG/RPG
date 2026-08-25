@@ -31,7 +31,7 @@
 
 ## 0. Protocolo agentes — no portar a medias
 
-> **Obligatorio para Cursor, OpenCode y Antigravity.** Detalle: `docs/AGENTES-Y-HERRAMIENTAS.md`.
+> **Obligatorio para cualquier portado visual.** Detalle: este documento y `docs/GUIA-ESTILOS-PHP.md`.
 
 ### 0.1 Regla
 
@@ -49,7 +49,7 @@ Portar un prototipo (`docs/Prototypes/Granblue/`) = implementar **todas** las ca
 
 ### 0.3 Cierre de tarea UI
 
-1. Checklist en `AGENTES-Y-HERRAMIENTAS.md` §2.
+1. Checklist de portado visual (§0 y §6).
 2. `sync-theme verify` → `OK CSS: in sync`.
 3. Comparación visual con prototipo (scroll completo).
 4. Actualizar §6.7 si cambia el estado F2b.
@@ -693,7 +693,7 @@ Toggle en navbar: alterna `document.documentElement.dataset.theme` entre `cielo`
 - [ ] `php scripts/check-inline-styles.php` limpio
 - [ ] `php scripts/sync-theme.php import && verify` → OK CSS in sync
 - [ ] Comparación visual con prototipo o página hermana
-- [ ] Si portado desde prototipo: checklist `docs/AGENTES-Y-HERRAMIENTAS.md` §2 completo
+- [ ] Si portado desde prototipo: checklist de portado visual (§0) completo
 - [ ] `prefers-reduced-motion` respetado
 - [ ] Tríada PJ no usa assets `hero-*.jpg` del sitio
 - [ ] Prompts de imagen documentados si faltan assets
@@ -704,8 +704,6 @@ Toggle en navbar: alterna `document.documentElement.dataset.theme` entre `cielo`
 
 | Archivo | Rol |
 |---|---|
-| `docs/AGENTES-Y-HERRAMIENTAS.md` | Protocolo agentes (Cursor, OpenCode, Antigravity) |
-| `docs/ANTIGRAVITY.md` | Prompt arranque Antigravity |
 | `AGENTS.md` | Resumen reglas raíz del repo |
 | `docs/Prototypes/Granblue/index.html` | Prototipo portada v3.2 |
 | `docs/Prototypes/Granblue/ficha.html` | Prototipo ficha v4 |

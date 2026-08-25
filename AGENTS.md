@@ -24,8 +24,6 @@
 
 Este proyecto tiene un grafo de conocimiento en `graphify-out/`.
 
-Cuando el usuario escribe `/graphify`, usa el skill graphify antes de cualquier otra cosa.
-
 Reglas:
 - Para preguntas sobre el código, ejecuta primero `py -m graphify query "<pregunta>"` si existe `graphify-out/graph.json`. Usa `py -m graphify path "<A>" "<B>"` para relaciones y `py -m graphify explain "<concepto>"` para conceptos.
 - Los archivos sucios en `graphify-out/` tras hooks o updates incrementales son normales; no omitas graphify por eso.
@@ -37,7 +35,7 @@ Reglas:
 
 ## Marca y codename
 
-- **Producto:** One Piece: Eternal
+- **Producto:** One Piece: 7 Seas (motor Eternal)
 - **Prefijo de código:** `ope_` (funciones PHP), `ope-` (CSS / plantillas)
 - **Plugin:** `inc/plugins/ope_rol.php` (codename `ope_rol`)
 - **Backend:** `inc/ope_rol/` (capas: `core/`, `catalogos/`, `dominio/`, `sistemas/`, `mundo/`, `tramites/`) — entrada `inc/ope_rol/bootstrap.php`. Stubs en `inc/ope_rol_*.php` para compatibilidad.
@@ -71,7 +69,7 @@ No usa `body.ope-pg-*`. Usa **`body.ope-index`**.
 |---|---|
 | Sistemas / lore (reglas) | `Eternal-Sistema/docs/DIRECCION-LORE-Y-SISTEMAS.md` |
 | UI / tema / portada | `docs/DESIGN-ONE-PIECE-ETERNAL.md`, `docs/themes/README.md` |
-| Página PHP nueva | DESIGN + `docs/GUIA-ESTILOS-PHP.md` + `.cursor/rules/page-scaffold.mdc` |
+| Página PHP nueva | DESIGN + `docs/GUIA-ESTILOS-PHP.md` |
 | Producto / copy | `docs/PRODUCT.md` |
 | Roadmap de implementación | `Eternal-Sistema/docs/10-AUTOMATISMOS/PLAN-IMPLEMENTACION-MYBB.md` |
 | Tema MyBB / sync | `docs/themes/README.md` |
@@ -79,11 +77,6 @@ No usa `body.ope-pg-*`. Usa **`body.ope-index`**.
 ---
 
 ## Herramientas de desarrollo
-
-| Entorno | Qué lee el agente |
-|---|---|
-| **Cursor** | `AGENTS.md`, `.cursor/rules/*.mdc`, skills `.agents/skills/` |
-| **OpenCode** | `AGENTS.md` (convención automática), `opencode.json` (MCPs: playwright, firecrawl; plugin: superpowers), skills `.agents/skills/` vía `skills.paths` |
 
 **PowerShell (Windows):** separar comandos con `;`, no `&&`.
 

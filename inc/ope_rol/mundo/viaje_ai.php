@@ -236,7 +236,7 @@ function ope_viaje_ai_generar(array $origen, array $destino, array $oraculo, arr
         $resumen = 'El oráculo no arrojó cartas destacables para este tramo.';
     }
 
-    $system = 'Eres "El Narrador", el cronista del foro de rol por post One Piece: Eternal. '
+    $system = 'Eres "El Narrador", el cronista del foro de rol por post One Piece: 7 Seas. '
         . 'Escribes las introducciones de travesía con la voz de un cronista del Grand Line: '
         . 'salitre, urgencia, camaradería y la promesa del mar abierto. Debe sentirse One Piece, '
         . 'no otro juego con piel de piratas. '
@@ -257,7 +257,7 @@ function ope_viaje_ai_generar(array $origen, array $destino, array $oraculo, arr
         . 'pendiente que invite a los jugadores a narrar cómo responden. '
         . 'Entrega SOLO el texto narrativo final, sin preámbulo ni notas.';
 
-    $user = 'Travesía del foro One Piece: Eternal.' . "\n"
+    $user = 'Travesía del foro One Piece: 7 Seas.' . "\n"
         . 'Origen: ' . $origen_nom . "\n"
         . 'Destino: ' . $destino_nom . "\n"
         . ($macro !== '' ? 'Zona del mar: ' . $macro . "\n" : '')

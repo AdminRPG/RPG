@@ -817,7 +817,7 @@ while ($staff = $db->fetch_array($staffQuery)) {
 $bburl = $mybb->settings['bburl'];
 $ope_categories = '';
 $catQuery = $db->query("
-    SELECT fid, name, description
+    SELECT fid, pid, name, description
     FROM ".TABLE_PREFIX."forums
     WHERE type = 'c' AND active = 1
     ORDER BY disporder ASC
@@ -853,6 +853,13 @@ while ($cat = $db->fetch_array($catQuery)) {
 
     // Ocultar categoría Navegación / Alta Mar (oráculo de viaje) en portada.
     if (mb_stripos($cat['name'], 'naveg') !== false) {
+        continue;
+    }
+
+    // Solo se listan categorías de primer nivel (El Mundo / Los Mares y Off Topic).
+    // Los "tramos" (East Blue, West Blue, Grand Line — Paraíso, Nuevo Mundo, Cúspide…)
+    // son subcategorías de Los Mares que solo organizan foros: no salen como secciones.
+    if ((int) $cat['pid'] > 0) {
         continue;
     }
 

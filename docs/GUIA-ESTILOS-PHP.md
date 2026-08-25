@@ -1,6 +1,6 @@
 ﻿# Guía de Estilos para Nuevas Páginas PHP
 
-> **Fuente de verdad: `docs/DESIGN-ONE-PIECE-ETERNAL.md` §5** (resumida en `AGENTS.md` y `docs/AGENTES-Y-HERRAMIENTAS.md`).
+> **Fuente de verdad: `docs/DESIGN-ONE-PIECE-ETERNAL.md` §5** (resumida en `AGENTS.md`).
 >
 > **Portada MyBB:** no uses esta guía — usa `body.ope-index` y DESIGN §6.
 >
@@ -8,9 +8,9 @@
 
 ---
 
-## Antes de portar UI (cualquier herramienta: Cursor / OpenCode / Antigravity)
+## Antes de portar UI
 
-1. Lee `docs/AGENTES-Y-HERRAMIENTAS.md` §2 — **no portes a medias**.
+1. Sigue el protocolo de portado visual de `docs/DESIGN-ONE-PIECE-ETERNAL.md` §0 — **no portes a medias**.
 2. Si viene de prototipo HTML, implementa las **5 capas** (estructura, tokens, overrides OP, fuentes, datos).
 3. Compara visualmente con `docs/Prototypes/Granblue/` antes de cerrar la tarea.
 
@@ -110,7 +110,7 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:red
 
 ### 4. Reglas CSS en ope.css
 
-**PASO 1 (OBLIGATORIO en scope nuevo)** — pega el scaffolding OPE de `DESIGN-ONE-PIECE-ETERNAL.md` §5.4 (o `.cursor/rules/page-scaffold.mdc`). Sin esto, los componentes de §3 salen SIN estilo.
+**PASO 1 (OBLIGATORIO en scope nuevo)** — pega el scaffolding OPE de `DESIGN-ONE-PIECE-ETERNAL.md` §5.4. Sin esto, los componentes de §3 salen SIN estilo.
 
 **PASO 2** — tus reglas propias, **SIEMPRE** scopeadas bajo `body.ope-pg-mi-pagina`:
 

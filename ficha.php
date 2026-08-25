@@ -1975,11 +1975,11 @@ header('Content-Type: text/html; charset=utf-8');
             </div>
             <div class="ope-field">
               <label>Firma</label>
-              <div class="ope-field-help">Admite BBCode: <code>[b]</code>, <code>[i]</code>, <code>[img]url[/img]</code>, <code>[color=#41A4E0]</code>&hellip; Si incluyes una imagen, <b>máximo recomendado 500&times;150px</b> para no romper la maquetación del hilo. Aparecerá bajo cada mensaje de este personaje con un separador <b>One Piece: Eternal</b>.</div>
+              <div class="ope-field-help">Admite BBCode: <code>[b]</code>, <code>[i]</code>, <code>[img]url[/img]</code>, <code>[color=#41A4E0]</code>&hellip; Si incluyes una imagen, <b>máximo recomendado 500&times;150px</b> para no romper la maquetación del hilo. Aparecerá bajo cada mensaje de este personaje con un separador <b>One Piece: 7 Seas</b>.</div>
               <textarea name="firma" rows="6" placeholder="[b]Dorr Kaskan[/b] &mdash; herrero de Elbaf&#10;[img]https://...[/img]"><?php echo $g_firma; ?></textarea>
             </div>
 
-            <div class="ope-msep" aria-hidden="true"><span>One Piece: Eternal</span></div>
+            <div class="ope-msep" aria-hidden="true"><span>One Piece: 7 Seas</span></div>
             <div class="ope-modal-actions">
               <button type="submit" class="btn btn-hot">Guardar cambios</button>
             </div>

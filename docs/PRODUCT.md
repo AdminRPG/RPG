@@ -60,8 +60,6 @@ Selector visual en navbar (migración pendiente de `eternal/rojo/...` OP a `ciel
 | Doc | Contenido |
 |---|---|
 | `docs/DIRECCION-LORE-Y-SISTEMAS.md` | Dirección de lore + sistemas (alto nivel, para IA de contenido) |
-| `docs/AGENTES-Y-HERRAMIENTAS.md` | Protocolo anti-portado parcial (Cursor, OpenCode, Antigravity) |
-| `docs/ANTIGRAVITY.md` | Prompt de arranque para Gemini IDE |
 | `docs/DESIGN-ONE-PIECE-ETERNAL.md` | Fuente de verdad visual + §5 scaffolding PHP |
 | `docs/PLAN-MAESTRO-ONE-PIECE-ETERNAL.md` | Visión, fases, mecánicas |
 | `docs/Prototypes/Granblue/index.html` | Referencia visual portada aprobada |

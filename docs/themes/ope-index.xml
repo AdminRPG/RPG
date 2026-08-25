@@ -76,7 +76,7 @@
   <header class="ope-hero ope-hero--portada" id="ope-hero">
     <div class="ope-slide-bg ope-bg-portada" style="background-image:url('{$ope_hero_banner}')"></div>
     <div class="ope-slide-in">
-      <h1 class="ope-hero-title">One Piece: <b>Eternal</b></h1>
+      <h1 class="ope-hero-title">One Piece: <b>7 Seas</b></h1>
     </div>
   </header>
 </div>
@@ -85,9 +85,6 @@
 <section class="ope-section ope-gaceta">
   <span class="ope-wm" aria-hidden="true">Gaceta</span>
   <div class="ope-wrap">
-    <span class="ope-eyebrow">El mundo ahora</span>
-    <h2 class="ope-stitle">Bitácora del Puerto</h2>
-    <div class="ope-gold-rule"></div>
     <div class="ope-bento{$ope_bento_mod}">
   <div class="ope-bento-grid">
 
@@ -256,9 +253,9 @@
 
     <template name="footer" version="1839"><![CDATA[<footer class="foot">
   <div class="foot-in">
-    <div class="foot-b">One Piece: Eternal</div>
+    <div class="foot-b">One Piece: 7 Seas</div>
     <div class="foot-links"><a href="{$mybb->settings['bburl']}/index.php">Inicio</a><a href="{$mybb->settings['bburl']}/personajes.php">Personaje</a><a href="{$mybb->settings['bburl']}/tramites.php">Trámites</a><a href="{$mybb->settings['bburl']}/guias.php">Guías</a></div>
-    <div class="foot-c">One Piece: Eternal</div>
+    <div class="foot-c">One Piece: 7 Seas</div>
   </div>
 </footer>
 </div></div></div>

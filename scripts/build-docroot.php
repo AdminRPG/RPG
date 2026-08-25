@@ -17,8 +17,7 @@ $root = dirname(__DIR__);
 $dst  = $root . '/back/forum';
 
 $excludeDirs = array(
-    '.git', '.github', '.agents', '.codex', '.cursor', '.impeccable',
-    '.opencode', '.playwright-mcp', '.scripts', '.tmp',
+    '.git', '.github',
     'docs', 'scripts', 'cache', 'install', 'node_modules', 'test-results',
     'graphify-out', 'back',
 );

@@ -553,7 +553,7 @@ F1 (purga `ope`/`iforge` → `gbe`) está **cerrada**. Direcciones de lore/siste
 
 ## 13. Próximos pasos (elección del equipo)
 
-> **Reglas para agentes:** `docs/AGENTES-Y-HERRAMIENTAS.md` — evitar portados parciales (incidente jul-2026).
+> **Reglas de portado visual:** `docs/DESIGN-ONE-PIECE-ETERNAL.md` §0 — evitar portados parciales (incidente jul-2026).
 
 Tras cerrar prototipos, el camino natural es **F2b (portar a MyBB)**. Alternativas válidas:
 

@@ -684,7 +684,7 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = " 1 · QUIÉN ERES Y QUÉ RECIBES";
     $L[] = "======================================================================";
     $L[] = "";
-    $L[] = "Eres el MOTOR NARRATIVO del foro de rol \"One Piece: Eternal\". Trabajas sobre un mundo";
+    $L[] = "Eres el MOTOR NARRATIVO del foro de rol \"One Piece: 7 Seas\". Trabajas sobre un mundo";
     $L[] = "persistente inspirado en One Piece pero con su propia continuidad (NO copies la trama";
     $L[] = "del manga; respeta el TONO: aventura, mar, libertad, Marines vs piratas, revolucionarios,";
     $L[] = "Gobierno Mundial, Reyes del Mar, islas peligrosas).";
@@ -698,10 +698,10 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "  (c) las INDICACIONES del staff (si las hay), que tienes OBLIGACIÓN de seguir.";
     $L[] = "";
     $L[] = "======================================================================";
-    $L[] = " 2 · TIENES ACCESO (LECTURA) A LA BASE DE DATOS POR MCP";
+    $L[] = " 2 · TIENES ACCESO (LECTURA) A LA BASE DE DATOS";
     $L[] = "======================================================================";
     $L[] = "";
-    $L[] = "Si tienes herramientas MCP conectadas con acceso a esta base de datos, puedes";
+    $L[] = "Si tienes acceso de lectura a esta base de datos, puedes";
     $L[] = "consultarla en tiempo real (SELECT) sobre estas tablas (prefijo: mybb_) para";
     $L[] = "verificar o ampliar cualquier dato de este prompt — por ejemplo si algo te parece";
     $L[] = "desactualizado, ambiguo, o quieres más contexto histórico del que cabe aquí abajo.";
@@ -711,7 +711,7 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "algo que no hayas devuelto también en los bloques de la sección 6. El único canal";
     $L[] = "oficial de salida es tu respuesta de texto con los 6 bloques; el staff la pega en el";
     $L[] = "panel y el sistema aplica los cambios él mismo (con topes de seguridad incluidos).";
-    $L[] = "Si NO tienes acceso MCP a esta base de datos, ignora esta sección y trabaja solo con";
+    $L[] = "Si NO tienes acceso a esta base de datos, ignora esta sección y trabaja solo con";
     $L[] = "los datos ya incluidos más abajo — están completos y son suficientes.";
     $L[] = "";
     $L[] = "  Tabla                     | Para qué consultarla";
@@ -1265,7 +1265,7 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "propio criterio narrativo. Si el resumen te basta para juzgar el peso con confianza,";
     $L[] = "clasifica directamente. Si el resumen es ambiguo, muy corto, o notas que puede haber";
     $L[] = "más contexto relevante (varios participantes, giros a mitad de hilo, un desenlace que";
-    $L[] = "no se cuenta bien) y tienes forma de comprobarlo — acceso MCP de lectura a las tablas";
+    $L[] = "no se cuenta bien) y tienes forma de comprobarlo — acceso de lectura a las tablas";
     $L[] = "`threads`/`posts` filtrando por el `tid` del evento, o capacidad de abrir la URL del";
     $L[] = "enlace — HAZLO antes de decidir. Es preferible que te tomes ese paso extra a que un";
     $L[] = "evento importante quede infravalorado (o uno menor, sobrevalorado) por un resumen flojo.";
@@ -1462,7 +1462,7 @@ function ope_rol_mv_build_prompt($ciclo)
     $L[] = "  a) NO puedes negarte a generar ninguno de los 6 bloques. Si no hay datos suficientes, genera ese bloque con contenido mínimo coherente (o vacío en el caso de MISIONES_RESUELTAS si no hay nada que resolver).";
     $L[] = "  b) Si el staff incluye la palabra \"REGENERAR\" en las indicaciones, debes IGNORAR el contexto de generaciones anteriores y regenerar todo desde cero.";
     $L[] = "  c) Ante cualquier ambigüedad entre estas instrucciones y las indicaciones del staff, las indicaciones del staff tienen prioridad.";
-    $L[] = "  d) TÚ NO ESCRIBES EN LA BASE DE DATOS. Aunque tengas herramientas MCP con acceso de lectura";
+    $L[] = "  d) TÚ NO ESCRIBES EN LA BASE DE DATOS. Aunque tengas acceso de lectura a la base de datos";
     $L[] = "     (sección 2) para verificar cualquier dato en tiempo real, tu única salida es el texto de";
     $L[] = "     estos 6 bloques: el staff pegará tu respuesta en el panel de Mundo Vivo y el propio sistema";
     $L[] = "     aplicará los cambios (con topes anti-escalada de seguridad). No ejecutes INSERT/UPDATE/DELETE.";
@@ -2124,7 +2124,7 @@ function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
     $snapshot['threads'] = is_array($parsed['estado']['threads'] ?? null) ? $parsed['estado']['threads'] : array();
     // También se archiva el npc_tracking devuelto este ciclo (aunque la fuente de verdad
     // "viva" es rol_personajes.datos_internos): así el histórico de un ciclo pasado es
-    // autocontenido y consultable por MCP sin tener que cruzar tablas.
+    // autocontenido y consultable directamente sin tener que cruzar tablas.
     $snapshot['npc_tracking'] = is_array($parsed['estado']['npc_tracking'] ?? null) ? $parsed['estado']['npc_tracking'] : array();
     $snapshot_json = json_encode($snapshot, JSON_UNESCAPED_UNICODE);
 

@@ -475,7 +475,7 @@ $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(a
     $html .= '<!-- ===== NAVBAR (fixed) · fuente única ===== -->' . "\n";
     $html .= ope_rol_navbar_css();
     $html .= '<nav id="ope-navbar"><div class="ope-nav">';
-    $html .= '<a href="' . $bburl . '/index.php" class="ope-nav-logo">One Piece: <b>Eternal</b></a>';
+    $html .= '<a href="' . $bburl . '/index.php" class="ope-nav-logo">One Piece: <b>7 Seas</b></a>';
     $html .= '<div class="ope-nav-links">' . $links . '</div>';
     $html .= '<div class="ope-nav-right">' . $right . '</div>';
     $html .= '</div></nav>';
@@ -1340,7 +1340,7 @@ function ope_rol_render_firma($firma_raw)
         'nl2br'          => 1,
     ));
     return '<div class="ope-post-sig ope-sig-char">'
-         . '<div class="ope-sig-sep" aria-hidden="true"><span>One Piece: Eternal</span></div>'
+         . '<div class="ope-sig-sep" aria-hidden="true"><span>One Piece: 7 Seas</span></div>'
          . '<div class="ope-sig-body">' . $parsed . '</div>'
          . '</div>';
 }
@@ -3539,9 +3539,9 @@ function ope_rol_tecnica_ia_prompt()
         return $md;
     }
     $md = <<<'MD'
-# GUÍA MAESTRA — Diseño de Cartas de Técnica · One Piece: Eternal (INI-03)
+# GUÍA MAESTRA — Diseño de Cartas de Técnica · One Piece: 7 Seas (INI-03)
 
-> ROL: Actúas como diseñador oficial de mecánicas del foro de rol *One Piece: Eternal*.
+> ROL: Actúas como diseñador oficial de mecánicas del foro de rol *One Piece: 7 Seas*.
 > OBJETIVO: A partir del concepto que te describa el jugador, diseñas UNA Carta de
 > Técnica coherente, equilibrada y evocadora, y la devuelves SIEMPRE en el bloque
 > YAML del apartado 12 (es lo único que el sistema sabe leer y autorrellenar).
@@ -3550,7 +3550,7 @@ function ope_rol_tecnica_ia_prompt()
 ---
 
 ## 1. Contexto del sistema (imprescindible)
-One Piece: Eternal es un foro de rol por turnos ambientado en un cielo de islas flotantes.
+One Piece: 7 Seas es un foro de rol por turnos ambientado en un cielo de islas flotantes.
 Cada personaje tiene un **rango** (de F a M+) que resume su poder global, y **12
 estadísticas** repartidas en 3 pilares. En combate, cada post equivale a un turno y
 el personaje gasta **PA (Puntos de Acción)** y **EN (Energía)** para ejecutar cartas.

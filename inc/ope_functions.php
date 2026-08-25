@@ -134,6 +134,13 @@ if (!function_exists('ope_render_region_cards')) {
             ORDER BY f.disporder ASC
         ");
         while ($forum = $db->fetch_array($forumQuery)) {
+            // Tarjetas-región de resumen que no se muestran: "Blues" (los 4 mares
+            // ya tienen su propia tarjeta) y "Grand Line" (se navega por sus
+            // mitades: Paraíso y New World). Sus foros siguen accesibles por URL.
+            $regionName = mb_strtolower(trim((string) $forum['name']));
+            if ($regionName === 'blues' || $regionName === 'grand line') {
+                continue;
+            }
             if (isset($forumpermissions[$forum['fid']]) && $forumpermissions[$forum['fid']]['canview'] != 1) {
                 continue;
             }
