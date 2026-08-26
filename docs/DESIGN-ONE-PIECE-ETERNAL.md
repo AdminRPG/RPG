@@ -2,7 +2,7 @@
 
 > **Fuente de verdad del diseño** para el foro de rol *One Piece: Eternal* (migración desde *One Piece: Eternal*).
 >
-> **Estado:** v1 — derivado de prototipos aprobados (`docs/Prototypes/Granblue/index.html` v3.2, `ficha.html` v4) y `docs/PLAN-MAESTRO-ONE-PIECE-ETERNAL.md` v3.
+> **Estado:** v2 — identidad del producto corregida a **One Piece: 7 Seas** (motor Eternal, prefijos `ope_`/`ope-`). Las secciones que nombren I-Forge/Granblue/Lyria o `docs/Prototypes/Granblue/` son **restos históricos no aplicables**: esos directorios y marcas se eliminaron en la limpieza. La dirección de lore/sistemas vive en el repo hermano `Eternal-Sistema/docs/` (ver `AGENTS.md`).
 >
 > **Documentos hermanos:** `docs/PLAN-MAESTRO-ONE-PIECE-ETERNAL.md` (visión/fases), `docs/DIRECCION-LORE-Y-SISTEMAS.md` (lore + sistemas), `docs/PRODUCT.md`.
 >
@@ -97,16 +97,13 @@ Tema emocional: de *Libertad* (mar, OP) → **Horizonte** (cielo, OPE). La escen
 
 | Campo | Valor |
 |---|---|
-| **Nombre público** | One Piece: Eternal |
-| **Codename técnico** | `gbe` |
-| **Prefijo CSS objetivo** | `ope-*`, `body.ope-pg-*` |
-| **Prefijo CSS actual (transición)** | `ope-*`, `body.ope-pg-*` — **no eliminar hasta F1** |
-| **Logo** | `images/gbe/crest-eternal.png` |
-| **Bot cronista** | Lyria (sustituye OPE Eternal) |
-| **Moneda** | Monedas |
-| **Disclaimer footer** | Foro no oficial; sin afiliación Cygames; personajes originales |
+| **Nombre público** | One Piece: 7 Seas |
+| **Codename técnico** | `ope` (plugin `ope_rol`, prefijos `ope_`/`ope-`) |
+| **Prefijo CSS** | `ope-*`, `body.ope-pg-*`, `body.ope-index` |
+| **Tema** | Eternal (Cielo `cielo` por defecto / `noche` conmutable) |
+| **Bot cronista** | OPE Eternal |
 
-> CSS canónico: `docs/themes/ope.css` → `cache/themes/theme13/ope.css`. Codename activo: `gbe`.
+> CSS canónico: `docs/themes/ope.css` → `cache/themes/theme13/ope.css`. **Codename activo: `ope`.**
 
 ---
 
@@ -220,7 +217,45 @@ Progresión océano → cielo → oro (sustituye escala marina OP):
 
 Aura del PJ: `--aura` = color del elemento activo (borde avatar, chips, borde pacto).
 
-#### Facciones OPE (reemplazan `--fac-pirata`…)
+### 3.4 Componentes legacy suavizados (migración fuera del “brutalismo”)
+
+Al migrar los paneles/tablas al sistema de tokens se **sustituyen** los bordes duros (`2px solid #000`) y las sombras metálicas de desplazamiento duro (`3px 3px 0 #000`, `5px 5px 0 …`) por los tokens suaves del sistema OPE. Patrón aplicado en `ope.css` (bloque PLACAS/DATOS/POST/META/SPOILER/TPLBTN/RPG):
+
+| Selector legacy | Antes (firma brutalista) | Después (tokens OPE) |
+|---|---|---|
+| `.ope-plate`, `.ope-post`, `.ope-rpg`, `.ope-meta-fields`, `.ope-spoiler`, `.ope-datos` | `border:2px solid #000` + `box-shadow:3px 3px 0/5px 5px 0/4px 4px 0 #000` | `border:1px solid var(--ope-line)` + `border-radius:8–14px` + `box-shadow:var(--ope-shadow-sm)` |
+| `.ope-plate-h`, `.ope-datos-head`, `.ope-post-author`, `.ope-spoiler-head` | `border-bottom:2px solid #000` sobre `var(--iron-edge)` | `border-bottom:1px solid var(--ope-line-soft)` sobre `var(--ope-card-2)` |
+| `.ope-tag`, `.ope-heat-badge`, `.ope-chip`, `.ope-badge` | `border:2px solid #000` | `border:1px solid var(--ope-line)` + `border-radius:6px` |
+| `.ope-tplbtn` | `border:2px solid #000` + `box-shadow:2px 2px 0` (+ desplazamiento hover) | `border:1px solid var(--ope-line)` + hover con `border-color:var(--ope-gold)` sin desplazamiento |
+| `.ope-meta-sel` | `border:2px solid #000` sobre `var(--iron)` | `border:1px solid var(--ope-line)` + `border-radius:6px` sobre `var(--ope-card-2)` |
+
+**Regla 3.4:** ningún componente nuevo debe reintroducir `border:2px solid #000` ni sombras duras de desplazamiento; usar `--ope-line` / `--ope-line-soft` para filetes y `--ope-shadow-sm` / `--ope-shadow` para elevación.
+
+#### 3.5 Auditoría de selectores legacy
+
+La migración revisó las 142 firmas brutalistas pendientes y dejó `0` coincidencias de `border:2px solid #000` en `docs/themes/ope.css`. La búsqueda se hizo contra el CSS canónico y contra PHP/XML/JS del producto, excluyendo `cache/`, `backups/`, `admin/` y `jscripts/` de la decisión de uso.
+
+**Selectores que deben conservarse:**
+
+| Selector | Uso confirmado |
+|---|---|
+| `.ope-island-head`, `.ope-island-card`, `.ope-island-tabs`, `.ope-itab*` | `forumdisplay.php` y `docs/themes/ope-forumdisplay.xml`; presentan las pestañas y el encabezado de cada isla. |
+| `.isla-chip-fixed`, `.isla-name`, `.isla-region` | `viajes.php`; resumen de la isla de origen del viaje. |
+| `.ope-tools .sceditor-*` | `docs/themes/ope-forms.xml` / `codebuttons`; el widget externo se neutraliza al final de `ope.css` y hereda `cielo`/`noche`. |
+| `.tl-tabs`, `.tl-tab`, `.ope-cron-item`, `.ope-tpl-item`, `.fp-med`, `.sum-temp`, `.sum-cell` | `ficha.php`; cronología, gestión, medallones y resumen de personaje. |
+
+**Candidatos para una purga posterior (no borrar en esta migración):**
+
+| Bloque / selector | Evidencia | Acción propuesta |
+|---|---|---|
+| `.reno`, `.vitals`, `.vital`, `.pact`, `.pact-body` | Sólo aparecen en el bloque histórico de `ope.css`; no hay referencias en PHP/XML/JS del producto. | Eliminar en una tarea independiente tras validar que no existen plantillas almacenadas en la base de datos. |
+| `.ope-enlace-*` | No hay referencias activas fuera de `ope.css`; parecen restos de un prototipo de enlace/identidad. | Eliminar el bloque completo y revisar cualquier template exportado antes de hacerlo. |
+| Selectores de prototipo comentados (`tabs-wrap`, `panel-h/.panel-b`, `.tec*`) | Sólo aparecen como nombres documentales o no aparecen como reglas activas. | Retirar comentarios y reglas huérfanas junto con una comprobación de regresión de ficha. |
+| Variantes `.ope-viaje-panel*` duplicadas | Hay una familia moderna tokenizada y una declaración legacy posterior con valores alias. | Consolidar en una sola familia después de verificar `inc/ope_rol/mundo/viajes.php`. |
+
+La purga queda separada porque los selectores sin referencias en el checkout todavía pueden existir en templates guardados en MyBB o en datos históricos. La eliminación segura requiere exportar templates, comparar nombres y comprobar `forumdisplay`, `showthread`, `ficha` y `viajes` en la instalación objetivo.
+
+#### Facciones (reemplazan `--fac-pirata`…)
 
 | Token | Facción |
 |---|---|
@@ -398,20 +433,9 @@ PORTADA
 └── FOOTER
 ```
 
-### 6.2 Hero carrusel (4 slides)
+### 6.2 Hero (encabezado actual)
 
-Reemplaza el `ope-hero` estático actual (`ope-index.xml` L76–86). Altura `100vh`, `min-height: 600px`.
-
-| Slide | Clase BG | Imagen sitio | Contenido |
-|---|---|---|---|
-| 0 — Portada | `.g-portada` | `hero-mundo.jpg` | Emblema, tagline, CTAs "Zarpar" / "Explorar" |
-| 1 — El Cielo | `.g-mundo` | `hero-mundo.jpg` | Ambientación: mundo sobre las nubes |
-| 2 — Pueblos | `.g-pueblos` | `hero-pueblos.jpg` | Razas del cielo |
-| 3 — Primordiales | `.g-primal` | `hero-primal.jpg` | Bestias Legendarias, pactos |
-
-**Controles:** flechas laterales (`.hero-side`, 9% ancho), dots inferiores, teclado ←/→, swipe táctil. **Sin** scroll horizontal largo; **sin** pin GSAP en hero.
-
-**Nota:** `images/gbe/hero-*.jpg` son **arte del sitio**, no banners de personaje.
+La portada actual usa un **hero estático** (`.ope-fhead` en `ope-index.xml`) con nombre del foro + tagline, y **no** hay carrusel de 4 slides en producción: el carrusel a pantalla completa del prototipo (`hero-mundo.jpg`, etc.) nunca se portó.
 
 ### 6.3 Gaceta bento (debajo del hero)
 
@@ -420,9 +444,7 @@ Grid equivalente a `ope-tablon` / `.bento` del prototipo:
 | Área grid | Panel | Contenido PHP |
 |---|---|---|
 | `onrol` | Calendario on-rol | `$ope_rol_season`, día/año, barra progreso |
-| `lore` | El mundo ahora | `$ope_lore_title`, `$ope_lore_text` |
 | `feed` | Últimas historias | `$ope_latest_posts` |
-| `news` | Gaceta del Cielo | Mundo Vivo / noticias rotativas |
 | `staff` | El equipo | `$ope_staff_list` |
 
 En OP el tablón comparte fila con el hero (`ope-top`); en OPE el tablón va **debajo** del carrusel full-viewport (un solo scroll vertical).
@@ -441,17 +463,20 @@ grid-template-areas:
   "es es es es"
 ```
 
-| Modifier | Cielo | Asset |
+| Modifier | Región (Los Mares) | Islas |
 |---|---|---|
-| `--verdepuerto` | Verdepuerto | `hero-mundo.jpg` |
-| `--ventisquero` | Ventisquero | `hero-pueblos.jpg` |
-| `--cielo eléctrico` | Cielo Eléctrico | `Cielo-cielo eléctrico.jpg` (pendiente) |
-| `--solsticio` | Solsticio | `hero-primal.jpg` |
-| `--estalucia` | Thule | `Cielo-estalucia.jpg` (pendiente) |
+| `--east-blue` | East Blue | 6 |
+| `--west-blue` | West Blue | 9 |
+| `--north-blue` | North Blue | 9 |
+| `--south-blue` | South Blue | 9 |
+| `--paraiso` | Paraíso | 18 |
+| `--new-world` | New World | 13 |
+| `--calm-belt` | Calm Belt | 4 |
+| `--red-line` | Red Line | 4 |
 
 Cada panel: imagen 16:9, velo gradiente, nombre `--disp`, descripción expandible en hover, meta `<b>N</b> islas · <b>N</b> temas`.
 
-**Regla:** las islas **no** se listan en portada; viven dentro del Cielo (`forumdisplay.php`).
+**Regla:** las islas **no** se listan en portada (instalación limpia: todas las regiones están vacías); viven dentro de la región (`forumdisplay.php`).
 
 ### 6.7 Estado F2b (julio 2026)
 
@@ -467,8 +492,9 @@ El portado a MyBB exige el **sistema visual completo** del prototipo, no compone
 | Tema cielo/noche | `html[data-theme]` | Toggle en `ope_rol.php` + cookie | ✅ |
 | `forumdisplay` / `showthread` / editor | Mismo lenguaje OPE | Overrides `body[data-ope-page]` | ✅ |
 | Páginas PHP core | Tokens OPE | `body[class*="ope-pg-"]` wave 4 + overrides | ✅ |
-| Assets Cielo | `images/gbe/Cielo-*.jpg` | 5 paneles (3 hero + 2 GD) | ✅ |
-| Purga codename `ope`→`gbe` | — | Scripts listos, no aplicados | ⏳ F1 |
+| Regiones de Los Mares | 8 tarjetas bento | `ope-render_region_cards` en `inc/ope_functions.php` | ✅ (sin islas) |
+
+**Nota:** la fila “Purga codename `ope`→`gbe`” queda **descartada** — el codename del proyecto es `ope` (plugin `ope_rol`), no `gbe`. La ruta `images/gbe/` no existe; los assets del sitio viven bajo `images/` y el CSS canónico sigue siendo `docs/themes/ope.css`.
 
 **Fix jul-2026:** bloques `:root` sin scope en `alertas`/`mensajes`/`revisar-personaje` filtraban tokens OP al resto del sitio — movidos a `body.ope-pg-*`.
 
@@ -506,7 +532,7 @@ Cada Aventurero tiene **cuatro assets propios**. Configurables por el dueño en 
 
 **Implementación actual:** modal Gestionar en `ficha.php` (banner, retrato, avatar, icono, firma); `$ficha_art = retrato ?: avatar` para compatibilidad con datos antiguos.
 
-> **NO confundir:** `images/gbe/hero-*.jpg` son decoración del **sitio**. El banner de cada PJ es URL propia en `datos.banner`. Retrato ≠ avatar: el avatar es exclusivo del postbit.
+> **NO confundir:** los `hero-*.jpg` del tema son decoración del **sitio**. El banner de cada PJ es URL propia en `datos.banner`. Retrato ≠ avatar: el avatar es exclusivo del postbit.
 
 **Placeholder banner:** gradiente por `--aura` (elemento) hasta que el jugador suba URL (`ficha.php` → `.forge-banner-placeholder`).
 
@@ -514,7 +540,7 @@ Cada Aventurero tiene **cuatro assets propios**. Configurables por el dueño en 
 
 ## 8. Ficha (`ficha.php`) — layout v4
 
-Prototipo: `docs/Prototypes/Granblue/ficha.html` v4. Scope CSS: `body.ope-pg-ficha` (→ `body.ope-pg-ficha`).
+Scope CSS: `body.ope-pg-ficha`. Portado directo en `ficha.php` + `ope.css` (sin prototipo HTML; el `docs/Prototypes/` se eliminó en la limpieza).
 
 ### 8.1 Estructura vertical
 
@@ -558,7 +584,7 @@ bc (breadcrumb, debajo nav 66px)
 
 ---
 
-## 9. Convención de imágenes (`images/gbe/`)
+## 9. Convención de imágenes
 
 ### 9.1 Reglas
 
@@ -603,9 +629,11 @@ Ejemplo Cielo: *"Cielo Eléctrico Cielo, frozen archipelago with ether crystal s
 
 ---
 
-## 10. Patrones de reskin (OP → OPE)
+## 10. Patrones de reskin — DESCATADO (no aplicado)
 
-### 10.1 Los 5 patrones de diseño
+> **Esta sección describe un reskin a Granblue (cielos/aeronaves) que NO se aplicó.** El producto real es **One Piece: 7 Seas**, un foro **marítimo** de One Piece: se conservan los `fac-pirata`/`fac-marine`, las Frutas del Diablo, la nave/barco (`nave_json`), los mares y la Grand Line, y el codename `ope_`. Los nombres de esta sección (Renombre de Aventurero, Aeronave, Pacto Primordial, Lyria, `images/gbe/`, `--fac-Aventurero`) son **restos históricos no aplicables**.
+
+### 10.1 Los 5 patrones de diseño (histórico, desestimado)
 
 | Patrón OP (legado) | Reskin OPE | Página / componente |
 |---|---|---|
@@ -705,17 +733,14 @@ Toggle en navbar: alterna `document.documentElement.dataset.theme` entre `cielo`
 | Archivo | Rol |
 |---|---|
 | `AGENTS.md` | Resumen reglas raíz del repo |
-| `docs/Prototypes/Granblue/index.html` | Prototipo portada v3.2 |
-| `docs/Prototypes/Granblue/ficha.html` | Prototipo ficha v4 |
-| `docs/themes/ope.css` | Tema fuente (4215+ líneas) |
+| `docs/themes/ope.css` | Tema fuente (`ope.css`, migrado a tokens OPE) |
 | `docs/themes/ope-index.xml` | Plantilla MyBB portada |
-| `index.php` | Lógica categorías Cielo/Off Topic |
-| `ficha.php` | Ficha personaje, cuádrupla visual, tabs Referencia Visual |
+| `index.php` | Lógica categorías Los Mares / Off Topic |
+| `ficha.php` | Ficha personaje, cuádrupla visual, tabs |
 | `inc/plugins/ope_rol.php` | Navbar, hooks, helpers región |
 | `scripts/sync-theme.php` | Import/verify CSS → cache |
 | `scripts/check-inline-styles.php` | Linter estilos inline |
-| `images/gbe/` | Assets globales del sitio |
 
 ---
 
-*Última actualización: julio 2026 — v1.2 + F2b cerrado + §7 cuádrupla visual.*
+*Última actualización: ago 2026 — identidad corregida a One Piece: 7 Seas + componente legacy migrado a tokens OPE.*
