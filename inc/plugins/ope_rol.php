@@ -24,7 +24,14 @@ if (!defined('IN_MYBB')) {
 // siguen válidos para páginas que cargan módulos sueltos.
 require_once MYBB_ROOT . 'inc/ope_rol/bootstrap.php';
 
+// Zona B 7 Seas (F2.2): panel del editor, parser y persistencia de turnos.
+require_once MYBB_ROOT . 'inc/ope_rol/sistemas/combate_ui.php';
+
 $plugins->add_hook('global_start', 'ope_rol_global');
+
+// Progresión 7 Seas (F3.0): calendario on-roll perezoso + entrenamientos vencidos.
+require_once MYBB_ROOT . 'inc/ope_rol/sistemas/progresion.php';
+$plugins->add_hook('global_start', 'ope7_progresion_cron');
 
 // Posteo por personaje: estampa el pid del personaje activo en cada
 // mensaje/hilo y propaga el "último posteo" a hilos y foros.
@@ -61,6 +68,13 @@ $plugins->add_hook('parse_message', 'ope_rol_parse_spoilers');
 
 // Bloques del RPG System ([combate], [accion], [tecnica], [estado], [dado]).
 $plugins->add_hook('parse_message', 'ope_rol_parse_rpg');
+
+// Zona B 7 Seas (F2.2): [ope7-zonab]{json}[/ope7-zonab] → cartas del turno.
+$plugins->add_hook('parse_message', 'ope7_zonab_parse');
+
+// Persistencia de la Zona B en turnos_combate + sala_combate (F2.2).
+$plugins->add_hook('datahandler_post_insert_thread_end', 'ope7_zonab_on_post');
+$plugins->add_hook('datahandler_post_insert_post_end', 'ope7_zonab_on_post');
 
 // Oráculo de Viaje: [viaje=ID] y [viaje-cierre=ID] → HTML visual OPE Eternal.
 $plugins->add_hook('parse_message', 'ope_rol_parse_viaje');
@@ -371,7 +385,7 @@ function ope_rol_mensajes_no_leidos(int $pid): int
 // ─────────────────────────────────────────────────────────────
 function ope_rol_navbar_html()
 {
-    global $mybb;
+    global $mybb, $db;
     static $html = null;
 
     if ($html !== null) {
@@ -3464,6 +3478,11 @@ function ope_rol_tpl_inserter_html()
         . '}'
         . 'if(form){form.addEventListener("submit",applyBlock,true);form.addEventListener("submit",applyBlock);}'
         . '})();</script>';
+
+    // Zona B 7 Seas (F2.2): panel de cartas del turno bajo el editor.
+    if (function_exists('ope7_zonab_editor_html')) {
+        $html .= ope7_zonab_editor_html();
+    }
 
     return $html;
 }
