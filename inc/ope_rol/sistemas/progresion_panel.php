@@ -108,11 +108,11 @@ function ope7_progresion_panel_html()
     $html .= '</tbody></table></div></div>';
 
     // ── Histórico reciente de movimientos (gastos e ingresos) ──
-    $html .= '<div class="plate"><div class="plate-h"><span class="t">Histórico reciente de PP</span><span class="c">últimos 25 movimientos</span></div><div class="plate-b">';
+    $html .= '<div class="plate"><div class="plate-h"><span class="t">Histórico reciente de PP</span><span class="c">últimos 20 movimientos</span></div><div class="plate-b">';
     if (ope7_tabla_existe('historico_pp') && ope7_tabla_existe('personajes')) {
         $q = $db->query('SELECT h.*, p.nombre FROM ' . ope7_tabla_full('historico_pp') . ' h '
             . 'LEFT JOIN ' . ope7_tabla_full('personajes') . ' p ON p.id = h.personaje_id '
-            . 'ORDER BY h.id DESC LIMIT 25');
+            . 'ORDER BY h.id DESC LIMIT 20');
         $n = 0;
         while ($h = $db->fetch_array($q)) {
             $n++;

@@ -89,8 +89,10 @@ function ope7_tramite_crear($uid, $pid, $numero, $motivo = '', array $ids = arra
         return array('ok' => false, 'msg' => 'El motor de trámites no está migrado (mybb_ope_tramites).');
     }
 
-    // Staff-only: solo el staff inicia.
-    if ($info['naturaleza'] === 'staff' && !ope7_es_staff($uid)) {
+    // Staff-only: solo el staff inicia. Se mira el campo `quien` (el catálogo
+    // separa quien inicia de la naturaleza: p.ej. el 34 lo inicia el jugador
+    // y el 62 cualquiera de los dos — solo bloquea quien === 'staff').
+    if ($info['quien'] === 'staff' && !ope7_es_staff($uid)) {
         return array('ok' => false, 'msg' => 'Este trámite solo lo inicia el staff.');
     }
     // Narrativos (hito y los que lo requieren): motivo obligatorio.
@@ -147,8 +149,17 @@ function ope7_tramite_crear($uid, $pid, $numero, $motivo = '', array $ids = arra
             ope7_tramite_log($tid, 'rechazado', $uid, $msg_efecto !== '' ? $msg_efecto : 'Validación ligera fallida.');
             return array('ok' => false, 'msg' => $msg_efecto !== '' ? $msg_efecto : 'Validación ligera fallida.', 'tid' => (int) $tid);
         }
-        $nota = $msg_efecto !== '' ? $msg_efecto : $nota;
-        $db->update_query(ope7_tabla('tramites'), array('fecha_firma' => TIME_NOW), "id = {$tid}");
+        // Efecto aún no implementado (F5-F6): no se publica — la solicitud va a
+        // la bandeja para revisión del staff (regla de oro: nada se decide solo).
+        // Marcador explícito [PENDIENTE] (nunca subcadenas: 'independiente' contiene
+        // 'pendiente' y rompía las compras de dominio ×1,0/×1,5).
+        if (strpos($msg_efecto, '[PENDIENTE]') !== false) {
+            $estado_final = null;
+            $nota = 'Trámite ligero sin efecto automático todavía: queda para revisión del staff.';
+        } else {
+            $nota = $msg_efecto !== '' ? $msg_efecto : $nota;
+            $db->update_query(ope7_tabla('tramites'), array('fecha_firma' => TIME_NOW), "id = {$tid}");
+        }
     }
 
     // Prompt: se genera al crear (22.6). Para ligeros no hace falta.
@@ -464,13 +475,13 @@ function ope7_tramite_aplicar_efectos($tr)
             $msg = ope7_efecto_muerte($tr, $pid, $res);
             break;
         case 45:
-            $msg = 'Tirada de fruta aplicada (pool por nivel).';
+            $msg = '[PENDIENTE] Tirada de akuma sin implementar todavía (F5).';
             break;
         case 50:
-            $msg = 'Tirada del Conquistador registrada (probabilidad aplicada).';
+            $msg = '[PENDIENTE] Tirada del Conquistador sin implementar todavía (F5).';
             break;
         default:
-            $msg = 'Efectos del sistema en su fase de implementación (pendiente).';
+            $msg = '[PENDIENTE] Efectos del sistema sin implementar: el trámite queda para revisión del staff.';
             break;
     }
 
@@ -1274,16 +1285,49 @@ function ope7_tramite_listar(array $filtros = array(), $limit = 100)
     if (isset($filtros['personaje_id']) && (int) $filtros['personaje_id'] > 0) {
         $where[] = 'personaje_id = ' . (int) $filtros['personaje_id'];
     }
-    $q = $db->simple_select(ope7_tabla('tramites'), '*', implode(' AND ', $where), array(
+    $opts = array(
         'order_by' => 'id',
         'order_dir' => 'DESC',
         'limit' => (int) $limit,
-    ));
+    );
+    // Paginación (listas largas → 20): desplazamiento desde el final más reciente.
+    if (isset($filtros['pagina']) && (int) $filtros['pagina'] > 1) {
+        $opts['limit_start'] = ((int) $filtros['pagina'] - 1) * (int) $limit;
+    }
+    $q = $db->simple_select(ope7_tabla('tramites'), '*', implode(' AND ', $where), $opts);
     $out = array();
     while ($r = $db->fetch_array($q)) {
         $out[] = $r;
     }
     return $out;
+}
+
+/** Total de trámites que cumplen los filtros (para paginar). */
+function ope7_tramite_contar(array $filtros = array())
+{
+    global $db;
+    if (!ope7_tabla_existe('tramites')) {
+        return 0;
+    }
+    $where = array('1=1');
+    if (isset($filtros['numero']) && (int) $filtros['numero'] > 0) {
+        $where[] = 'numero = ' . (int) $filtros['numero'];
+    }
+    if (isset($filtros['estado']) && $filtros['estado'] !== '') {
+        $estados = (array) $filtros['estado'];
+        $esc = array_map(function ($e) use ($db) {
+            return "'" . $db->escape_string($e) . "'";
+        }, $estados);
+        $where[] = 'estado IN (' . implode(',', $esc) . ')';
+    }
+    if (isset($filtros['solicitante_id']) && (int) $filtros['solicitante_id'] > 0) {
+        $where[] = 'solicitante_id = ' . (int) $filtros['solicitante_id'];
+    }
+    if (isset($filtros['personaje_id']) && (int) $filtros['personaje_id'] > 0) {
+        $where[] = 'personaje_id = ' . (int) $filtros['personaje_id'];
+    }
+    $q = $db->simple_select(ope7_tabla('tramites'), 'COUNT(*) AS n', implode(' AND ', $where));
+    return (int) $db->fetch_field($q, 'n');
 }
 
 /** Conteos por estado para la bandeja (resumen). */

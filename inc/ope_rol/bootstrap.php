@@ -104,6 +104,7 @@ require_once $dir . '/tramites/tramites.php';
 require_once $dir . '/tramites/catalogo.php';
 require_once $dir . '/tramites/motor.php';
 require_once $dir . '/tramites/bandeja.php';
+require_once $dir . '/tramites/paginas.php';
 require_once $dir . '/core/permisos.php';
 
 // Bot «OPE Eternal» (News Coo, sucesos, rumores, avisos)

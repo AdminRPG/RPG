@@ -1699,6 +1699,12 @@ ope7_add_col($db, 'muertes', 'heredero_id', "INT UNSIGNED NULL COMMENT 'personaj
 // `precios` el array completo [N1,N2,N3] (números cerrados del cap. 18 del Jugador).
 ope7_add_col($db, 'tipos_barcos', 'precios', "JSON NULL COMMENT 'precio por nivel [N1,N2,N3] (F4.1)'", 'precio');
 
+// F4.3-bis — narrativa del personaje: la ficha ya lee `desc_fisica`/`notas` desde
+// `ope_personajes` (con fallback al JSON de `bio` legado); ahora son columnas reales
+// que el wizard de creación escribe (descripción física, personalidad, historia, notas).
+ope7_add_col($db, 'personajes', 'desc_fisica', 'TEXT NULL COMMENT "narrativa: descripción física (wizard paso 1)"', 'retrato');
+ope7_add_col($db, 'personajes', 'notas', 'TEXT NULL COMMENT "notas libres del jugador (wizard paso 1)"', 'desc_fisica');
+
 // ─────────────────────────────────────────────────────────────
 // 5.21-ter — Tripulaciones
 // ─────────────────────────────────────────────────────────────

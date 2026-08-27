@@ -62,12 +62,55 @@ function ope7_shead($titulo, $kicker, $sub = '')
     return $html;
 }
 
+/** Paginación simple (lista larga → 20 por página). */
+function ope7_pager_html($base_url, $pagina, $total, $por_pagina = 20)
+{
+    $paginas = max(1, (int) ceil(max(0, (int) $total) / max(1, $por_pagina)));
+    $pagina = min(max(1, (int) $pagina), $paginas);
+    if ($paginas < 2) {
+        return '';
+    }
+    $sep = strpos((string) $base_url, '?') === false ? '?' : '&';
+    $h = '<nav class="tram-pager" aria-label="Paginación">';
+    if ($pagina > 1) {
+        $h .= '<a class="ope-btn ope-btn-sm ope-btn-ghost" href="' . ope7_e($base_url) . $sep . 'p=' . ($pagina - 1) . '">← Anterior</a>';
+    }
+    for ($i = 1; $i <= $paginas; $i++) {
+        if ($i === $pagina) {
+            $h .= '<span class="tram-pager-cur">' . $i . '</span>';
+        } else {
+            $h .= '<a class="tram-pager-n" href="' . ope7_e($base_url) . $sep . 'p=' . $i . '">' . $i . '</a>';
+        }
+    }
+    if ($pagina < $paginas) {
+        $h .= '<a class="ope-btn ope-btn-sm ope-btn-ghost" href="' . ope7_e($base_url) . $sep . 'p=' . ($pagina + 1) . '">Siguiente →</a>';
+    }
+    $h .= '</nav>';
+    return $h;
+}
+
+/** Etiqueta humana de quién inicia el trámite. */
+function ope7_quien_label($quien)
+{
+    $labels = array(
+        'jugador'       => 'Lo pides tú',
+        'jugador-staff' => 'Tú o el staff',
+        'staff'         => 'Solo el staff',
+        'staff-jugador' => 'Staff o jugador',
+        'capitan'       => 'Capitán de tripulación',
+        'capitan-staff' => 'Capitán o staff',
+    );
+    return isset($labels[$quien]) ? $labels[$quien] : $quien;
+}
+
+
 /**
  * Bandeja transversal del staff.
  * @param int $uid uid del staff.
  * @param int $detalle_tid si > 0, muestra el detalle/firma de ese trámite.
+ * @param int $pagina página de la cola (20 por página).
  */
-function ope7_bandeja_staff_html($uid, $detalle_tid = 0)
+function ope7_bandeja_staff_html($uid, $detalle_tid = 0, $pagina = 1)
 {
     global $mybb;
 
@@ -133,7 +176,10 @@ function ope7_bandeja_staff_html($uid, $detalle_tid = 0)
     }
 
     // ── Vista lista ──
-    $pendientes = ope7_tramite_listar(array('estado' => array('pendiente', 'prompt_listo', 'analizado', 'en_revision')), 200);
+    $pagina = max(1, (int) $pagina);
+    $por_pagina = 20;
+    $total_cola = ope7_tramite_contar(array('estado' => array('pendiente', 'prompt_listo', 'analizado', 'en_revision')));
+    $pendientes = ope7_tramite_listar(array('estado' => array('pendiente', 'prompt_listo', 'analizado', 'en_revision'), 'pagina' => $pagina), $por_pagina);
 
     $html  = ope7_shead('Bandeja de trámites', 'motor 5.21 · la IA propone, el staff decide',
         'Catálogo cerrado de <b>' . (int) $resumen['total'] . ' trámites</b> (cap. 22.3). '
@@ -143,7 +189,7 @@ function ope7_bandeja_staff_html($uid, $detalle_tid = 0)
         . 'Regla de oro: la automatización nunca decide sola — la IA propone, tú firmas.');
 
     // Pendientes
-    $html .= '<div class="plate"><div class="plate-h"><span>En cola (' . count($pendientes) . ')</span></div><div class="plate-b">' . "\n";
+    $html .= '<div class="plate"><div class="plate-h"><span>En cola (' . (int) $total_cola . ')</span></div><div class="plate-b">' . "\n";
     if (empty($pendientes)) {
         $html .= '<p class="tram-empty">No hay trámites en cola. El catálogo de 67 está listo abajo.</p>' . "\n";
     } else {
@@ -160,6 +206,7 @@ function ope7_bandeja_staff_html($uid, $detalle_tid = 0)
             $html .= '  </li>' . "\n";
         }
         $html .= '</ul>' . "\n";
+        $html .= ope7_pager_html($bburl . '/bandeja.php', $pagina, $total_cola, $por_pagina);
     }
     $html .= '</div></div>' . "\n";
 
@@ -171,19 +218,22 @@ function ope7_bandeja_staff_html($uid, $detalle_tid = 0)
     return $html;
 }
 
-/** Hub del jugador: sus trámites + ventanillas disponibles. */
-function ope7_tramites_jugador_html($uid)
+/** Hub del jugador: sus solicitudes (paginadas) + catálogo de ventanillas por grupo. */
+function ope7_tramites_jugador_html($uid, $pagina = 1)
 {
     global $mybb;
     $bburl = htmlspecialchars_uni($mybb->settings['bburl']);
-    $mis = ope7_tramite_listar(array('solicitante_id' => $uid), 50);
+    $pagina = max(1, (int) $pagina);
+    $por_pagina = 20;
+    $total = ope7_tramite_contar(array('solicitante_id' => $uid));
+    $mis = ope7_tramite_listar(array('solicitante_id' => $uid, 'pagina' => $pagina), $por_pagina);
 
     $html  = ope7_shead('Tus trámites', 'ventanillas · motor 5.21',
         'Sigue el estado de tus solicitudes: pendiente → prompt → analizado → revisión → <b>publicado/rechazado</b>. '
         . 'En la validación de ficha y la creación de técnica (ciclo) el resultado vuelve a ti: lo aceptas o pides cambios. '
         . 'El histórico con los motivos del staff es público y auditable.');
 
-    $html .= '<div class="plate"><div class="plate-h"><span>Tus solicitudes (' . count($mis) . ')</span></div><div class="plate-b">' . "\n";
+    $html .= '<div class="plate"><div class="plate-h"><span>Tus solicitudes (' . (int) $total . ')</span></div><div class="plate-b">' . "\n";
     if (empty($mis)) {
         $html .= '<p class="tram-empty">Todavía no has enviado ningún trámite. Abajo tienes el catálogo de ventanillas.</p>' . "\n";
     } else {
@@ -218,12 +268,89 @@ function ope7_tramites_jugador_html($uid)
             }
         }
         $html .= '</ul>' . "\n";
+        $html .= ope7_pager_html($bburl . '/tramites.php', $pagina, $total, $por_pagina);
     }
     $html .= '</div></div>' . "\n";
 
-    $html .= '<div class="plate"><div class="plate-h"><span>Catálogo de ventanillas (67)</span></div><div class="plate-b">' . "\n";
-    $html .= ope7_catalogo_tabla_html(false);
+    $html .= ope7_tramites_hub_html();
+    return $html;
+}
+
+/** Catálogo de ventanillas del jugador: 6 áreas, tarjetas enlazadas a su página. */
+function ope7_tramites_hub_html()
+{
+    global $mybb;
+    $bburl = htmlspecialchars_uni($mybb->settings['bburl']);
+    $lista = ope7_tramites_lista();
+    $areas = ope7_tramites_areas();
+    $solo = ope7_tramites_solo_staff();
+
+    $html  = '<div class="plate"><div class="plate-h"><span>Catálogo de ventanillas (67)</span><span class="c">6 áreas · cada una con su página</span></div><div class="plate-b">' . "\n";
+    $html .= '<div class="tram-filtros" role="group" aria-label="Filtrar ventanillas">' . "\n";
+    $html .= '  <button type="button" class="tram-chip" data-filtro="yo" aria-pressed="true">Puedo iniciar</button>' . "\n";
+    $html .= '  <button type="button" class="tram-chip" data-filtro="auto" aria-pressed="false">Automáticos</button>' . "\n";
+    $html .= '  <button type="button" class="tram-chip" data-filtro="ia" aria-pressed="false">IA + firma</button>' . "\n";
+    $html .= '  <button type="button" class="tram-chip" data-filtro="todo" aria-pressed="false">Ver todo</button>' . "\n";
+    $html .= '</div>' . "\n";
+
+    foreach ($areas as $a) {
+        list($titulo, $desc, $numeros) = $a;
+        $html .= '<div class="tram-grupo">' . "\n";
+        $html .= '  <div class="tram-grupo-h"><span class="t">' . ope7_e($titulo) . '</span><span class="c">' . count($numeros) . ' ventanillas</span></div>' . "\n";
+        $html .= '  <p class="tram-grupo-desc">' . ope7_e($desc) . '</p>' . "\n";
+        $html .= '  <div class="tram-hub-grid">' . "\n";
+        foreach ($lista as $e) {
+            $n = (int) $e['numero'];
+            if (!in_array($n, $numeros, true)) {
+                continue;
+            }
+            $yo = ope7_tramite_tiene_pagina($n);
+            $auto = $e['naturaleza'] === 'ligero';
+            $f = array('yo');
+            $f[] = $auto ? 'auto' : 'ia';
+            if (!$yo) {
+                $f[] = 'staff';
+            }
+            $badge = $auto ? 'g' : ($yo ? 's' : 'r');
+            $etiqueta = ope7_naturaleza_label($e['naturaleza']);
+            if (!$yo) {
+                $etiqueta = 'Solo staff';
+            }
+            $card = '<div class="tram-card-h"><span class="ope-tag ope-tag-rank">#' . $n . '</span>'
+                  . '<span class="ope-badge ope-badge-' . $badge . '">' . ope7_e($etiqueta) . '</span></div>' . "\n"
+                  . '<div class="tram-card-n">' . ope7_e($e['nombre']) . '</div>' . "\n"
+                  . '<div class="tram-card-d">' . ope7_e($e['efecto']) . '</div>' . "\n"
+                  . '<div class="tram-card-meta">' . ope7_e(ope7_quien_label($e['quien'])) . '</div>' . "\n";
+            if ($yo) {
+                $html .= '  <a class="tram-card" data-f="' . implode(' ', $f) . '" href="' . $bburl . '/tramite-' . str_pad((string) $n, 2, '0', STR_PAD_LEFT) . '.php">' . "\n" . $card . '  </a>' . "\n";
+            } else {
+                $html .= '  <div class="tram-card tram-card-staff" data-f="' . implode(' ', $f) . '" title="Solo el staff puede iniciarlo (bandeja).">' . "\n" . $card . '  </div>' . "\n";
+            }
+        }
+        $html .= '  </div>' . "\n";
+        $html .= '</div>' . "\n";
+    }
     $html .= '</div></div>' . "\n";
+
+    // Filtros por chips (solo un activo a la vez).
+    $html .= '<script>(function () {' . "\n";
+    $html .= '  var chips = Array.prototype.slice.call(document.querySelectorAll(".tram-filtros .tram-chip"));' . "\n";
+    $html .= '  var cards = Array.prototype.slice.call(document.querySelectorAll(".tram-hub-grid .tram-card"));' . "\n";
+    $html .= '  var grupos = Array.prototype.slice.call(document.querySelectorAll(".tram-grupo"));' . "\n";
+    $html .= '  function aplicar(f) {' . "\n";
+    $html .= '    chips.forEach(function (c) { c.setAttribute("aria-pressed", c.getAttribute("data-filtro") === f ? "true" : "false"); });' . "\n";
+    $html .= '    cards.forEach(function (card) {' . "\n";
+    $html .= '      var ok = f === "todo" || (card.getAttribute("data-f") || "").split(" ").indexOf(f) !== -1;' . "\n";
+    $html .= '      card.style.display = ok ? "" : "none";' . "\n";
+    $html .= '    });' . "\n";
+    $html .= '    grupos.forEach(function (g) {' . "\n";
+    $html .= '      var alguno = g.querySelectorAll(".tram-card").length > 0 && Array.prototype.some.call(g.querySelectorAll(".tram-card"), function (c) { return c.style.display !== "none"; });' . "\n";
+    $html .= '      g.style.display = alguno ? "" : "none";' . "\n";
+    $html .= '    });' . "\n";
+    $html .= '  }' . "\n";
+    $html .= '  chips.forEach(function (c) { c.addEventListener("click", function () { aplicar(c.getAttribute("data-filtro")); }); });' . "\n";
+    $html .= '  aplicar("yo");' . "\n";
+    $html .= '})();</script>' . "\n";
     return $html;
 }
 

@@ -503,7 +503,7 @@ function ope7_pj_guardar($datos, $id = 0)
         'fue', 'des', 'agi', 'res', 'per', 'inte', 'car', 'vol',
         'puntos_comprados', 'reserva', 'entrenamiento_fin', 'entrenamiento_bloque',
         'pp_saldo', 'avatar', 'icono', 'firma', 'bio', 'historia', 'personalidad',
-        'retrato', 'datos', 'dateline', 'lastedit',
+        'desc_fisica', 'notas', 'retrato', 'datos', 'dateline', 'lastedit',
     );
     // Columnas INT: MyBB convierte null → '' (falla en columnas INT/JSON).
     $int_cols = array('uid', 'es_NPC', 'nivel', 'raza_id', 'raza_hibrida_id', 'tribu_id', 'akuma_id', 'faccion_id', 'rango_id', 'fama_global_grado', 'fama_infamia_expo', 'rep_faccion', 'wanted_base', 'ubicacion_isla_id', 'ubicacion_zona_id', 'fue', 'des', 'agi', 'res', 'per', 'inte', 'car', 'vol', 'puntos_comprados', 'reserva', 'entrenamiento_fin', 'entrenamiento_bloque', 'pp_saldo', 'dateline', 'lastedit');

@@ -287,14 +287,36 @@ function ope7_ficha_html($f, $ctx = array())
         $html .= '</div></div>';
     }
 
+    // Narrativa (descripción física, personalidad e historia públicas; las notas
+    // solo las ve el dueño y el staff). Las escribe el wizard de creación (paso 1).
+    $narr = array(
+        'desc_fisica'  => array('Descripción física', false),
+        'personalidad' => array('Personalidad', false),
+        'historia'     => array('Historia', false),
+        'notas'        => array('Notas', true),
+    );
+    $narr_html = '';
+    foreach ($narr as $nk => $nn) {
+        $txt = trim((string) ($f[$nk] ?? ''));
+        $privada = $nn[1];
+        if ($privada && empty($ctx['puede_gestionar']) && empty($ctx['es_staff'])) {
+            continue;
+        }
+        if ($txt === '' && $privada) {
+            continue;
+        }
+        $narr_html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">' . $e($nn[0]) . ($privada ? ' <span class="f7-row-meta">(solo tú y el staff)</span>' : '') . '</span></div>'
+                    . '<div class="f7-row-desc">' . ($txt !== '' ? nl2br($e($txt)) : '<span class="f7-empty">Todavía sin redactar.</span>') . '</div></div>';
+    }
+    if ($narr_html !== '') {
+        $html .= '<div class="plate f7-narrativa"><div class="plate-h"><span class="t">Narrativa</span><span class="c">quiénes eres antes de jugar</span></div><div class="plate-b">' . $narr_html . '</div></div>';
+    }
+
     // Sección solo-staff.
     if (!empty($ctx['es_staff'])) {
         $html .= '<div class="plate f7-staff"><div class="plate-h"><span class="t">Solo staff</span><span class="c">no visible para jugadores</span></div><div class="plate-b">';
         $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Estado del personaje</span><span class="f7-row-pts">' . $e($estado_txt) . '</span></div>'
               . '<div class="f7-row-meta">id ' . (int) $f['id'] . ' · uid ' . (int) $f['uid'] . ' · es_NPC ' . ((int) $f['es_NPC'] ? 'sí' : 'no') . ' · vida: ' . $e($f['estado_vida']) . '</div></div>';
-        if ($f['historia']) {
-            $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Historia</span></div><div class="f7-row-desc">' . $e($f['historia']) . '</div></div>';
-        }
         $html .= '</div></div>';
     }
 

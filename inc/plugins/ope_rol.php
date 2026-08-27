@@ -422,7 +422,7 @@ function ope_rol_navbar_html()
     $gestionScripts = array('gestion.php', 'tripulacion.php', 'tienda-personal.php');
     $links   = '<a href="' . $bburl . '/resumen.php" class="ope-nav-link' . $isOn(array('resumen.php')) . '">' . $iconResumen . '<span>Resumen</span></a>';
     $links  .= '<a href="' . $bburl . '/gestion.php" class="ope-nav-link' . $isOn($gestionScripts) . '">' . $iconGestion . '<span>Gestión</span></a>';
-    $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php')) . '">' . $iconTramites . '<span>Trámites</span></a>';
+    $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php')) . (strpos($script, 'tramite-') === 0 ? ' on' : '') . '">' . $iconTramites . '<span>Trámites</span></a>';
     $tiendasScripts = array('tiendas.php', 'tienda-general.php', 'astillero.php', 'mercado-negro.php', 'tiendas-personales.php');
     $links  .= '<a href="' . $bburl . '/tiendas.php" class="ope-nav-link' . $isOn($tiendasScripts) . '">' . $iconTiendas . '<span>Tiendas</span></a>';
     $links  .= '<a href="' . $bburl . '/mapa.php" class="ope-nav-link' . $isOn(array('mapa.php')) . '">' . $iconMapa . '<span>Mapa</span></a>';
