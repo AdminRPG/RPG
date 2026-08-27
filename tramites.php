@@ -1,7 +1,9 @@
 <?php
 /**
- * One Piece: Eternal · Trámites (hub)
- * Skeleton — cards se agregan una a una.
+ * One Piece: 7 Seas · Trámites (hub del jugador — motor 5.21)
+ * -----------------------------------------------------------------
+ * Ventanillas del jugador: seguimiento de sus solicitudes (estado + histórico
+ * auditable) y el catálogo de ventanillas. Scope CSS: body.ope-pg-tramites.
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'tramites.php');
@@ -14,6 +16,28 @@ $uid    = (int) ($mybb->user['uid'] ?? 0);
 if ($uid < 1) {
     header('Location: ' . $mybb->settings['bburl'] . '/member.php?action=login');
     exit;
+}
+
+require_once MYBB_ROOT . 'inc/ope_rol/bootstrap.php';
+
+// ── Ciclo con usuario (F1.3): aceptar / pedir cambios en trámites 3 y 13 ──
+$flash = '';
+if ($mybb->request_method === 'post') {
+    $tid   = (int) $mybb->get_input('tid', 1);
+    $acc   = (string) $mybb->get_input('accion');
+    $motivo = trim((string) $mybb->get_input('motivo'));
+    if ($tid > 0) {
+        if ($acc === 'aceptar') {
+            $r = ope7_tramite_usuario_aceptar($tid, $uid);
+        } elseif ($acc === 'cambios') {
+            $r = ope7_tramite_usuario_pedir_cambios($tid, $uid, $motivo);
+        } else {
+            $r = array('ok' => false, 'msg' => 'Acción no válida.');
+        }
+        $flash = $r['ok']
+            ? '<div class="flash ok">' . htmlspecialchars_uni($r['msg']) . '</div>'
+            : '<div class="flash warn">' . htmlspecialchars_uni($r['msg']) . '</div>';
+    }
 }
 
 header('Content-Type: text/html; charset=utf-8');
@@ -31,15 +55,8 @@ header('Content-Type: text/html; charset=utf-8');
   <a href="<?php echo $bburl; ?>/index.php">Inicio</a><span class="sep">›</span><b>Trámites</b>
 </div></div>
 <div class="wrap">
-  <section class="reveal">
-    <div class="shead">
-      <h1>Trámites</h1>
-      <span class="code">// ventanillas</span>
-      <span class="rule"></span>
-    </div>
-    <p class="tram-intro">Solicitudes que requieren revisión humana. Autoservicio (stats, Eternal, Ken/Buso normales, Fruta Nv.0–2) vive en la <a href="<?php echo $bburl; ?>/ficha.php">ficha</a>.</p>
-  </section>
-  <!-- Agregar cards aquí -->
+  <?php echo $flash; ?>
+  <?php echo ope7_tramites_jugador_html($uid); ?>
 </div>
 <?php include __DIR__ . '/inc/footer_custom.php'; ?>
 <script>
