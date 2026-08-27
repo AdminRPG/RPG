@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="cielo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resumen — Mockup Dashboard</title>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   MOCKUP — CSS extraído de ope.css (scope resumen + base)
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  --ope-card: #f6f5f1; --ope-card-2: #ece9e1; --ope-wash: #faf9f6;
+  --ope-line: #d4d0c8; --ope-line-soft: #e5e2da;
+  --ope-ink: #1a1a1a; --ope-ink-soft: #555; --ope-ink-dim: #999;
+  --ope-gold: #c9a84c; --ope-gold-deep: #8b6914; --ope-gold-hi: #e8c84a;
+  --ope-eter: #4db8a4; --ope-sky: #52aace; --ope-sky-deep: #3a8ab0;
+  --patina: #6b9e78; --patina-deep: #4a7f57;
+  --crack: #ba6b56; --ink: #2c2c2c;
+  --ope-shadow: 0 4px 24px rgba(0,0,0,.08); --ope-shadow-sm: 0 2px 8px rgba(0,0,0,.06);
+  --ope-disp: 'Georgia', 'Times New Roman', serif;
+  --ope-body: 'Segoe UI', system-ui, sans-serif;
+  --mono: 'Consolas', 'SF Mono', monospace;
+  --ope-mark: 'Segoe UI', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--ope-body); background: var(--ope-wash); color: var(--ope-ink); min-height: 100vh; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px 48px; }
+.breadcrumb { padding: 12px 20px; font-family: var(--mono); font-size: .7rem; color: var(--ope-ink-dim); }
+.breadcrumb a { color: var(--ope-gold-deep); text-decoration: none; }
+.breadcrumb .sep { margin: 0 6px; }
+
+/* ══════ RESUMEN ══════ */
+.res-section { background: var(--ope-card); border: 1px solid var(--ope-line); border-radius: 14px; padding: 22px 24px; margin-bottom: 16px; box-shadow: var(--ope-shadow-sm); }
+.res-section--full { margin-bottom: 20px; }
+.res-section--compact { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.res-section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 0 0 16px; padding: 0 0 10px; border-bottom: 1px solid var(--ope-line-soft); }
+.res-section-head h2 { font-family: var(--ope-disp); font-weight: 800; font-size: 1.05rem; color: var(--ope-ink); margin: 0; }
+.res-section-sub { font-family: var(--mono); font-size: .6rem; letter-spacing: 1px; text-transform: uppercase; color: var(--ope-ink-dim); }
+.res-section-link { font-family: var(--mono); font-size: .68rem; color: var(--ope-gold-deep); text-decoration: none; }
+.res-section-link:hover { text-decoration: underline; }
+
+/* Hero */
+.resumen-hero { display: flex; gap: 28px; padding: 28px 30px; background: linear-gradient(135deg, var(--ope-card) 0%, color-mix(in srgb, var(--ope-gold) 8%, var(--ope-card)) 100%); border: 1px solid var(--ope-line); border-left: 4px solid var(--ope-gold); border-radius: 14px; margin-bottom: 20px; box-shadow: var(--ope-shadow-sm); }
+.res-hero-left { flex: 0 0 auto; }
+.res-hero-avatar { width: 120px; height: 120px; border-radius: 16px; overflow: hidden; border: 2px solid var(--ope-line); background: var(--ope-card-2); box-shadow: var(--ope-shadow); display: flex; align-items: center; justify-content: center; }
+.res-hero-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.res-hero-avatar span { font-family: var(--ope-disp); font-size: 2.8rem; font-weight: 900; color: var(--ope-gold-deep); background: var(--ope-wash); width: 100%; height: 100%; display: grid; place-items: center; }
+.res-hero-right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.res-hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.res-hero-id { min-width: 0; }
+.res-kicker { display: block; font-family: var(--mono); font-size: .6rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ope-ink-dim); margin-bottom: 2px; }
+.res-hero-name { margin: 0; font-family: var(--ope-disp); font-size: 1.6rem; font-weight: 900; color: var(--ope-gold-deep); line-height: 1.1; }
+.res-hero-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.res-meta-chip { font-family: var(--mono); font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; padding: 4px 10px; border-radius: 6px; background: var(--ope-card-2); border: 1px solid var(--ope-line-soft); color: var(--ope-ink-soft); }
+.res-fac-chip.fac-piratas { background: color-mix(in srgb, #b94438 12%, var(--ope-card)); border-color: #b94438; color: #b94438; }
+.res-hero-level { flex: 0 0 auto; text-align: center; padding: 10px 16px; background: linear-gradient(135deg, color-mix(in srgb, var(--ope-gold) 14%, var(--ope-card)), var(--ope-card)); border: 1px solid var(--ope-line); border-radius: 12px; box-shadow: var(--ope-shadow-sm); }
+.res-lv-num { display: block; font-family: var(--ope-disp); font-size: 2rem; font-weight: 900; color: var(--ope-gold-deep); line-height: 1; }
+.res-lv-lbl { display: block; font-family: var(--mono); font-size: .52rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ope-ink-dim); margin-top: 2px; }
+.res-xp-bar { display: flex; align-items: center; gap: 10px; }
+.res-xp-track { flex: 1; height: 10px; border-radius: 999px; background: var(--ope-line-soft); overflow: hidden; }
+.res-xp-track span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--ope-gold), color-mix(in srgb, var(--ope-gold) 70%, var(--ope-ink))); }
+.res-xp-label { font-family: var(--mono); font-size: .6rem; color: var(--ope-ink-dim); white-space: nowrap; letter-spacing: .5px; }
+.res-hero-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.res-quick-pill { font-family: var(--mono); font-size: .64rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; background: var(--ope-card-2); border: 1px solid var(--ope-line-soft); color: var(--ope-ink-soft); text-decoration: none; }
+.res-quick-pill b { color: var(--ope-ink); font-weight: 800; }
+.res-quick-location { color: var(--ope-gold-deep); border-color: color-mix(in srgb, var(--ope-gold) 30%, var(--ope-line-soft)); }
+
+/* Grids */
+.res-grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.res-grid-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+/* Stats */
+.res-stats-grid { display: flex; flex-direction: column; gap: 10px; }
+.res-stat-row { display: flex; align-items: center; gap: 10px; }
+.res-stat-key { font-family: var(--mono); font-size: .7rem; font-weight: 800; color: var(--ope-ink); width: 36px; flex: 0 0 auto; text-align: right; letter-spacing: 1px; }
+.res-stat-bar { flex: 1; height: 10px; border-radius: 999px; background: var(--ope-line-soft); overflow: hidden; }
+.res-stat-fill { display: block; height: 100%; border-radius: inherit; }
+.res-stat-fill.res-stat-fue { background: linear-gradient(90deg, #d96a5c, #b94438); }
+.res-stat-fill.res-stat-des { background: linear-gradient(90deg, #5cb8a0, #2d8a6e); }
+.res-stat-fill.res-stat-con { background: linear-gradient(90deg, #7a9ec4, #4a6f94); }
+.res-stat-fill.res-stat-int { background: linear-gradient(90deg, #a58bc4, #7a5fa0); }
+.res-stat-fill.res-stat-per { background: linear-gradient(90deg, #d4a843, #b8932e); }
+.res-stat-fill.res-stat-vol { background: linear-gradient(90deg, var(--ope-eter), #1f7f7f); }
+.res-stat-val { font-family: var(--mono); font-size: .72rem; font-weight: 800; color: var(--ope-ink); width: 28px; flex: 0 0 auto; text-align: right; }
+
+/* Info grid */
+.res-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.res-info-item { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; background: var(--ope-wash); border: 1px solid var(--ope-line-soft); border-radius: 8px; }
+.res-info-label { font-family: var(--mono); font-size: .56rem; letter-spacing: 1px; text-transform: uppercase; color: var(--ope-ink-dim); }
+.res-info-val { font-family: var(--ope-body); font-size: .88rem; color: var(--ope-ink); font-weight: 600; }
+.res-info-val a { color: var(--ope-gold-deep); text-decoration: none; }
+.res-status { font-family: var(--mono); font-size: .62rem; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; }
+.res-status--aprobado { background: color-mix(in srgb, #2d7a3a 12%, var(--ope-card)); color: #2d7a3a; }
+
+/* Virtudes/Defectos */
+.res-virtues-row { display: flex; gap: 14px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--ope-line-soft); }
+.res-virtue-box { flex: 1; min-width: 0; }
+.res-virtue-title { display: block; font-family: var(--mono); font-size: .58rem; letter-spacing: 1px; text-transform: uppercase; color: var(--ope-ink-dim); margin-bottom: 6px; }
+.res-virtue-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.res-vtag { font-family: var(--mono); font-size: .6rem; font-weight: 700; padding: 3px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: .3px; }
+.res-vtag--virtue { background: color-mix(in srgb, #2d7a3a 10%, var(--ope-card)); border: 1px solid color-mix(in srgb, #2d7a3a 25%, var(--ope-line-soft)); color: #2d7a3a; }
+.res-vtag--defect { background: color-mix(in srgb, #b94438 10%, var(--ope-card)); border: 1px solid color-mix(in srgb, #b94438 25%, var(--ope-line-soft)); color: #b94438; }
+
+/* Economía */
+.res-eco-main { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 0 8px; }
+.res-eco-berry-icon { font-size: 1.8rem; color: var(--ope-gold-deep); font-weight: 900; }
+.res-eco-berry-val { font-family: var(--ope-disp); font-size: 1.8rem; font-weight: 900; color: var(--ope-gold-deep); line-height: 1; }
+.res-eco-berry-lbl { font-family: var(--mono); font-size: .58rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ope-ink-dim); }
+.res-eco-link { font-family: var(--mono); font-size: .68rem; color: var(--ope-gold-deep); text-decoration: none; margin-top: auto; padding-top: 10px; }
+
+/* Inventario */
+.res-inv-stats { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 10px; }
+.res-inv-pill { font-family: var(--mono); font-size: .64rem; font-weight: 700; display: flex; align-items: center; gap: 5px; color: var(--ope-ink-soft); }
+.res-inv-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+.res-inv-dot--all { background: var(--ope-gold); }
+.res-inv-dot--venta { background: #2d7a3a; }
+.res-inv-dot--rare { background: #7a5fa0; }
+.res-inv-dot--legend { background: #b94438; }
+
+/* Vocaciones */
+.res-voc-list { display: flex; flex-direction: column; gap: 8px; }
+.res-voc-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--ope-wash); border: 1px solid var(--ope-line-soft); border-radius: 8px; }
+.res-voc-level { font-family: var(--mono); font-size: .62rem; font-weight: 800; color: var(--ope-gold-deep); width: 36px; flex: 0 0 auto; }
+.res-voc-name { font-family: var(--ope-body); font-size: .88rem; color: var(--ope-ink); font-weight: 600; }
+
+/* Tripulación */
+.res-trip-header { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+.res-trip-emblem { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 12px; background: var(--ope-wash); border: 1px solid var(--ope-line-soft); font-size: 1.6rem; flex: 0 0 auto; }
+.res-trip-info { min-width: 0; }
+.res-trip-name { margin: 0; font-family: var(--ope-disp); font-size: 1.15rem; font-weight: 800; color: var(--ope-gold-deep); }
+.res-trip-motto { margin: 2px 0 0; font-family: var(--mono); font-size: .64rem; color: var(--ope-ink-dim); font-style: italic; }
+.res-trip-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.res-trip-roster { display: flex; flex-wrap: wrap; gap: 8px; }
+.res-trip-member { display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; width: 56px; }
+.res-trip-mavatar { width: 42px; height: 42px; border-radius: 10px; overflow: hidden; border: 1px solid var(--ope-line); background: var(--ope-card-2); display: flex; align-items: center; justify-content: center; }
+.res-trip-mavatar img { width: 100%; height: 100%; object-fit: cover; }
+.res-trip-mavatar span { font-family: var(--ope-disp); font-size: .9rem; font-weight: 800; color: var(--ope-gold-deep); }
+.res-trip-mname { font-family: var(--mono); font-size: .54rem; color: var(--ope-ink-soft); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
+
+/* Ship */
+.res-ship-card { display: flex; gap: 16px; }
+.res-ship-hero { flex: 0 0 auto; width: 80px; height: 80px; border-radius: 12px; overflow: hidden; border: 1px solid var(--ope-line-soft); background: var(--ope-wash); display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+.res-ship-info { min-width: 0; flex: 1; }
+.res-ship-name { margin: 0 0 6px; font-family: var(--ope-disp); font-size: 1.1rem; font-weight: 800; color: var(--ope-gold-deep); }
+.res-ship-meta { display: flex; flex-wrap: wrap; gap: 5px; }
+.res-meta-chip--active { background: color-mix(in srgb, var(--ope-gold) 14%, var(--ope-card)); border-color: var(--ope-gold); color: var(--ope-gold-deep); }
+
+/* Bio */
+.res-bio-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.res-bio-block { min-width: 0; }
+.res-bio-label { margin: 0 0 6px; font-family: var(--mono); font-size: .62rem; letter-spacing: 1px; text-transform: uppercase; color: var(--ope-ink-dim); }
+.res-bio-text { margin: 0; font-size: .86rem; line-height: 1.55; color: var(--ope-ink-soft); max-height: 120px; overflow: hidden; }
+.res-bio-cta { text-align: center; margin-top: 14px; }
+.btn { font-family: var(--mono); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 10px 18px; border-radius: 8px; text-decoration: none; display: inline-block; transition: transform .12s, border-color .12s; }
+.btn-ghost { border: 1px solid var(--ope-line); color: var(--ope-ink-soft); background: transparent; }
+.btn-ghost:hover { border-color: var(--ope-gold); color: var(--ope-ink); }
+.btn-sm { padding: 8px 14px; font-size: .68rem; }
+
+/* Pendientes */
+.res-pend-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.res-pend-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 12px; border: 1px solid var(--ope-line-soft); border-radius: 12px; text-decoration: none; background: var(--ope-wash); transition: border-color .15s; }
+.res-pend-card:hover { border-color: var(--ope-gold); }
+.res-pend-count { font-family: var(--ope-disp); font-size: 1.6rem; font-weight: 900; color: var(--ope-gold-deep); line-height: 1; }
+.res-pend-label { font-family: var(--mono); font-size: .6rem; letter-spacing: .5px; text-transform: uppercase; color: var(--ope-ink); font-weight: 700; text-align: center; }
+.res-pend-detail { font-family: var(--ope-body); font-size: .72rem; color: var(--ope-ink-dim); text-align: center; }
+.res-pend--tramites { border-left: 3px solid var(--ope-gold); }
+.res-pend--trip { border-left: 3px solid var(--ope-sky); }
+.res-pend--msgs { border-left: 3px solid var(--patina); }
+.res-pend--alertas { border-left: 3px solid var(--crack); }
+.res-tramites-mini { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--ope-line-soft); }
+.res-mini-title { margin: 0 0 8px; font-family: var(--mono); font-size: .6rem; letter-spacing: 1px; text-transform: uppercase; color: var(--ope-ink-dim); }
+.res-tramite-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--ope-line-soft); }
+.res-tramite-row:last-child { border-bottom: none; }
+.res-tramite-type { font-family: var(--ope-body); font-size: .82rem; color: var(--ope-ink); font-weight: 600; }
+.res-tramite-date { font-family: var(--mono); font-size: .62rem; color: var(--ope-ink-dim); }
+
+/* Entry animation */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .45s ease, transform .45s cubic-bezier(.23,1,.32,1); }
+.reveal.vis { opacity: 1; transform: none; }
+.resumen-hero.reveal { transition-delay: .06s; }
+.res-section.reveal:nth-child(2) { transition-delay: .12s; }
+.res-section.reveal:nth-child(3) { transition-delay: .18s; }
+.res-section.reveal:nth-child(4) { transition-delay: .24s; }
+.res-section.reveal:nth-child(5) { transition-delay: .30s; }
+.res-section.reveal:nth-child(6) { transition-delay: .36s; }
+.res-section.reveal:nth-child(7) { transition-delay: .42s; }
+.res-section.reveal:nth-child(8) { transition-delay: .48s; }
+
+/* Theme toggle */
+.theme-toggle { position: fixed; top: 16px; right: 20px; z-index: 999; font-family: var(--mono); font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 8px 14px; border: 1px solid var(--ope-line); border-radius: 8px; background: var(--ope-card); color: var(--ope-ink-soft); cursor: pointer; transition: border-color .15s; }
+.theme-toggle:hover { border-color: var(--ope-gold); }
+
+/* Noche */
+html[data-theme="noche"] { --ope-card: #0e1730; --ope-card-2: #151f3a; --ope-wash: #0a1020; --ope-line: rgba(185,198,221,.15); --ope-line-soft: rgba(185,198,221,.1); --ope-ink: #d6dce8; --ope-ink-soft: #8a94a8; --ope-ink-dim: #555e70; --ope-gold: #e8c84a; --ope-gold-deep: #c9a84c; --ope-gold-hi: #f0d860; }
+html[data-theme="noche"] .resumen-hero { background: linear-gradient(135deg, rgba(14,23,48,.72) 0%, color-mix(in srgb, var(--ope-gold) 10%, rgba(14,23,48,.72)) 100%); border-color: rgba(185,198,221,.12); }
+html[data-theme="noche"] .res-section { background: rgba(14,23,48,.72); border-color: rgba(185,198,221,.12); }
+html[data-theme="noche"] .res-meta-chip { background: rgba(185,198,221,.06); border-color: rgba(185,198,221,.1); color: rgba(185,198,221,.6); }
+html[data-theme="noche"] .res-hero-level { background: linear-gradient(135deg, color-mix(in srgb, var(--ope-gold) 10%, rgba(14,23,48,.72)), rgba(14,23,48,.72)); border-color: rgba(185,198,221,.12); }
+html[data-theme="noche"] .res-info-item { background: rgba(185,198,221,.04); border-color: rgba(185,198,221,.08); }
+html[data-theme="noche"] .res-stat-bar { background: rgba(185,198,221,.08); }
+html[data-theme="noche"] .res-vtag--virtue { background: rgba(45,122,58,.1); border-color: rgba(45,122,58,.25); color: rgba(45,122,58,.8); }
+html[data-theme="noche"] .res-vtag--defect { background: rgba(185,68,56,.1); border-color: rgba(185,68,56,.25); color: rgba(185,68,56,.8); }
+html[data-theme="noche"] .res-pend-card { background: rgba(185,198,221,.04); border-color: rgba(185,198,221,.08); }
+html[data-theme="noche"] .res-voc-item { background: rgba(185,198,221,.04); border-color: rgba(185,198,221,.08); }
+html[data-theme="noche"] .res-ship-hero { background: rgba(185,198,221,.04); border-color: rgba(185,198,221,.08); }
+html[data-theme="noche"] .res-trip-emblem { background: rgba(185,198,221,.04); border-color: rgba(185,198,221,.08); }
+html[data-theme="noche"] .breadcrumb { color: rgba(185,198,221,.4); }
+html[data-theme="noche"] .breadcrumb a { color: var(--ope-gold); }
+
+@media (max-width: 800px) {
+  .res-grid-2col, .res-grid-3col { grid-template-columns: 1fr; }
+  .resumen-hero { flex-direction: column; align-items: center; text-align: center; }
+  .res-hero-top { flex-direction: column; align-items: center; }
+  .res-hero-meta { justify-content: center; }
+  .res-hero-quick { justify-content: center; }
+  .res-bio-grid { grid-template-columns: 1fr; }
+  .res-pend-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .res-info-grid { grid-template-columns: 1fr; }
+  .res-pend-grid { grid-template-columns: 1fr; }
+  .res-virtues-row { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="var h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='noche'?'cielo':'noche')">Noche / Cielo</button>
+
+<div class="breadcrumb">
+  <a href="#">Inicio</a><span class="sep">›</span><b>Resumen</b>
+</div>
+
+<div class="wrap">
+
+  <!-- ════════════════ HERO ════════════════ -->
+  <section class="resumen-hero reveal vis">
+    <div class="res-hero-left">
+      <div class="res-hero-avatar">
+        <span>R</span>
+      </div>
+    </div>
+    <div class="res-hero-right">
+      <div class="res-hero-top">
+        <div class="res-hero-id">
+          <span class="res-kicker">Tramo I — Aprendiz</span>
+          <h1 class="res-hero-name">Roronoa Zoro</h1>
+          <div class="res-hero-meta">
+            <span class="res-meta-chip">"El Cazador de Hombres"</span>
+            <span class="res-meta-chip res-fac-chip fac-piratas">Pirata</span>
+            <span class="res-meta-chip">Guerrero</span>
+            <span class="res-meta-chip">Humano</span>
+          </div>
+        </div>
+        <div class="res-hero-level">
+          <span class="res-lv-num">12</span>
+          <span class="res-lv-lbl">NIVEL</span>
+        </div>
+      </div>
+      <div class="res-xp-bar">
+        <div class="res-xp-track"><span style="width:65%"></span></div>
+        <span class="res-xp-label">NEXT 7 pts · 65%</span>
+      </div>
+      <div class="res-hero-quick">
+        <span class="res-quick-pill">PV <b>340</b></span>
+        <span class="res-quick-pill">EN <b>210</b></span>
+        <span class="res-quick-pill">PA <b>8</b></span>
+        <span class="res-quick-pill">PP <b>3</b></span>
+        <a href="#" class="res-quick-pill res-quick-location">📍 Water Seven</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ STATS + FICHA ════════════════ -->
+  <div class="res-grid-2col">
+    <section class="res-section reveal vis">
+      <div class="res-section-head">
+        <h2>Atributos</h2>
+        <span class="res-section-sub">// 110 pts gastados</span>
+      </div>
+      <div class="res-stats-grid">
+        <div class="res-stat-row"><span class="res-stat-key">FUE</span><div class="res-stat-bar"><span style="width:83%" class="res-stat-fill res-stat-fue"></span></div><span class="res-stat-val">25</span></div>
+        <div class="res-stat-row"><span class="res-stat-key">DES</span><div class="res-stat-bar"><span style="width:63%" class="res-stat-fill res-stat-des"></span></div><span class="res-stat-val">19</span></div>
+        <div class="res-stat-row"><span class="res-stat-key">CON</span><div class="res-stat-bar"><span style="width:57%" class="res-stat-fill res-stat-con"></span></div><span class="res-stat-val">17</span></div>
+        <div class="res-stat-row"><span class="res-stat-key">INT</span><div class="res-stat-bar"><span style="width:27%" class="res-stat-fill res-stat-int"></span></div><span class="res-stat-val">8</span></div>
+        <div class="res-stat-row"><span class="res-stat-key">PER</span><div class="res-stat-bar"><span style="width:67%" class="res-stat-fill res-stat-per"></span></div><span class="res-stat-val">20</span></div>
+        <div class="res-stat-row"><span class="res-stat-key">VOL</span><div class="res-stat-bar"><span style="width:73%" class="res-stat-fill res-stat-vol"></span></div><span class="res-stat-val">22</span></div>
+      </div>
+    </section>
+
+    <section class="res-section reveal vis">
+      <div class="res-section-head">
+        <h2>Ficha Personal</h2>
+        <span class="res-section-sub">// expediente</span>
+      </div>
+      <div class="res-info-grid">
+        <div class="res-info-item"><span class="res-info-label">Edad</span><span class="res-info-val">19 años</span></div>
+        <div class="res-info-item"><span class="res-info-label">Género</span><span class="res-info-val">Masculino</span></div>
+        <div class="res-info-item"><span class="res-info-label">Raza</span><span class="res-info-val">Humano</span></div>
+        <div class="res-info-item"><span class="res-info-label">Facción</span><span class="res-info-val">Piratas</span></div>
+        <div class="res-info-item"><span class="res-info-label">Ubicación</span><span class="res-info-val"><a href="#">Water Seven</a> · <small>Grand Line</small></span></div>
+        <div class="res-info-item"><span class="res-info-label">Estado</span><span class="res-info-val"><span class="res-status res-status--aprobado">Aprobado</span></span></div>
+      </div>
+      <div class="res-virtues-row">
+        <div class="res-virtue-box">
+          <span class="res-virtue-title">Virtudes</span>
+          <div class="res-virtue-tags">
+            <span class="res-vtag res-vtag--virtue">Lealtad</span>
+            <span class="res-vtag res-vtag--virtue">Disciplina</span>
+            <span class="res-vtag res-vtag--virtue">Coraje</span>
+            <span class="res-vtag res-vtag--virtue">Respeto</span>
+          </div>
+        </div>
+        <div class="res-virtue-box">
+          <span class="res-virtue-title">Defectos</span>
+          <div class="res-virtue-tags">
+            <span class="res-vtag res-vtag--defect">Terco</span>
+            <span class="res-vtag res-vtag--defect">Impaciente</span>
+            <span class="res-vtag res-vtag--defect">Desorientado</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ════════════════ ECONOMÍA + INVENTARIO + VOCACIÓN ════════════════ -->
+  <div class="res-grid-3col">
+    <section class="res-section res-section--compact reveal vis">
+      <div class="res-section-head">
+        <h2>Economía</h2>
+        <span class="res-section-sub">// fortuna</span>
+      </div>
+      <div class="res-eco-main">
+        <div class="res-eco-berry-icon">₿</div>
+        <div class="res-eco-berry-val">156.800</div>
+        <div class="res-eco-berry-lbl">berries</div>
+      </div>
+      <a href="#" class="res-eco-link">Ir a Mi Tienda →</a>
+    </section>
+
+    <section class="res-section res-section--compact reveal vis">
+      <div class="res-section-head">
+        <h2>Inventario</h2>
+        <span class="res-section-sub">// 6 objetos</span>
+      </div>
+      <div class="res-inv-stats">
+        <div class="res-inv-pill"><span class="res-inv-dot res-inv-dot--all"></span>6 total</div>
+        <div class="res-inv-pill"><span class="res-inv-dot res-inv-dot--venta"></span>2 en venta</div>
+        <div class="res-inv-pill"><span class="res-inv-dot res-inv-dot--rare"></span>1 raras</div>
+        <div class="res-inv-pill"><span class="res-inv-dot res-inv-dot--legend"></span>1 legendarias</div>
+      </div>
+      <a href="#" class="res-eco-link">Gestionar inventario →</a>
+    </section>
+
+    <section class="res-section res-section--compact reveal vis">
+      <div class="res-section-head">
+        <h2>Vocación</h2>
+        <span class="res-section-sub">// clase & oficio</span>
+      </div>
+      <div class="res-voc-list">
+        <div class="res-voc-item"><span class="res-voc-level">Lv.8</span><span class="res-voc-name">Espadachín — Santoryu</span></div>
+        <div class="res-voc-item"><span class="res-voc-level">Lv.4</span><span class="res-voc-name">Forjador de armas</span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ════════════════ TRIPULACIÓN + BARCO ════════════════ -->
+  <div class="res-grid-2col">
+    <section class="res-section reveal vis">
+      <div class="res-section-head">
+        <h2>Tripulación</h2>
+        <a href="#" class="res-section-link">Ver →</a>
+      </div>
+      <div class="res-trip-header">
+        <div class="res-trip-emblem">🏴‍☠️</div>
+        <div class="res-trip-info">
+          <h3 class="res-trip-name">Sombrero de Paja</h3>
+          <p class="res-trip-motto">"Vamos a comer algo"</p>
+          <div class="res-trip-meta">
+            <span class="res-meta-chip">Tripulante</span>
+            <span class="res-meta-chip">10 miembros</span>
+          </div>
+        </div>
+      </div>
+      <div class="res-trip-roster">
+        <a href="#" class="res-trip-member"><div class="res-trip-mavatar"><span>L</span></div><div class="res-trip-mname">Luffy</div></a>
+        <a href="#" class="res-trip-member"><div class="res-trip-mavatar"><span>Z</span></div><div class="res-trip-mname">Zoro</div></a>
+        <a href="#" class="res-trip-member"><div class="res-trip-mavatar"><span>N</span></div><div class="res-trip-mname">Nami</div></a>
+        <a href="#" class="res-trip-member"><div class="res-trip-mavatar"><span>U</span></div><div class="res-trip-mname">Usopp</div></a>
+        <a href="#" class="res-trip-member"><div class="res-trip-mavatar"><span>S</span></div><div class="res-trip-mname">Sanji</div></a>
+        <a href="#" class="res-trip-member"><div class="res-trip-mavatar"><span>C</span></div><div class="res-trip-mname">Chopper</div></a>
+        <a href="#" class="res-trip-member"><div class="res-trip-mavatar"><span>R</span></div><div class="res-trip-mname">Robin</div></a>
+        <a href="#" class="res-trip-member"><div class="res-trip-mavatar"><span>F</span></div><div class="res-trip-mname">Franky</div></a>
+      </div>
+    </section>
+
+    <section class="res-section reveal vis">
+      <div class="res-section-head">
+        <h2>Embarcación</h2>
+        <a href="#" class="res-section-link">Ver →</a>
+      </div>
+      <div class="res-ship-card">
+        <div class="res-ship-hero">⛵</div>
+        <div class="res-ship-info">
+          <h3 class="res-ship-name">Thousand Sunny</h3>
+          <div class="res-ship-meta">
+            <span class="res-meta-chip">Goleta</span>
+            <span class="res-meta-chip">Vel. x3</span>
+            <span class="res-meta-chip res-meta-chip--active">Buque Insignia</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ════════════════ BIOGRAFÍA ════════════════ -->
+  <section class="res-section res-section--full reveal vis">
+    <div class="res-section-head">
+      <h2>Biografía</h2>
+      <span class="res-section-sub">// perfil</span>
+    </div>
+    <div class="res-bio-grid">
+      <div class="res-bio-block">
+        <h4 class="res-bio-label">Apariencia</h4>
+        <p class="res-bio-text">Zoro es un hombre alto y musculoso de 181 cm. Tiene el pelo verde corto (más largo en el post-skip), un piercing de oro en la oreja izquierda y una cicatriz sobre el ojo izquierdo cerrado. Viste pantalones oscuros, botas de cuero y una bandana verde cuando entra en serio.</p>
+      </div>
+      <div class="res-bio-block">
+        <h4 class="res-bio-label">Personalidad</h4>
+        <p class="res-bio-text">Serio, directo y obsesionado con convertirse en el mejor espadachín del mundo. Es extremadamente leal a su capitán, aunque no lo demuestre con palabras. Tiene un sentido del honor inquebrantable y una ética de trabajo feroz. Odia perder, especialmente contra espadachines.</p>
+      </div>
+      <div class="res-bio-block">
+        <h4 class="res-bio-label">Historia</h4>
+        <p class="res-bio-text">Ex CAZA-HOMBRES del East Blue. Prometió a su amiga de la infancia Kuina que llegaría a ser el mejor espadachín del mundo. Tras ser derrotado por Mihawk, se unió a los Sombrero de Paja jurando no volver a perder. Entrena duramente cada día, incluso durante los viajes.</p>
+      </div>
+    </div>
+    <div class="res-bio-cta">
+      <a href="#" class="btn btn-ghost btn-sm">Ver ficha completa →</a>
+    </div>
+  </section>
+
+  <!-- ════════════════ PENDIENTES ════════════════ -->
+  <section class="res-section res-section--full reveal vis">
+    <div class="res-section-head">
+      <h2>Pendientes</h2>
+      <span class="res-section-sub">// atención requerida</span>
+    </div>
+    <div class="res-pend-grid">
+      <a href="#" class="res-pend-card res-pend--tramites">
+        <div class="res-pend-count">2</div>
+        <div class="res-pend-label">Trámites pendientes</div>
+        <div class="res-pend-detail">Revisa el estado de tus solicitudes al staff</div>
+      </a>
+      <a href="#" class="res-pend-card res-pend--trip">
+        <div class="res-pend-count">1</div>
+        <div class="res-pend-label">Solicitudes de tripulación</div>
+        <div class="res-pend-detail">Tienes propuestas de embarque esperando</div>
+      </a>
+      <a href="#" class="res-pend-card res-pend--msgs">
+        <div class="res-pend-count">5</div>
+        <div class="res-pend-label">Mensajes sin leer</div>
+        <div class="res-pend-detail">Tienes mensajes nuevos de otros personajes</div>
+      </a>
+      <a href="#" class="res-pend-card res-pend--alertas">
+        <div class="res-pend-count">3</div>
+        <div class="res-pend-label">Alertas</div>
+        <div class="res-pend-detail">Notificaciones del sistema pendientes</div>
+      </a>
+    </div>
+    <div class="res-tramites-mini">
+      <h4 class="res-mini-title">Últimos trámites</h4>
+      <div class="res-tramite-row"><span class="res-tramite-type">Solicitud de barco</span><span class="res-tramite-date">25 Ago 2026</span></div>
+      <div class="res-tramite-row"><span class="res-tramite-type">Aumento de slots</span><span class="res-tramite-date">20 Ago 2026</span></div>
+      <div class="res-tramite-row"><span class="res-tramite-type">Cambio de rango</span><span class="res-tramite-date">15 Ago 2026</span></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+// Trigger staggered animation
+document.querySelectorAll('.reveal').forEach(function(el, i) {
+  setTimeout(function() { el.classList.add('vis'); }, 80 + i * 70);
+});
+</script>
+</body>
+</html>

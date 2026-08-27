@@ -392,27 +392,42 @@ function ope_rol_navbar_html()
         return in_array($script, $scripts, true) ? ' on' : '';
     };
 
-    // Nav reducido (F1 cleanup): Personaje · Trámites · Guías (+ Zona Staff si aplica).
-    // Tripulación, Mundo Vivo y Bibliotecas fuera del menú; páginas conservadas.
-    $links   = '<a href="' . $bburl . '/personajes.php" class="ope-nav-link' . $isOn(array('personajes.php', 'ficha.php', 'crear-personaje.php')) . '">Personaje</a>';
-    $links  .= '<a href="' . $bburl . '/barco.php" class="ope-nav-link' . $isOn(array('barco.php', 'barcos.php')) . '">Barco</a>';
-$links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php')) . '">Trámites</a>';
+    // Sidebar icons (SVG inline — siempre visibles, texto se oculta colapsado)
+    $iconPersonaje = '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+    $iconBarco      = '<svg viewBox="0 0 24 24"><path d="M2 20l2-4h16l2 4"/><path d="M4 16l2-8h12l2 8"/><path d="M12 4v4"/><path d="M9 4h6"/></svg>';
+    $iconTramites   = '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>';
+    $iconMapa       = '<svg viewBox="0 0 24 24"><path d="M9 3L1 6v15l8-3 6 3 8-3V3l-8 3-6-3z"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>';
+    $iconGestion    = '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>';
+    $iconTiendas    = '<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+    $iconCatalogo   = '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';
+    $iconGuias      = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+    $iconStaff      = '<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+
+    // Sidebar: Gestión · Trámites · Tiendas · Mapa · Catálogo (dropdown) · Guías · Zona Staff
+    $iconResumen = '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>';
+    $gestionScripts = array('gestion.php', 'tripulacion.php', 'tienda-personal.php');
+    $links   = '<a href="' . $bburl . '/resumen.php" class="ope-nav-link' . $isOn(array('resumen.php')) . '">' . $iconResumen . '<span>Resumen</span></a>';
+    $links  .= '<a href="' . $bburl . '/gestion.php" class="ope-nav-link' . $isOn($gestionScripts) . '">' . $iconGestion . '<span>Gestión</span></a>';
+    $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(array('tramites.php')) . '">' . $iconTramites . '<span>Trámites</span></a>';
+    $tiendasScripts = array('tiendas.php', 'tienda-general.php', 'astillero.php', 'mercado-negro.php', 'tiendas-personales.php');
+    $links  .= '<a href="' . $bburl . '/tiendas.php" class="ope-nav-link' . $isOn($tiendasScripts) . '">' . $iconTiendas . '<span>Tiendas</span></a>';
+    $links  .= '<a href="' . $bburl . '/mapa.php" class="ope-nav-link' . $isOn(array('mapa.php')) . '">' . $iconMapa . '<span>Mapa</span></a>';
 
     // Zona Catálogo (dropdown): Akuma no Mi, Lore & Cronología, Catálogo de NPCs.
     $catScripts = array('biblioteca-akuma.php', 'biblioteca-lore.php', 'catalogo-npcs.php');
     $links  .= '<div class="ope-nav-drop">'
              . '<button type="button" class="ope-nav-link ope-nav-dd-btn' . $isOn($catScripts) . '"'
              . ' aria-haspopup="true" aria-expanded="false"'
-             . ' onclick="var d=this.nextElementSibling;var o=d.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',o?\'true\':\'false\');">Catálogo</button>'
+             . ' onclick="var d=this.nextElementSibling;var o=d.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',o?\'true\':\'false\');">' . $iconCatalogo . '<span>Catálogo</span></button>'
              . '<div class="ope-dropdown ope-nav-dropdown">'
              . '<a href="' . $bburl . '/biblioteca-akuma.php" class="ope-dropdown-item">Akuma no Mi</a>'
              . '<a href="' . $bburl . '/biblioteca-lore.php" class="ope-dropdown-item">Lore y Cronología</a>'
              . '<a href="' . $bburl . '/catalogo-npcs.php" class="ope-dropdown-item">Catálogo de NPCs</a>'
              . '</div></div>';
 
-    $links  .= '<a href="' . $bburl . '/guias.php" class="ope-nav-link' . $isOn(array('guias.php')) . '">Guías</a>';
+    $links  .= '<a href="' . $bburl . '/guias.php" class="ope-nav-link' . $isOn(array('guias.php')) . '">' . $iconGuias . '<span>Guías</span></a>';
     if ($isStaff) {
-        $links .= '<a href="' . $bburl . '/zona-staff.php" class="ope-nav-link' . $isOn(array('zona-staff.php')) . '">Zona Staff</a>';
+        $links .= '<a href="' . $bburl . '/zona-staff.php" class="ope-nav-link' . $isOn(array('zona-staff.php')) . '">' . $iconStaff . '<span>Zona Staff</span></a>';
     }
 
     if ($loggedin) {
@@ -467,18 +482,87 @@ $links  .= '<a href="' . $bburl . '/tramites.php" class="ope-nav-link' . $isOn(a
     // Anti-flash: aplica data-theme al <html> antes de que se pinte nada.
     // En páginas del pipeline, ope_rol_inject_navbar() ya lo pone server-side;
     // este fallback JS cubre páginas propias en PHP puro (ficha.php, etc.).
-    $html  = '<script>document.documentElement.setAttribute("data-theme",(function(){'
-           . 'var m=document.cookie.match(/(?:^|; )ope_theme=([^;]+)/);'
-           . 'var t=m?decodeURIComponent(m[1]):"";'
-           . 'return t==="noche"?"noche":"cielo";'
-           . '})());</script>' . "\n";
-    $html .= '<!-- ===== NAVBAR (fixed) · fuente única ===== -->' . "\n";
+    $html  = '<script>(function(){'
+           . 'var t=null;'
+           . 'try{t=localStorage.getItem("ope_theme");}catch(e){}'
+           . 'if(!t){var m=document.cookie.match(/(?:^|; )ope_theme=([^;]+)/);t=m?decodeURIComponent(m[1]):"";}'
+           . 'document.documentElement.setAttribute("data-theme",t==="noche"?"noche":"cielo");'
+           . '})()</script>' . "\n";
+    $html .= '<!-- ===== SIDEBAR (fixed) · fuente única ===== -->' . "\n";
     $html .= ope_rol_navbar_css();
-    $html .= '<nav id="ope-navbar"><div class="ope-nav">';
+    $sidebarCookie = isset($_COOKIE['ope_sidebar']) ? (string) $_COOKIE['ope_sidebar'] : '';
+    $sidebarOpen = ($sidebarCookie === 'open');
+    $html .= '<nav id="ope-navbar" class="ope-sidebar' . ($sidebarOpen ? ' is-open' : '') . '">';
+    $html .= '<div class="ope-sidebar-head">';
+    $html .= '<button type="button" class="ope-sidebar-toggle" id="ope-sidebar-toggle" aria-label="Abrir/Cerrar menú" aria-expanded="' . ($sidebarOpen ? 'true' : 'false') . '">';
+    $html .= '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+    $html .= '</button>';
     $html .= '<a href="' . $bburl . '/index.php" class="ope-nav-logo">One Piece: <b>7 Seas</b></a>';
+    $html .= '</div>';
+    $html .= '<div class="ope-sidebar-body">';
+
+    // ── Zona resumen: avatar + nombre + ubicación (solo logged-in, solo expandido) ──
+    if ($loggedin) {
+        $resume_pid = $activePid;
+        $resume_pj = null;
+        $resume_nombre = '';
+        $resume_nivel = 1;
+        $resume_avatar = '';
+        $resume_initials = '';
+        if ($resume_pid > 0 && $db->table_exists('rol_personajes')) {
+            $rq = $db->simple_select('rol_personajes', 'pid, nombre, nivel, avatar, icono, datos', "pid = {$resume_pid}", array('limit' => 1));
+            if ($db->num_rows($rq)) {
+                $resume_pj = $db->fetch_array($rq);
+                $resume_nombre = htmlspecialchars_uni($resume_pj['nombre']);
+                $resume_nivel = (int) ($resume_pj['nivel'] ?? 1);
+                $rd = json_decode((string) ($resume_pj['datos'] ?? ''), true);
+                if (!is_array($rd)) $rd = array();
+                $resume_avatar = trim((string) ($rd['retrato'] ?? ''));
+                if ($resume_avatar === '') $resume_avatar = trim((string) ($resume_pj['avatar'] ?? ''));
+                if ($resume_avatar === '') $resume_avatar = trim((string) ($resume_pj['icono'] ?? ''));
+                $resume_avatar_e = htmlspecialchars_uni($resume_avatar);
+                $resume_initials = function_exists('mb_substr') ? mb_strtoupper(mb_substr($resume_pj['nombre'], 0, 1, 'UTF-8'), 'UTF-8') : strtoupper(substr($resume_pj['nombre'], 0, 1));
+            }
+        }
+        // Berries
+        $resume_berries = 0;
+        if ($resume_pj && function_exists('ope_eco_berries')) {
+            $resume_berries = (int) ope_eco_berries($resume_pid);
+        }
+        // Ubicación insular
+        $resume_isla = '';
+        if ($resume_pj && function_exists('ope_isla_por_slug')) {
+            $isla_slug = (string) ($resume_pj['isla_actual'] ?? '');
+            if ($isla_slug !== '') {
+                $isla_data = ope_isla_por_slug($isla_slug);
+                if ($isla_data) $resume_isla = htmlspecialchars_uni($isla_data['nombre'] ?? '');
+            }
+        }
+        if ($resume_nombre !== '') {
+            $html .= '<div class="ope-sidebar-summary">';
+            $html .= '<a href="' . $bburl . '/resumen.php" class="ope-summary-avatar">';
+            if ($resume_avatar !== '') {
+                $html .= '<img src="' . $resume_avatar_e . '" alt="">';
+            } else {
+                $html .= '<span>' . htmlspecialchars_uni($resume_initials) . '</span>';
+            }
+            $html .= '</a>';
+            $html .= '<div class="ope-summary-info">';
+            $html .= '<a href="' . $bburl . '/resumen.php" class="ope-summary-name">' . $resume_nombre . '</a>';
+            $html .= '<span class="ope-summary-meta">Lv.' . $resume_nivel;
+            if ($resume_isla !== '') $html .= ' · ' . $resume_isla;
+            $html .= '</span>';
+            if ($resume_berries > 0) {
+                $html .= '<span class="ope-summary-berries">' . number_format($resume_berries, 0, ',', '.') . ' berries</span>';
+            }
+            $html .= '</div></div>';
+        }
+    }
+
     $html .= '<div class="ope-nav-links">' . $links . '</div>';
     $html .= '<div class="ope-nav-right">' . $right . '</div>';
-    $html .= '</div></nav>';
+    $html .= '</div>';
+    $html .= '</nav>';
 
     // Toasts flash one-time (p.ej. "¡Te avisaremos cuando zarpe!" tras encolar el viaje).
     if ($loggedin) {
@@ -2991,6 +3075,7 @@ function ope_rol_theme_js()
         . "btn.setAttribute('data-theme',next);"
         . "btn.textContent=next==='noche'?'Cielo':'Noche';"
         . "document.documentElement.setAttribute('data-theme',next);"
+        . "try{localStorage.setItem('ope_theme',next);}catch(e){}"
         . "document.cookie='ope_theme='+next+'; path=/; max-age=31536000; SameSite=Lax';"
         . "});}"
         . "})();\n"
@@ -3000,6 +3085,21 @@ function ope_rol_theme_js()
         . "for(var k=0;k<openDrops.length;k++){var od=openDrops[k];"
         . "if(!od.contains(e.target)&&!(e.target.closest&&e.target.closest('.ope-user-name'))&&!(e.target.closest&&e.target.closest('.ope-nav-dd-btn'))){od.classList.remove('open');}}"
         . "});"
+        . "})();\n"
+        // Sidebar toggle — hamburger + cookie + body class
+        . "(function(){"
+        . "var btn=document.getElementById('ope-sidebar-toggle');"
+        . "var sidebar=document.getElementById('ope-navbar');"
+        . "if(!btn||!sidebar)return;"
+        . "function toggle(){"
+        . "var open=sidebar.classList.toggle('is-open');"
+        . "btn.setAttribute('aria-expanded',open?'true':'false');"
+        . "document.body.classList.toggle('ope-sidebar-open',open);"
+        . "document.cookie='ope_sidebar='+(open?'open':'')+'; path=/; max-age=31536000; SameSite=Lax';"
+        . "}"
+        . "if(sidebar.classList.contains('is-open'))document.body.classList.add('ope-sidebar-open');"
+        . "btn.addEventListener('click',function(e){e.stopPropagation();toggle();});"
+        . "document.addEventListener('keydown',function(e){if(e.key==='Escape'&&sidebar.classList.contains('is-open'))toggle();});"
         . "})();\n"
         . "</script>\n";
     return $js;

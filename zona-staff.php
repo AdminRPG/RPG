@@ -1,24 +1,16 @@
 <?php
 /**
  * One Piece: Eternal · Zona Staff (hub)
- * Cards agrupadas por rank mínimo → Acceder a panel PHP.
+ * Skeleton — cards se agregan una a una.
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'zona-staff.php');
 require_once './global.php';
 require_once MYBB_ROOT . 'inc/ope_rol_data.php';
-require_once MYBB_ROOT . 'inc/ope_rol_tramites.php';
 
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 $uid    = (int) ($mybb->user['uid'] ?? 0);
-
-// Compat: enlaces antiguos ?pid= → panel de aprobación
-$view_pid = (int) $mybb->get_input('pid', MyBB::INPUT_INT);
-if ($view_pid > 0) {
-    header('Location: ' . $mybb->settings['bburl'] . '/zona-staff-aprobacion.php?pid=' . $view_pid);
-    exit;
-}
 
 $staff = $uid > 0
     ? ope_rol_active_staff($uid)
@@ -28,116 +20,6 @@ $staff_rank = (int) ($staff['rank'] ?? 0);
 $rol_lbl    = ope_rol_staff_label($staff['rol']);
 $char_name  = htmlspecialchars_uni((string) $staff['nombre']);
 $mi_rango   = $rol_lbl !== '' ? $rol_lbl : 'Sin rango';
-
-$rank_labels = array(
-    1 => 'Colaborador',
-    2 => 'Moderador',
-    3 => 'Administrador',
-    4 => 'Web Master',
-);
-
-$paneles = array(
-    array(
-        'id' => 'aprobacion',
-        'titulo' => 'Aprobación de personajes',
-        'code' => 'STF-01',
-        'desc' => 'Cola de fichas en revisión. Aprobar otorga 1 PT y activa Eternal interactivo.',
-        'rank_min' => 1,
-        'href' => 'zona-staff-aprobacion.php',
-        'count_key' => 'cola_pj',
-        'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>',
-    ),
-    array(
-        'id' => 'tramites',
-        'titulo' => 'Cola de trámites',
-        'code' => 'STF-02',
-        'desc' => 'Solicitudes de ventanillas. Ver desde Colaborador; resolver según rank del tipo.',
-        'rank_min' => 1,
-        'href' => 'zona-staff-tramites.php',
-        'count_key' => 'cola_tram',
-        'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>',
-    ),
-    array(
-        'id' => 'personajes',
-        'titulo' => 'Gestión de personajes',
-        'code' => 'STF-03',
-        'desc' => 'Listado interactivo de fichas. Cambiar estado, asignar rango Staff o borrar personajes sin escribir IDs.',
-        'rank_min' => 1,
-        'href' => 'zona-staff-personajes.php',
-        'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-    ),
-    array(
-        'id' => 'cuentas',
-        'titulo' => 'Gestión de cuentas y narradores',
-        'code' => 'STF-04',
-        'desc' => 'Administración de usuarios. Cambiar número de slots de PJ, rol de Narrador, rango Staff y personaje activo.',
-        'rank_min' => 2,
-        'href' => 'zona-staff-cuentas.php',
-        'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>',
-    ),
-    array(
-        'id' => 'cards',
-        'titulo' => 'Catálogo de Cards',
-        'code' => 'STF-05',
-        'desc' => 'Crea y gestiona tarjetas reutilizables (objetos, técnicas, lore) y asígnalas a las fichas de personajes.',
-        'rank_min' => 1,
-        'href' => 'zona-staff-cards.php',
-        'count_key' => 'cards',
-        'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>',
-    ),
-    array(
-        'id' => 'viajes',
-        'titulo' => 'Revisión de Cierres de Viaje',
-        'code' => 'STF-06',
-        'desc' => 'Revisa las solicitudes de cierre de viaje. Analiza el roleo con IA, verifica eventos del oráculo y aprueba o rechaza llegadas.',
-        'rank_min' => 3,
-        'href' => 'zona-staff-viajes.php',
-        'count_key' => 'cola_viajes',
-        'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/><circle cx="12" cy="12" r="3"/></svg>',
-    ),
-    array(
-        'id' => 'misiones',
-        'titulo' => 'Tablon de Misiones',
-        'code' => 'STF-07',
-        'desc' => 'Escribe y gestiona las misiones del tablon. Aprueba tomas de jugadores y cierra las misiones en curso como completadas o fallidas.',
-        'rank_min' => 1,
-        'href' => 'zona-staff-misiones.php',
-        'count_key' => 'cola_misiones',
-        'icon_svg' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
-    ),
-);
-
-$counts = array('cola_pj' => 0, 'cola_tram' => 0, 'cards' => 0, 'cola_viajes' => 0, 'cola_misiones' => 0);
-if ($is_staff && $db->table_exists('rol_personajes')) {
-    $q = $db->simple_select('rol_personajes', 'COUNT(*) AS c', "estado = 'revision'");
-    $counts['cola_pj'] = (int) $db->fetch_field($q, 'c');
-}
-if ($is_staff && $staff_rank >= 1 && $db->table_exists('rol_tramites')) {
-    $q = $db->simple_select(
-        'rol_tramites',
-        'COUNT(*) AS c',
-        "estado IN ('pendiente','en_proceso') AND tipo != 'crear_personaje'"
-    );
-    $counts['cola_tram'] = (int) $db->fetch_field($q, 'c');
-}
-if ($is_staff && $db->table_exists('rol_cards')) {
-    $counts['cards'] = (int) $db->fetch_field($db->simple_select('rol_cards', 'COUNT(*) AS c', 'activo = 1'), 'c');
-}
-if ($is_staff && $staff_rank >= 3 && $db->table_exists('rol_viajes')) {
-    $counts['cola_viajes'] = (int) $db->fetch_field($db->simple_select('rol_viajes', 'COUNT(*) AS c', "estado = 'pendiente_cierre'"), 'c');
-}
-if ($is_staff && $staff_rank >= 1 && $db->table_exists('rol_mision_tomas')) {
-    $counts['cola_misiones'] = (int) $db->fetch_field($db->simple_select('rol_mision_tomas', 'COUNT(*) AS c', "estado = 'pendiente'"), 'c');
-}
-
-$by_rank = array();
-foreach ($paneles as $p) {
-    if ($staff_rank < (int) $p['rank_min'] && $staff_rank < 4) {
-        continue;
-    }
-    $by_rank[(int) $p['rank_min']][] = $p;
-}
-ksort($by_rank);
 
 header('Content-Type: text/html; charset=utf-8');
 ?><!DOCTYPE html>
@@ -184,52 +66,7 @@ header('Content-Type: text/html; charset=utf-8');
       <span class="zs-level">Activo: <b><?php echo $char_name !== '' ? $char_name : 'Admin (sin PJ)'; ?></b> · rol: <b><?php echo htmlspecialchars_uni($mi_rango); ?></b> · rank <?php echo (int) $staff_rank; ?></span>
     </div>
   </section>
-
-<?php if (empty($by_rank)): ?>
-  <section class="reveal">
-    <div class="empty-state">
-      <div class="big">Sin paneles disponibles</div>
-      <p>Tu rank actual no abre ninguna herramienta.</p>
-    </div>
-  </section>
-<?php else: ?>
-<?php foreach ($by_rank as $need => $list): ?>
-  <section class="reveal zs-group">
-    <div class="zs-group-h">
-      <span class="lbl">Rank ≥ <?php echo (int) $need; ?></span>
-      <span class="need"><?php echo htmlspecialchars_uni($rank_labels[$need] ?? ('Rank ' . $need)); ?>+</span>
-      <span class="rule"></span>
-    </div>
-    <div class="cards">
-<?php foreach ($list as $p):
-    $ck = (string) ($p['count_key'] ?? '');
-    $cnt = ($ck !== '' && isset($counts[$ck])) ? (int) $counts[$ck] : null;
-    $svg = $p['icon_svg'] ?? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>';
-?>
-      <article class="card">
-        <div class="card-top">
-          <div class="card-ic">
-            <?php echo $svg; ?>
-          </div>
-          <div class="card-head">
-            <div class="card-title"><?php echo htmlspecialchars_uni($p['titulo']); ?></div>
-            <div class="card-code"><?php echo htmlspecialchars_uni($p['code']); ?></div>
-          </div>
-<?php if ($cnt !== null): ?>
-          <span class="card-count" title="En cola"><?php echo $cnt; ?></span>
-<?php endif; ?>
-        </div>
-        <div class="card-body"><?php echo htmlspecialchars_uni($p['desc']); ?></div>
-        <div class="card-foot">
-          <span class="card-meta">Mín. <?php echo htmlspecialchars_uni($rank_labels[$need] ?? ('rank ' . $need)); ?></span>
-          <a class="btn btn-hot btn-sm" href="<?php echo $bburl; ?>/<?php echo htmlspecialchars_uni($p['href']); ?>">Acceder</a>
-        </div>
-      </article>
-<?php endforeach; ?>
-    </div>
-  </section>
-<?php endforeach; ?>
-<?php endif; ?>
+  <!-- Agregar cards aquí -->
 <?php endif; ?>
 </div>
 <?php include __DIR__ . '/inc/footer_custom.php'; ?>
