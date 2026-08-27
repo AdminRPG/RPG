@@ -91,7 +91,8 @@ $errores = array();
 $avisos  = array();
 $preview = false;
 $d = array(
-    'nombre' => '', 'retrato' => '', 'bio' => '',
+    'nombre' => '', 'retrato' => '',
+    'desc_fisica' => '', 'personalidad' => '', 'historia' => '', 'notas' => '',
     'raza_id' => 0, 'raza_hibrida_id' => 0, 'tribu_id' => 0,
     'fue' => 0, 'des' => 0, 'agi' => 0, 'res' => 0, 'per' => 0, 'inte' => 0, 'car' => 0, 'vol' => 0,
     'dotes' => array(), 'defectos' => array(), 'rasgos' => array(),
@@ -105,7 +106,10 @@ if ($mybb->request_method === 'post') {
 
     $d['nombre'] = trim((string) $mybb->get_input('nombre'));
     $d['retrato'] = trim((string) $mybb->get_input('retrato'));
-    $d['bio'] = trim((string) $mybb->get_input('bio'));
+    $d['desc_fisica'] = trim((string) $mybb->get_input('desc_fisica'));
+    $d['personalidad'] = trim((string) $mybb->get_input('personalidad'));
+    $d['historia'] = trim((string) $mybb->get_input('historia'));
+    $d['notas'] = trim((string) $mybb->get_input('notas'));
     $d['raza_id'] = (int) $mybb->get_input('raza_id', 1);
     $d['raza_hibrida_id'] = (int) $mybb->get_input('raza_hibrida_id', 1);
     $d['tribu_id'] = (int) $mybb->get_input('tribu_id', 1);
@@ -208,7 +212,8 @@ if ($mybb->request_method === 'post') {
             'per' => $d['per'], 'inte' => $d['inte'], 'car' => $d['car'], 'vol' => $d['vol'],
             'puntos_comprados' => 0, 'pp_saldo' => 0, // 7.1: acumulado desde el último nivel (0 al crear)
             'retrato' => $d['retrato'] !== '' ? $d['retrato'] : null,
-            'bio' => $d['bio'],
+            'desc_fisica' => $d['desc_fisica'], 'personalidad' => $d['personalidad'],
+            'historia' => $d['historia'], 'notas' => $d['notas'],
         ));
         if ($pid > 0) {
             foreach ($d['dotes'] as $dot_id) {
@@ -228,11 +233,14 @@ if ($mybb->request_method === 'post') {
             // F2.1: herencia de personajes muertos (trámite 62) → el nuevo hereda.
             $heredado = function_exists('ope7_pj_heredar') ? ope7_pj_heredar($uid, $pid) : array('aplicadas' => 0);
 
+            $palabras = function ($t) { return count(preg_split('/\s+/u', trim((string) $t), -1, PREG_SPLIT_NO_EMPTY)); };
             $resumen_ficha = "Personaje: {$d['nombre']} (nivel 1)\n"
                 . "Raza: " . ($SEL_RAZA[$d['raza_id']]['nombre'] ?? '?')
                 . ($d['raza_hibrida_id'] > 0 ? ' × ' . ($SEL_RAZA[$d['raza_hibrida_id']]['nombre'] ?? '?') : '')
                 . "\nAtributos base: FUE {$d['fue']} DES {$d['des']} AGI {$d['agi']} RES {$d['res']} PER {$d['per']} INT {$d['inte']} CAR {$d['car']} VOL {$d['vol']}\n"
                 . "Secundarios: PV {$sec_resumen['pv']} · PE {$sec_resumen['pe']} · PA {$sec_resumen['pa']} · Vel {$sec_resumen['velocidad']} m/s\n"
+                . "Narrativa (palabras): descripción física " . $palabras($d['desc_fisica']) . ' · personalidad ' . $palabras($d['personalidad'])
+                . ' · historia ' . $palabras($d['historia']) . ' · notas ' . $palabras($d['notas']) . "\n"
                 . "Idea de técnica inicial: " . ($d['idea_tecnica'] !== '' ? $d['idea_tecnica'] : '(ninguna)');
 
             $tr = ope7_tramite_crear($uid, $pid, 3, 'Validación de ficha de creación', array('personaje_id' => $pid), array(
@@ -337,19 +345,38 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="plate">
             <div class="plate-h"><span class="t">Identidad</span><span class="c">Paso 1</span></div>
             <div class="plate-b">
-              <div class="field">
-                <label class="flabel" for="nombre">Nombre del personaje</label>
-                <input type="text" id="nombre" name="nombre" maxlength="120" value="<?php echo htmlspecialchars_uni($d['nombre']); ?>" placeholder="Cómo te llamas en el mar">
-                <span class="fl-hint">Tu nombre on-rol. Sin apellidos obligatorios: uno basta.</span>
-              </div>
               <div class="grid2">
+                <div class="field">
+                  <label class="flabel" for="nombre">Nombre del personaje</label>
+                  <input type="text" id="nombre" name="nombre" maxlength="120" value="<?php echo htmlspecialchars_uni($d['nombre']); ?>" placeholder="Cómo te llamas en el mar">
+                  <span class="fl-hint">Tu nombre on-rol. Sin apellidos obligatorios: uno basta.</span>
+                </div>
                 <div class="field">
                   <label class="flabel" for="retrato">Retrato (URL de imagen, opcional)</label>
                   <input type="text" id="retrato" name="retrato" maxlength="255" value="<?php echo htmlspecialchars_uni($d['retrato']); ?>" placeholder="https://…">
                 </div>
+              </div>
+              <h3 class="wiz-sub">Narrativa</h3>
+              <div class="grid2">
                 <div class="field">
-                  <label class="flabel" for="bio">Una línea de bio (opcional)</label>
-                  <input type="text" id="bio" name="bio" maxlength="300" value="<?php echo htmlspecialchars_uni($d['bio']); ?>" placeholder="Un marinero con un sueño…">
+                  <label class="flabel" for="desc_fisica">Descripción física</label>
+                  <textarea id="desc_fisica" name="desc_fisica" maxlength="2000" class="historia-textarea" placeholder="Estatura, complexión, marcas, cicatrices, cómo vistes…"><?php echo htmlspecialchars_uni($d['desc_fisica']); ?></textarea>
+                  <span class="fl-hint">Cómo te ven los demás. El staff la usará para tu ficha.</span>
+                </div>
+                <div class="field">
+                  <label class="flabel" for="personalidad">Personalidad</label>
+                  <textarea id="personalidad" name="personalidad" maxlength="2000" class="historia-textarea" placeholder="Temperamento, manías, miedos, cómo reaccionas…"><?php echo htmlspecialchars_uni($d['personalidad']); ?></textarea>
+                  <span class="fl-hint">Quién eres cuando no hay cámaras. Conecta con tus rasgos del paso 6.</span>
+                </div>
+                <div class="field">
+                  <label class="flabel" for="historia">Historia</label>
+                  <textarea id="historia" name="historia" maxlength="5000" class="historia-textarea" placeholder="Tu pasado antes de zarpar: origen, sueño, por qué estás en el mar…"><?php echo htmlspecialchars_uni($d['historia']); ?></textarea>
+                  <span class="fl-hint">Tu pasado on-rol. Sin spoilers del futuro: eso se juega.</span>
+                </div>
+                <div class="field">
+                  <label class="flabel" for="notas">Notas (opcional)</label>
+                  <textarea id="notas" name="notas" maxlength="2000" class="historia-textarea" placeholder="Detalles para el staff, dudas de coherencia, inspiraciones…"><?php echo htmlspecialchars_uni($d['notas']); ?></textarea>
+                  <span class="fl-hint">Lo que quieras que el staff sepa en la validación del trámite 3.</span>
                 </div>
               </div>
             </div>

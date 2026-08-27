@@ -67,66 +67,54 @@ header('Content-Type: text/html; charset=utf-8');
     </div>
   </section>
   <section class="reveal">
-    <div class="plate">
-      <div class="plate-h"><span class="t">Resolución de combate</span><span class="c">// F2 · veredictos y bandas de delta</span></div>
-      <div class="plate-b">
-        <p class="zs-intro">Revisa los turnos de cada combate (PA total vs. gastado), resuelve intercambio a intercambio con las Tablas 1–3, ajusta matices y firma el veredicto con histórico.</p>
-        <a href="<?php echo $bburl; ?>/resolucion-combate.php" class="btn btn-ghost">Abrir panel</a>
+    <div class="zs-grid">
+      <div class="zs-card">
+        <div class="zs-card-h"><span class="t">Bandeja de trámites</span><span class="c">motor 5.21</span></div>
+        <p class="zs-card-d">La cola del motor: 67 trámites. La IA propone, tú firmas con motivo. Todo el flujo editable y auditable.</p>
+        <a href="<?php echo $bburl; ?>/bandeja.php" class="btn btn-ghost btn-sm">Abrir bandeja</a>
+      </div>
+      <div class="zs-card">
+        <div class="zs-card-h"><span class="t">Resolución de combate</span><span class="c">F2</span></div>
+        <p class="zs-card-d">Turnos de cada combate (PA vs. gastado), Tablas 1–3, matices y veredicto firmado.</p>
+        <a href="<?php echo $bburl; ?>/resolucion-combate.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+      </div>
+      <div class="zs-card">
+        <div class="zs-card-h"><span class="t">Calendario del foro</span><span class="c">A.3</span></div>
+        <p class="zs-card-d">Fecha on-roll, presentes con ancla, congelados y avisos de coherencia.</p>
+        <a href="<?php echo $bburl; ?>/calendario-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+      </div>
+      <div class="zs-card">
+        <div class="zs-card-h"><span class="t">Progresión</span><span class="c">A.3</span></div>
+        <p class="zs-card-d">Cronómetros de entrenamiento, gastos de PP por concepto, saldos y reservas.</p>
+        <a href="<?php echo $bburl; ?>/progresion-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+      </div>
+      <div class="zs-card">
+        <div class="zs-card-h"><span class="t">Mundo Vivo</span><span class="c">A.3</span></div>
+        <p class="zs-card-d">Ronda mensual, cola de análisis y la matriz de las 17 islas con su ficha viva.</p>
+        <a href="<?php echo $bburl; ?>/mundo-vivo.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+      </div>
+      <div class="zs-card">
+        <div class="zs-card-h"><span class="t">Navegación</span><span class="c">A.3</span></div>
+        <p class="zs-card-d">Travesías en curso con ruta, plazo, vencimientos y víveres pendientes.</p>
+        <a href="<?php echo $bburl; ?>/navegacion-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+      </div>
+      <div class="zs-card">
+        <div class="zs-card-h"><span class="t">Facciones</span><span class="c">A.3</span></div>
+        <p class="zs-card-d">Rangos y cupos, ascensos en cola, Shichibukai e histórico de cambios.</p>
+        <a href="<?php echo $bburl; ?>/facciones-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+      </div>
+      <div class="zs-card">
+        <div class="zs-card-h"><span class="t">Conquista</span><span class="c">A.3</span></div>
+        <p class="zs-card-d">Fases del asedio, ejércitos (unidades/hordas) y registro con motivo.</p>
+        <a href="<?php echo $bburl; ?>/conquista-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+      </div>
+      <div class="zs-card">
+        <div class="zs-card-h"><span class="t">Barcos</span><span class="c">A.3</span></div>
+        <p class="zs-card-d">Flota por jugador, daños (18.7) y módulos del astillero (18.6).</p>
+        <a href="<?php echo $bburl; ?>/barcos-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
       </div>
     </div>
-  </section>
-  <section class="reveal">
-    <div class="plate">
-      <div class="plate-h"><span class="t">Calendario del foro</span><span class="c">// A.3 · fecha on-roll, presentes y coherencia</span></div>
-      <div class="plate-b">
-        <p class="zs-intro">Fecha on-roll actual con su histórico de avances, presentes activos con su ancla y jugadores congelados, histórico de aperturas/cierres y avisos de pasados incoherentes.</p>
-        <a href="<?php echo $bburl; ?>/calendario-staff.php" class="btn btn-ghost">Abrir panel</a>
-      </div>
-    </div>
-    <div class="plate">
-      <div class="plate-h"><span class="t">Progresión</span><span class="c">// A.3 · cronómetros, subidas, gastos de PP, saldos y reservas</span></div>
-      <div class="plate-b">
-        <p class="zs-intro">Cronómetros de entrenamiento por jugador, saldos y reservas con progreso de nivel, gastos de PP por concepto (atributos, dominios, técnicas — libro <code>historico_pp</code>) e histórico reciente de movimientos.</p>
-        <a href="<?php echo $bburl; ?>/progresion-staff.php" class="btn btn-ghost">Abrir panel</a>
-      </div>
-    </div>
-    <div class="plate">
-      <div class="plate-h"><span class="t">Mundo Vivo</span><span class="c">// A.3 · ronda mensual, cola de análisis y matriz de islas</span></div>
-      <div class="plate-b">
-        <p class="zs-intro">Ronda actual con su estado (abierta/análisis/cerrada), los temas presentes en la cola de análisis, y la matriz de las 17 islas con su ficha viva (peligrosidad, control, defensa, desarrollo, clima). La skill-mundo-vivo propone; aquí firmas antes de aplicar.</p>
-        <a href="<?php echo $bburl; ?>/mundo-vivo.php" class="btn btn-ghost">Abrir panel</a>
-      </div>
-    </div>
-    <div class="plate">
-      <div class="plate-h"><span class="t">Navegación</span><span class="c">// A.3 · travesías activas, oráculos, vencimientos e histórico</span></div>
-      <div class="plate-b">
-        <p class="zs-intro">Travesías en curso por jugador con su ruta, plazo real y vencimiento, oráculos por tema, víveres pendientes al cierre y el histórico de resueltas/vencidas. La ficha del trámite 38 se edita y firma en la bandeja (skill-navegacion).</p>
-        <a href="<?php echo $bburl; ?>/navegacion-staff.php" class="btn btn-ghost">Abrir panel</a>
-      </div>
-    </div>
-    <div class="plate">
-      <div class="plate-h"><span class="t">Facciones</span><span class="c">// A.3 · rangos y cupos, ascensos, élite e histórico</span></div>
-      <div class="plate-b">
-        <p class="zs-intro">Tablero de rangos y cupos por facción (cúspide con cupo), ascensos en cola del trámite 20 (la skill propone el termómetro, aquí firmas), subfacciones de élite (Shichibukai 7) e histórico inmutable de cambios, deserciones e infiltraciones.</p>
-        <a href="<?php echo $bburl; ?>/facciones-staff.php" class="btn btn-ghost">Abrir panel</a>
-      </div>
-    </div>
-    <div class="plate">
-      <div class="plate-h"><span class="t">Conquista</span><span class="c">// A.3 · fases, ejércitos y registro con motivo</span></div>
-      <div class="plate-b">
-        <p class="zs-intro">Conquistas activas por isla con sus fases (anuncio → asedio → resolución → registro → ocupación), rondas requeridas según la fuerza defensiva (16.3), ejércitos del asedio (unidades/hordas, 16.7) e histórico de resueltas con motivo. Al registrar una conquista, las tiendas del anterior dueño se suspenden (16.6).</p>
-        <a href="<?php echo $bburl; ?>/conquista-staff.php" class="btn btn-ghost">Abrir panel</a>
-      </div>
-    </div>
-    <div class="plate">
-      <div class="plate-h"><span class="t">Barcos</span><span class="c">// A.3 · flota, daños y astillero</span></div>
-      <div class="plate-b">
-        <p class="zs-intro">Flota por jugador con su ficha (tipo, nivel, madera, casco, módulos), estados de daño (18.7) y el catálogo de módulos del astillero (18.6). El barco no tiene PA propio ni progreso: las mejoras son módulos y madera, y la madera del casco marca el límite de mar (18.5).</p>
-        <a href="<?php echo $bburl; ?>/barcos-staff.php" class="btn btn-ghost">Abrir panel</a>
-      </div>
-    </div>
-  </section>
-  <!-- Agregar cards aquí -->
+    <!-- Agregar cards aquí -->
 <?php endif; ?>
 </div>
 <?php include __DIR__ . '/inc/footer_custom.php'; ?>

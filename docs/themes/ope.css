@@ -9300,3 +9300,83 @@ body.ope-pg-barcos-staff .zs-tab th{text-align:left;font-family:var(--mono);font
 body.ope-pg-barcos-staff .zs-tab td{padding:6px 8px;border-bottom:1px solid var(--ope-line-soft);color:var(--ope-ink-soft);vertical-align:top}
 body.ope-pg-barcos-staff .zs-tab td b{color:var(--ope-ink)}
 body.ope-pg-barcos-staff .pj-empty{font-family:var(--mono);font-size:.72rem;color:var(--ope-ink-dim);padding:8px 2px;margin:0}
+
+/* ---- Hub de ventanillas del jugador (tramites.php) ---- */
+body.ope-pg-tramites .tram-filtros{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+body.ope-pg-tramites .tram-chip[aria-pressed="true"]{background:var(--ember);color:#160f06;border-color:var(--ember-hi)}
+body.ope-pg-tramites .tram-grupo{margin:0 0 20px;padding-top:14px;border-top:1px solid var(--ope-line-soft)}
+body.ope-pg-tramites .tram-grupo-h{display:flex;align-items:baseline;gap:10px}
+body.ope-pg-tramites .tram-grupo-h .t{font-family:var(--ope-disp);font-weight:700;font-size:1.05rem;color:var(--ope-gold-deep)}
+body.ope-pg-tramites .tram-grupo-h .c{font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ope-ink-dim)}
+body.ope-pg-tramites .tram-grupo-desc{font-size:.82rem;color:var(--ope-ink-soft);margin:4px 0 12px;line-height:1.5}
+body.ope-pg-tramites .tram-hub-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+body.ope-pg-tramites .tram-card{border:1px solid var(--ope-line-soft);background:var(--ope-card-2);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s,transform .15s,box-shadow .15s}
+body.ope-pg-tramites .tram-card:hover{border-color:var(--ope-gold);transform:translateY(-1px);box-shadow:var(--ope-shadow-sm)}
+body.ope-pg-tramites .tram-card-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+body.ope-pg-tramites .tram-card-n{font-family:var(--ope-disp);font-weight:700;font-size:.95rem;color:var(--ope-ink);line-height:1.2}
+body.ope-pg-tramites .tram-card-d{font-size:.76rem;color:var(--ope-ink-soft);line-height:1.45;flex:1}
+body.ope-pg-tramites .tram-card-meta{font-family:var(--mono);font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--ope-ink-dim);border-top:1px solid var(--ope-line-soft);padding-top:7px}
+body.ope-pg-tramites .tram-pager{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:14px}
+body.ope-pg-tramites .tram-pager-n{font-family:var(--mono);font-size:.7rem;font-weight:700;min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--ope-line);border-radius:8px;color:var(--ope-ink-soft);background:var(--ope-card-2);text-decoration:none;transition:all .14s}
+body.ope-pg-tramites .tram-pager-n:hover{border-color:var(--ope-gold);color:var(--ope-gold-deep)}
+body.ope-pg-tramites .tram-pager-cur{font-family:var(--mono);font-size:.7rem;font-weight:700;min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--ember);border-radius:8px;background:var(--ember);color:#160f06}
+body.ope-pg-bandeja .tram-pager{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:14px}
+body.ope-pg-bandeja .tram-pager-n{font-family:var(--mono);font-size:.7rem;font-weight:700;min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--ope-line);border-radius:8px;color:var(--ope-ink-soft);background:var(--ope-card-2);text-decoration:none;transition:all .14s}
+body.ope-pg-bandeja .tram-pager-n:hover{border-color:var(--ope-gold);color:var(--ope-gold-deep)}
+body.ope-pg-bandeja .tram-pager-cur{font-family:var(--mono);font-size:.7rem;font-weight:700;min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--ember);border-radius:8px;background:var(--ember);color:#160f06}
+
+/* ---- Zona Staff · grid de paneles ---- */
+body.ope-pg-zona-staff .zs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+body.ope-pg-zona-staff .zs-card{border:1px solid var(--ope-line);background:var(--ope-card);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--ope-shadow-sm);transition:border-color .15s,transform .15s,box-shadow .15s}
+body.ope-pg-zona-staff .zs-card:hover{border-color:var(--ope-gold);transform:translateY(-2px);box-shadow:var(--ope-shadow)}
+body.ope-pg-zona-staff .zs-card-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-bottom:1px solid var(--ope-line-soft);padding-bottom:8px}
+body.ope-pg-zona-staff .zs-card-h .t{font-family:var(--ope-disp);font-weight:700;font-size:1rem;color:var(--ope-gold-deep)}
+body.ope-pg-zona-staff .zs-card-h .c{font-family:var(--mono);font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ope-ink-dim)}
+body.ope-pg-zona-staff .zs-card-d{font-size:.82rem;color:var(--ope-ink-soft);line-height:1.5;flex:1;margin:0}
+
+/* ---- Wizard · narrativa y progreso ---- */
+body.ope-pg-crear-personaje .wiz-sub:first-of-type{margin-top:4px}
+@media(max-width:1180px){body.ope-pg-crear-personaje .wiz-progress{flex-wrap:wrap;overflow-x:visible}}
+
+/* ---- Páginas de trámite (tramite-NN.php · scope ope-pg-tramite) ---- */
+body.ope-pg-tramite .shead{display:flex;align-items:baseline;gap:14px;margin:8px 0 18px}
+body.ope-pg-tramite .shead h1{font-family:var(--ope-disp);font-weight:700;font-size:1.7rem;color:var(--ope-ink);line-height:1;margin:0}
+body.ope-pg-tramite .shead .code{font-family:var(--mono);font-size:.66rem;font-weight:700;color:var(--ope-gold-deep);letter-spacing:1px;text-transform:uppercase}
+body.ope-pg-tramite .shead .rule{flex:1;height:1px;background:var(--ope-line-soft)}
+body.ope-pg-tramite .plate{border:1px solid var(--ope-line);background:var(--ope-card);margin-bottom:12px;border-radius:14px;box-shadow:var(--ope-shadow-sm);overflow:hidden}
+body.ope-pg-tramite .plate-h{background:linear-gradient(120deg,var(--ope-wash),var(--ope-card));padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--ope-line-soft)}
+body.ope-pg-tramite .plate-h .t{font-family:var(--ope-disp);font-weight:700;font-size:1rem;color:var(--ope-gold-deep)}
+body.ope-pg-tramite .plate-h .c{font-family:var(--mono);font-size:.56rem;font-weight:700;text-transform:uppercase;color:var(--ope-ink-dim)}
+body.ope-pg-tramite .plate-b{padding:16px}
+body.ope-pg-tramite .flash{border:1px solid var(--ope-line);padding:11px 14px;margin-bottom:16px;border-radius:10px;font-size:.88rem}
+body.ope-pg-tramite .flash.ok{background:color-mix(in srgb,var(--ope-eter) 16%,var(--ope-card));border-color:color-mix(in srgb,var(--ope-eter) 40%,var(--ope-line))}
+body.ope-pg-tramite .flash.warn{background:color-mix(in srgb,var(--ope-gold) 14%,var(--ope-card));border-color:color-mix(in srgb,var(--ope-gold) 45%,var(--ope-line))}
+body.ope-pg-tramite .tp-nota{font-size:.9rem;color:var(--ope-ink-soft);line-height:1.55;margin:0 0 6px;padding:10px 12px;background:var(--ope-wash);border:1px solid var(--ope-line-soft);border-radius:10px}
+body.ope-pg-tramite .tp-nota b{color:var(--ope-gold-deep)}
+body.ope-pg-tramite .tp-efecto{font-family:var(--mono);font-size:.68rem;color:var(--ope-ink-dim);margin:0 0 16px}
+body.ope-pg-tramite .tp-form{display:flex;flex-direction:column;gap:14px}
+body.ope-pg-tramite .field label.flabel{display:block;font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ope-ink-dim);margin-bottom:6px}
+body.ope-pg-tramite .tp-req{color:var(--ember-hi)}
+body.ope-pg-tramite .fl-hint{display:block;font-size:.72rem;color:var(--ope-ink-soft);margin-top:5px;line-height:1.45}
+body.ope-pg-tramite .fl-hint b{color:var(--ope-gold-deep)}
+body.ope-pg-tramite .field input[type=text],
+body.ope-pg-tramite .field input[type=number],
+body.ope-pg-tramite .field select,
+body.ope-pg-tramite .field textarea{width:100%;background:var(--ope-card-2);border:1px solid var(--ope-line);color:var(--ope-ink);font-family:var(--ope-body);font-size:.92rem;padding:10px 12px;border-radius:8px;transition:border-color .15s,box-shadow .15s}
+body.ope-pg-tramite .field input:focus,
+body.ope-pg-tramite .field select:focus,
+body.ope-pg-tramite .field textarea:focus{outline:none;border-color:var(--ope-gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--ope-gold) 22%,transparent)}
+body.ope-pg-tramite .field textarea{resize:vertical;min-height:96px;line-height:1.55}
+body.ope-pg-tramite .tp-area{min-height:130px}
+body.ope-pg-tramite .tp-num{max-width:120px}
+body.ope-pg-tramite .tp-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px}
+body.ope-pg-tramite .btn{font-family:var(--ope-mark);font-size:.84rem;font-weight:500;text-transform:none;letter-spacing:0;padding:10px 20px;border:1px solid var(--ope-line);border-radius:8px;cursor:pointer;transition:all .18s;display:inline-block;box-shadow:var(--ope-shadow-sm);text-decoration:none}
+body.ope-pg-tramite .btn-hot{background:var(--ember);color:var(--iron)}
+body.ope-pg-tramite .btn-hot:hover{background:var(--ember-hi);transform:translateY(-1px);box-shadow:var(--ope-shadow)}
+body.ope-pg-tramite .btn-ghost{background:transparent;color:var(--paper);border-color:var(--rivet)}
+body.ope-pg-tramite .btn-ghost:hover{color:var(--ope-gold-deep);background:var(--ope-card);border-color:var(--ope-gold);transform:translateY(-1px)}
+
+/* Hub: tarjetas enlazadas y solo-staff */
+body.ope-pg-tramites a.tram-card{text-decoration:none;color:inherit}
+body.ope-pg-tramites .tram-card-staff{border-style:dashed;opacity:.72;cursor:not-allowed}
+body.ope-pg-tramites .tram-card-staff:hover{border-color:var(--ope-line-soft);transform:none;box-shadow:none}

@@ -56,7 +56,7 @@ header('Content-Type: text/html; charset=utf-8');
 </div></div>
 <div class="wrap">
   <?php echo $flash; ?>
-  <?php echo ope7_tramites_jugador_html($uid); ?>
+  <?php echo ope7_tramites_jugador_html($uid, (int) $mybb->get_input('p', 1)); ?>
 </div>
 <?php include __DIR__ . '/inc/footer_custom.php'; ?>
 <script>
