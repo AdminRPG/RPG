@@ -92,7 +92,7 @@ function ope_system_create_thread($fid, $subject, $message, $tag = '')
     $thread_info = $dh->insert_thread();
     $tid = isset($thread_info['tid']) ? (int) $thread_info['tid'] : 0;
     if ($tid > 0) {
-        if ($db->table_exists('rol_thread_meta')) {
+        if ($db->table_exists('ope_thread_meta')) {
             ope_rol_store_thread_meta($tid, (int) $fid, 'presente', 0, $tag);
         }
     }
@@ -188,11 +188,11 @@ function ope_pp_saldo($pid)
     $pid = (int) $pid;
     if ($pid < 1) return array('pp_total' => 0, 'pp_gastado' => 0, 'pp_disponible' => 0);
 
-    if (!$db->table_exists('rol_pp_saldo')) {
+    if (!$db->table_exists('ope_pp_saldo')) {
         return array('pp_total' => 0, 'pp_gastado' => 0, 'pp_disponible' => 0);
     }
 
-    $q = $db->simple_select('rol_pp_saldo', '*', "pid = {$pid}", array('limit' => 1));
+    $q = $db->simple_select('ope_pp_saldo', '*', "pid = {$pid}", array('limit' => 1));
     if ($db->num_rows($q)) {
         $row = $db->fetch_array($q);
         return array(
@@ -203,7 +203,7 @@ function ope_pp_saldo($pid)
     }
 
     // Crear fila
-    $db->insert_query('rol_pp_saldo', array(
+    $db->insert_query('ope_pp_saldo', array(
         'pid'           => $pid,
         'pp_total'      => 0,
         'pp_gastado'    => 0,
@@ -230,10 +230,10 @@ function ope_pp_add($pid, $pp, $tipo = 'post', $tid = 0, $post_pid = 0, $palabra
     $pid  = (int) $pid;
     $pp   = (int) $pp;
     if ($pid < 1 || $pp < 1) return false;
-    if (!$db->table_exists('rol_pp_log') || !$db->table_exists('rol_pp_saldo')) return false;
+    if (!$db->table_exists('ope_pp_log') || !$db->table_exists('ope_pp_saldo')) return false;
 
     // Insertar log
-    $db->insert_query('rol_pp_log', array(
+    $db->insert_query('ope_pp_log', array(
         'pid'       => $pid,
         'tid'       => (int) $tid,
         'post_pid'  => (int) $post_pid,
@@ -249,7 +249,7 @@ function ope_pp_add($pid, $pp, $tipo = 'post', $tid = 0, $post_pid = 0, $palabra
     $saldo = ope_pp_saldo($pid);
     $nuevo_total = $saldo['pp_total'] + $pp;
     $nuevo_disp  = $saldo['pp_disponible'] + $pp;
-    $db->update_query('rol_pp_saldo', array(
+    $db->update_query('ope_pp_saldo', array(
         'pp_total'      => $nuevo_total,
         'pp_disponible' => $nuevo_disp,
         'last_update'   => TIME_NOW,
@@ -268,13 +268,13 @@ function ope_pp_spend($pid, $cost, $tipo = 'gasto_stat', $notas = '')
     $pid  = (int) $pid;
     $cost = (int) $cost;
     if ($pid < 1 || $cost < 1) return false;
-    if (!$db->table_exists('rol_pp_log') || !$db->table_exists('rol_pp_saldo')) return false;
+    if (!$db->table_exists('ope_pp_log') || !$db->table_exists('ope_pp_saldo')) return false;
 
     $saldo = ope_pp_saldo($pid);
     if ($saldo['pp_disponible'] < $cost) return false;
 
     // Insertar log (negativo)
-    $db->insert_query('rol_pp_log', array(
+    $db->insert_query('ope_pp_log', array(
         'pid'       => $pid,
         'tid'       => 0,
         'post_pid'  => 0,
@@ -289,7 +289,7 @@ function ope_pp_spend($pid, $cost, $tipo = 'gasto_stat', $notas = '')
     // Actualizar saldo
     $nuevo_gastado = $saldo['pp_gastado'] + $cost;
     $nuevo_disp    = $saldo['pp_disponible'] - $cost;
-    $db->update_query('rol_pp_saldo', array(
+    $db->update_query('ope_pp_saldo', array(
         'pp_gastado'    => $nuevo_gastado,
         'pp_disponible' => $nuevo_disp,
         'last_update'   => TIME_NOW,
@@ -306,7 +306,7 @@ function ope_pp_on_post(&$dh)
 {
     global $db;
 
-    if (!$db->table_exists('rol_pp_log') || !$db->table_exists('rol_pp_saldo')) {
+    if (!$db->table_exists('ope_pp_log') || !$db->table_exists('ope_pp_saldo')) {
         return $dh;
     }
 
@@ -340,7 +340,7 @@ function ope_pp_on_post(&$dh)
     }
 
     // Idempotente: no duplicar PP para el mismo post
-    $exists = $db->simple_select('rol_pp_log', 'log_id', "post_pid = {$post_pid} AND tipo = 'post'", array('limit' => 1));
+    $exists = $db->simple_select('ope_pp_log', 'log_id', "post_pid = {$post_pid} AND tipo = 'post'", array('limit' => 1));
     if ($db->num_rows($exists)) return $dh;
 
     // Contar palabras del mensaje

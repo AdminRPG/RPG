@@ -16,33 +16,33 @@ $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
 // Las alertas son POR PERSONAJE: se muestran las del personaje activo.
 $activePid = (int)($mybb->user['ope_active_pid'] ?? 0);
-if ($activePid <= 0 && $loggedin && $db->table_exists('rol_personajes')) {
-    $aq0 = $db->simple_select('rol_personajes', 'pid', "uid = {$uid} AND activo = 1", array('limit' => 1));
-    if ($db->num_rows($aq0)) $activePid = (int)$db->fetch_field($aq0, 'pid');
+if ($activePid <= 0 && $loggedin) {
+    $act = function_exists('ope7_pj_activo') ? ope7_pj_activo($uid) : null;
+    if ($act && (int) $act['id'] > 0) $activePid = (int) $act['id'];
 }
 
 // POST: marcar leídas / borrar (siempre acotado al personaje activo)
-if ($loggedin && $activePid > 0 && $mybb->request_method === 'post' && verify_post_check($mybb->get_input('my_post_key'), true) && $db->table_exists('rol_alertas')) {
+if ($loggedin && $activePid > 0 && $mybb->request_method === 'post' && verify_post_check($mybb->get_input('my_post_key'), true) && $db->table_exists('ope_alertas')) {
     // Marcar como leídas
     if ($mybb->get_input('mark_all')) {
-        $db->update_query('rol_alertas', array('leido' => 1), "pid = {$activePid}");
+        $db->update_query('ope_alertas', array('leido' => 1), "pid = {$activePid}");
     }
     if (($aid = (int)$mybb->get_input('mark_one', MyBB::INPUT_INT)) > 0) {
-        $db->update_query('rol_alertas', array('leido' => 1), "aid = {$aid} AND pid = {$activePid}");
+        $db->update_query('ope_alertas', array('leido' => 1), "aid = {$aid} AND pid = {$activePid}");
     }
     // Borrar
     if ($mybb->get_input('delete_all')) {
-        $db->delete_query('rol_alertas', "pid = {$activePid}");
+        $db->delete_query('ope_alertas', "pid = {$activePid}");
     }
     if (($del = (int)$mybb->get_input('delete_one', MyBB::INPUT_INT)) > 0) {
-        $db->delete_query('rol_alertas', "aid = {$del} AND pid = {$activePid}");
+        $db->delete_query('ope_alertas', "aid = {$del} AND pid = {$activePid}");
     }
     if ($mybb->get_input('delete_sel')) {
         $sel = (array)$mybb->get_input('sel', MyBB::INPUT_ARRAY);
         $ids = array();
         foreach ($sel as $s) { $s = (int)$s; if ($s > 0) $ids[] = $s; }
         if (!empty($ids)) {
-            $db->delete_query('rol_alertas', "pid = {$activePid} AND aid IN (".implode(',', $ids).")");
+            $db->delete_query('ope_alertas', "pid = {$activePid} AND aid IN (".implode(',', $ids).")");
         }
     }
     // PRG: evita reenvíos al recargar
@@ -52,8 +52,8 @@ if ($loggedin && $activePid > 0 && $mybb->request_method === 'post' && verify_po
 
 // Cargar alertas del personaje activo
 $alertas = array();
-if ($loggedin && $activePid > 0 && $db->table_exists('rol_alertas')) {
-    $aq = $db->simple_select('rol_alertas', '*', "pid = {$activePid}", array('order_by' => 'dateline', 'order_dir' => 'DESC', 'limit' => 50));
+if ($loggedin && $activePid > 0 && $db->table_exists('ope_alertas')) {
+    $aq = $db->simple_select('ope_alertas', '*', "pid = {$activePid}", array('order_by' => 'dateline', 'order_dir' => 'DESC', 'limit' => 50));
     while ($row = $db->fetch_array($aq)) $alertas[] = $row;
 }
 

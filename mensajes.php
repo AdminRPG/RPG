@@ -15,10 +15,10 @@ $uid       = (int)($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 $activePid = (int)($mybb->user['ope_active_pid'] ?? 0);
 
-// Fallback: buscar personaje activo
-if ($activePid <= 0 && $loggedin && $db->table_exists('rol_personajes')) {
-    $aq = $db->simple_select('rol_personajes', 'pid', "uid = {$uid} AND activo = 1", array('limit' => 1));
-    if ($db->num_rows($aq)) $activePid = (int)$db->fetch_field($aq, 'pid');
+// Fallback: buscar personaje activo (canónico ope_cuentas)
+if ($activePid <= 0 && $loggedin) {
+    $act = function_exists('ope7_pj_activo') ? ope7_pj_activo($uid) : null;
+    if ($act && (int) $act['id'] > 0) $activePid = (int) $act['id'];
 }
 
 $staff_level = 0;
@@ -28,7 +28,7 @@ if ($loggedin && isset($mybb->user['ope_staff_level'])) {
 
 // POST: enviar mensaje
 $flash = ''; $flash_kind = 'ok';
-if ($loggedin && $activePid > 0 && $mybb->request_method === 'post' && $db->table_exists('rol_mensajes')) {
+if ($loggedin && $activePid > 0 && $mybb->request_method === 'post' && $db->table_exists('ope_mensajes')) {
     if (!verify_post_check($mybb->get_input('my_post_key'), true)) {
         $flash = 'Sesión caducada.'; $flash_kind = 'warn';
     } else {
@@ -41,7 +41,7 @@ if ($loggedin && $activePid > 0 && $mybb->request_method === 'post' && $db->tabl
             $flash = 'Faltan campos obligatorios.'; $flash_kind = 'warn';
         } else {
             if ($thread_id <= 0) $thread_id = (int)(microtime(true) * 10000);
-            $db->insert_query('rol_mensajes', array(
+            $db->insert_query('ope_mensajes', array(
                 'thread_id' => $thread_id,
                 'origen_pid' => $activePid,
                 'destino_pid' => $destino_pid,
@@ -51,10 +51,10 @@ if ($loggedin && $activePid > 0 && $mybb->request_method === 'post' && $db->tabl
                 'dateline' => TIME_NOW
             ));
             // Alerta para el destinatario
-            if ($db->table_exists('rol_alertas')) {
-                $du = $db->simple_select('rol_personajes', 'uid', "pid = {$destino_pid}", array('limit' => 1));
+            if ($db->table_exists('ope_alertas')) {
+                $du = $db->simple_select('ope_personajes', 'uid', "id = {$destino_pid}", array('limit' => 1));
                 $dest_uid = (int)$db->fetch_field($du, 'uid');
-                $db->insert_query('rol_alertas', array(
+                $db->insert_query('ope_alertas', array(
                     'pid' => $destino_pid, 'uid' => $dest_uid,
                     'tipo' => 'mensaje_nuevo',
                     'titulo' => 'Nuevo mensaje',
@@ -70,26 +70,26 @@ if ($loggedin && $activePid > 0 && $mybb->request_method === 'post' && $db->tabl
 
 // Marcar hilo como leído
 $thread_open = (int)($mybb->get_input('t', MyBB::INPUT_INT));
-if ($thread_open > 0 && $activePid > 0 && $db->table_exists('rol_mensajes')) {
-    $db->update_query('rol_mensajes', array('leido' => 1), "thread_id = {$thread_open} AND destino_pid = {$activePid}");
+if ($thread_open > 0 && $activePid > 0 && $db->table_exists('ope_mensajes')) {
+    $db->update_query('ope_mensajes', array('leido' => 1), "thread_id = {$thread_open} AND destino_pid = {$activePid}");
 }
 
 // Cargar hilos (conversaciones)
 $hilos = array();
-if ($activePid > 0 && $db->table_exists('rol_mensajes')) {
+if ($activePid > 0 && $db->table_exists('ope_mensajes')) {
     // Último mensaje de cada hilo (self-join al MAX(dateline) por thread_id;
     // compatible con ONLY_FULL_GROUP_BY de MySQL 8 — no seleccionar columnas
     // sin agregar junto a un GROUP BY).
     $hq = $db->query("
         SELECT m.*, 
                CASE WHEN m.origen_pid = {$activePid} THEN m.destino_pid ELSE m.origen_pid END as otro_pid,
-               (SELECT nombre FROM " . TABLE_PREFIX . "rol_personajes WHERE pid = CASE WHEN m.origen_pid = {$activePid} THEN m.destino_pid ELSE m.origen_pid END LIMIT 1) as otro_nombre,
-               (SELECT icono FROM " . TABLE_PREFIX . "rol_personajes WHERE pid = CASE WHEN m.origen_pid = {$activePid} THEN m.destino_pid ELSE m.origen_pid END LIMIT 1) as otro_icono,
-               (SELECT COUNT(*) FROM " . TABLE_PREFIX . "rol_mensajes WHERE thread_id = m.thread_id AND destino_pid = {$activePid} AND leido = 0) as no_leidos
-        FROM " . TABLE_PREFIX . "rol_mensajes m
+               (SELECT nombre FROM " . TABLE_PREFIX . "ope_personajes WHERE id = CASE WHEN m.origen_pid = {$activePid} THEN m.destino_pid ELSE m.origen_pid END LIMIT 1) as otro_nombre,
+               (SELECT icono FROM " . TABLE_PREFIX . "ope_personajes WHERE id = CASE WHEN m.origen_pid = {$activePid} THEN m.destino_pid ELSE m.origen_pid END LIMIT 1) as otro_icono,
+               (SELECT COUNT(*) FROM " . TABLE_PREFIX . "ope_mensajes WHERE thread_id = m.thread_id AND destino_pid = {$activePid} AND leido = 0) as no_leidos
+        FROM " . TABLE_PREFIX . "ope_mensajes m
         INNER JOIN (
             SELECT thread_id, MAX(dateline) AS max_dl
-            FROM " . TABLE_PREFIX . "rol_mensajes
+            FROM " . TABLE_PREFIX . "ope_mensajes
             WHERE origen_pid = {$activePid} OR destino_pid = {$activePid}
             GROUP BY thread_id
         ) latest ON latest.thread_id = m.thread_id AND latest.max_dl = m.dateline
@@ -101,11 +101,11 @@ if ($activePid > 0 && $db->table_exists('rol_mensajes')) {
 
 // Cargar mensajes del hilo abierto
 $mensajes_hilo = array();
-if ($thread_open > 0 && $db->table_exists('rol_mensajes')) {
+if ($thread_open > 0 && $db->table_exists('ope_mensajes')) {
     $mq = $db->query("
         SELECT m.*, 
-               (SELECT nombre FROM " . TABLE_PREFIX . "rol_personajes WHERE pid = m.origen_pid LIMIT 1) as origen_nombre
-        FROM " . TABLE_PREFIX . "rol_mensajes m
+               (SELECT nombre FROM " . TABLE_PREFIX . "ope_personajes WHERE id = m.origen_pid LIMIT 1) as origen_nombre
+        FROM " . TABLE_PREFIX . "ope_mensajes m
         WHERE m.thread_id = {$thread_open} AND (m.origen_pid = {$activePid} OR m.destino_pid = {$activePid})
         ORDER BY m.dateline ASC
     ");
@@ -114,9 +114,9 @@ if ($thread_open > 0 && $db->table_exists('rol_mensajes')) {
 
 // Lista de personajes para enviar nuevo mensaje (solo aprobados)
 $personajes_destino = array();
-if ($activePid > 0 && $db->table_exists('rol_personajes')) {
-    $dq = $db->simple_select('rol_personajes', 'pid, nombre', "pid != {$activePid} AND estado = 'aprobado'", array('order_by' => 'nombre'));
-    while ($row = $db->fetch_array($dq)) $personajes_destino[] = $row;
+if ($activePid > 0 && $db->table_exists('ope_personajes')) {
+    $dq = $db->simple_select('ope_personajes', 'id, nombre', "id != {$activePid} AND estado = 'aprobado' AND es_NPC = 0", array('order_by' => 'nombre'));
+    while ($row = $db->fetch_array($dq)) $personajes_destino[] = array('pid' => (int) $row['id'], 'nombre' => $row['nombre']);
 }
 
 $initials = '';

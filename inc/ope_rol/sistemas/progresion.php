@@ -193,27 +193,82 @@ function ope7_pj_colocar_reserva($pid, array $distribucion)
 }
 
 /**
+ * Registra la ejecución de un cron en `cron_log` (F6.5, panel «Progresión»).
+ * Ejecuta $fn, captura su retorno (un int de acciones o un array) y guarda
+ * cuándo corrió y cuánto automatizó. Idempotente: solo inserta/actualiza la
+ * fila del cron. Devuelve el valor que devolvió $fn.
+ */
+function ope7_cron_tick($cron, $etiqueta = '')
+{
+    global $db;
+    $acciones = 0;
+    $detalle = '';
+    if (is_callable($cron)) {
+        $res = $cron();
+        if (is_array($res)) {
+            $acciones = (int) ($res['acciones'] ?? 0);
+            if (empty($acciones) && isset($res['propuestas'], $res['aplicadas'])) {
+                $acciones = (int) $res['propuestas'] + (int) $res['aplicadas'];
+            }
+            $detalle = trim(implode(' · ', array_map(function ($v, $k) {
+                return (string) $k . '=' . (is_scalar($v) ? $v : 'n');
+            }, $res, array_keys($res))));
+        } elseif (is_scalar($res)) {
+            $acciones = (int) $res;
+            $detalle = $acciones > 0 ? ($etiqueta !== '' ? $etiqueta . ': ' : '') . $acciones . ' acción/es' : '';
+        }
+    }
+    if (ope7_tabla_existe('cron_log')) {
+        $existe = $db->simple_select(ope7_tabla('cron_log'), 'cron', "cron = '" . $db->escape_string((string) $etiqueta) . "'", array('limit' => 1));
+        $nombre = $etiqueta !== '' ? $etiqueta : (is_string($cron) ? $cron : 'cron');
+        if ($db->num_rows($existe)) {
+            $db->update_query(ope7_tabla('cron_log'), array(
+                'ultima_run' => TIME_NOW,
+                'acciones'   => $acciones,
+                'detalle'    => $db->escape_string((string) $detalle),
+            ), "cron = '" . $db->escape_string((string) $nombre) . "'");
+        } else {
+            $db->insert_query(ope7_tabla('cron_log'), array(
+                'cron'       => $nombre,
+                'ultima_run' => TIME_NOW,
+                'acciones'   => $acciones,
+                'detalle'    => $db->escape_string((string) $detalle),
+            ));
+        }
+    }
+    return $acciones;
+}
+
+/**
  * Cron perezoso de progresión (hook global_start): avanza el calendario y
  * finaliza entrenamientos vencidos. Idempotente y barato (una lectura + 0-1
- * escrituras por día real).
+ * escrituras por día real). F6.5: cada subcron queda registrado en cron_log
+ * para que el panel «Progresión» muestre qué automatizó (última ejecución,
+ * acciones y pendientes detectados).
  */
 function ope7_progresion_cron()
 {
-    ope7_calendario_avanzar();
-    ope7_pj_finalizar_entrenamientos();
-    ope7_pj_finalizar_dominios();
+    ope7_cron_tick(function () { ope7_calendario_avanzar(); return 0; }, 'Calendario');
+    ope7_cron_tick('ope7_pj_finalizar_entrenamientos', 'Entrenamientos');
+    ope7_cron_tick('ope7_pj_finalizar_dominios', 'Dominios');
     // F4.3: travesías cuyo plazo (17.5) se agotó sin cierre → vencidas.
-    if (function_exists('ope7_travesias_vencidas')) {
-        ope7_travesias_vencidas();
-    }
-    // F4.3: conquista — mantenimientos de unidades (16.7: sin pago se van) y
-    // abandono (16.5: 2 rondas sin actividad → revuelta, 3.ª se aplica).
+    ope7_cron_tick('ope7_travesias_vencidas', 'Travesías vencidas');
+    // F4.3: conquista — mantenimientos de unidades y abandono de asedios.
     if (function_exists('ope7_conquista_mantenimientos')) {
-        ope7_conquista_mantenimientos();
+        ope7_cron_tick('ope7_conquista_mantenimientos', 'Conquista · mantenimientos');
     }
     if (function_exists('ope7_conquista_abandonos')) {
-        ope7_conquista_abandonos();
+        ope7_cron_tick('ope7_conquista_abandonos', 'Conquista · abandonos');
     }
+    // F5.1 (20.1): despertar automático de Armadura/Mantra a nv10.
+    ope7_cron_tick('ope7_haki_auto_despertar_cron', 'Haki · auto-despertar');
+    ope7_cron_tick('ope7_misiones_ronda_cerrar', 'Misiones vencidas');
+    // F5.3 (22.9): tripulaciones con <2 activos → aviso/disolución.
+    ope7_cron_tick('ope7_tripulaciones_ronda_cerrar', 'Tripulaciones');
+    // F5.4 (23.3): mantenimiento de implantes → averiados sin saldo.
+    ope7_cron_tick('ope7_implantes_ronda_mantenimiento', 'Implantes · mantenimiento');
+    // F6 (14.6): caducidad de paraderos de carteles.
+    ope7_cron_tick('ope7_bajomundo_cron', 'Bajo mundo · paraderos');
 }
 
 /**

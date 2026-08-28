@@ -35,7 +35,7 @@
 | 22 | Trámites: catálogo y prompts | ✅ disponible |
 | 23 | Sistemas opcionales: cibernética y familias legendarias | ✅ disponible |
 | — | Anexo A: capa de implementación técnica (MyBB) | ✅ completo |
-| — | Anexo B: catálogo de skills de IA | ✅ disponible (resumen) |
+| — | Anexo B: catálogo de skills de IA | ✅ completo (8 skills implementadas) |
 
 ---
 
@@ -1628,7 +1628,7 @@ Al crear o validar una misión, verifica los **6 bloques** en orden:
 
 **Paneles:** «Narradores» (rol de foro, cupo de 2 simultáneas, historial) · «Misiones» (tablón CRUD con la ficha de 6 bloques y el campo de secretos **visible solo para staff/narradores**) · bandeja de trámites de auto-narrada (cap. 22).
 
-**Skill:** `skill-narracion-automatica` (§21.4) — con ella el catálogo de skills del Anexo B queda **completo** (7 skills).
+**Skill:** `skill-narracion-automatica` (§21.4) — con ella el catálogo de skills del Anexo B queda **completo** (8 skills, actualizado 2026-08-28 con la implementación real de todas).
 
 ## 21.6 Checklist operativo de las aventuras
 
@@ -1681,7 +1681,7 @@ Recibes, lanzas el análisis (o lo resuelves), editas, **firmas** y publicas. La
 | 16 | 5.9 | Cierre/reapertura de tienda | — | Jugador | ligero/firma | Ítems al almacén; suspensión hasta reabrir |
 | 17 | 5.9 | Reposición de stock | — | Jugador | ligero | Stock desde producción o almacén |
 | 18 | 5.9 | Boletín de precios | — | Staff | staff | Precios con banda de margen |
-| 19 | 5.11 | Reclutamiento de NPC | — | Jugador | firma | Uso de ficha existente; tripulante sin ficha de combate |
+| 19 | 5.11 | Reclutamiento de NPC | — | Jugador | ligero/firma | Marca «reclutado» en `npc_apariciones`; tripulante sin ficha de combate (efecto real F6.2) |
 | 20 | 5.12 | Ascenso de facción | `cierre-temas` (anexo) | Jugador/staff | IA + firma | Propuesta fama/termómetro/umbral; staff firma; sueldo y rango |
 | 21 | 5.12 | Concesión de subfacción élite | IA general | Staff | staff | Nombramiento con cupo y firma (ítem 139) |
 | 22 | 5.12 | Cambio de facción | — | Jugador | hito + firma | Transición narrada, equivalencia, `cambios_faccion` |
@@ -1696,9 +1696,9 @@ Recibes, lanzas el análisis (o lo resuelves), editas, **firmas** y publicas. La
 | 31 | 5.13 | Cobrar recompensa | IA general | Jugador | IA + firma | Entrega verificada + histórico |
 | 32 | 5.13 | Crear rumor falso (propaganda) | IA general | Jugador | IA | Veracidad *falsa*; fiabilidad del staff |
 | 33 | 5.13 | Ataque a una red | IA general | Jugador | IA | Veredicto sin dados |
-| 34 | 5.15 | Anuncio de conquista | IA general + matriz | Jugador | staff + firma | Público; invita al defensor; rumores y periódico |
+| 34 | 5.15 | Anuncio de conquista | IA general + matriz | Jugador | staff + firma | Público; invita al defensor; rumores y periódico (lo inicia el jugador, F6.2) |
 | 35 | 5.15 | Responder al asedio (defensor) | — | Jugador | firma | Defensa activa |
-| 36 | 5.15 | Resolver/registrar conquista | `mundo-vivo` + `cierre-temas` | Staff | staff | Veredicto; afiliación/fuerza defensiva con motivo |
+| 36 | 5.15 | Resolver/registrar conquista | `mundo-vivo` | Staff | staff | Veredicto; afiliación/fuerza defensiva con motivo |
 | 37 | 5.15 | Declarar reconquista | IA general | Jugador | staff + firma | Nueva disputa con las mismas fases |
 | 38 | 5.16 | Navegación (travesía) | `navegacion` | Jugador | IA | Ficha de travesía; abre el tema; cierre → víveres, daños, `ubicacion` |
 | 39 | 5.17 | Compra/adquisición de barco | — | Jugador | ligero/firma | Barco en flota; verificación tipo/nivel/madera |
@@ -1707,34 +1707,34 @@ Recibes, lanzas el análisis (o lo resuelves), editas, **firmas** y publicas. La
 | 42 | 5.17 | Módulos (instalar/quitar) | IA general (Carpintero) | Jugador | IA + firma | Ranuras y efectos; personalizados calibrados |
 | 43 | 5.17 | Reparación | IA general | Jugador | IA + firma | Grados de daño con oficio; `reparaciones` |
 | 44 | 5.17 | Venta/desguace/baja | — | Jugador | ligero/firma | Barco fuera de flota; hundimiento con veredicto |
-| 45 | 5.18 | Tirada de akuma aleatoria | — | Jugador | ligero (azar) | Pool por nivel, afinidad −10 % PE; anti-abuso nv7 |
-| 46 | 5.18 | Compra de fruta con PP | — | Jugador | ligero | Descuento matriz de especificidad; cupo mundial |
+| 45 | 5.18 | Tirada de akuma aleatoria | — | Jugador | ligero (azar) | Pool por nivel (nv3+/15+/30+), afinidad −10 % PE; anti-abuso nv7 — **100 % automático** (F5.1) |
+| 46 | 5.18 | Compra de fruta con PP | — | Jugador | ligero | Matriz 150/300/600/1.000/1.500 ×1/×2/×3; familia automática con descuento PP; concepto/concreta a bandeja (la propone el staff) |
 | 47 | 5.18 | Comer la fruta | — | Jugador | ligero | Asignación, defectos exigidos, dotes exclusivas |
 | 48 | 5.18 | Despertar | IA general (plantilla) | Jugador | IA + firma | Requisitos (nivel, antigüedad, temas, VOL); `despertares` |
-| 49 | 5.18 | Adaptación de fruta bajo demanda | `adaptacion-akumas` + guía | Staff | IA + firma | Ficha de 8 bloques desde nombre+concepto canon |
+| 49 | 5.18 | Adaptación de fruta bajo demanda | `adaptacion-akumas` + guía | Staff | staff + firma | Ficha de 8 bloques desde nombre+concepto canon (staff inicia; IA propone, staff firma) |
 | 50 | 5.19 | Tirada del Conquistador (nv5+ cada 10 niveles) | IA general (validación + hook) | Jugador | ligero (hook) | Valida nivel e `intentos`, aplica probabilidad 3→40 %, registra; si acierta: nivel 1 + suceso 5.14 |
 | 51 | 5.19 | Subida de nivel de Haki | IA general (verificación) | Jugador | IA + firma | Valida usos (1/tipo/tema) + PP (200/300/400/500) + VOL mínima (55/70/85/95); descuenta y postea en la hoja |
 | 52 | 5.20 | Solicitud de auto-narrada | `narracion-automatica` | Jugador | IA + firma | Elige misión de la ficha pública, confirma requisitos, paga la tasa del tablón (5.9); hook: valida ficha completa, oráculo del acto 1, prompt, tema presente + primera `mision_tramos`; el staff publica el tramo inicial |
 | 53 | 5.20 | Posteo de tramo (siguiente tramo de la ronda) | `narracion-automatica` | Jugador | IA + firma | Hook: recoge los posts de la ronda, lanza el siguiente oráculo si el acto lo pide, genera el prompt y marca el tramo pendiente de firma |
 | 54 | 5.20 | Apertura de misión (tablón) | IA general (ficha de 6 bloques) | Staff | staff | Publica la misión en el tablón con ficha completa (condiciones de victoria/fracaso explícitas + secretos solo-staff) |
-| 55 | 5.20 | Cierre de misión (veredicto + recompensas) | `narracion-automatica` + `cierre-temas` | Staff | staff | Verifica las condiciones del acto final, aplica recompensas (berries 5.9 · PP 5.6 · fama 5.12 · objetos 5.8) con motivo y alimenta el análisis de ronda (5.14) |
+| 55 | 5.20 | Cierre de misión (veredicto + recompensas) | `narracion-automatica` (prompt suma `cierre-temas`) | Staff | staff | Verifica las condiciones del acto final, aplica recompensas (berries 5.9 · PP 5.6 · fama 5.12 · objetos 5.8) con motivo y alimenta el análisis de ronda (5.14) |
 | 56 | 5.22 | Instalación de implante | `adaptacion-cibernetica` (si es a medida) | Jugador | IA + firma | Valida requisitos acumulativos + balanza a 0 + cupo por zona + pago; vara de Cirujano+Ingeniero; aplica defectos; revalida la ficha |
 | 57 | 5.22 | Retirada de implante | — | Jugador | ligero/firma | Libera el cupo de la zona y la balanza; las mejoras se pierden |
 | 58 | 5.22 | Mantenimiento / reparación | — | Jugador | ligero | Pago por ronda (hook de 5.14) o reparación con Ingeniero (grados de daño como 5.17) |
-| 59 | 5.22 | Diseño de mejora a medida | `adaptacion-cibernetica` + guía | Staff | IA + firma | La ranura de habilidad especial calibrada (efecto del catálogo o no registrado con condiciones) |
+| 59 | 5.22 | Diseño de mejora a medida | `adaptacion-cibernetica` + guía | Staff | staff + firma | La ranura de habilidad especial calibrada (efecto del catálogo o no registrado con condiciones); la inicia el staff |
 | 60 | 5.22 | Concesión de linaje | IA general (expediente) | Staff | staff | Cruza el expediente de fidelidad con el cupo (3–5); aplica dote/defecto «La sangre llama»; suceso de ronda (5.14) |
 | 61 | 5.22 | Revocación de linaje | — | Staff | staff | Retira dote/defecto, libera cupo, suceso de ronda; motivo obligatorio |
 | 62 | 5.21-bis | Muerte de personaje | `cierre-temas` (calidad del desenlace) | Jugador/staff | staff + firma | Veredicto con motivo; ficha a reliquia; fruta renace (5.18); cartel retirado (5.13); baja de facción (5.12); suceso de ronda (5.14); herencia al nuevo personaje por bandas de nivel × calidad (PP 60→1.000 · berries 5.000→1M · ×0,5/×1/×1,5) |
 | 63 | 5.21-ter | Fundación de tripulación | IA general | Capitán (jugador) | IA + firma | Entidad creada; valida mínimo 2, ficha (nombre/bandera/propósito), plazas del barco (5.17), un PJ por usuario; abre el tema de fundación |
-| 64 | 5.21-ter | Ingreso en tripulación | — | Capitán/miembro | ligero/firma | Verifica espacio del barco (solo PJs, 5.17) y un PJ por usuario; fecha de ingreso |
-| 65 | 5.21-ter | Baja / expulsión | — | Capitán/miembro | ligero/firma | Libera plaza; reparto de la parte del cofre con registro |
+| 64 | 5.21-ter | Ingreso en tripulación | — | Capitán | ligero/firma | Verifica espacio del barco (solo PJs, 5.17) y un PJ por usuario; fecha de ingreso |
+| 65 | 5.21-ter | Baja / expulsión | — | Capitán | ligero/firma | Libera plaza; reparto de la parte del cofre con registro |
 | 66 | 5.21-ter | Cambio de capitán | IA general | Staff/jugador | staff + firma | Cesión o motín con veredicto (5.10/5.14); mueve el cofre; suceso de ronda si cambia el nombre |
 | 67 | 5.21-ter | Disolución | — | Capitán/staff | staff + firma | Reparte el cofre, devuelve objetos, barco al último capitán; cierra la entidad (automática <2 activos) |
 
 ## 22.4 Naturaleza de los trámites (decisiones confirmadas)
 
-- **Con IA (skill o IA general + prompt):** 2, 3, 6, 13, 15, 20, 21, 25–34, 36–38, 40–43, 48, 49, 51–53, 56, 62, 63, 66. Cada uno con su **plantilla de prompt** (22.6) y su skill del Anexo B cuando existe.
-- **Ligeros/automáticos (validación + hooks, sin IA):** 1, 4, 14, 16–18, 26, 28–29, 39, 42 (simple), 44–47, 50 (tirada aplicada por hook), 64, 65. **Confirmado: la compra de PP (4) es automática** — valida PP/techo/cronómetro y aplica al instante, sin IA ni firma.
+- **Con IA (skill o IA general + prompt):** naturaleza `ia` pura — 2, 3, 6, 13, 15, 20, 25, 27, 31–33, 38, 40–43, 48, 51–53, 56, 63 — **y los staff-only que también usan IA** — 21, 30, 34, 36, 37, 49, 54, 55, 59, 60, 62, 66 (naturaleza `staff` en el catálogo, con su skill de la tabla 22.5). Cada uno con su **plantilla de prompt** (22.6) y su skill del Anexo B cuando existe. *(Ajustado F6: 26/28/29 son ligeros de pago/transferencia sin IA — ver lista siguiente; 34 y 37 son `staff` que inicia el jugador con IA general; 49 lo inicia el staff con `skill-adaptacion-akumas`.)*
+- **Ligeros/automáticos (validación + hooks, sin IA):** 1, 4, 14, 16, 17, 19, 26, 28–29, 35, 39, 44–47, 50 (tirada aplicada por hook), 57, 58, 64, 65. **Confirmado: la compra de PP (4) es automática** — valida PP/techo/cronómetro y aplica al instante, sin IA ni firma. *(Ajustado F6: 19 reclutamiento de NPC es ligero con firma (marca «reclutado»); 57 retirada de implante y 58 mantenimiento son ligeros (58 sin firma); 35 responder al asedio es ligero con firma; el 18 boletín de precios es staff-only, no ligero.)*
 - **Staff-only — mismo motor (confirmado):** 18, 21, 24, 30, 36, 49, 54 (apertura de misión), 55 (cierre de misión), **59 (diseño de mejora a medida)**, 60 (concesión de linaje), 61 (revocación de linaje), **62 (muerte de personaje)** — el veredicto puede nacer del cierre de un tema (combate 5.10, misión 5.20, suceso 5.14) o del sacrificio declarado por el jugador; siempre firma del staff —, **66 (cambio de capitán: cesión o motín con veredicto)** y **67 (disolución: voluntaria con firma o automática <2 activos por hook)**, y los paneles de recompensas/misiones (5.14).
 - **Ciclo con usuario (confirmado):** solo 13 (técnica) y 3 (ficha). En el resto, una iteración opcional.
 
@@ -1742,7 +1742,7 @@ Recibes, lanzas el análisis (o lo resuelves), editas, **firmas** y publicas. La
 
 > **Registro consolidado (Sesión 11):** qué trámites tocan la zona staff, qué automatiza el motor y qué queda para ti. Complementa la vista por evento del Anexo A.2 (allí: automatización por hook · aquí: por trámite).
 
-**Staff-only — inicia el staff por el mismo motor (14 trámites + los procesos de ronda):**
+**Staff-only — inicia el staff por el mismo motor (16 trámites + los procesos de ronda; ajustado F6.2):**
 
 | # | Trámite | Automático (hook) | Zona staff (manual) |
 |---|---|---|---|
@@ -1760,9 +1760,11 @@ Recibes, lanzas el análisis (o lo resuelves), editas, **firmas** y publicas. La
 | 62 | Muerte de personaje | Al firmar: congela la ficha (instantánea 5.6), libera el presente, marca la fruta renacida (5.18), retira el cartel (5.13), da de baja de facción (5.12), genera el suceso de ronda (5.14) y aplica la herencia (PP 60→1.000 · berries 5.000→1M × calidad) | Firma el veredicto con motivo; ajusta la banda de calidad (descuidada/digna/leyenda) y la herencia si procede |
 | 66 | Cambio de capitán | Valida la cesión o el motín; propone el veredicto (5.10/5.14); mueve el cofre; dispara el suceso de ronda si cambia el nombre | Firma con motivo; decide el sucesor si el motín es ambiguo |
 | 67 | Disolución | Automática si <2 PJs activos (hook de ronda 5.14, con aviso y plazo para reclutar); reparte el cofre y devuelve objetos | Firma la disolución voluntaria con motivo; valida el reparto |
+| 34 | Anuncio de conquista | Valida control previo (16.2), rondas requeridas (16.3) y anti-abuso de activa duplicada; suceso público + invitación al defensor | Firma con motivo; el **jugador** lo inicia (guard del motor F6.2 — es el único staff+naturaleza que arranca el jugador) |
+| 37 | Declarar reconquista | Mismas cinco fases del asedio; exige conquista previa registrada | Firma con motivo; el jugador lo inicia |
 | Ronda | Procesos de 5.14 | Cron mensual: KPIs, precios, islas, rumores de ronda, hordas, periódico | Revisas el dashboard, editas y publicas el «News Coo» |
 
-**IA + firma (llegan desde el jugador):** 2, 3, 6, 13, 15, 20, 25, 27, 31–34, 37, 38, 40–43, 48, 51–53, 56, 63 (y los hitos con firma: 5, 7–12, 16, 19, 22, 23, 35, 39, 44, 57). En todos: al crear el trámite el hook valida requisitos y arma el prompt; la skill propone; **al firmar, el hook aplica los efectos** (PP, posteo, histórico, inventario, impacto en la matriz de 5.14) y deja el motivo auditable. Tu trabajo manual se limita a revisar, editar si procede y firmar.
+**IA + firma (llegan desde el jugador):** 2, 3, 6, 13, 15, 20, 25, 27, 31–33, 38, 40–43, 48, 51–53, 56, 63 (y los ligeros/hitos con firma: 5, 7–12, 16, 19, 22, 23, 35, 39, 44, 57, 58, 64, 65). En todos: al crear el trámite el hook valida requisitos y arma el prompt; la skill propone; **al firmar, el hook aplica los efectos** (PP, posteo, histórico, inventario, impacto en la matriz de 5.14) y deja el motivo auditable. Tu trabajo manual se limita a revisar, editar si procede y firmar.
 
 **Regla de la zona staff:** la automatización nunca decide sola — *la IA propone, tú decides, nada sale sin firma*. Únicas excepciones **100 % automáticas** (validación dura sin margen interpretativo, no pasan por ti): compra de PP (4), tirada de fruta (45) y tirada del Conquistador (50).
 
@@ -1770,7 +1772,33 @@ Recibes, lanzas el análisis (o lo resuelves), editas, **firmas** y publicas. La
 
 **Genérica** (todos los trámites con IA): rol del staff de análisis · número y tipo de trámite · contexto con IDs y datos del sistema según tipo · skill exacta del Anexo B · salida esperada en el formato del tipo + motivo · formato editable, nada se publica sin firma.
 
-**Específicas ya definidas por sistema** (se consolidan aquí): cierre de temas (`skill-cierre-temas`: IDs + fidelidad/peso/calidad/extensión/presente-pasado/riesgo/perfil) · técnica (`skill-creacion-tecnicas`: nombre+descripción+tier → ficha) · navegación (`skill-navegacion`: trámite + matriz 5.14 + oficios/barco → inicio/tiempo/oráculos) · ascenso de facción (expediente de fama + termómetro + umbral) · fruta bajo demanda (`skill-adaptacion-akumas` + guía maestra) · Mundo Vivo (proceso de ronda, no trámite de jugador) · narración auto-narrada (`skill-narracion-automatica`: ficha de 6 bloques + oráculos de la isla + posts de la ronda + contexto del Mundo Vivo → tramo narrado; verificación de condiciones en el acto final) · implante a medida (`skill-adaptacion-cibernetica` + guía maestra: concepto → ficha calibrada con requisitos, ranuras, defectos, costes e incompatibilidades) · **muerte de personaje** (`skill-cierre-temas`: tema/combate/misión/suceso que causó la muerte + confirmación mecánica del umbral de 5.10 (PV ≤ −(VOL×2) o PE ≤ −RES) + banda de calidad (descuidada/digna/leyenda) + efectos de mundo propuestos + herencia calculada — la IA propone, tú firmas con motivo) · **fundación de tripulación** (IA general: ficha de nombre/bandera/propósito + capitán + fundadores + barco con plazas de 5.17 → validación y tema de fundación) · **cambio de capitán** (IA general: cesión o motín con el veredicto de 5.10/5.14 → sucesor, traslado del cofre y suceso de ronda si cambia el nombre). El sistema genera el prompt al crear el trámite; tú lo pegas en la sesión de IA con la skill; el resultado vuelve **editable** a la bandeja.
+**Específicas ya definidas por sistema** (se consolidan aquí; la lista completa vive en `inc/ope_rol/tramites/catalogo.php` → `ope7_prompt_especifica`):
+
+- **Cierre de temas (2)** — `skill-cierre-temas`: IDs + participantes → PP = Base(T) × 7 factores (fidelidad, peso, calidad, extensión ≥350 palabras, presente/pasado F_tiempo, riesgo, perfil), informe de rasgos por participante, fama propuesta y peso en la matriz 5.14. Base 50/75/125/200/300, techo 2×, suelo 0,5×, redondeo a favor del jugador.
+- **Validación de ficha (3)** — `skill-validacion-personajes`: raza(s)/híbrido/tribu, balanza dotes/defectos = 0, balanza de rasgos = 0, parejas antagónicas, cadenas, techos `20 + 1,6×(L−1)`, secundarios 5.2, físicos, cupo INT → informe checklist (ciclo con el usuario).
+- **Creación de técnica (13)** — `skill-creacion-tecnicas`: nombre+descripción+tier → ficha completa (requisitos T1:25→T5:70/55/40, dominio ≥ tier, efectos dentro del presupuesto, tipo, PA 2+tier, PE %, reposo, puerta) con el criterio de originalidad (ciclo con el usuario).
+- **Ascenso de facción (20)** — `skill-cierre-temas` (anexo): expediente de fama (4 capas) + termómetro de la facción + umbral del rango → procede / no procede todavía / espera de cupo.
+- **Solicitar rumor a la red (25)** — IA general (14.2.3): espía y capacidad (Novato→Supremo limita categoría/alcance) y tiempo (1–4 rondas) → ficha del rumor: contenido, tipo, alcance, categoría, fiabilidad publicada, veracidad interna y precio sugerido. Sin tiradas: la capacidad decide.
+- **Contrastar rumor (27)** — IA general (14.4): coste por alcance × sensibilidad (×1–×10), tiempo 1–2 rondas → afina la fiabilidad un grado; en Sólido revela la veracidad interna. Límites: sin pistas no llega a Sólido.
+- **Publicar cartel (30, staff)** — IA general (14.6): cifra (escala 5.9), paradero publicado con fiabilidad y nivel aproximado; caducidad de paradero a las 3 rondas.
+- **Cobrar recompensa (31)** — IA general (14.6): verifica cartel vigente, paradero no frío, entrega real con veredicto (5.10) y anti-abuso de autocaza.
+- **Crear rumor falso (32)** — IA general (14.8): veracidad interna = falso (nunca se reescribe); el staff decide la fiabilidad publicada y el alcance.
+- **Ataque a una red (33)** — IA general (14.5): método declarado → veredicto sin dados: espías descubiertos, si la red se desactiva y la trama resultante.
+- **Anuncio de conquista (34)** — IA general + matriz (cap. 16): control previo, motivo y justificación de presencia (16.2), rondas requeridas (16.3: 0/1/2/3/4+ por fuerza defensiva, fortificaciones +1), invitación al defensor y suceso público.
+- **Declarar reconquista (37)** — IA general (16.5): nueva disputa con las mismas cinco fases; ventaja del defensor = fuerza defensiva instalada.
+- **Navegación (38)** — `skill-navegacion`: trámite + matriz 5.14 + oficios/barco/utensilio → IRT interno (no se publica), narrativa inicial, tiempo off-roll (72/48/36 h por tramo), oráculos (7 tipos × gravedad) y víveres.
+- **Construcción (40) / Mejora (41) / Módulos (42) / Reparación (43) de barco** — IA general (Astillero): verifica oficio y costes (madera 5.8 por clase 18.5; mejora por diferencia + un paso a la vez; ranuras del tipo/nivel con requisito de oficio; reparación por grados con log).
+- **Despertar de akuma (48)** — IA general (19.6): requisitos por banda de tier/familia (T1–T2 nv25 · T3–T4 nv32 · Logia/mitológica nv40) + antigüedad on-roll + temas usándola + VOL → propuesta del despertar DE ESTA fruta y su suceso de ronda (la Logia siempre lo es).
+- **Fruta bajo demanda (49, staff)** — `skill-adaptacion-akumas` + guía maestra: concepto canon → ficha de 8 bloques en JSON (identidad, mecánica base, puertas, debilidades, requisitos, influencia con balanza a 0, despertar, precio/vías con cupo de fruto único).
+- **Tirada del Conquistador (50)** — 100 % automático (hook): valida ventanas nv5/15/25/35/45 (3→40 %) e intentos; si acierta: nivel 1 + suceso de ronda en borrador que el staff publica.
+- **Subida de nivel de Haki (51)** — IA general (20.2/20.3): valida tipo despierto, usos 1/tipo/tema (satisfactorios), PP (200/300/400/500) y VOL efectiva (55/70/85/95); escalera N1→N5 pagada entera, sin adaptabilidad humana.
+- **Solicitud de auto-narrada (52) y posteo de tramo (53)** — `skill-narracion-automatica`: ficha de 6 bloques + oráculos del acto (motor 5.16) + posts de la ronda + contexto de isla/ronda → tramo narrado en prosa rica; los NPCs actúan según su ficha, no se resuelve por los jugadores; verificación de condiciones en el acto final. **54 (apertura de misión, staff)** — IA general: ficha de 6 bloques en JSON (identidad, condiciones de victoria/fracaso explícitas, escenas en 3 actos con NPCs, recompensas, requisitos, secretos solo-staff) para el tablón. **55 (cierre de misión, staff)** — `skill-narracion-automatica` + `skill-cierre-temas`: verifica condiciones contra lo roleado, aplica recompensas con motivo y alimenta la ronda (5.14).
+- **Instalación de implante (56) y diseño a medida (59, staff)** — `skill-adaptacion-cibernetica` + guía maestra: concepto → ficha calibrada con requisitos acumulativos (suma de todos los implantes), ranuras + efectos 5.7, defectos exigidos con balanza a 0, precios (100k/500k/2,5M ฿ · PP 200/400/600 · mantenimiento 2.500/10.000/40.000 ฿/ronda) e incompatibilidades (frutas, kairoseki máx O). **57 (retirada)** — motivo narrativo, libera cupo y balanza. **58 (mantenimiento/reparación)** — pago por ronda (×2 con «Mantenimiento oneroso») o reparación con Ingeniero.
+- **Concesión (60) / revocación (61) de linaje (staff)** — IA general (expediente de fidelidad ponderado por `skill-cierre-temas`): cruza con el cupo mundial (3–5) → dote/defecto «La sangre llama» (−1) y suceso de ronda; la revocación exige motivo (traición al nombre o contradicciones 5.5).
+- **Muerte de personaje (62)** — `skill-cierre-temas` (calidad del desenlace): tema/combate/misión/suceso que causó la muerte + confirmación mecánica del umbral de 5.10 (PV ≤ −(VOL×2) o PE ≤ −RES) + banda de calidad (descuidada/digna/leyenda) + efectos de mundo propuestos (fruta renacida, cartel retirado, baja de facción, suceso) + herencia calculada (PP 60→1.000 · berries 5.000→1M × 0,5/×1/×1,5).
+- **Fundación de tripulación (63)** — IA general: ficha de nombre/bandera/propósito + capitán + fundadores + barco con plazas de 5.17 → validación (mínimo 2, un PJ por usuario) y tema de fundación. **Cambio de capitán (66)** — IA general: cesión o motín con el veredicto de 5.10/5.14 → sucesor, traslado del cofre y suceso de ronda si cambia el nombre. **Ingreso (64), baja/expulsión (65) y disolución (67)** — sin prompt: ligeros con firma (validación + reparto del cofre).
+
+El sistema genera el prompt al crear el trámite; tú lo pegas en la sesión de IA con la skill; el resultado vuelve **editable** a la bandeja.
 
 ## 22.7 Capa técnica (ver Anexo A)
 
@@ -1869,7 +1897,7 @@ Ficha de implante **bajo demanda** (trámites 56/59): entrada = concepto (zona, 
 |---|---|---|
 | `razas` · `raciales` | 5.1 | `diseno/5.1_razas_y_raciales.md` |
 | `tribus` + `personajes.tribu_id` | 5.1-bis | `diseno/5.1_tribus.md` |
-| `personajes` (ampliación: atributos, nivel, es_NPC…) | 5.1/5.2/5.6 | caps. 2, 3 y 7 |
+| `personajes` (atributos, nivel, pp_saldo, es_NPC, **`estado` = validación** borrador/revision/aprobado/rechazado + **`estado_vida`** activa/muerta) · `cuentas` (puntero activo + staff/narrador + slots, canon F6.3) | 5.1/5.2/5.6 | caps. 2, 3 y 7 |
 | `atributos_secundarios` | 5.2 | cap. 3 |
 | `dominios` · `dominios_personaje` · `especializaciones` | 5.3 | cap. 4 |
 | `dotes` · `defectos` · `personaje_dotes` | 5.4 | cap. 5 |
@@ -1878,22 +1906,23 @@ Ficha de implante **bajo demanda** (trámites 56/59): entrada = concepto (zona, 
 | `tecnicas` · `catalogo_efectos` | 5.7 | cap. 8 |
 | `objetos` · `inventario_personaje` · `almacen` · `arma_meito` | 5.8 | cap. 9 |
 | `economia_config` · `precios_mercado` · `carteras` · `tiendas` · `tienda_items` · `transacciones` | 5.9 | cap. 10 |
-| `estados` · `estados_activos` · `resoluciones_combate` · `matices_combate` · `acciones_pa` · `turnos_combate` · `sala_combate` | 5.10 | cap. 11 (grupo/naval y formato de posteo) |
-| `personajes.es_NPC`/`tipo_npc` · `npc_primario` (capa oculta) · `bestiario` · `npc_apariciones` | 5.11 | cap. 12 |
+| `acciones_pa` · `estados` · `estados_activos` · `resoluciones_combate` · `matices_combate` · `turnos_combate` · `sala_combate` | 5.10 | cap. 11 (grupo/naval y formato de posteo) |
+| `es_NPC`/`tipo_npc` (en `personajes`) · `npc_primario` (capa oculta) · `bestiario` · `npc_apariciones` · `npcs_secundarios` | 5.11 | cap. 12 |
 | `facciones` · `rangos_faccion` · `faccion_personaje` (fama) · `subfaccion_elite` · `cambios_faccion` · `sueldos` · `npc_faccion` | 5.12 | cap. 13 |
 | `rumores` (veracidad solo-staff) · `fuentes_informacion` · `red_espionaje` + `espias` · `rumor_operaciones` · `carteles_recompensa` · `rumor_isla_ronda` | 5.13 | cap. 14 |
-| `mares` · `islas` · `isla_estado` · `isla_estado_historico` · `rondas` · `matriz_peso` · `dashboard_acciones` · `recompensas_historico` · `sucesos` · `historico_periodicos` | 5.14 | cap. 15 |
-| `conquistas` · `asedios` · `fuerza_defensiva` (en `isla_estado`) · `unidades` · `hordas` · `zonas` | 5.15 | cap. 16 |
+| `islas` · `isa_estado` (con **`fuerza_defensiva_nivel`**, no `fuerza_defensiva`) · `isa_estado_historico` · `rondas` · `matriz_peso` · `dashboard_acciones` · `recompensas_historico` · `sucesos` · `historico_periodicos` · `mv_noticias` · `cronologia` (respaldo legado F6.4) · `mv_mision_asignaciones` | 5.14 | cap. 15 |
+| `conquistas` · `asedios` · `unidades` · `hordas` · `zonas` · `fuerza_defensiva_nivel` (en `isla_estado`) | 5.15 | cap. 16 |
 | `travesias` · `oraculos_catalogo` · `incidentes_travesia` · `transportes` | 5.16 | cap. 17 |
 | `barcos` · `tipos_barcos` · `maderas_casco` · `modulos_barcos` · `reparaciones` | 5.17 | cap. 18 |
-| `akumas` · `akuma_pool_tirada` · `personajes.akuma_id` · `despertares` · `akuma_historico` | 5.18 | cap. 19 |
+| `akumas` · `akuma_pool_tirada` · `personajes.akuma_id`/`akuma_afinidad` · `despertares` · `akuma_historico` | 5.18 | cap. 19 |
 | `haki` · `haki_conquistador` · `haki_historico` | 5.19 | cap. 20 (niveles/usos/PP, intentos de tirada, subidas con firma) |
 | `misiones` · `mision_tramos` · `mision_participantes` | 5.20 | cap. 21 (ficha de 6 bloques con `secretos_json` de permiso restringido solo-staff, histórico de tramos con oráculos y firma, participantes para reparto de fama/PP) |
 | `implantes` · `modificaciones_personaje` · `implante_historico` · `familias_legendarias` · `linaje_personaje` | 5.22 | cap. 23 (catálogo de implantes con requisitos/ranuras/precios/defectos; fichas por personaje con ranuras JSON y estado/daño; histórico; linajes con dote/defecto/cupo y portadores activos/revocados) |
 | `tramites` · `tramites_historico` | 5.21 | cap. 22 (tipos, estados, prompt/resultado, firma, histórico auditable) |
-| `personajes.estado` (activa/muerta) · `muertes` | 5.21-bis | cap. 22 (trámite 62: veredicto con causa y calidad, herencia PP+berries, reliquia visible, suceso de ronda) |
-| `tripulaciones` · `tripulantes` · `tripulacion_historico` | 5.21-ter | cap. 22 (trámites 63–67: ficha con `cofre_id` que reutiliza el mecanismo de 5.9, miembros con `espacio_ocupado` por raza de 5.17, histórico auditable) |
+| `personajes.estado_vida` (activa/muerta) · `muertes` | 5.21-bis | cap. 22 (trámite 62: veredicto con causa y calidad, herencia PP+berries, reliquia visible, suceso de ronda) |
+| `tripulaciones` · `tripulantes` · `cofre_tripulacion` (berries/log, no el mecanismo de carteras de 5.9) · `tripulacion_historico` | 5.21-ter | cap. 22 (trámites 63–67: ficha con `cofre_id` → `cofre_tripulacion`, miembros con `espacio_ocupado` por raza de 5.17, histórico auditable) |
 | Venenos/diales/materiales (catálogos menores) | 5.8-bis | cap. 9 (reutilizan `objetos` con `categoria` consumible/dial y el trámite 6 — **sin tablas nuevas**) |
+| Espejos del front legado migrados (F6.4) · `cron_log` (F6.5) | — | **sin sistema propio**: `alertas` · `mensajes` · `relaciones` · `post_templates` · `thread_meta` · `estilos` · `lore` · `pp_saldo` · `pp_log` · `pj_vocaciones` · `acompanantes` · `acompanante_solicitudes` — respaldados read-only del esquema anterior conservados para el front · `cron_log` (última ejecución de cada cron, panel Progresión F6.5) |
 
 ## A.2 Automatizaciones / hooks
 
@@ -1921,6 +1950,61 @@ Ficha de implante **bajo demanda** (trámites 56/59): entrada = concepto (zona, 
 | **Muerte de personaje** | 5.21-bis | Al firmar el trámite 62: congela la ficha (instantánea 5.6), libera el presente, marca la fruta renacida (5.18), retira el cartel (5.13), baja de facción (5.12), aplica la herencia (PP+berries), verifica la sanción de tirada de fruta (5.18) y genera suceso+rumor (5.14/5.13) | Veredicto con motivo (umbral 5.10 / misión 5.20 / suceso / sacrificio) + banda de calidad (`skill-cierre-temas`) + firma |
 | **Tripulaciones** | 5.21-ter | Fundación/ingreso → valida mínimo 2, ficha, plazas del barco (solo PJs) y 1 PJ/usuario; cambio de capitán → mueve el cofre y dispara suceso de ronda si cambia el nombre; disolución → reparte el cofre y devuelve objetos; ronda (5.14) → avisa si <2 activos con plazo | Motín con veredicto (5.10/5.14) + firma; disolución voluntaria con firma y reparto validado |
 
+### A.2-bis Verificación de implementación (hooks y crones reales, 2026-08-28)
+
+> Tabla de control que cierra la brecha diseño → código: **cada hook/cron del motor 7 Seas**
+> con su archivo y cuándo se dispara. Auditoría hecha contra el código real (plugin + `inc/ope_rol/`)
+> en F6. Los hooks del motor viejo desactivados (snapshot, CU, PP por post, parses legacy) están
+> **comentados** en el plugin y no aparecen aquí: son código muerto retirado en D6.3/F6.4.
+
+#### Hooks del plugin (`inc/plugins/ope_rol.php`)
+
+| Hook MyBB | Función | Cuándo se dispara | Qué hace |
+|---|---|---|---|
+| `global_start` | `ope_rol_global` | Cada petición | Contexto del motor: staff/permisos (`ope_cuentas`), PJ activo, navbar, contadores alertas/mensajes |
+| `global_start` | `ope7_progresion_cron` | Cada petición (cron perezoso, idempotente) | Avanza calendario on-roll, finaliza entrenamientos/dominios y encadena los subcrones de ronda de la tabla siguiente |
+| `datahandler_post_insert_thread` | `ope_rol_stamp_thread` | Al insertar un hilo nuevo (validación) | Ancla `ope_lastpid` del hilo al PJ activo |
+| `datahandler_post_insert_thread_post` | `ope_rol_stamp_thread_post` | Tras validar el hilo | Registro del hilo con el PJ autor |
+| `datahandler_post_insert_post` | `ope_rol_stamp_post` | Al insertar una respuesta | Ancla `ope_lastpid` del post al PJ activo |
+| `datahandler_post_insert_thread_end` | `ope_rol_after_thread` | Al insertarse el hilo en BD (D1.8) | Vincula `ope_temas.tid ↔ mybb_tid` del hilo real; `ope_lastpid` en hilo/foro |
+| `datahandler_post_insert_post_end` | `ope_rol_after_post` | Al insertarse la respuesta en BD | Cierra el vínculo del presente y refresca `ope_lastpid` |
+| `datahandler_post_insert_thread_end` / `post_end` | `ope7_zonab_on_post` | Tras cada posteo | Persiste el turno de Zona B (`turnos_combate`/`sala_combate`) si el post lo lleva |
+| `newthread_do_newthread_start` | `ope_rol_guard_newthread` | Antes de crear un hilo | Guard de apertura: zona permitida, un-presente, permisos |
+| `newreply_do_newreply_start` | `ope_rol_guard_newreply` | Antes de responder | Guard de respuesta: presencia en el tema, bloqueos |
+| `parse_message` | `ope_rol_parse_spoilers` | Render de cada mensaje | Parsea los spoilers propios del foro |
+| `parse_message` | `ope7_zonab_parse` | Render de cada mensaje | Parsea el bloque de Zona B en posts |
+| `postbit` | `ope_rol_postbit` | Render de cada post | Postbit 7 Seas: nombre/avatar del PJ activo, identidad |
+| `newreply_threadreview_post` | `ope_rol_threadreview_post` | Revisión de hilo al responder | Vista de posts del hilo en la respuesta |
+| `forumdisplay_thread_end` | `ope_rol_forumdisplay_thread` | Listado de un foro | Marca/personaliza el listado (último PJ, estilos) |
+| `showthread_end` | `ope_rol_hide_modtools_showthread` | Vista de un hilo | Oculta herramientas de moderación no aplicables |
+| `showthread_end` | `ope_rol_showthread_tags` | Vista de un hilo | Etiquetas/estados visibles del tema |
+| `pre_output_page` | `ope_rol_inject_navbar` | Antes de servir la página | Inyecta la navbar 7 Seas (fallback JS para páginas propias) |
+
+#### Subcrones encadenados desde `ope7_progresion_cron` (`inc/ope_rol/sistemas/progresion.php`)
+
+| Cron | Archivo | Cuándo se dispara | Qué hace |
+|---|---|---|---|
+| `ope7_calendario_avanzar` | `sistemas/progresion.php` | Cada petición (perezoso, 1 real = 2 on-roll) | Avanza la fecha on-roll e histórico |
+| `ope7_pj_finalizar_entrenamientos` | `sistemas/progresion.php` | Cada petición | Cronómetros de atributos vencidos → reserva + subida de nivel |
+| `ope7_pj_finalizar_dominios` | `sistemas/progresion.php` | Cada petición | Cronómetro de 15 días de dominios vencidos → nivel objetivo (F4.3) |
+| `ope7_travesias_vencidas` | `sistemas/navegacion.php` | Cada petición | Travesías con plazo off-roll agotado sin cierre → vencidas (17.5) |
+| `ope7_conquista_mantenimientos` | `sistemas/conquista.php` | Cada petición | Mantenimiento por ronda de unidades/hordas (16.7) |
+| `ope7_conquista_abandonos` | `sistemas/conquista.php` | Cada petición | Asedios sin actividad: 2.ª ronda → propuesta, 3.ª → revuelta (16.5) |
+| `ope7_haki_auto_despertar_cron` | `sistemas/akumas.php` | Cada petición | Despertar automático de Armadura/Mantra al nv10 (20.1) |
+| `ope7_misiones_ronda_cerrar` | `sistemas/misiones.php` | Cada petición | Misiones con tema cerrado sin cierre → abandonadas (21.2) |
+| `ope7_tripulaciones_ronda_cerrar` | `sistemas/tripulaciones.php` | Cada petición | <2 activos: 1.ª detección → aviso con plazo; 2.ª → disolución (22.9) |
+| `ope7_implantes_ronda_mantenimiento` | `sistemas/cibernetica.php` | Cada petición | Mantenimiento por ronda de implantes; sin saldo → averiado (23.3) |
+| `ope7_bajomundo_cron` | `sistemas/bajomundo.php` | Cada petición | Paraderos de carteles fríos a las 3 rondas sin avistamiento (14.6) |
+
+#### Disparos manuales (staff / motor de trámites)
+
+| Disparador | Función | Archivo | Cuándo |
+|---|---|---|---|
+| Firma de trámite (bandeja staff) | `ope7_tramite_firmar` → `ope7_tramite_aplicar_efectos` | `tramites/motor.php` | Al publicar/rechazar/archivar un trámite: `switch` de los 67 efectos (apertura/cierre de tema, PP, técnicas, akumas, Haki, misiones, cibernética, tripulaciones, muerte…) |
+| Panel «Mundo Vivo» | `ope7_ronda_abrir_siguiente` | `sistemas/mundo.php` | Al renderizar el panel: asegura la ronda actual abierta (crea la siguiente si la anterior está cerrada) |
+| Panel «Mundo Vivo» | `ope7_ronda_aplicar_cierre` | `sistemas/mundo.php` | Cierre de ronda por el staff: matriz de islas, precios, recompensas, periódico en borrador |
+| Bot «OPE Eternal» | `ope7_bot_post_thread` / `ope7_bot_post_reply` | `core/bot.php` | Posteo automático del bot (News Coo, sucesos, trámites) desde los efectos al publicar |
+
 ## A.3 Paneles de staff (la zona staff)
 
 > Todas las vistas comparten el mismo motor de trámites (5.21): bandeja, histórico, firma y auditoría unificados — un panel es una **vista filtrada** de ese motor.
@@ -1946,19 +2030,26 @@ Ficha de implante **bajo demanda** (trámites 56/59): entrada = concepto (zona, 
 | **«Reliquias»** | Fichas muertas con su leyenda (visibles para el mundo), histórico de muertes con calidad y herencia | 5.21-bis |
 | **«Trámites»** | La bandeja transversal: pendientes, prompt generado, resultado de la IA editable, firma con motivo, histórico auditable | 5.21 |
 
-# Anexo B: catálogo de skills de IA (resumen)
+# Anexo B: catálogo de skills de IA (8 completas, 2026-08-28)
 
-| Skill | Función |
-|---|---|
-| `skill-cierre-temas` | Calcula PP al cerrar temas: fórmula `Base(T) × 7 factores` con ancla ~50 PP por tema de Tramo I (fidelidad, peso, calidad, extensión ≥350 palabras, presente/pasado, riesgo, perfil). **Extensión (5.12, Sesión 7): propuesta de ascenso de facción** — cruza el expediente de fama con el termómetro de la facción y el umbral del rango (propone, el staff firma). **Diseñada y confirmada**, ver `diseno/skill-cierre-temas.md` (§8 anexo). |
-| `skill-creacion-tecnicas` | Genera la ficha completa de una técnica desde nombre+descripción+tier: requisitos, dominio, efectos del catálogo dentro del presupuesto, tipo, PA/PE/reposo/puerta de turno, aplicando el **criterio de originalidad** (la justificación narrativa del concepto se integra en la ficha — p. ej. un humano que gira para incendiar su pierna lleva Carga + Quemadura). **Diseñada**: ver `diseno/5.7_tecnicas.md`. |
-| `skill-mundo-vivo` | Análisis de ronda (cap. 15): genera el prompt, procesa los temas presentes y produce **dashboard** (KPIs + «Acciones detectadas», interno y separado del periódico) · **matriz de islas** (cambios con peligrosidad 1–50 y motivo) · **ajustes de recompensas** (criterio libre del staff + histórico) · **periódico «News Coo»** en HTML autocontenido (widget + modal + catálogo) · **matriz de peso** (rangos 0,5×–3× interno) y **verdicto de destructividad** (daño de ruptura por nivel). **Y la fluctuación del mercado (5.9)**: computa los tres factores por zona y ronda con su motivo y publica el boletín de precios + histórico. **Y los rumores de ronda (5.13)**: escribe el «qué se sabe/rumorea en la isla» por isla, propone los carteles (Wanted) y pondera la propagación de los rumores usados. **Y las hordas de conquista (5.15)**: cuando la guerra lo pide, propone una horda (Mara/Masa/Marea) como factor del escenario del asedio. |
-| `skill-navegacion` | Oráculos de travesía: narrativa inicial, tiempo disponible, incidentes. |
-| `skill-narracion-automatica` | Narrativa por rondas para misiones/aventuras auto-narradas. |
-| `skill-validacion-personajes` | Valida fichas: balanza dotes/defectos = 0, atributos híbridos, prerrequisitos. |
-| `skill-adaptacion-akumas` | Ficha completa de fruta **bajo demanda** desde nombre+concepto canon (trámite 5.21): familia/tier, mecánica base, puertas del catálogo de 5.7 (+ efectos no registrados con calibración), debilidades (enemigo natural), requisitos, influencia en la ficha (dote exclusiva inventada), despertar, precio/vías — usa la **guía maestra** `diseno/5.18_guia_adaptacion_frutas.md` (5.18, Sesión 10). |
+> Las 8 skills están **implementadas** como plantillas de prompt en el catálogo de trámites
+> (`inc/ope_rol/tramites/catalogo.php`, `ope7_prompt_especifica`) y siguen el flujo estándar
+> 5.21: prompt → la IA propone → resultado editable → firma del staff con motivo → se publica.
+> Regla de oro: **la automatización nunca decide sola** — la IA propone, el staff firma
+> (3 excepciones 100 % automáticas sin skill: compra de PP · tirada de fruta · Conquistador).
 
-*El detalle completo del flujo de cada skill se desarrolla con su sistema correspondiente y en el capítulo 22 (Trámites).*
+| Skill | Trámites que la usan | Función (implementación real) |
+|---|---|---|
+| `skill-validacion-personajes` | **3** (validación de ficha) | Valida fichas con **ciclo con el usuario**: raza(s) en catálogo, híbridos con media bien calculada y sin secundarias, tribu (pureza/unicidad/sustitución), **balanza dotes/defectos = 0 exacto**, **balanza de rasgos = 0**, sin parejas antagónicas, requisitos y cadenas, sin redundancias, **techos por nivel** (20 + 1,6×(L−1)), secundarios con las fórmulas de 5.2, físicos coherentes, cupo INT. Devuelve **informe checklist con rojos/verdes** que el jugador ve para corregir (estados `revision_usuario`/`en_revision`/`aceptado_usuario` en el motor). |
+| `skill-cierre-temas` | **2** (cierre de tema) · **20** (ascenso de facción, anexo) · **60** (concesión de linaje, ponderación) · **62** (muerte, calidad del desenlace) · **55** (cierre de misión, con narración) | Calcula PP al cerrar temas: **PP = Base(T) × 7 factores** (fidelidad, peso, calidad, extensión ≥350 palabras, presente/pasado F_tiempo, riesgo, perfil). **Base(T) por tramo: 50/75/125/200/300 PP** · techo 2×, suelo 0,5×, redondeo al entero más cercano (mitades a favor del jugador). Produce además: informe de rasgos por participante (jugado/no jugado/contradicho), **fama propuesta** (4 capas de 5.12, bandeja de fama) y peso en la matriz de 5.14. **Anexos:** propuesta de ascenso de facción (cruza expediente de fama + termómetro de la facción + umbral del rango → procede / no procede todavía / espera de cupo) · ponderación del expediente de fidelidad para linajes · banda de calidad del desenlace en muertes (descuidada/digna/leyenda). |
+| `skill-creacion-tecnicas` | **13** (creación de técnica) | Genera la ficha completa de una técnica desde nombre+descripción+tier con **ciclo con el usuario**: requisitos escalados (T1:25 → T5:70/55/40), dominio ≥ tier, **efectos dentro del presupuesto del tier** (T1:1 · T2:1 · T3:2 · T4:2 · T5:3 efectos, +25 % coste, máx 1 extra), tipo, **PA 2+tier**, PE %, reposo, puerta de turno, aplicando el **criterio de originalidad** (la justificación narrativa se integra en la ficha — p. ej. un humano que gira para incendiar su pierna lleva Carga + Quemadura). Sin duplicados con la librería del personaje (cupo INT/4 + PP por tier). |
+| `skill-mundo-vivo` | Análisis de ronda (cap. 15) · rumores de ronda (5.13) · fluctuación del mercado (5.9) · hordas de conquista (5.15) | Análisis de ronda: procesa los temas presentes y produce **dashboard** (KPIs + «Acciones detectadas», interno y separado del periódico) · **matriz de islas** (cambios con peligrosidad 1–50 y motivo) · **ajustes de recompensas** (criterio libre del staff + `recompensas_historico`) · **periódico «News Coo»** en HTML autocontenido (widget + modal + catálogo, edición en borrador publicable desde el panel) · **matriz de peso** (rangos 0,5×–3× interno) y **veredicto de destructividad** (daño de ruptura por nivel). **Y la fluctuación del mercado (5.9):** computa los tres factores por zona y ronda con su motivo y publica el boletín de precios + histórico (banda 0,5×–2×). **Y los rumores de ronda (5.13):** escribe el «qué se sabe/rumorea en la isla», propone los carteles (Wanted) y pondera la propagación de los rumores usados. **Y las hordas de conquista (5.15):** cuando la guerra lo pide, propone una horda (Mara/Masa/Marea) como factor del escenario del asedio. |
+| `skill-navegacion` | **38** (travesía) | Genera la **ficha de travesía** editable: calcula el **IRT interno** (base del mar 1–4 + peligrosidad del destino 1–50 + estado del Mundo Vivo − mitigadores Navegante/Timón/Cartógrafo/barco/utensilio — el desglose **no se publica**), produce narrativa inicial, **tiempo off-roll** (72/48/36 h por tramo, −12 h utensilio, −25 % Maestre, +24 h incidentes, +tiempo transporte), **oráculos** deterministas por banda (catálogo de 7 tipos × gravedad, ruta segura en transporte civil) y **gasto de víveres** (1 ración/persona/día on-roll). La ficha es editable y el staff firma el veredicto al cierre (17.6). Sin dados: el IRT es cálculo interno de la skill. |
+| `skill-narracion-automatica` | **52** (solicitud de auto-narrada) · **53** (posteo de tramo) · **54** (apertura de misión en el tablón) · **55** (cierre de misión) | Narrativa por rondas para misiones/aventuras auto-narradas sobre la **ficha de 6 bloques** (identidad · objetivo con condiciones de victoria/fracaso explícitas · escenas en 3 actos con NPCs · recompensas · requisitos · secretos solo-staff). **52** abre el tema presente invadible y crea el tramo 1 firmado; **53** narra cada tramo en prosa rica aplicando el **oráculo del acto** (motor de 5.16) y los NPCs según su ficha, sin resolver por los jugadores, y verifica las condiciones si es el acto final; **54** publica la ficha JSON en el tablón (validación dura del hook: condiciones explícitas, tasa 5.9, un-presente); **55** verifica las condiciones del acto final contra lo roleado (sin dados), aplica recompensas (berries/PP/fama/objetos con motivo) y alimenta un suceso de Mundo Vivo en borrador. Resultado siempre editable y firmado antes de publicarse. |
+| `skill-adaptacion-akumas` | **45** (tirada) · **46** (compra) · **49** (fruta bajo demanda, staff) · **48** (despertar) | Ficha completa de fruta **bajo demanda** desde nombre+concepto canon (trámite 49): **ficha de 8 bloques** (identidad con familia/tier/rareza · mecánica base con límites · puertas del catálogo 5.7 + efectos no registrados con calibración y condición · debilidades con enemigo natural · requisitos del portador · influencia en la ficha con balanza a 0 y dote exclusiva inventada · despertar · precio y vías con cupo de fruto único). Usa la **guía maestra** `diseno/5.18_guia_adaptacion_frutas.md` (árbol de decisión del poder canon a la ficha, tabla de tier por tipo y rareza, anti-abuso). **48** (despertar): valida banda de nivel por tier/familia (T1–T2 nv25 · T3–T4 nv32 · Logia/mitológica nv40) + no repetido + antigüedad on-roll y propone el despertar de la fruta con su suceso (la Logia siempre es periódico). |
+| `skill-adaptacion-cibernetica` | **56** (instalación) · **59** (diseño a medida, staff) · 57/58 (retirada/mantenimiento, apoyo) | Genera la ficha calibrada del implante desde concepto+zona+nivel (trámites 56/59): **requisitos acumulativos** (suma de todos los implantes), **ranuras del catálogo + efectos de 5.7**, **defectos exigidos con balanza a 0 exacta**, **precios cerrados** (instalación 100.000/500.000/2.500.000 ฿ · PP 200/400/600 · mantenimiento 2.500/10.000/40.000 ฿/ronda, ×2 con «Mantenimiento oneroso»), incompatibilidades (frutas, kairoseki máx 0). Usa la **guía maestra** `diseno/5.22_guia_adaptacion_implantes.md` (árbol de decisión concepto→ranura, tabla de mapeo mejora→efectos, calibración por nivel, anti-abuso, ejemplos resueltos). Aplica defectos con balanza exacta y registra el histórico de instalaciones. |
+
+*El detalle completo del flujo de cada skill se desarrolla con su sistema correspondiente (capítulos 7–23) y en el capítulo 22 (Trámites). Las plantillas de prompt exactas están en `inc/ope_rol/tramites/catalogo.php` (`ope7_prompt_especifica`) y los paneles staff por sistema en la Zona Staff.*
 
 ---
 

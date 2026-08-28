@@ -444,6 +444,57 @@ function ope7_mundo_vivo_panel_html()
         $out .= '</tbody></table></div></div>';
     }
 
+    // ── Recompensas con motivo (A.3: «recompensas con motivo») ──
+    $out .= '<div class="plate mv-recompensas"><div class="plate-h">Recompensas con motivo</div><div class="plate-b">';
+    if (ope7_tabla_existe('recompensas_historico') && ope7_tabla_existe('personajes')) {
+        $q = $db->query('SELECT r.*, p.nombre AS pj_nombre FROM ' . ope7_tabla_full('recompensas_historico') . ' r '
+            . 'LEFT JOIN ' . ope7_tabla_full('personajes') . ' p ON p.id = r.personaje_id '
+            . 'ORDER BY r.id DESC LIMIT 15');
+        if ($db->num_rows($q) === 0) {
+            $out .= '<p class="mv-dim">Sin recompensas registradas todavía (el cierre de ronda 15.2 las archiva aquí con su motivo).</p>';
+        } else {
+            $out .= '<table class="mv-table"><thead><tr><th>Personaje</th><th>Tipo</th><th>Cantidad</th><th>Ronda</th><th>Motivo</th></tr></thead><tbody>';
+            while ($r = $db->fetch_array($q)) {
+                $out .= '<tr><td>' . htmlspecialchars((string) ($r['pj_nombre'] ?? '#' . (int) $r['personaje_id'])) . '</td>'
+                    . '<td>' . htmlspecialchars((string) $r['tipo']) . '</td>'
+                    . '<td>' . number_format((int) $r['cantidad'], 0, ',', '.') . ' ฿</td>'
+                    . '<td>' . (int) $r['ronda'] . '</td>'
+                    . '<td>' . htmlspecialchars((string) $r['motivo']) . '</td></tr>';
+            }
+            $out .= '</tbody></table>';
+        }
+    } else {
+        $out .= '<p class="mv-dim">Tablas no migradas (recompensas_historico).</p>';
+    }
+    $out .= '</div></div>';
+
+    // ── Periódico «News Coo» (A.3): borrador → publicado, visibilidad manual (15.2) ──
+    $out .= '<div class="plate mv-periodico"><div class="plate-h">Periódico «News Coo»</div><div class="plate-b">';
+    if (ope7_tabla_existe('historico_periodicos')) {
+        $q = $db->query('SELECT * FROM ' . ope7_tabla_full('historico_periodicos') . ' ORDER BY id DESC LIMIT 5');
+        if ($db->num_rows($q) === 0) {
+            $out .= '<p class="mv-dim">Sin ediciones todavía (el cierre de ronda archiva el borrador aquí).</p>';
+        } else {
+            while ($r = $db->fetch_array($q)) {
+                $estado = (string) $r['estado'];
+                $out .= '<div class="mv-row"><div class="mv-arccard-h"><b>' . htmlspecialchars((string) $r['titulo']) . '</b>'
+                    . ' <span class="mv-pill">Nº ' . (int) $r['numero_edicion'] . '</span>'
+                    . ' <span class="mv-pill">' . ($estado === 'publicado' ? 'publicado' : 'borrador') . '</span>'
+                    . ' <span class="mv-dim">ronda ' . (int) $r['ronda'] . '</span></div>'
+                    . '<div class="mv-dim">' . date('d/m/Y', (int) $r['fecha']) . '</div>';
+                if ($estado === 'borrador') {
+                    $out .= '<form method="post" action="mundo-vivo.php"><input type="hidden" name="my_post_key" value="' . htmlspecialchars_uni((string) $mybb->get_input('my_post_key')) . '">'
+                        . '<input type="hidden" name="gaccion" value="publicar_periodico"><input type="hidden" name="periodico_id" value="' . (int) $r['id'] . '">'
+                        . '<button class="ope-btn" type="submit">Publicar edición</button></form>';
+                }
+                $out .= '</div>';
+            }
+        }
+    } else {
+        $out .= '<p class="mv-dim">Tabla no migrada (historico_periodicos).</p>';
+    }
+    $out .= '</div></div>';
+
     // ── Matriz de islas ──
     $islas = ope7_islas_lista();
     $out .= '<div class="plate mv-islas"><div class="plate-h">Matriz de islas (' . count($islas) . ')</div><div class="plate-b">';

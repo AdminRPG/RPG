@@ -157,7 +157,9 @@ if ($t4 > 0 && ope7_tramite_get($t4)['estado'] === 'publicado') {
 echo "    RESULTADO [3]: " . ($ok3 ? 'OK' : 'FALLO') . "\n";
 
 // ── [4] Efecto 1 · apertura de tema (presente + un-presente) ──
-$r = ope7_tramite_crear($uid, $pid, 1, '', array('zona' => 'Paraíso', 'tipo' => 'presente'));
+// D1.8: el hilo real se vincula (bien por formulario con mybb_tid, bien por el
+// hook de posteo ope7_tema_vincular_mybb_por_pj). Probamos el campo explícito.
+$r = ope7_tramite_crear($uid, $pid, 1, '', array('zona' => 'Paraíso', 'tipo' => 'presente', 'mybb_tid' => 777));
 $t1a = (int) ($r['tid'] ?? 0);
 $tids[] = $t1a;
 $q = $db->simple_select('ope_temas_participantes', 'tema_id', "personaje_id = {$pid}", array('limit' => 1));
@@ -165,15 +167,20 @@ $tema1 = (int) $db->fetch_field($q, 'tema_id');
 $temas[] = $tema1;
 $ok4 = false;
 if ($t1a > 0 && $tema1 > 0) {
-    $tq = $db->simple_select('ope_temas', 'tipo, estado, fecha_foro', "tid = {$tema1}", array('limit' => 1));
+    $tq = $db->simple_select('ope_temas', 'tipo, estado, fecha_foro, mybb_tid', "tid = {$tema1}", array('limit' => 1));
     $trow = $db->fetch_array($tq);
     $pq = $db->simple_select('ope_temas_participantes', 'ficha_instantanea', "personaje_id = {$pid} AND tema_id = {$tema1}", array('limit' => 1));
     $snap = $db->fetch_field($pq, 'ficha_instantanea');
-    echo "[4] Apertura tema: tipo={$trow['tipo']} estado={$trow['estado']} ancla={$trow['fecha_foro']} instantánea=" . ($snap ? 'OK' : 'FALLO') . "\n";
+    echo "[4] Apertura tema: tipo={$trow['tipo']} estado={$trow['estado']} ancla={$trow['fecha_foro']} instantánea=" . ($snap ? 'OK' : 'FALLO') . " mybb_tid={$trow['mybb_tid']}\n";
     // Segundo presente → bloqueado por un-presente.
     $r2 = ope7_tramite_crear($uid, $pid, 1, '', array('zona' => 'East Blue', 'tipo' => 'presente'));
-    $ok4 = $trow['tipo'] === 'presente' && $trow['estado'] === 'abierto' && $snap !== '' && !$r2['ok'];
-    echo "    bloqueo un-presente: " . (!$r2['ok'] ? 'OK' : 'FALLO') . "\n";
+    $ok4 = $trow['tipo'] === 'presente' && $trow['estado'] === 'abierto' && $snap !== '' && !$r2['ok'] && (int) $trow['mybb_tid'] === 777;
+    echo "    bloqueo un-presente: " . (!$r2['ok'] ? 'OK' : 'FALLO') . " · vinculación hilo (777): " . ((int) $trow['mybb_tid'] === 777 ? 'OK' : 'FALLO') . "\n";
+    // D1.8: vincular por hook (por_pj) no pisa un hilo ya vinculado.
+    $vin = ope7_tema_vincular_mybb_por_pj($pid, 999);
+    $mybb_tras = (int) $db->fetch_field($db->simple_select('ope_temas', 'mybb_tid', "tid = {$tema1}", array('limit' => 1)), 'mybb_tid');
+    echo "    hook por_pj no pisa: " . ($vin === 0 && $mybb_tras === 777 ? 'OK' : 'FALLO') . " (quedó {$mybb_tras})\n";
+    $ok4 = $ok4 && $vin === 0 && $mybb_tras === 777;
     $tids[] = 0; // el segundo ni se creó
 }
 echo "    RESULTADO [4]: " . ($ok4 ? 'OK' : 'FALLO') . "\n";
@@ -181,6 +188,16 @@ echo "    RESULTADO [4]: " . ($ok4 ? 'OK' : 'FALLO') . "\n";
 // ── [5] Efecto 2 · cierre de tema (PP + karma) ──
 $q = $db->simple_select('ope_personajes', 'pp_saldo', "id = {$pid}", array('limit' => 1));
 $saldo_antes = (int) $db->fetch_field($q, 'pp_saldo');
+// D1.8: el thread real vinculado (777) se crea en MyBB y el cierre lo cierra.
+if ($db->table_exists('threads')) {
+    $db->delete_query('threads', 'tid = 777');
+    $db->insert_query('threads', array(
+        'tid' => 777, 'fid' => 1, 'subject' => 'Test D1.8', 'uid' => $uid,
+        'username' => 'admin', 'dateline' => TIME_NOW, 'firstpost' => 0, 'lastpost' => TIME_NOW,
+        'lastposter' => 'admin', 'lastposteruid' => $uid, 'views' => 0, 'replies' => 0,
+        'closed' => '', 'sticky' => 0, 'notes' => '', 'visible' => 1,
+    ));
+}
 $r = ope7_tramite_crear($uid, $pid, 2, 'Cierre del tema de la taberna', array('tema_id' => $tema1), array('participantes' => array($pid)));
 $t2 = (int) ($r['tid'] ?? 0);
 $tids[] = $t2;
@@ -199,8 +216,14 @@ if ($t2 > 0) {
     $rk = $db->fetch_array($q);
     $q = $db->simple_select('ope_temas', 'estado', "tid = {$tema1}", array('limit' => 1));
     $t_estado = $db->fetch_field($q, 'estado');
-    echo "[5] Cierre: PP {$saldo_antes}→{$saldo_despues} (esperado +50) · karma={$rk['karma_acumulado']} (4→5) estado_rasgo={$rk['estado']} (arraigado) · tema={$t_estado} (cerrado)\n";
-    $ok5 = $saldo_despues === $saldo_antes + 50 && (int) $rk['karma_acumulado'] === 5 && $rk['estado'] === 'arraigado' && $t_estado === 'cerrado' && $fir['ok'];
+    // D1.8: el hilo real vinculado (777) debe quedar cerrado en MyBB.
+    $th = $db->table_exists('threads') ? (string) $db->fetch_field($db->simple_select('threads', 'closed', 'tid = 777', array('limit' => 1)), 'closed') : '';
+    $hilo_cerrado = $th !== '';
+    echo "[5] Cierre: PP {$saldo_antes}→{$saldo_despues} (esperado +50) · karma={$rk['karma_acumulado']} (4→5) estado_rasgo={$rk['estado']} (arraigado) · tema={$t_estado} (cerrado) · hilo 777 closed='{$th}'\n";
+    $ok5 = $saldo_despues === $saldo_antes + 50 && (int) $rk['karma_acumulado'] === 5 && $rk['estado'] === 'arraigado' && $t_estado === 'cerrado' && $fir['ok'] && $hilo_cerrado;
+    if ($db->table_exists('threads')) {
+        $db->delete_query('threads', 'tid = 777');
+    }
 }
 echo "    RESULTADO [5]: " . ($ok5 ? 'OK' : 'FALLO') . "\n";
 

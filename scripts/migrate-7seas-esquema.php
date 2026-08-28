@@ -24,6 +24,17 @@ require __DIR__ . '/_db-config.php';
 
 $P = 'mybb_ope_'; // prefijo canónico del esquema 7 Seas (D0.3-bis)
 
+/** ¿Existe una tabla del motor viejo (mybb_rol_<nombre>)? */
+function ope7_tabla_existe_legacy(string $nombre): bool
+{
+    global $db;
+    $res = $db->query('SHOW TABLES LIKE \'mybb_rol_' . $nombre . '\'');
+    if ($res === false) {
+        return false;
+    }
+    return $res->num_rows > 0;
+}
+
 /** Ejecuta una sentencia y aborta con mensaje claro si falla. */
 function ope7_run(mysqli $db, string $label, string $sql): void
 {
@@ -104,6 +115,24 @@ CREATE TABLE IF NOT EXISTS {$P}tribus (
 // ─────────────────────────────────────────────────────────────
 // 5.2 / 5.6 / 5.11 / 5.12 / 5.18 / 5.21-bis — Personajes (ficha)
 // ─────────────────────────────────────────────────────────────
+// Cuentas de rol (F6.3, sustituye mybb_rol_cuentas): puntero de personaje
+// activo por usuario + rol staff/narrador. La retirada de mybb_rol_* migra
+// aquí los datos vivos (uid 1 admin, uid 2 bot) desde la tabla vieja.
+ope7_run($db, 'cuentas', "
+CREATE TABLE IF NOT EXISTS {$P}cuentas (
+    uid INT UNSIGNED NOT NULL,
+    personaje_activo INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'id en personajes (ope) o rol_personajes (legado)',
+    personaje_tabla ENUM('ope','rol') NOT NULL DEFAULT 'ope' COMMENT 'ope = esquema canónico 7 Seas; rol = legado del motor viejo',
+    staff_level TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0-3 (5.12): 0 jugador · 1 colaborador · 2 moderador · 3 admin',
+    staff_rol VARCHAR(40) NOT NULL DEFAULT '' COMMENT 'webmaster/moderador/colaborador (legado del plugin)',
+    staff_narrador TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'narrador habilitado por personaje (21.2, independiente del staff_level)',
+    slots TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    datos JSON NULL,
+    dateline INT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (uid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+");
+
 ope7_run($db, 'personajes', "
 CREATE TABLE IF NOT EXISTS {$P}personajes (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -334,6 +363,12 @@ CREATE TABLE IF NOT EXISTS {$P}temas (
 ope7_run($db, 'temas+tid-auto', "
 ALTER TABLE {$P}temas MODIFY tid INT UNSIGNED NOT NULL AUTO_INCREMENT;
 ");
+
+// D1.8 — vincula ope_temas.tid al thread MyBB real: mybb_tid = tid de mybb_threads
+// (0 = el hilo aún no se ha posteado/vinculado). Lo rellena el hook de posteo
+// (inc/plugins/ope_rol.php → ope_rol_after_thread) y lo lee el cierre de tema
+// para cerrar también el hilo real del foro. Idempotente.
+ope7_add_col($db, 'temas', 'mybb_tid', "INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'thread MyBB real vinculado (D1.8): 0 = sin hilo aún'", 'tid');
 
 ope7_run($db, 'temas_participantes', "
 CREATE TABLE IF NOT EXISTS {$P}temas_participantes (
@@ -1236,6 +1271,22 @@ ope7_add_col($db, 'hordas', 'conquista_id', 'INT UNSIGNED NOT NULL DEFAULT 0 COM
 ope7_add_col($db, 'hordas', 'contratada_por', 'INT UNSIGNED NOT NULL DEFAULT 0 COMMENT "0 = la genera el Mundo Vivo"', 'conquista_id');
 
 // ─────────────────────────────────────────────────────────────
+// 5.18/5.19 — Akumas y Haki (F5)
+// ─────────────────────────────────────────────────────────────
+// La fruta en el inventario es un objeto de tamaño (19.7, mediano 1 ranura):
+// amplía el ENUM de `objetos.categoria` con 'akuma' (idempotente).
+$q = $db->query("SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'mybb_ope_objetos' AND COLUMN_NAME = 'categoria'");
+$r = $q ? $q->fetch_assoc() : null;
+if ($r && strpos((string) ($r['COLUMN_TYPE'] ?? ''), 'akuma') === false) {
+    $db->query("ALTER TABLE mybb_ope_objetos MODIFY COLUMN `categoria` ENUM('arma','armadura','escudo','consumible','herramienta','dial','material','municion','akuma') NOT NULL DEFAULT 'arma'");
+    echo "  [OK] objetos.categoria ampliado con 'akuma' (5.18)\n";
+} else {
+    echo "  [ok ] objetos.categoria ya incluye 'akuma'\n";
+}
+// Afinidad natural de la tirada (19.7: −10 % PE en las técnicas de la fruta).
+ope7_add_col($db, 'personajes', 'akuma_afinidad', "TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'afinidad natural de la tirada aleatoria (−10 % PE, 5.18)'", 'akuma_id');
+
+// ─────────────────────────────────────────────────────────────
 // 5.16 — Navegación: travesías, oráculos, incidentes, transportes
 // ─────────────────────────────────────────────────────────────
 ope7_run($db, 'travesias', "
@@ -1542,9 +1593,14 @@ CREATE TABLE IF NOT EXISTS {$P}mision_participantes (
     entrada INT UNSIGNED NOT NULL DEFAULT 0,
     salida INT UNSIGNED NULL,
     PRIMARY KEY (id),
-    KEY idx_mision (mision_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-");
+    KEY idx_mision (mision_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+// F5.2 — flujo de la auto-narrada: el tema presente del trámite 52, el PJ que
+// la solicitó y la fecha de apertura (el cron cierra abandonadas con él).
+ope7_add_col($db, 'misiones', 'tema_id', "INT UNSIGNED NULL COMMENT 'tema presente de la misión (5.6, trámite 52)'", 'en_tablon');
+ope7_add_col($db, 'misiones', 'solicitante_id', "INT UNSIGNED NULL COMMENT 'personaje que la solicitó (en curso)'", 'tema_id');
+ope7_add_col($db, 'misiones', 'abierta_en', "INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'fecha real de apertura del tema'", 'solicitante_id');
+ope7_add_col($db, 'misiones', 'oraculos', "JSON NULL COMMENT 'plan de oráculos por acto (5.16, motor de travesías)'", 'abierta_en');
 
 // ─────────────────────────────────────────────────────────────
 // 5.22 — Cibernética (implantes) y Familias Legendarias (linajes)
@@ -1754,6 +1810,10 @@ CREATE TABLE IF NOT EXISTS {$P}tripulacion_historico (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ");
 
+// F5.3 — aviso de disolución por <2 activos (22.9): primera detección → aviso
+// con plazo para reclutar; segunda → disolución automática (hook de ronda).
+ope7_add_col($db, 'tripulaciones', 'aviso_disolucion_en', "INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'fecha real del aviso de disolución (22.9)'", 'fundacion_tema_id');
+
 // ─────────────────────────────────────────────────────────────
 // Seeds base de F0 (idempotentes)
 // ─────────────────────────────────────────────────────────────
@@ -1770,6 +1830,121 @@ WHERE NOT EXISTS (SELECT 1 FROM {$P}calendario_foro WHERE id = 1);
 ");
 
 // ─────────────────────────────────────────────────────────────
+// F6.3 — Migración de datos desde mybb_rol_* (retirada por capas)
+// ─────────────────────────────────────────────────────────────
+// Copia (idempotente) los datos VIVOS del motor viejo al esquema canónico
+// mybb_ope_*: el puntero de personaje activo + roles staff/narrador viven en
+// mybb_rol_cuentas (lo escribe el motor 7 Seas en cada cambio de personaje)
+// y el bot «OPE Eternal» vive en mybb_rol_personajes.
+// Tablas viejas del motor anterior (prefijo mybb_rol_): la copia de datos
+// solo se ejecuta si la tabla legada existe todavía (retirada por capas).
+if (ope7_tabla_existe_legacy('cuentas')) {
+    ope7_run($db, 'F6.3 cuentas <- rol_cuentas', "
+INSERT INTO {$P}cuentas (uid, personaje_activo, personaje_tabla, staff_level, staff_rol, staff_narrador, slots, datos, dateline)
+SELECT c.uid,
+       IF(c.personaje_tabla = 'ope', c.personaje_activo, 0),
+       'ope',
+       c.staff_level,
+       COALESCE(p.staff_rol, ''),
+       COALESCE(p.staff_narrador, 0),
+       c.slots,
+       c.datos,
+       c.dateline
+FROM mybb_rol_cuentas c
+LEFT JOIN mybb_rol_personajes p ON p.uid = c.uid AND p.pid = c.personaje_activo AND c.personaje_tabla = 'rol'
+ON DUPLICATE KEY UPDATE
+    personaje_activo = VALUES(personaje_activo),
+    personaje_tabla  = VALUES(personaje_tabla),
+    staff_level      = VALUES(staff_level),
+    staff_rol        = VALUES(staff_rol),
+    staff_narrador   = VALUES(staff_narrador);
+");
+}
+
+// ─────────────────────────────────────────────────────────────
+// F6.4 — Retirada TOTAL de mybb_rol_* (decisión D6.3 ampliada: "retirar las
+// 34 todas migrando también el front"). Estrategia por capas:
+//   1. MIRRORS: las tablas que el FRONT VIVO aún lee con el esquema viejo
+//      (sin equivalente real en mybb_ope_*) se copian a mybb_ope_* con el
+//      MISMO esquema + datos (idempotente). El front se flipea a ope_*.
+//   2. Las que tienen equivalente real mybb_ope_* (personajes, cuentas,
+//      tramites, tripulaciones, tripulantes, bestiario, tienda_items,
+//      estados, akumas) se retiran y el front pasa a leer las reales.
+//   3. Las que solo usa código muerto legacy se archivan directamente.
+// Retirada por capas (F6.3): las tablas mybb_rol_* que SOLO usa el código
+// muerto del motor viejo (inc/ope_rol/mundo/* y funciones legacy sin hooks)
+// se archivan (RENAME a mybb_rol_retirada_* — reversible, sin DROP).
+
+// ─────────────────────────────────────────────────────────────
+// F6.5 — Registro de ejecución de crones (vista del panel «Progresión»)
+// permite al staff ver qué automatizó cada cron (última ejecución, acciones).
+// ─────────────────────────────────────────────────────────────
+ope7_run($db, 'cron_log', "
+CREATE TABLE IF NOT EXISTS {$P}cron_log (
+    cron VARCHAR(60) NOT NULL,
+    ultima_run INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'timestamp de la última ejecución',
+    acciones INT NOT NULL DEFAULT 0 COMMENT 'cuánto automatizó la última ejecución (conteo de acciones)',
+    detalle TEXT NULL COMMENT 'resumen de la última ejecución',
+    PRIMARY KEY (cron),
+    KEY idx_run (ultima_run)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+");
+
+// ── 1) Espejos front-vivos (mismo esquema + datos, idempotente) ──
+// ATENCIÓN: $P ya es 'mybb_ope_', así que el destino es el NOMBRE CORTO
+// ('alertas', no 'ope_alertas') — {$P}{$dest} = mybb_ope_alertas.
+$mirror_front = array(
+    'alertas'                  => 'alertas',
+    'mensajes'                 => 'mensajes',
+    'cronologia'               => 'cronologia',
+    'relaciones'               => 'relaciones',
+    'post_templates'           => 'post_templates',
+    'thread_meta'              => 'thread_meta',
+    'estilos'                  => 'estilos',
+    'lore'                     => 'lore',
+    'npcs_secundarios'         => 'npcs_secundarios',
+    'acompanantes'             => 'acompanantes',
+    'acompanante_solicitudes'  => 'acompanante_solicitudes',
+    'mv_noticias'              => 'mv_noticias',
+    'mv_mision_asignaciones'   => 'mv_mision_asignaciones',
+    'pp_saldo'                 => 'pp_saldo',
+    'pp_log'                   => 'pp_log',
+    'pj_vocaciones'            => 'pj_vocaciones',
+);
+foreach ($mirror_front as $lt => $dest) {
+    if (!ope7_tabla_existe_legacy($lt)) {
+        continue;
+    }
+    $res = $db->query("SHOW TABLES LIKE '{$P}{$dest}'");
+    if ($res && $res->num_rows > 0) {
+        // Ya migrado en una corrida anterior: solo asegura datos.
+        ope7_run($db, 'F6.4 espejo datos ' . $dest, "
+INSERT IGNORE INTO {$P}{$dest} SELECT * FROM mybb_rol_{$lt}
+");
+        continue;
+    }
+    ope7_run($db, 'F6.4 espejo ' . $dest, "CREATE TABLE {$P}{$dest} LIKE mybb_rol_{$lt}");
+    ope7_run($db, 'F6.4 espejo datos ' . $dest, "INSERT IGNORE INTO {$P}{$dest} SELECT * FROM mybb_rol_{$lt}");
+}
+
+// ── 2+3) Retirar TODAS las 34 tablas restantes (archivo reversible) ──
+$legacy_retirar = array(
+    // (F6.3 ya archivó 20 tablas de código muerto)
+    'acompanante_solicitudes', 'acompanantes', 'akuma', 'alertas', 'bestiario',
+    'cronologia', 'cuentas', 'enlace', 'estados', 'estilos', 'forum_meta',
+    'lore', 'mensajes', 'mision_tomas', 'mv_mision_asignaciones', 'mv_noticias',
+    'npcs_secundarios', 'personajes', 'pj_fruta', 'pj_vocaciones', 'pl', 'pl_log',
+    'post_snapshot', 'post_templates', 'pp_log', 'pp_saldo', 'relaciones',
+    'renombre', 'thread_meta', 'thread_snapshots', 'tienda_items', 'tramites',
+    'tripulacion_miembros', 'tripulaciones',
+);
+foreach ($legacy_retirar as $lt) {
+    if (!ope7_tabla_existe_legacy($lt)) {
+        continue;
+    }
+    ope7_run($db, 'F6.4 retirar rol_' . $lt, "RENAME TABLE mybb_rol_{$lt} TO mybb_rol_retirada_{$lt}");
+}
+
 // Verificación
 // ─────────────────────────────────────────────────────────────
 echo "\n--- Verificación ---\n";

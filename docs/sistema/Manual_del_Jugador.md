@@ -3,7 +3,7 @@
 > Sistema de rol por foro ambientado en One Piece · motor MyBB
 >
 > **Estado:** documento vivo en construcción. Se completa a medida que cada sistema del proyecto se cierra y se valida con el staff. Los capítulos marcados con 🧪 están en revisión: sus valores pueden cambiar.
-> **Versión:** 0.19 (Sesión 11, 2026-08-27)
+> **Versión:** 0.20 (2026-08-28) — añadida la sección 22.1-bis «Quién revisa tu solicitud» y corregidas dos referencias que apuntaban al proceso interno (22.1 y 11.6, matices) para que toda revisión se atribuya siempre al equipo de moderación.
 
 ---
 
@@ -117,7 +117,7 @@ Y para la **sangre pura** hay un escalón más: las **tribus** (sección 2.12). 
 
 *(Los números de las raciales — Percepción efectiva del mink, reducción de daño del lunarian, PV del gigante, etc. — se explican en cada raza y se resumen en el diseño técnico; están confirmados.)*
 
-**Cómo se juegan los efectos condicionales (importante).** Algunas raciales son *triggers*: "Furia de batalla" (Oni, por debajo del 30% de vida) o "Eco del Dios Perdido" (Bucaner, una vez por tema-trama). **Tú los activas escribiéndolos en tu post** cuando se dan las condiciones — "mi personaje sangra y está por debajo del 30% de vida: la furia se enciende" — y el staff o la IA lo verifica en ese momento. No hay contadores ni avisos automáticos: tu ficha es tuya y la conoces tú. Lo mismo aplica a los requisitos de las técnicas (por ejemplo, una técnica a dos manos que cita la empuñadura de titán de un Gigante): se declara en la ficha de la técnica y se verifica al validarla. Confía en tu ficha, decláralo con limpieza y el sistema lo respeta.
+**Cómo se juegan los efectos condicionales (importante).** Algunas raciales son *triggers*: "Furia de batalla" (Oni, por debajo del 30% de vida) o "Eco del Dios Perdido" (Bucaner, una vez por tema-trama). **Tú los activas escribiéndolos en tu post** cuando se dan las condiciones — "mi personaje sangra y está por debajo del 30% de vida: la furia se enciende" — y el staff lo verifica en ese momento. No hay contadores ni avisos automáticos: tu ficha es tuya y la conoces tú. Lo mismo aplica a los requisitos de las técnicas (por ejemplo, una técnica a dos manos que cita la empuñadura de titán de un Gigante): se declara en la ficha de la técnica y se verifica al validarla. Confía en tu ficha, decláralo con limpieza y el sistema lo respeta.
 
 ## 2.1 Humano — el lienzo en blanco
 
@@ -757,7 +757,7 @@ El catálogo tiene 15 efectos, cada uno con su **puerta de tier** (desde cuándo
 ## 8.4 Cómo se crea una técnica
 
 1. **Rellenas el formulario de trámite** (capítulo 22): nombre, descripción de la idea y tier deseado.
-2. El trámite llega a la zona staff y la IA de moderación (**skill-creacion-tecnicas**) construye la **ficha completa**: requisitos, dominio, descripción mejor construida, efectos dentro del presupuesto, tipo, costes y puerta de turno.
+2. El trámite llega a la zona staff y el equipo de moderación construye la **ficha completa**: requisitos, dominio, descripción mejor construida, efectos dentro del presupuesto, tipo, costes y puerta de turno.
 3. Si tu idea excede el presupuesto del tier (o se queda corta), la moderación te ofrece **alternativas**: quitar un efecto, subir el coste, bajar el tier... — eliges tú.
 4. El resultado vuelve a tu zona de trámites; puedes pedir cambios **hasta que la aceptes**.
 5. Al aceptar, el sistema descuenta los **puntos de progreso** y la técnica entra en tu **librería**.
@@ -779,7 +779,7 @@ Las **técnicas de oficio** funcionan igual: la receta del Cocinero, el elixir d
 - **La defensiva bloquea hasta +1 tier por encima.** Una defensiva Media bloquea un ataque Básico o Media; contra una Avanzada, solo reduce a la mitad; contra +2 tiers o más, apenas ayuda. Tu **Épica** solo se responde con técnica defensiva superior o Haki.
 - **Puertas de turno.** Una Maestra (T4) solo desde el 3º turno del combate; una Épica (T5) desde el 5º. El duelo se construye antes de que saques tu mejor golpe.
 - **La Sobrecarga: el extra-límite (Revisión 10).** Hay momentos en que decides que *ahora* es ahora: al usar una técnica puedes declarar una **Sobrecarga** — gastas el **doble de Energía** (redondeo hacia arriba) y el daño de esa técnica sube un **25%**. Límite: **1 uso por tema-trama por cada 50 puntos de Intelecto** (máximo 2 usos). No elude nada: ni las puertas de turno, ni los reposos (después entra en su reposo normal), ni el presupuesto de efectos — es una técnica normal con más gas, no una técnica superior de contrabando. Y es un riesgo real: si el golpe se esquiva o se bloquea, el PE extra se pierde igual. Es la herramienta de la remontada, no un comodín.
-- **No-crunch**: los requisitos de tus técnicas (la empuñadura, la condición, el estado) los **declaras en tu post** y la IA/staff los verifica en el momento. Tú conoces tu ficha; el sistema comprueba, no te hace calcular.
+- **No-crunch**: los requisitos de tus técnicas (la empuñadura, la condición, el estado) los **declaras en tu post** y el staff los verifica en el momento. Tú conoces tu ficha; el sistema comprueba, no te hace calcular.
 - **Técnicas duales** (con la dote Estilo Exótico o un arma doble): ejecutas tu técnica con las dos armas a la vez — coste de Energía doble, reposo doble, **requisitos de atributos duplicados** (la dualidad exige el doble de lo que exige el arma) y el daño se computa aparte (dos golpes, dos umbrales de dolor). Los buffs no se duplican.
 - **Técnicas combinadas** (2 personajes): sumáis vuestro daño como **un solo ataque**, con reposo global de 3 turnos para ambos. Requieren estar en la misma tripulación, tener una relación justificada o haber luchado juntos 8 turnos. El sabor del combate en dúo.
 
@@ -1246,7 +1246,7 @@ Es la diferencia entre el golpe que te hace retroceder y el golpe que te deja *v
 
 ### Los matices narrativos: el contexto manda
 
-Las tablas dan el veredicto del delta puro; el **contexto ajusta los valores efectivos antes** de calcularlo (nunca después — el matiz cambia la banda, no el resultado). Tú los invocas roleándolos; el staff/IA los aplica al cerrar el tema:
+Las tablas dan el veredicto del delta puro; el **contexto ajusta los valores efectivos antes** de calcularlo (nunca después — el matiz cambia la banda, no el resultado). Tú los invocas roleándolos; el equipo de moderación lo aplica al cerrar el tema:
 
 | Matiz | Efecto sobre los valores efectivos |
 |---|---|
@@ -1438,7 +1438,7 @@ El botón que acompaña la zona de posteo hace dos cosas, y una tercera le ocurr
 
 1. **Valida tu turno en vivo**: comprueba que el presupuesto de PA no se desboca, que las cartas son coherentes con tu ficha y que no hay incompatibilidades evidentes. Si gastas de más, **el sistema avisa** para que el staff lo tenga en cuenta en el cierre — pero no bloquee la narrativa: puedes seguir escribiendo.
 2. **Publica tu Zona B junto al post**. Esta es la parte importante: **toda la mecánica de tu turno es visible para el rival**. El otro jugador lee tu narrativa *y también* el factor mecánico — qué técnica usas, con qué coste, con qué modificadores — y **actúa en consecuencia**. No hay cartas escondidas: el rol por turnos se apoya en esa transparencia.
-3. **La resolución llega al cierre**. Cuando el tema se cierra, la IA y el staff computan las cartas conforme a las tablas de delta (quién conecta, quién invalida, qué interrumpe un botiquín si el rival lo corta en su turno) sobre los datos ya publicados.
+3. **La resolución llega al cierre**. Cuando el tema se cierra, el staff computa las cartas conforme a las tablas de delta (quién conecta, quién invalida, qué interrumpe un botiquín si el rival lo corta en su turno) sobre los datos ya publicados.
 
 Esa separación — **las cartas se juegan, se publican, el rival reacciona en consecuencia y el cierre sentencia** — es la que hace que el combate sea una conversación justa y legible: nadie dicta resultados y nadie pasa a escondidas.
 
@@ -2274,7 +2274,7 @@ El despertar es la cúspide de una fruta: cuando portador y fruto se entienden d
 - Una **antigüedad real como portador** (meses on-roll usando la fruta, medidos con el calendario del capítulo 7) y **temas cerrados usándola** (los cuenta tu histórico, como los usos de una técnica).
 - **Voluntad** para sostenerlo: la VOL es la moneda del dominio — quien despierta una fruta tiene la Voluntad para sostenerla.
 
-Se solicita por **trámite** (capítulo 22), como el despertar de cualquier técnica: la skill propone el despertar de *tu* fruta según su ficha, el staff firma. Cada fruta despierta a su manera, pero las referencias marcan tres patrones: la **Zoan** despierta en forma colosal con regeneración acelerada; la **Paramecia** transmuta el entorno en la materia o propiedad de su fruta (el suelo se vuelve goma, el aire se vuelve retorno); la **Logia** altera el clima a escala insular — y eso, ojo, es **suceso de ronda** (capítulo 15): el despertar de una Logia es historia del periódico.
+Se solicita por **trámite** (capítulo 22), como el despertar de cualquier técnica: el staff estudia el despertar de *tu* fruta según su ficha y lo firma. Cada fruta despierta a su manera, pero las referencias marcan tres patrones: la **Zoan** despierta en forma colosal con regeneración acelerada; la **Paramecia** transmuta el entorno en la materia o propiedad de su fruta (el suelo se vuelve goma, el aire se vuelve retorno); la **Logia** altera el clima a escala insular — y eso, ojo, es **suceso de ronda** (capítulo 15): el despertar de una Logia es historia del periódico.
 
 **El despertar sostiene**: mientras está activo, tus técnicas de fruta no cuestan PE extra (el despertar ya paga la cuenta), pero mantienen sus reposos y puertas, y el despertar exige **mantenimiento de PE por turno**. Es la cima de tu poder, no un botón de "ganar": un límite real para que la leyenda siga siendo leyenda.
 
@@ -2430,12 +2430,12 @@ El flujo es sencillo:
 
 1. **Solicitas** la narración auto-narrada por el trámite del capítulo 22 (como un viaje del capítulo 17): eliges la misión, confirmas que cumples requisitos y pagas si hay tasa.
 2. El sistema **lanza oráculos según la isla** (el mismo motor de los viajes): los incidentes que pueden aparecer en cada acto — sin dados, son escenarios.
-3. El staff revisa y genera el **prompt**; la IA (la skill de narración) **escribe el primer tramo**: la escena, los NPCs presentes, el mundo respirando.
+3. El staff revisa tu solicitud y **escribe el primer tramo**: la escena, los NPCs presentes, el mundo respirando.
 4. Tú y tu grupo hacéis **vuestros posts de la ronda** en el tema de la misión, como en cualquier tema presente.
 5. Volvéis al trámite a pedir el **siguiente tramo**: el sistema recoge vuestros posts, los suma a la historia, lanza el siguiente oráculo si toca y repite el ciclo.
 6. En el **acto final**, se verifican las condiciones: si las cumpliste, ganas; si no, pierdes — siempre con motivo y con el mundo reaccionando (capítulo 15).
 
-**Reglas de la modalidad:** la misión ocupa tu único presente (capítulo 7) y es invadible como cualquier tema · la IA nunca adelanta un tramo sin vuestros posts · los combates se resuelven con el capítulo 11 · y los secretos se revelan solo en su momento. Si abandonáis o se agota el plazo, la misión se cierra como **fracasada o abandonada**, y el mundo lo nota.
+**Reglas de la modalidad:** la misión ocupa tu único presente (capítulo 7) y es invadible como cualquier tema · nunca se adelanta un tramo sin vuestros posts · los combates se resuelven con el capítulo 11 · y los secretos se revelan solo en su momento. Si abandonáis o se agota el plazo, la misión se cierra como **fracasada o abandonada**, y el mundo lo nota.
 
 ## 21.5 Las recompensas en detalle
 
@@ -2455,13 +2455,19 @@ Tu aventura no ocurre en el vacío: ocurre en una **isla viva** (capítulo 15). 
 
 El trámite es **cómo le pides algo al foro** — y cómo el foro te responde con coherencia. Cada vez que el sistema necesita una decisión, un análisis o un registro, pasa por un trámite: cerrar un tema y ganar PP, crear tu técnica, zarpar, abrir una tienda, reclutar a alguien, despertar tu fruta. Es el hilo que conecta todo lo que has leído en este manual.
 
-No es papeleo: es la **garantía de que el mundo responde**. Detrás de cada trámite hay una persona del equipo que revisa, una IA que analiza con las reglas exactas de este manual y un registro que queda para siempre. Cuando pides algo, el foro no dice «sí» porque sí: dice «sí, y esto es lo que significa» — con su motivo escrito y su histórico.
+No es papeleo: es la **garantía de que el mundo responde**. Detrás de cada trámite hay una persona del equipo de moderación que revisa y firma, ateniéndose a las reglas exactas de este manual, y un registro que queda para siempre. Cuando pides algo, el foro no dice «sí» porque sí: dice «sí, y esto es lo que significa» — con su motivo escrito y su histórico.
+
+## 22.1-bis Quién revisa tu solicitud
+
+Quizá te preguntes quién está tras el mostrador cuando pides algo. La respuesta es siempre la misma: el **equipo de moderación del foro**. Cada trámite que envías entra en su bandeja, donde alguien lo estudia contra las reglas de este manual, prepara la respuesta con tu expediente y contexto a la vista, y **firma** el resultado antes de publicarse. Nada — ni un atributo, ni una técnica, ni un rumor, ni un despertar — se hace oficial sin esa firma.
+
+No hay atajos ni decisiones sin rostro: si algo se resuelve mal, hay una persona responsable y un motivo escrito que puedes cuestionar. A veces el sistema valida y aplica cosas al instante (comprar con PP, equiparte), pero aun esas siguen las reglas del manual y dejan rastro. El resto pasa por revisión y firma: tu solicitud nunca se resuelve sola, y siempre puedes saber quién decidió, qué decidió y por qué.
 
 ## 22.2 Cómo se pide (el viaje de tu solicitud)
 
 1. **Rellenas el formulario** del trámite: qué pides y por qué. El **motivo** importa — un hito sin historia no es un hito, y el foro lo va a leer.
 2. El sistema **arma el análisis**: junta tu ficha, el contexto (tu tema, tu isla, tu rumor, tu barco…) y las reglas que aplican.
-3. El equipo **lanza el análisis** con la IA: la máquina propone un resultado siguiendo exactamente las reglas de este manual.
+3. El equipo **lanza el análisis**: el resultado se prepara siguiendo exactamente las reglas de este manual y se firma antes de publicarse.
 4. **Alguien del foro lo revisa y lo edita** si hace falta. Tú ves el resultado: nunca una caja negra.
 5. Al **publicarse**, el sistema hace el resto solo: postea, descuenta PP, actualiza históricos y, si toca, avisa al mundo (un cambio de control, un rumor, una recompensa — capítulo 15).
 6. Y todo queda **registrado con motivo**: siempre puedes saber por qué se resolvió como se resolvió.
@@ -2474,7 +2480,7 @@ Tu trámite vive estados visibles: **borrador** (lo estás escribiendo), **pendi
 
 Todo trámite cae en una de cuatro puertas, y saber cuál es te dice qué esperar:
 
-- **Lo que se analiza.** El foro estudia tu petición con la IA y las reglas — hay criterio detrás, no un botón: cerrar temas (PP y fama), crear tu técnica, navegar, ascender en tu facción, despertar tu fruta, contrastar un rumor, cobrar una recompensa. Estos tardan un poco más porque merecen análisis.
+- **Lo que se analiza.** El foro estudia tu petición con las reglas — hay criterio detrás, no un botón: cerrar temas (PP y fama), crear tu técnica, navegar, ascender en tu facción, despertar tu fruta, contrastar un rumor, cobrar una recompensa. Estos tardan un poco más porque merecen análisis.
 - **Lo que es automático.** El sistema valida y aplica al instante: comprar puntos con PP, equiparte, comprar y vender en el mercado, comerte una fruta que ya tienes. La validación es dura (¿tienes PP? ¿cabe en tu ficha? ¿lo permite tu nivel?) pero no necesita revisión humana: si cumples, se aplica.
 - **Lo que pide un hito.** Los cambios que tu historia debe ganar: una dote por un hito, la evolución de un rasgo, un cambio de facción, la Genética Alterada de un híbrido. Se tramitan como el resto, pero el **motivo narrativo es el corazón** del trámite: el foro valida tu historia, no tu ficha.
 - **Lo que solo hace el foro.** Concesiones de élite, carteles de recompensa, ajustes de tu Wanted, misiones: cosas que el mundo decide solo. Tú no las pides — las mereces (o las sufres), y el mundo te avisa por su propio canal.
@@ -2485,7 +2491,7 @@ Hay dos trámites donde el resultado **vuelve a ti antes de publicarse**: la cre
 
 ## 22.6 La regla de oro y tus derechos
 
-La regla de oro de todo trámite: **la IA propone, el foro decide, y nada se publica sin la firma del staff**. Eso te garantiza tres derechos:
+La regla de oro de todo trámite: **el foro estudia, el staff decide, y nada se publica sin la firma del staff**. Eso te garantiza tres derechos:
 
 - **Ver el resultado.** El análisis llega a tus manos antes de hacerse oficial; siempre es editable y revisable.
 - **Saber el motivo.** Toda resolución — aceptada o rechazada — tiene su porqué escrito y guardado en el histórico.
@@ -2497,7 +2503,7 @@ No todo pasa por ti. El staff inicia sus propios trámites — los que dan forma
 
 ## 22.8 Cuando tu personaje muere
 
-La muerte es real en este foro — y se maneja como todo: con **veredicto**, sin dados. Cuando tu personaje cae más allá del umbral (capítulo 11), fracasa una misión en condiciones que lo matan (capítulo 21) o muere en un suceso del mundo (capítulo 15), el foro abre el trámite de muerte: la IA analiza cómo fue el desenlace con la skill de cierre de temas, el staff lo firma con motivo, y el mundo reacciona. Tu ficha queda como **reliquia visible**: el foro recuerda al personaje. Su fruta **renace** en el mundo (capítulo 19), su cartel se retira, su facción pierde al miembro y su muerte es noticia en el periódico. Lo que llevaba encima se queda donde cayó: puede ser saqueado, recuperado por los suyos o perdido — el mundo es el mundo.
+La muerte es real en este foro — y se maneja como todo: con **veredicto**, sin dados. Cuando tu personaje cae más allá del umbral (capítulo 11), fracasa una misión en condiciones que lo matan (capítulo 21) o muere en un suceso del mundo (capítulo 15), el foro abre el trámite de muerte: se analiza cómo fue el desenlace, el staff lo firma con motivo, y el mundo reacciona. Tu ficha queda como **reliquia visible**: el foro recuerda al personaje. Su fruta **renace** en el mundo (capítulo 19), su cartel se retira, su facción pierde al miembro y su muerte es noticia en el periódico. Lo que llevaba encima se queda donde cayó: puede ser saqueado, recuperado por los suyos o perdido — el mundo es el mundo.
 
 También puedes elegir el **sacrificio**: declarar en un post que tu personaje se queda atrás para cubrir la retirada o toma el golpe por un aliado. El veredicto decide si el sacrificio resultó en muerte — es una escena, no una garantía. Y hay una ventana de salvación: dentro del mismo tema, un aliado con el Fénix despertado (capítulo 19) o una operación imposible avalada por el foro pueden devolverte la vida antes de que el veredicto se firme.
 
@@ -2542,7 +2548,7 @@ Cada implante se describe por sus **ranuras de mejora** — lo que le has montad
 1. **Material (obligatoria, slot 1).** El armazón. Sigue las calidades del capítulo 9 (Común → Meitou): un brazo de acero Superior es mejor que uno de chatarra. Y hay dos materiales especiales: el **kairoseki** (la piedra del mar — el contador Logia ya cerrado en el capítulo 19: tu puño de piedra toca el cuerpo real de quien es intocable) y las **maderas de Adán y Eva** (capítulo 18: casco ligero que aguanta más).
 2. **Armamento o dial integrado.** Armas ocultas de tu dominio bélico (capítulo 4) o diales (capítulo 9) montados en la prótesis: una pistola en la muñeca, una hoja retráctil, un dial de impacto. Funcionan como tu equipo, con su coste de PA (capítulo 11) — no crean técnicas nuevas, te dan herramientas.
 3. **Bonificador de atributos.** La máquina refuerza una estadística **ligada a su función**: un brazo de acero da FUE, un ojo mecánico da PER. Nunca pasa de **+5 por atributo** en total de implantes, y nunca te lleva por encima de tu techo por nivel (capítulo 7).
-4. **Habilidad especial.** La pieza única: una pasiva o activa del catálogo de efectos del capítulo 8 (visión térmica, propulsores, blindaje) o una **invención a medida** — la describes, el staff la calibra con la skill `skill-adaptacion-cibernetica` y el criterio de originalidad (se busca el «sí con condiciones», como con las técnicas y las frutas). Las activas gastan PE en % y su PA, como cualquier técnica; las pasivas se declaran en tu post y se verifican al cierre.
+4. **Habilidad especial.** La pieza única: una pasiva o activa del catálogo de efectos del capítulo 8 (visión térmica, propulsores, blindaje) o una **invención a medida** — la describes, el staff la calibra con el criterio de originalidad (se busca el «sí con condiciones», como con las técnicas y las frutas). Las activas gastan PE en % y su PA, como cualquier técnica; las pasivas se declaran en tu post y se verifican al cierre.
 
 ## 23.4 Qué cuesta (las dos monedas)
 
@@ -2699,7 +2705,7 @@ La cibernética es para quien quiere que su cuerpo hable de su camino: el pirata
 
 **Técnica dual / combinada.** Dual: ejecutar tu técnica con dos armas a la vez (PE y reposo dobles, daño aparte). Combinada: dos personajes que suman su daño como un solo ataque (reposo global 3 turnos) (capítulo 8).
 
-**Originalidad (en la moderación).** El criterio con el que la skill construye tus técnicas: tiene en cuenta todo — tu historia, tu idea y cómo la justificas — y hace funcionar la idea dentro del sistema en lugar de rechazarla (un humano que gira para incendiar su pierna puede tener daño de fuego, con el giro como condición). No es un bono mecánico: es una forma de moderar (capítulo 8).
+**Originalidad (en la moderación).** El criterio con el que se construyen tus técnicas: tiene en cuenta todo — tu historia, tu idea y cómo la justificas — y hace funcionar la idea dentro del sistema en lugar de rechazarla (un humano que gira para incendiar su pierna puede tener daño de fuego, con el giro como condición). No es un bono mecánico: es una forma de moderar (capítulo 8).
 
 ## El combate (PA, defensas, resolución, estados, grupo y naval)
 
@@ -2835,7 +2841,7 @@ La cibernética es para quien quiere que su cuerpo hable de su camino: el pirata
 
 **Cierre de tema.** El trámite que cierra un tema terminado: el staff analiza lo roleado y el sistema te otorga los PP correspondientes (con su histórico). Es el momento en que tu rol se convierte en progreso.
 
-**Firma del staff.** El visto bueno obligatorio de un administrador antes de que cualquier resultado se publique: la IA propone, el foro decide. Sin firma no hay publicación (capítulo 22).
+**Firma del staff.** El visto bueno obligatorio de un administrador antes de que cualquier resultado se publique: el foro estudia, el staff decide. Sin firma no hay publicación (capítulo 22).
 
 **Ciclo de cambios.** El derecho a pedir ajustes sobre el resultado de un trámite antes de que se publique: obligatorio en la creación de tu técnica y en la validación de tu ficha, opcional en el resto (capítulo 22).
 
@@ -3003,7 +3009,7 @@ La cibernética es para quien quiere que su cuerpo hable de su camino: el pirata
 
 **Ficha de misión.** Los 6 bloques del contrato: identidad · objetivo con **condiciones de victoria y fracaso explícitas** · escenas en 3 actos · recompensas (berries/PP/fama/objetos) · requisitos · **secretos solo-staff** (los giros que el jugador no ve).
 
-**Auto-narrada.** La modalidad donde el sistema cuenta la aventura por rondas: la eliges libremente (aunque haya narrador); pide ficha completa. Flujo: solicitud → oráculos de la isla → staff → prompt → skill de narración → posts de la ronda → siguiente tramo → verificación de condiciones en el acto final.
+**Auto-narrada.** La modalidad donde la aventura avanza por rondas: la eliges libremente (aunque haya narrador); pide ficha completa. Flujo: solicitud → oráculos de la isla → staff → tramo narrado → posts de la ronda → siguiente tramo → verificación de condiciones en el acto final.
 
 **Condiciones explícitas.** La regla de oro de la auto-narrada: la ficha dice exactamente qué hay que hacer para ganar y para perder. Sin ellas, no hay auto-narrada posible.
 

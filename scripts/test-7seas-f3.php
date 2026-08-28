@@ -44,6 +44,14 @@ while ($row = $db->fetch_array($q)) {
     $viejos[] = (int) $row['id'];
 }
 foreach ($viejos as $viejo) {
+    // Los temas que el PJ abrió (trámite 1) quedan huérfanos si solo borramos
+    // los participantes; ese 'presente abierto' huérfano rompe re-corridas
+    // (f3 no es idempotente si no limpia ope_temas). Los borramos aquí.
+    $ttd = $db->simple_select('ope_temas_participantes', 'tema_id', "personaje_id = {$viejo}");
+    $temas_viejos = array();
+    while ($row = $db->fetch_array($ttd)) {
+        $temas_viejos[] = (int) $row['tema_id'];
+    }
     $bt = $db->simple_select('ope_tramites', 'id', "personaje_id = {$viejo}");
     while ($row = $db->fetch_array($bt)) {
         $db->delete_query('ope_tramites_historico', 'tramite_id = ' . (int) $row['id']);
@@ -52,6 +60,9 @@ foreach ($viejos as $viejo) {
     foreach (array('ope_tecnicas', 'ope_historico_pp', 'ope_muertes', 'ope_carteras', 'ope_temas_participantes', 'ope_dominios_personaje', 'ope_personaje_dotes', 'ope_personaje_rasgos', 'ope_almacen', 'ope_inventario_personaje') as $t) {
         $db->delete_query($t, "personaje_id = {$viejo}");
     }
+    foreach ($temas_viejos as $tv) {
+        $db->delete_query('ope_temas', "tid = {$tv}");
+    }
     $tt = $db->simple_select('ope_tiendas', 'id', "dueno_id = {$viejo}");
     while ($row = $db->fetch_array($tt)) {
         $db->delete_query('ope_tienda_items', 'tienda_id = ' . (int) $row['id']);
@@ -59,6 +70,11 @@ foreach ($viejos as $viejo) {
     }
     $db->delete_query('ope_personajes', "id = {$viejo}");
 }
+// Huérfanos de corridas previas cuyos PJ ya se borraron: temas sin participantes
+// que quedaron 'abiertos'. Igual que hace test-7seas-f4, limpiamos el tablero de
+// temas de prueba a fondo para hacer esta corrida independiente del orden.
+$db->delete_query('ope_temas_participantes', '1=1');
+$db->delete_query('ope_temas', '1=1');
 
 // ── [1] Calendario on-roll ──
 $fecha0 = ope7_calendario_semilla();
@@ -263,6 +279,14 @@ $G['chk']('Boletín: precio publicado 420 con desglose', $fir['ok'] && $pm === 4
 
 // ── [10] Limpieza ──
 foreach (array($pid, $pid2) as $pdel) {
+    // Los temas abiertos por el test (presente/pasados del trámite 1) deben
+    // quedar limpios junto a sus participantes; si no, un 'presente abierto'
+    // huérfano rompe la siguiente corrida del test.
+    $ttd = $db->simple_select('ope_temas_participantes', 'tema_id', "personaje_id = {$pdel}");
+    $temas_test = array();
+    while ($row = $db->fetch_array($ttd)) {
+        $temas_test[] = (int) $row['tema_id'];
+    }
     $bt = $db->simple_select('ope_tramites', 'id', "personaje_id = {$pdel}");
     while ($row = $db->fetch_array($bt)) {
         $db->delete_query('ope_tramites_historico', 'tramite_id = ' . (int) $row['id']);
@@ -270,6 +294,9 @@ foreach (array($pid, $pid2) as $pdel) {
     }
     foreach (array('ope_tecnicas', 'ope_historico_pp', 'ope_muertes', 'ope_carteras', 'ope_temas_participantes', 'ope_dominios_personaje', 'ope_personaje_dotes', 'ope_personaje_rasgos', 'ope_almacen', 'ope_inventario_personaje') as $t) {
         $db->delete_query($t, "personaje_id = {$pdel}");
+    }
+    foreach ($temas_test as $tv) {
+        $db->delete_query('ope_temas', "tid = {$tv}");
     }
     $tt = $db->simple_select('ope_tiendas', 'id', "dueno_id = {$pdel}");
     while ($row = $db->fetch_array($tt)) {

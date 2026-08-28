@@ -113,6 +113,51 @@ header('Content-Type: text/html; charset=utf-8');
         <p class="zs-card-d">Flota por jugador, daños (18.7) y módulos del astillero (18.6).</p>
         <a href="<?php echo $bburl; ?>/barcos-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
       </div>
+      <div class="zs-card">
+        <div class="zs-card-h"><span class="t">Akumas y Haki</span><span class="c">A.3</span></div>
+        <p class="zs-card-d">Cupos mundiales de frutas, pool de la tirada y Conquistador (sucesos en borrador).</p>
+        <a href="<?php echo $bburl; ?>/akumas-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+      </div>
+      <div class="zs-card">
+        <div class="zs-card-h"><span class="t">Narradores y Misiones</span><span class="c">A.3</span></div>
+        <p class="zs-card-d">Tablón de misiones (ficha de 6 bloques), auto-narradas por rondas y cupo de narradores.</p>
+        <a href="<?php echo $bburl; ?>/misiones-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+      </div>
+    </div>
+    <div class="zs-card reveal">
+      <div class="zs-card-h"><span class="t">Tripulaciones</span><span class="c">A.3</span></div>
+      <p class="zs-card-d">Fichas de banda (cofre común, plazas del barco), avisos de disolución y histórico auditable.</p>
+      <a href="<?php echo $bburl; ?>/tripulaciones-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+    </div>
+    <div class="zs-card reveal">
+      <div class="zs-card-h"><span class="t">Cibernética</span><span class="c">A.3</span></div>
+      <p class="zs-card-d">Implantes por zona/nivel (requisitos acumulativos, balanza a 0), mantenimientos por ronda y histórico.</p>
+      <a href="<?php echo $bburl; ?>/cibernetica-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+    </div>
+    <div class="zs-card reveal">
+      <div class="zs-card-h"><span class="t">Familias Legendarias</span><span class="c">A.3</span></div>
+      <p class="zs-card-d">Los 3 linajes con cupo mundial, portadores y bandeja de concesión/revocación (60–61).</p>
+      <a href="<?php echo $bburl; ?>/familias-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+    </div>
+    <div class="zs-card reveal">
+      <div class="zs-card-h"><span class="t">Bajo Mundo</span><span class="c">A.3</span></div>
+      <p class="zs-card-d">Rumores por isla (veracidad solo-staff), redes y espías, carteles con caducidad de paradero y el histórico de operaciones (25–33).</p>
+      <a href="<?php echo $bburl; ?>/bajomundo-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+    </div>
+    <div class="zs-card reveal">
+      <div class="zs-card-h"><span class="t">Mercado / Economía</span><span class="c">A.3</span></div>
+      <p class="zs-card-d">Fluctuación de precios por zona y ronda con motivo, carteras (robable/bóveda) y transacciones (10.1–10.5).</p>
+      <a href="<?php echo $bburl; ?>/mercado-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+    </div>
+    <div class="zs-card reveal">
+      <div class="zs-card-h"><span class="t">NPCs</span><span class="c">A.3</span></div>
+      <p class="zs-card-d">Primarios con capa oculta solo-staff, bestiario y apariciones por tema (incluido «reclutado», 12.5).</p>
+      <a href="<?php echo $bburl; ?>/npc-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
+    </div>
+    <div class="zs-card reveal">
+      <div class="zs-card-h"><span class="t">Reliquias</span><span class="c">A.3</span></div>
+      <p class="zs-card-d">Fichas muertas con su leyenda e histórico de muertes con calidad y herencia (5.21-bis).</p>
+      <a href="<?php echo $bburl; ?>/reliquias-staff.php" class="btn btn-ghost btn-sm">Abrir panel</a>
     </div>
     <!-- Agregar cards aquí -->
 <?php endif; ?>

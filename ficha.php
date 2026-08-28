@@ -290,7 +290,7 @@ if ($puede_gestionar && $mybb->request_method === 'post'
 if ($puede_gestionar && $mybb->request_method === 'post'
     && verify_post_check($mybb->get_input('my_post_key'), true)
     && $mybb->get_input('gaccion') === 'cronologia'
-    && $db->table_exists('rol_cronologia')) {
+    && $db->table_exists('ope_cronologia')) {
 
     $pid_c   = (int) $pj['pid'];
     $descs   = $mybb->get_input('descripcion', MyBB::INPUT_ARRAY);
@@ -307,11 +307,11 @@ if ($puede_gestionar && $mybb->request_method === 'post'
             $txt = trim((string) $txt);
             $txt = function_exists('mb_substr') ? mb_substr($txt, 0, 2000) : substr($txt, 0, 2000);
 
-            $ex = $db->simple_select('rol_cronologia', 'tid',
+            $ex = $db->simple_select('ope_cronologia', 'tid',
                 "pid = {$pid_c} AND tid = {$tid_k}", array('limit' => 1));
             if ($txt === '') {
                 if ($db->num_rows($ex)) {
-                    $db->delete_query('rol_cronologia', "pid = {$pid_c} AND tid = {$tid_k}");
+                    $db->delete_query('ope_cronologia', "pid = {$pid_c} AND tid = {$tid_k}");
                 }
                 continue;
             }
@@ -320,11 +320,11 @@ if ($puede_gestionar && $mybb->request_method === 'post'
                 'dateline'    => TIME_NOW,
             );
             if ($db->num_rows($ex)) {
-                $db->update_query('rol_cronologia', $row, "pid = {$pid_c} AND tid = {$tid_k}");
+                $db->update_query('ope_cronologia', $row, "pid = {$pid_c} AND tid = {$tid_k}");
             } else {
                 $row['pid'] = $pid_c;
                 $row['tid'] = $tid_k;
-                $db->insert_query('rol_cronologia', $row);
+                $db->insert_query('ope_cronologia', $row);
             }
         }
     }
@@ -337,7 +337,7 @@ if ($puede_gestionar && $mybb->request_method === 'post'
 if ($puede_gestionar && $mybb->request_method === 'post'
     && verify_post_check($mybb->get_input('my_post_key'), true)
     && in_array($mybb->get_input('gaccion'), array('rel_add', 'rel_edit', 'rel_del', 'rel_pos'), true)
-    && $db->table_exists('rol_relaciones')) {
+    && $db->table_exists('ope_relaciones')) {
 
     $pid_r    = (int) $pj['pid'];
     $gaccion  = $mybb->get_input('gaccion');
@@ -358,13 +358,13 @@ if ($puede_gestionar && $mybb->request_method === 'post'
             $dq = $db->simple_select('rol_personajes', 'pid',
                 "pid = {$destino} AND estado = 'aprobado'", array('limit' => 1));
             if ($db->num_rows($dq)) {
-                $ex = $db->simple_select('rol_relaciones', 'rid',
+                $ex = $db->simple_select('ope_relaciones', 'rid',
                     "pid = {$pid_r} AND destino_pid = {$destino}", array('limit' => 1));
                 if (!$db->num_rows($ex)) $ok = true;
             }
         }
         if ($ok) {
-            $db->insert_query('rol_relaciones', array(
+            $db->insert_query('ope_relaciones', array(
                 'pid'         => $pid_r,
                 'destino_pid' => $destino,
                 'etiqueta'    => $db->escape_string($etq),
@@ -384,7 +384,7 @@ if ($puede_gestionar && $mybb->request_method === 'post'
         $etq  = function_exists('mb_substr') ? mb_substr($etq, 0, 120) : substr($etq, 0, 120);
         $desc = function_exists('mb_substr') ? mb_substr($desc, 0, 1500) : substr($desc, 0, 1500);
         if ($rid > 0) {
-            $db->update_query('rol_relaciones', array(
+            $db->update_query('ope_relaciones', array(
                 'etiqueta'    => $db->escape_string($etq),
                 'tipo'        => $db->escape_string($tipo),
                 'descripcion' => $db->escape_string($desc),
@@ -393,7 +393,7 @@ if ($puede_gestionar && $mybb->request_method === 'post'
     } elseif ($gaccion === 'rel_del') {
         $rid = $mybb->get_input('rid', MyBB::INPUT_INT);
         if ($rid > 0) {
-            $db->delete_query('rol_relaciones', "rid = {$rid} AND pid = {$pid_r}");
+            $db->delete_query('ope_relaciones', "rid = {$rid} AND pid = {$pid_r}");
         }
     } elseif ($gaccion === 'rel_pos') {
         $pxs = $mybb->get_input('px', MyBB::INPUT_ARRAY);
@@ -407,7 +407,7 @@ if ($puede_gestionar && $mybb->request_method === 'post'
                 // Clamp al lienzo (viewBox 0..1000 x 0..640).
                 if ($vx < 0) $vx = 0; if ($vx > 1000) $vx = 1000;
                 if ($vy < 0) $vy = 0; if ($vy > 640)  $vy = 640;
-                $db->update_query('rol_relaciones',
+                $db->update_query('ope_relaciones',
                     array('px' => $vx, 'py' => $vy),
                     "rid = {$rid_k} AND pid = {$pid_r}");
             }
@@ -427,7 +427,7 @@ if ($puede_gestionar && $mybb->request_method === 'post'
 if ($puede_gestionar && $mybb->request_method === 'post'
     && verify_post_check($mybb->get_input('my_post_key'), true)
     && in_array($mybb->get_input('gaccion'), array('tpl_add', 'tpl_edit', 'tpl_del'), true)
-    && $db->table_exists('rol_post_templates')) {
+    && $db->table_exists('ope_post_templates')) {
 
     $pid_t   = (int) $pj['pid'];
     $gaccion = $mybb->get_input('gaccion');
@@ -435,7 +435,7 @@ if ($puede_gestionar && $mybb->request_method === 'post'
     if ($gaccion === 'tpl_del') {
         $tpl_id = $mybb->get_input('tpl_id', MyBB::INPUT_INT);
         if ($tpl_id > 0) {
-            $db->delete_query('rol_post_templates', "tpl_id = {$tpl_id} AND pid = {$pid_t}");
+            $db->delete_query('ope_post_templates', "tpl_id = {$tpl_id} AND pid = {$pid_t}");
         }
     } else {
         $nombre = trim((string) $mybb->get_input('nombre'));
@@ -447,9 +447,9 @@ if ($puede_gestionar && $mybb->request_method === 'post'
         if ($gaccion === 'tpl_add') {
             // disporder = último + 1
             $ord = 0;
-            $oq = $db->simple_select('rol_post_templates', 'MAX(disporder) AS mx', "pid = {$pid_t}");
+            $oq = $db->simple_select('ope_post_templates', 'MAX(disporder) AS mx', "pid = {$pid_t}");
             if ($db->num_rows($oq)) $ord = (int) $db->fetch_field($oq, 'mx') + 1;
-            $db->insert_query('rol_post_templates', array(
+            $db->insert_query('ope_post_templates', array(
                 'pid'      => $pid_t,
                 'nombre'   => $db->escape_string($nombre),
                 'cuerpo'   => $db->escape_string($cuerpo),
@@ -459,7 +459,7 @@ if ($puede_gestionar && $mybb->request_method === 'post'
         } else { // tpl_edit
             $tpl_id = $mybb->get_input('tpl_id', MyBB::INPUT_INT);
             if ($tpl_id > 0) {
-                $db->update_query('rol_post_templates', array(
+                $db->update_query('ope_post_templates', array(
                     'nombre' => $db->escape_string($nombre),
                     'cuerpo' => $db->escape_string($cuerpo),
                 ), "tpl_id = {$tpl_id} AND pid = {$pid_t}");
@@ -887,16 +887,16 @@ header('Content-Type: text/html; charset=utf-8');
     $cron_years   = array();   // año => [entradas]  (para la timeline pública)
     $cron_flat    = array();   // lista plana ordenada (para el modal de gestión)
     $pid_tl       = (int) $pj['pid'];
-    $has_meta     = $db->table_exists('rol_thread_meta');
-    $has_cron     = $db->table_exists('rol_cronologia');
+    $has_meta     = $db->table_exists('ope_thread_meta');
+    $has_cron     = $db->table_exists('ope_cronologia');
     $pref         = TABLE_PREFIX;
 
     $sel  = "SELECT t.tid, t.subject, t.fid, t.dateline AS tdate";
     $sel .= $has_meta ? ", m.era, m.fecha_rol, m.tag" : ", NULL AS era, NULL AS fecha_rol, '' AS tag";
     $sel .= $has_cron ? ", c.descripcion" : ", NULL AS descripcion";
     $from  = " FROM {$pref}posts p INNER JOIN {$pref}threads t ON t.tid = p.tid";
-    if ($has_meta) $from .= " LEFT JOIN {$pref}rol_thread_meta m ON m.tid = t.tid";
-    if ($has_cron) $from .= " LEFT JOIN {$pref}rol_cronologia c ON c.tid = t.tid AND c.pid = {$pid_tl}";
+    if ($has_meta) $from .= " LEFT JOIN {$pref}ope_thread_meta m ON m.tid = t.tid";
+    if ($has_cron) $from .= " LEFT JOIN {$pref}ope_cronologia c ON c.tid = t.tid AND c.pid = {$pid_tl}";
     $where = " WHERE p.ope_pid = {$pid_tl} AND p.visible = 1 AND t.visible = 1";
     $grp   = " GROUP BY t.tid, t.subject, t.fid, t.dateline";
     if ($has_meta) $grp .= ", m.era, m.fecha_rol, m.tag";
@@ -945,8 +945,8 @@ header('Content-Type: text/html; charset=utf-8');
     $REL_TIPOS   = ope_rel_tipos();
     $relaciones  = array();
     $rel_pid     = (int) $pj['pid'];
-    if ($db->table_exists('rol_relaciones')) {
-        $rq = $db->simple_select('rol_relaciones', '*', "pid = {$rel_pid}", array('order_by' => 'dateline', 'order_dir' => 'asc'));
+    if ($db->table_exists('ope_relaciones')) {
+        $rq = $db->simple_select('ope_relaciones', '*', "pid = {$rel_pid}", array('order_by' => 'dateline', 'order_dir' => 'asc'));
         while ($rr = $db->fetch_array($rq)) {
             $other = ope_rol_char((int) $rr['destino_pid']);
             if (!$other) continue; // destino borrado: se ignora

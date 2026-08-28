@@ -23,7 +23,7 @@ if (!defined('IN_MYBB')) {
 /** Devuelve el contexto de permisos del uid actual (o de un uid dado). */
 function ope7_permisos($uid = 0)
 {
-    global $mybb;
+    global $mybb, $db;
     $uid = (int) $uid;
     if ($uid < 1) {
         $uid = (int) ($mybb->user['uid'] ?? 0);
@@ -34,12 +34,28 @@ function ope7_permisos($uid = 0)
         return $out;
     }
 
-    if (function_exists('ope_rol_active_staff')) {
+    // F6.3: fuente canónica mybb_ope_cuentas (staff_level/staff_rol/
+    // staff_narrador) con fallback al legado rol_cuentas + rol_personajes.
+    if (ope7_tabla_existe('cuentas')) {
+        $q = $db->simple_select(ope7_tabla('cuentas'), 'staff_level, staff_rol, staff_narrador', "uid = {$uid}", array('limit' => 1));
+        $cu = $db->fetch_array($q);
+        if ($cu) {
+            $out['rank']     = (int) ($cu['staff_level'] ?? 0);
+            $out['rol']      = (string) ($cu['staff_rol'] ?? '');
+            $out['narrador'] = (int) ($cu['staff_narrador'] ?? 0);
+            $out['is_staff'] = $out['rank'] > 0;
+        }
+    }
+    if (!$out['is_staff'] && function_exists('ope_rol_active_staff')) {
         $st = ope_rol_active_staff($uid);
         $out['rank']      = (int) ($st['rank'] ?? 0);
         $out['narrador']  = (int) ($st['narrador'] ?? 0);
         $out['is_staff']  = (bool) ($st['is_staff'] ?? false);
-        $out['is_narrador'] = $out['is_staff'] && (int) ($st['narrador'] ?? 0) === 1;
+    }
+    // 21.2: el narrador es un rol de foro INDEPENDIENTE (staff_narrador) —
+    // puede ser un jugador habilitado, no solo el staff.
+    if ((int) ($out['narrador'] ?? 0) === 1) {
+        $out['is_narrador'] = true;
     }
 
     // Bypass admin MyBB (cuenta, no personaje).

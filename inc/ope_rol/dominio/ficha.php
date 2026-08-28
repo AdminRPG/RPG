@@ -244,6 +244,187 @@ function ope7_ficha_html($f, $ctx = array())
         $html .= '</div></div>';
     }
 
+    // Fruta y Haki (F5, 5.18/5.19): el poder del personaje en un vistazo.
+    if (ope7_tabla_existe('akumas') && function_exists('ope7_akuma_info')) {
+        $akuma_id = (int) ($f['akuma_id'] ?? 0);
+        $sin_comer = false;
+        if ($akuma_id < 1) {
+            $aq = $db->simple_select('ope_akumas', 'id', "portador_id = " . (int) $f['id'] . " AND estado = 'con_portador'", array('limit' => 1));
+            $akuma_id = (int) $db->fetch_field($aq, 'id');
+            $sin_comer = $akuma_id > 0;
+        }
+        if ($akuma_id > 0) {
+            $akuma = ope7_akuma_info($akuma_id);
+            if ($akuma) {
+                $rareza = (string) ($akuma['rareza'] ?? '');
+                $html .= '<div class="plate f7-akuma"><div class="plate-h"><span class="t">Fruta del diablo</span><span class="c">' . ($sin_comer ? 'sin comer — trámite 47' : 'T' . (int) $akuma['tier'] . ' · ' . $e($akuma['familia']) . ($rareza !== '' ? ' · ' . $e($rareza) : '') . ($akuma_id > 0 && !$sin_comer && (int) ($f['akuma_afinidad'] ?? 0) ? ' · afinidad −10 % PE' : '')) . '</span></div><div class="plate-b">';
+                $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name"><b>' . $e($akuma['nombre_propio']) . '</b></span><span class="f7-row-pts">' . $e($akuma['aspecto']) . '</span></div></div>';
+                if (!$sin_comer) {
+                    $mec = is_array($akuma['mecanica_base'] ?? null) ? $akuma['mecanica_base'] : array();
+                    $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Mecánica base</span></div><div class="f7-row-meta">' . $e((string) ($mec['resumen'] ?? '')) . '</div></div>';
+                    $puertas = (array) ($akuma['puertas'] ?? array());
+                    if ($puertas) {
+                        $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Puertas de poder</span></div><div class="f7-row-meta">' . $e(implode(' · ', $puertas)) . '</div></div>';
+                    }
+                    $deb = is_array($akuma['debilidades'] ?? null) ? $akuma['debilidades'] : array();
+                    if (!empty($deb['enemigo_natural'])) {
+                        $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Enemigo natural</span></div><div class="f7-row-meta">' . $e((string) $deb['enemigo_natural']) . '</div></div>';
+                    }
+                    $desp = is_array($akuma['despertar'] ?? null) ? $akuma['despertar'] : array();
+                    if (!empty($desp['resumen'])) {
+                        $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Despertar</span></div><div class="f7-row-meta">' . $e((string) $desp['resumen']) . '</div></div>';
+                    }
+                    $inf = function_exists('ope7_akuma_influencia') ? ope7_akuma_influencia($akuma) : null;
+                    if ($inf && ($inf['defectos'] || $inf['dotes'])) {
+                        $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Influencia en la ficha</span></div><div class="f7-row-meta">' . $e(implode(' · ', array_merge($inf['defectos'], $inf['dotes']))) . '</div></div>';
+                    }
+                }
+                $html .= '</div></div>';
+            }
+        }
+    }
+    if (ope7_tabla_existe('haki')) {
+        $html .= '<div class="plate f7-haki"><div class="plate-h"><span class="t">Haki</span><span class="c">20.x — niveles, usos y PP</span></div><div class="plate-b">';
+        $hq = $db->simple_select('ope_haki', '*', "personaje_id = " . (int) $f['id'] . " AND activo = 1", array('order_by' => 'tipo'));
+        if (!$db->num_rows($hq)) {
+            $html .= '<div class="f7-empty">Sin Haki despertado. Armadura y Mantra se despiertan solos a nv10 (20.1); el Conquistador solo por tirada (trámite 50, nv5+).</div>';
+        } else {
+            while ($h = $db->fetch_array($hq)) {
+                $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">' . $e(ucfirst((string) $h['tipo'])) . '</span><span class="f7-row-pts">N' . (int) $h['nivel'] . ' · ' . (int) $h['usos_acumulados'] . ' usos · ' . (int) $h['pp_invertidos'] . ' PP</span></div></div>';
+            }
+        }
+        $html .= '</div></div>';
+    }
+
+    // Tripulación (F5.3, 5.21-ter): banda activa con cofre común (5.9) y
+    // espacio del barco (5.17). Valor operativo, sin bonos numéricos.
+    if (function_exists('ope7_pj_tripulacion_activa') && function_exists('ope7_trip_get')) {
+        $trip_id = ope7_pj_tripulacion_activa((int) $f['id']);
+        if ($trip_id > 0) {
+            $trip = ope7_trip_get($trip_id);
+            if ($trip) {
+                $miembros = function_exists('ope7_trip_miembros') ? ope7_trip_miembros($trip_id, true) : array();
+                $cofre = function_exists('ope7_trip_cofre_get') ? ope7_trip_cofre_get($trip_id) : array('berries' => 0);
+                $nombres = array();
+                foreach ($miembros as $m) {
+                    $nombres[] = ($m['rol'] === 'capitan' ? '👑 ' : '') . $e((string) $m['pj_nombre']);
+                }
+                $html .= '<div class="plate f7-trip"><div class="plate-h"><span class="t">Tripulación</span><span class="c">' . $e((string) $trip['nombre']) . ' · ' . count($miembros) . ' miembros · cofre ' . number_format((int) ($cofre['berries'] ?? 0)) . ' ฿</span></div><div class="plate-b">';
+                if ($nombres) {
+                    $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Miembros</span></div><div class="f7-row-meta">' . implode(' · ', $nombres) . '</div></div>';
+                }
+                if (trim((string) ($trip['proposito'] ?? '')) !== '') {
+                    $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Propósito</span></div><div class="f7-row-desc">' . $e(trim((string) $trip['proposito'])) . '</div></div>';
+                }
+                $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Cofre común (5.9)</span></div><div class="f7-row-meta">' . number_format((int) ($cofre['berries'] ?? 0)) . ' ฿ — lo gestiona el capitán (trámites 63–67).</div></div>';
+                $html .= '</div></div>';
+            }
+        }
+    }
+
+    // Misión en curso (F5.2, 5.20): auto-narrada activa con tramo/acto.
+    if (ope7_tabla_existe('misiones') && function_exists('ope7_mision_get') && function_exists('ope7_mision_ultimo_tramo')) {
+        $mq = $db->simple_select('ope_misiones', '*', "estado = 'en_curso' AND solicitante_id = " . (int) $f['id'], array('order_by' => 'id', 'order_dir' => 'DESC', 'limit' => 1));
+        $mrow = $db->fetch_array($mq);
+        if ($mrow) {
+            $m = ope7_mision_get((int) $mrow['id']);
+            if ($m) {
+                $ult = ope7_mision_ultimo_tramo((int) $m['id']);
+                $nombre = (string) ($m['identidad']['nombre'] ?? ('Misión #' . $m['id']));
+                $html .= '<div class="plate f7-mision"><div class="plate-h"><span class="t">Misión en curso</span><span class="c">auto-narrada · tramo ' . (int) $ult['tramo'] . '/' . (int) $m['duracion_rondas'] . '</span></div><div class="plate-b">';
+                $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">' . $e($nombre) . '</span><span class="f7-row-pts">Acto ' . (int) $ult['acto'] . ' de 3</span></div></div>';
+                $cond = (array) ($m['condiciones'] ?? array());
+                if (trim((string) ($cond['victoria'] ?? '')) !== '') {
+                    $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Victoria</span></div><div class="f7-row-meta">' . $e(trim((string) $cond['victoria'])) . '</div></div>';
+                }
+                if (trim((string) ($cond['fracaso'] ?? '')) !== '') {
+                    $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Fracaso</span></div><div class="f7-row-meta">' . $e(trim((string) $cond['fracaso'])) . '</div></div>';
+                }
+                $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Posteo de tramo</span></div><div class="f7-row-meta">Trámite 53 — sin posts de la ronda no hay tramo (21.3).</div></div>';
+                $html .= '</div></div>';
+            }
+        }
+    }
+
+    // Cibernética (F5.4, 5.22/23): implantes activos con zona/nivel/estado,
+    // defectos aplicados y bonos de atributo — SEPARADOS del desglose
+    // base+racial (sus bonos viven en su propio sistema, 23.2/5.22 §A.4).
+    if (function_exists('ope7_implantes_pj')) {
+        $implantes = ope7_implantes_pj((int) $f['id']);
+        if ($implantes) {
+            $html .= '<div class="plate f7-ciber"><div class="plate-h"><span class="t">Cibernética</span><span class="c">implantes · zona/nivel · estado · bonos aparte</span></div><div class="plate-b">';
+            // Bonos de atributo de TODOS los implantes (tope +5 por atributo, 5.22 §A.4).
+            $bonos = array('fue' => 0, 'des' => 0, 'agi' => 0, 'res' => 0, 'per' => 0, 'inte' => 0, 'car' => 0, 'vol' => 0);
+            $bonos_txt = array();
+            foreach ($implantes as $m) {
+                $ranuras = json_decode((string) ($m['ranuras'] ?? '[]'), true);
+                foreach ((array) $ranuras as $r) {
+                    if ((string) ($r['tipo'] ?? '') === 'bonificador') {
+                        $det = (string) ($r['detalle'] ?? '');
+                        if (preg_match('/(FUE|DES|AGI|RES|PER|INT|CAR|VOL)\s*\+?(\d+)/', $det, $mm)) {
+                            $k = strtolower($mm[1]);
+                            $bonos[$k] += (int) $mm[2];
+                        }
+                    }
+                }
+            }
+            foreach ($bonos as $k => $v) {
+                if ($v > 0) {
+                    $bonos_txt[] = strtoupper($k) . ' +' . $v;
+                }
+            }
+            if ($bonos_txt) {
+                $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Bonos de implantes</span><span class="f7-row-pts">' . $e(implode(' · ', $bonos_txt)) . '</span></div>'
+                      . '<div class="f7-row-meta">Se aplican aparte del desglose base + racial (tope +5 por atributo, 5.22 §A.4).</div></div>';
+            }
+            foreach ($implantes as $m) {
+                $t = (array) ($m['tabla'] ?? array());
+                $estado = (string) $m['estado'];
+                $estado_txt = $estado === 'averiado' ? ' ⚠ averiado (sin mantenimiento)' : ucfirst($estado);
+                $defectos = array();
+                $def_raw = json_decode((string) ($m['defectos'] ?? '[]'), true);
+                foreach ((array) $def_raw as $d) {
+                    $defectos[] = (string) ($d['nombre'] ?? '');
+                }
+                $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">' . $e((string) $m['nombre']) . '</span>'
+                      . '<span class="f7-row-pts">' . $e((string) $m['zona']) . ' ' . $e((string) $m['nivel']) . ' · ' . $e($estado_txt) . '</span></div>'
+                      . '<div class="f7-row-meta">Puerta nv' . (int) ($t['puerta'] ?? 0) . ' · mantenimiento ' . number_format((int) ($t['mant'] ?? 0)) . ' ฿/ronda'
+                      . ($defectos ? ' · defectos: ' . $e(implode(', ', array_filter($defectos))) : '') . '</div>'
+                      . '</div>';
+            }
+            $html .= '</div></div>';
+        }
+    }
+
+    // Linaje (F5.4, 5.22 §B/23.7): familia legendaria activa con su dote y el
+    // defecto «La sangre llama» — origen narrativo visible, no toca la balanza
+    // de creación (la herencia se juega, no se compra).
+    if (ope7_tabla_existe('linaje_personaje') && ope7_tabla_existe('familias_legendarias')) {
+        $lq = $db->query('SELECT l.*, f.nombre AS fam_nombre, f.dote AS fam_dote, f.defecto AS fam_defecto, f.lore AS fam_lore '
+            . 'FROM ' . ope7_tabla_full('linaje_personaje') . ' l '
+            . 'JOIN ' . ope7_tabla_full('familias_legendarias') . ' f ON f.id = l.familia_id '
+            . 'WHERE l.personaje_id = ' . (int) $f['id'] . " AND l.estado = 'activo' ORDER BY l.fecha DESC LIMIT 1");
+        $lin = $db->fetch_array($lq);
+        if ($lin) {
+            $html .= '<div class="plate f7-linaje"><div class="plate-h"><span class="t">Linaje</span><span class="c">' . $e((string) $lin['fam_nombre']) . ' · concedido por el staff (23.7)</span></div><div class="plate-b">';
+            if (trim((string) ($lin['fam_lore'] ?? '')) !== '') {
+                $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">La sangre</span></div><div class="f7-row-desc">' . $e(trim((string) $lin['fam_lore'])) . '</div></div>';
+            }
+            if (trim((string) ($lin['fam_dote'] ?? '')) !== '') {
+                $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Dote de linaje</span><span class="f7-row-pts">+1</span></div>'
+                      . '<div class="f7-row-meta">' . $e(trim((string) $lin['fam_dote'])) . ' · origen: narrativo</div></div>';
+            }
+            if (trim((string) ($lin['fam_defecto'] ?? '')) !== '') {
+                $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">' . $e(trim((string) $lin['fam_defecto'])) . '</span><span class="f7-row-pts neg">−1</span></div>'
+                      . '<div class="f7-row-meta">El legado pesa: la sangre llama (23.7) · origen: narrativo</div></div>';
+            }
+            if (trim((string) ($lin['motivo'] ?? '')) !== '') {
+                $html .= '<div class="f7-row"><div class="f7-row-h"><span class="f7-row-name">Motivo de la concesión</span></div><div class="f7-row-meta">' . $e(trim((string) $lin['motivo'])) . '</div></div>';
+            }
+            $html .= '</div></div>';
+        }
+    }
+
     // Reserva de puntos (F4.2, 7.3): stepper por atributo con el techo del
     // nivel y botón que aplica la distribución (ope7_pj_colocar_reserva).
     if (!empty($ctx['puede_gestionar']) && function_exists('ope7_pj_techo_atributo')) {

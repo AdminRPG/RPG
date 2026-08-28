@@ -1,7 +1,7 @@
 <?php
 /**
  * One Piece: Eternal · Biblioteca de Estilos de lucha
- * Catálogo poblado desde BD (rol_estilos). Sin datos mockup.
+ * Catálogo poblado desde BD (ope_estilos). Sin datos mockup.
  * Estilos en docs/themes/ope.css (scope: ope-pg-biblioteca).
  */
 define('IN_MYBB', 1);

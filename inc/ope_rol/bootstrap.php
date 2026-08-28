@@ -69,6 +69,19 @@ require_once $dir . '/sistemas/conquista.php';
 // mejora N1–N3/módulos/reparación/venta, ficha 18.2, madera por clase (18.5),
 // espacio por raza (18.3) + panel staff
 require_once $dir . '/sistemas/barcos.php';
+require_once $dir . '/sistemas/akumas.php';
+
+// Narradores y auto-narradas (F5.2, 5.20/cap.21): trámites 52–55 — ficha de 6
+// bloques, oráculos de 5.16, tramos por rondas, cierre con recompensas + panel staff
+require_once $dir . '/sistemas/misiones.php';
+require_once $dir . '/sistemas/tripulaciones.php';
+require_once $dir . '/sistemas/bajomundo.php';
+require_once $dir . '/sistemas/npc.php';
+require_once $dir . '/sistemas/muertes.php';
+
+// Cibernética y Familias Legendarias (F5.4, 5.22/cap.23): trámites 56–61 —
+// implantes con calibración 5.22, mantenimiento por ronda y linajes con cupo
+require_once $dir . '/sistemas/cibernetica.php';
 
 // Combate 7 Seas (F2, 5.10): motor puro — PA, daño, deltas, tablas, estados, sala
 require_once $dir . '/sistemas/combate.php';

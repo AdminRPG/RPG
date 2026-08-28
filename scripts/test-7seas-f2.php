@@ -450,6 +450,9 @@ foreach ($borrar as $tid) {
 $db->delete_query('ope_tecnicas', "personaje_id = {$pid}");
 $db->delete_query('ope_historico_pp', "personaje_id = {$pid}");
 $db->delete_query('ope_muertes', "personaje_id = {$pid}");
+$db->delete_query('ope_sucesos', "tipo = 'muerte' AND titulo LIKE 'Muere Prueba%'");
+$db->delete_query('ope_carteles_recompensa', "personaje_id = {$pid}");
+$db->delete_query('ope_cambios_faccion', "personaje_id = {$pid}");
 $db->delete_query('ope_carteras', "personaje_id = {$pid}");
 $db->delete_query('ope_akumas', "id = {$akuma_id}");
 $db->delete_query('ope_personajes', "id = {$pid_heredero}");

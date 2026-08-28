@@ -228,8 +228,8 @@ function ope7_tramites_jugador_html($uid, $pagina = 1)
     $total = ope7_tramite_contar(array('solicitante_id' => $uid));
     $mis = ope7_tramite_listar(array('solicitante_id' => $uid, 'pagina' => $pagina), $por_pagina);
 
-    $html  = ope7_shead('Tus trámites', 'ventanillas · motor 5.21',
-        'Sigue el estado de tus solicitudes: pendiente → prompt → analizado → revisión → <b>publicado/rechazado</b>. '
+    $html  = ope7_shead('Tus trámites', 'ventanillas del foro',
+        'Sigue el estado de tus solicitudes: pendiente → en estudio → en revisión → <b>publicado/rechazado</b>. '
         . 'En la validación de ficha y la creación de técnica (ciclo) el resultado vuelve a ti: lo aceptas o pides cambios. '
         . 'El histórico con los motivos del staff es público y auditable.');
 
@@ -289,7 +289,7 @@ function ope7_tramites_hub_html()
     $html .= '<div class="tram-filtros" role="group" aria-label="Filtrar ventanillas">' . "\n";
     $html .= '  <button type="button" class="tram-chip" data-filtro="yo" aria-pressed="true">Puedo iniciar</button>' . "\n";
     $html .= '  <button type="button" class="tram-chip" data-filtro="auto" aria-pressed="false">Automáticos</button>' . "\n";
-    $html .= '  <button type="button" class="tram-chip" data-filtro="ia" aria-pressed="false">IA + firma</button>' . "\n";
+    $html .= '  <button type="button" class="tram-chip" data-filtro="ia" aria-pressed="false">Con firma del staff</button>' . "\n";
     $html .= '  <button type="button" class="tram-chip" data-filtro="todo" aria-pressed="false">Ver todo</button>' . "\n";
     $html .= '</div>' . "\n";
 
@@ -384,7 +384,7 @@ function ope7_tramite_estado_label($estado)
     $labels = array(
         'borrador'         => 'Borrador',
         'pendiente'        => 'Pendiente',
-        'prompt_listo'     => 'Prompt listo',
+        'prompt_listo'     => 'En estudio',
         'analizado'        => 'Analizado',
         'en_revision'      => 'En revisión',
         'revision_usuario' => 'Espera tu decisión',

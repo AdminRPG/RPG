@@ -9277,6 +9277,10 @@ body.ope-pg-facciones-staff .fc-mov{border:1px solid var(--ope-line-soft);border
 body.ope-pg-facciones-staff .fc-mov-h{font-size:.78rem;color:var(--ope-ink)}
 body.ope-pg-facciones-staff .fc-tipo{font-family:var(--mono);font-weight:700;color:var(--ope-gold-deep);text-transform:uppercase;font-size:.68rem}
 body.ope-pg-facciones-staff .fc-mov-meta{font-family:var(--mono);font-size:.62rem;color:var(--ope-ink-dim);margin-top:3px}
+body.ope-pg-facciones-staff .zs-tab{width:100%;border-collapse:collapse;font-size:.78rem}
+body.ope-pg-facciones-staff .zs-tab th{text-align:left;font-family:var(--mono);font-size:.62rem;letter-spacing:.5px;text-transform:uppercase;color:var(--ope-ink-dim);border-bottom:1px solid var(--ope-line-soft);padding:4px 8px}
+body.ope-pg-facciones-staff .zs-tab td{padding:6px 8px;border-bottom:1px solid var(--ope-line-soft);color:var(--ope-ink-soft);vertical-align:top}
+body.ope-pg-facciones-staff .zs-tab td b{color:var(--ope-ink)}
 /* ---- staff · Conquista (F4.3, A.3) ---- */
 body.ope-pg-conquista-staff .wrap{max-width:1100px;margin:0 auto;padding:0 18px 48px}
 body.ope-pg-conquista-staff .shead{display:flex;align-items:baseline;gap:14px;margin:16px 0 18px;flex-wrap:wrap}
@@ -9380,3 +9384,96 @@ body.ope-pg-tramite .btn-ghost:hover{color:var(--ope-gold-deep);background:var(-
 body.ope-pg-tramites a.tram-card{text-decoration:none;color:inherit}
 body.ope-pg-tramites .tram-card-staff{border-style:dashed;opacity:.72;cursor:not-allowed}
 body.ope-pg-tramites .tram-card-staff:hover{border-color:var(--ope-line-soft);transform:none;box-shadow:none}
+
+/* ---- Akumas y Haki (F5) — panel staff ---- */
+body.ope-pg-akumas-staff .zs-row{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--ope-line-soft)}
+body.ope-pg-akumas-staff .zs-row:last-child{border-bottom:0}
+body.ope-pg-akumas-staff .zs-mut{color:var(--ope-muted,#8a8f98);font-size:.92em;margin-top:2px}
+body.ope-pg-akumas-staff .zs-ok{color:#3fb950}
+body.ope-pg-akumas-staff .zs-sub{margin-top:14px;font-weight:700;color:var(--ope-muted,#8a8f98);text-transform:uppercase;font-size:.78em;letter-spacing:.06em}
+body.ope-pg-akumas-staff .zs-ficha{border:1px solid var(--ope-line-soft);border-radius:10px;padding:8px 12px;margin-bottom:8px;background:var(--ope-card)}
+body.ope-pg-akumas-staff .zs-ficha summary{cursor:pointer;font-weight:700;color:var(--ope-ink)}
+body.ope-pg-akumas-staff .zs-ficha-b{margin-top:8px;border-top:1px dashed var(--ope-line-soft);padding-top:8px}
+body.ope-pg-akumas-staff .zs-bloque{font-size:.74rem;line-height:1.5;margin-bottom:4px}
+
+/* ---- Narradores y Misiones (F5.2) — panel staff ---- */
+body.ope-pg-misiones-staff .zs-tab{width:100%;border-collapse:collapse;font-size:.78rem}
+body.ope-pg-misiones-staff .zs-tab th{text-align:left;font-family:var(--mono);font-size:.62rem;letter-spacing:.5px;text-transform:uppercase;color:var(--ope-ink-dim);border-bottom:1px solid var(--ope-line-soft);padding:4px 8px}
+body.ope-pg-misiones-staff .zs-tab td{padding:6px 8px;border-bottom:1px solid var(--ope-line-soft);color:var(--ope-ink-soft);vertical-align:top}
+body.ope-pg-misiones-staff .zs-tab td b{color:var(--ope-ink)}
+body.ope-pg-misiones-staff .zs-row{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--ope-line-soft)}
+body.ope-pg-misiones-staff .zs-row:last-child{border-bottom:0}
+body.ope-pg-misiones-staff .ms-grow{flex:1;min-width:0}
+body.ope-pg-misiones-staff .zs-mut{color:var(--ope-muted,#8a8f98);font-size:.92em;margin-top:2px}
+body.ope-pg-misiones-staff .zs-ok{color:#3fb950}
+body.ope-pg-misiones-staff .ms-chip{font-family:var(--mono);font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ope-gold-deep);border:1px solid var(--ope-line);padding:1px 6px;margin-left:6px}
+body.ope-pg-misiones-staff .ms-secret{color:#b3541e;font-size:.82em;margin-top:2px}
+body.ope-pg-bajomundo-staff .zs-tab{width:100%;border-collapse:collapse;font-size:.78rem}
+body.ope-pg-bajomundo-staff .zs-tab th{text-align:left;font-family:var(--mono);font-size:.62rem;letter-spacing:.5px;text-transform:uppercase;color:var(--ope-ink-dim);border-bottom:1px solid var(--ope-line-soft);padding:4px 8px}
+body.ope-pg-bajomundo-staff .zs-tab td{padding:6px 8px;border-bottom:1px solid var(--ope-line-soft);color:var(--ope-ink-soft);vertical-align:top}
+body.ope-pg-bajomundo-staff .zs-tab td b{color:var(--ope-ink)}
+body.ope-pg-bajomundo-staff .zs-row{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--ope-line-soft)}
+body.ope-pg-bajomundo-staff .zs-row:last-child{border-bottom:0}
+body.ope-pg-bajomundo-staff .zs-mut{color:var(--ope-muted,#8a8f98);font-size:.92em;margin-top:2px}
+body.ope-pg-bajomundo-staff .zs-ok{color:#3fb950}
+body.ope-pg-bajomundo-staff .zs-input{flex:1;min-width:180px;background:var(--ope-card);color:var(--ope-ink);border:1px solid var(--ope-line);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:.78rem}
+body.ope-pg-bajomundo-staff .zs-input:focus{border-color:var(--ope-gold);outline:none}
+body.ope-pg-mercado-staff .zs-tab{width:100%;border-collapse:collapse;font-size:.78rem}
+body.ope-pg-mercado-staff .zs-tab th{text-align:left;font-family:var(--mono);font-size:.62rem;letter-spacing:.5px;text-transform:uppercase;color:var(--ope-ink-dim);border-bottom:1px solid var(--ope-line-soft);padding:4px 8px}
+body.ope-pg-mercado-staff .zs-tab td{padding:6px 8px;border-bottom:1px solid var(--ope-line-soft);color:var(--ope-ink-soft);vertical-align:top}
+body.ope-pg-mercado-staff .zs-tab td b{color:var(--ope-ink)}
+body.ope-pg-npc-staff .zs-tab{width:100%;border-collapse:collapse;font-size:.78rem}
+body.ope-pg-npc-staff .zs-tab th{text-align:left;font-family:var(--mono);font-size:.62rem;letter-spacing:.5px;text-transform:uppercase;color:var(--ope-ink-dim);border-bottom:1px solid var(--ope-line-soft);padding:4px 8px}
+body.ope-pg-npc-staff .zs-tab td{padding:6px 8px;border-bottom:1px solid var(--ope-line-soft);color:var(--ope-ink-soft);vertical-align:top}
+body.ope-pg-npc-staff .zs-tab td b{color:var(--ope-ink)}
+body.ope-pg-npc-staff .zs-row{display:block;padding:10px 0;border-bottom:1px solid var(--ope-line-soft)}
+body.ope-pg-npc-staff .zs-row:last-child{border-bottom:0}
+body.ope-pg-npc-staff .zs-row-h{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+body.ope-pg-npc-staff .zs-mut{color:var(--ope-muted,#8a8f98);font-size:.92em;margin-top:2px}
+body.ope-pg-npc-staff .zs-sub{color:var(--ope-ink-soft);font-size:.84rem;margin-top:4px;line-height:1.45}
+body.ope-pg-reliquias-staff .zs-tab{width:100%;border-collapse:collapse;font-size:.78rem}
+body.ope-pg-reliquias-staff .zs-tab th{text-align:left;font-family:var(--mono);font-size:.62rem;letter-spacing:.5px;text-transform:uppercase;color:var(--ope-ink-dim);border-bottom:1px solid var(--ope-line-soft);padding:4px 8px}
+body.ope-pg-reliquias-staff .zs-tab td{padding:6px 8px;border-bottom:1px solid var(--ope-line-soft);color:var(--ope-ink-soft);vertical-align:top}
+body.ope-pg-reliquias-staff .zs-tab td b{color:var(--ope-ink)}
+body.ope-pg-reliquias-staff .zs-row{display:block;padding:10px 0;border-bottom:1px solid var(--ope-line-soft)}
+body.ope-pg-reliquias-staff .zs-row:last-child{border-bottom:0}
+body.ope-pg-reliquias-staff .zs-row-h{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+body.ope-pg-reliquias-staff .zs-mut{color:var(--ope-muted,#8a8f98);font-size:.92em;margin-top:2px}
+body.ope-pg-reliquias-staff .zs-sub{color:var(--ope-ink-soft);font-size:.84rem;margin-top:4px;line-height:1.45}
+body.ope-pg-tripulaciones-staff .ms-grow{flex:1;min-width:0}
+body.ope-pg-tripulaciones-staff .ms-chip{font-family:var(--mono);font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ope-gold-deep);border:1px solid var(--ope-line);padding:1px 6px;margin-left:6px}
+body.ope-pg-tripulaciones-staff .ms-secret{color:#b3541e;font-size:.82em;margin-top:2px}
+body.ope-pg-tripulaciones-staff .zs-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+body.ope-pg-tripulaciones-staff .zs-form{border-top:1px solid var(--ope-line);padding-top:10px;margin-top:10px}
+body.ope-pg-tripulaciones-staff .zs-form .flabel{display:block;margin:6px 0;font-size:.82rem}
+body.ope-pg-tripulaciones-staff .zs-form select,.zs-form input[type=text],body.ope-pg-tripulaciones-staff .zs-form textarea{width:100%;box-sizing:border-box;margin-top:3px}
+body.ope-pg-cibernetica-staff .ms-grow{flex:1;min-width:0}
+body.ope-pg-cibernetica-staff .ms-chip{font-family:var(--mono);font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ope-gold-deep);border:1px solid var(--ope-line);padding:1px 6px;margin-left:6px}
+body.ope-pg-cibernetica-staff .ms-secret{color:#b3541e;font-size:.82em;margin-top:2px}
+body.ope-pg-cibernetica-staff .zs-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+body.ope-pg-cibernetica-staff .zs-form{border-top:1px solid var(--ope-line);padding-top:10px;margin-top:10px}
+body.ope-pg-cibernetica-staff .zs-form .flabel{display:block;margin:6px 0;font-size:.82rem}
+body.ope-pg-cibernetica-staff .zs-form select,body.ope-pg-cibernetica-staff .zs-form textarea{width:100%;box-sizing:border-box;margin-top:3px}
+body.ope-pg-familias-staff .ms-grow{flex:1;min-width:0}
+body.ope-pg-familias-staff .ms-chip{font-family:var(--mono);font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ope-gold-deep);border:1px solid var(--ope-line);padding:1px 6px;margin-left:6px}
+body.ope-pg-familias-staff .zs-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+body.ope-pg-familias-staff .zs-form{border-top:1px solid var(--ope-line);padding-top:10px;margin-top:10px}
+body.ope-pg-familias-staff .zs-form .flabel{display:block;margin:6px 0;font-size:.82rem}
+body.ope-pg-familias-staff .zs-form select,body.ope-pg-familias-staff .zs-form textarea{width:100%;box-sizing:border-box;margin-top:3px}
+body.ope-pg-misiones-staff .ms-acc{display:flex;gap:8px;align-items:center;flex-shrink:0}
+body.ope-pg-misiones-staff .ms-form{margin-top:14px;border-top:1px dashed var(--ope-line-soft);padding-top:10px}
+body.ope-pg-misiones-staff .ms-form summary{font-family:var(--mono);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ope-gold-deep);cursor:pointer}
+body.ope-pg-misiones-staff .ms-form form{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+body.ope-pg-misiones-staff .ms-form label{display:flex;flex-direction:column;gap:4px;font-family:var(--mono);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ope-ink-dim)}
+body.ope-pg-misiones-staff .ms-form input[type=text],
+body.ope-pg-misiones-staff .ms-form input[type=number],
+body.ope-pg-misiones-staff .ms-form select,
+body.ope-pg-misiones-staff .ms-form textarea{width:100%;background:var(--ope-card-2);border:1px solid var(--ope-line);color:var(--ope-ink);font-family:var(--ope-body);font-size:.88rem;padding:8px 10px;border-radius:8px}
+body.ope-pg-misiones-staff .ms-form textarea{min-height:64px;resize:vertical}
+body.ope-pg-misiones-staff .ms-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+body.ope-pg-misiones-staff .ms-ficha{display:flex;flex-direction:column;gap:5px;padding:10px 12px;border:1px solid var(--ope-line-soft);background:var(--ope-card);font-size:.8rem}
+body.ope-pg-misiones-staff .ms-f-h{font-size:.86rem}
+body.ope-pg-misiones-staff .ms-f-b{color:var(--ope-ink-soft);line-height:1.5}
+body.ope-pg-misiones-staff .ms-lbl{font-family:var(--mono);font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ope-ink-dim);margin-right:6px}
+body.ope-pg-misiones-staff .ope-btn{font-family:var(--mono);font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:6px 12px;border:1px solid var(--ope-line);background:var(--iron);color:var(--paper-dim);cursor:pointer;border-radius:8px;transition:background .14s,color .14s}
+body.ope-pg-misiones-staff .ope-btn:hover{color:var(--paper)}

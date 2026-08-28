@@ -515,12 +515,12 @@ $calendario_texto = 'DÍA 1 · PRIMAVERA · AÑO I';
 // One Piece: Eternal: Latest posts (feed with avatar initial + relative time)
 // El autor mostrado es el PERSONAJE que posteó (ope_pid), no la cuenta.
 $ope_latest_posts = '';
-$ope_has_rol = $db->table_exists('rol_personajes');
+$ope_has_rol = $db->table_exists('ope_personajes');
 $feedSelect = "p.pid, p.subject, p.tid, p.uid, p.dateline, u.username";
 $feedJoin   = "";
 if ($ope_has_rol) {
     $feedSelect .= ", p.ope_pid, rp.nombre AS char_name";
-    $feedJoin    = "LEFT JOIN ".TABLE_PREFIX."rol_personajes rp ON (rp.pid = p.ope_pid)";
+    $feedJoin    = "LEFT JOIN ".TABLE_PREFIX."ope_personajes rp ON (rp.id = p.ope_pid)";
 }
 $q = $db->query("
     SELECT {$feedSelect}
@@ -702,10 +702,10 @@ function _ope_presence_char_links(array $uids, $db): array
     if (empty($uids)) return $map;
     $list = implode(',', array_map('intval', $uids));
     $cq = $db->query("
-        SELECT pid, uid, nombre
-        FROM ".TABLE_PREFIX."rol_personajes
-        WHERE uid IN ({$list}) AND estado = 'aprobado'
-        ORDER BY pid ASC
+        SELECT id AS pid, uid, nombre
+        FROM ".TABLE_PREFIX."ope_personajes
+        WHERE uid IN ({$list}) AND estado = 'aprobado' AND es_NPC = 0
+        ORDER BY id ASC
     ");
     while ($ch = $db->fetch_array($cq)) {
         $map[$ch['uid']][] = $ch;
@@ -832,7 +832,7 @@ while ($cat = $db->fetch_array($catQuery)) {
                t.tid AS lastpost_tid
         FROM ".TABLE_PREFIX."forums f
         LEFT JOIN ".TABLE_PREFIX."threads t ON (t.fid = f.fid AND t.lastpost = f.lastpost)
-        LEFT JOIN ".TABLE_PREFIX."rol_personajes rp ON (rp.pid = f.ope_lastpid)
+        LEFT JOIN ".TABLE_PREFIX."ope_personajes rp ON (rp.id = f.ope_lastpid)
         WHERE f.type = 'f' AND f.pid = '{$cat['fid']}' AND f.active = 1
         ORDER BY f.disporder ASC
     ");
@@ -938,11 +938,11 @@ $forums = $ope_categories;
 
 // One Piece: Eternal: último personaje creado (para el censo del pie de portada)
 $ope_last_char = '';
-if ($db->table_exists('rol_personajes')) {
-    $lcq = $db->simple_select('rol_personajes', 'pid, nombre', "estado = 'aprobado'", array('order_by' => 'pid', 'order_dir' => 'DESC', 'limit' => 1));
+if ($db->table_exists('ope_personajes')) {
+    $lcq = $db->simple_select('ope_personajes', 'id, nombre', "estado = 'aprobado'", array('order_by' => 'id', 'order_dir' => 'DESC', 'limit' => 1));
     if ($db->num_rows($lcq)) {
         $lcRow = $db->fetch_array($lcq);
-        $ope_last_char = '<a href="'.$mybb->settings['bburl'].'/ficha.php?pid='.(int)$lcRow['pid'].'">'.htmlspecialchars_uni($lcRow['nombre']).'</a>';
+        $ope_last_char = '<a href="'.$mybb->settings['bburl'].'/ficha.php?pid='.(int)$lcRow['id'].'">'.htmlspecialchars_uni($lcRow['nombre']).'</a>';
     }
 }
 if ($ope_last_char === '') {

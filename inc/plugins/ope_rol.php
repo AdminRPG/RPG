@@ -41,33 +41,37 @@ $plugins->add_hook('datahandler_post_insert_post', 'ope_rol_stamp_post');
 $plugins->add_hook('datahandler_post_insert_thread_end', 'ope_rol_after_thread');
 $plugins->add_hook('datahandler_post_insert_post_end', 'ope_rol_after_post');
 
-// Snapshot histórico e inmutable (stats + objetos "encima") en el momento
-// exacto en que se publica cada post: los modales Mochila/Atributos del
-// postbit deben reflejar SIEMPRE ese estado, nunca el estado actual/en vivo.
-$plugins->add_hook('datahandler_post_insert_thread_end', 'ope_rol_snapshot_post');
-$plugins->add_hook('datahandler_post_insert_post_end', 'ope_rol_snapshot_post');
-
-// PP automático por post: cuenta palabras y asigna Puntos de Progreso.
-// Corre DESPUÉS de snapshot_post en el mismo hook (MyBB ejecuta en orden de registro).
-$plugins->add_hook('datahandler_post_insert_thread_end', 'ope_pp_on_post');
-$plugins->add_hook('datahandler_post_insert_post_end', 'ope_pp_on_post');
-$plugins->add_hook('datahandler_post_insert_thread_end', 'ope_rol_cu_on_post');
-$plugins->add_hook('datahandler_post_insert_post_end', 'ope_rol_cu_on_post');
+// D6.3: hooks legacy de posteo DESACTIVADOS — escriben en tablas mybb_rol_*
+// retiradas (rol_post_snapshot, ope_pp_saldo, rol_haki/rol_tecnicas). El motor
+// 7 Seas hace el conteo de usos de Haki al CIERRE de tema (5.19, D5.3) y el
+// PP por cierre (trámite 2), no por post. El postbit degrada al estado actual
+// del personaje (mybb_ope_personajes). Las funciones se conservan en el plugin
+// (código legacy con guards) por si se quieren restaurar tras migrar los datos.
+//$plugins->add_hook('datahandler_post_insert_thread_end', 'ope_rol_snapshot_post');
+//$plugins->add_hook('datahandler_post_insert_post_end', 'ope_rol_snapshot_post');
+//$plugins->add_hook('datahandler_post_insert_thread_end', 'ope_pp_on_post');
+//$plugins->add_hook('datahandler_post_insert_post_end', 'ope_pp_on_post');
+//$plugins->add_hook('datahandler_post_insert_thread_end', 'ope_rol_cu_on_post');
+//$plugins->add_hook('datahandler_post_insert_post_end', 'ope_rol_cu_on_post');
 
 // Restricción de posteo: un personaje EN REVISIÓN solo puede publicar en la
 // zona Off Topic (crear tema o responder). Los aprobados, en cualquier foro.
 $plugins->add_hook('newthread_do_newthread_start', 'ope_rol_guard_newthread');
 $plugins->add_hook('newreply_do_newreply_start', 'ope_rol_guard_newreply');
 
-// Época (pasado/presente) + etiqueta del tema para la línea de tiempo del rol.
-$plugins->add_hook('newthread_do_newthread_end', 'ope_rol_save_thread_meta');
-$plugins->add_hook('editpost_do_editpost_end', 'ope_rol_save_thread_meta_edit');
+// D6.3: metadata de época legacy DESACTIVADA (escribe en ope_thread_meta,
+// retirada). El motor 7 Seas ancla la época en ope_temas (fecha_foro/tipo) y
+// vincula el hilo real con mybb_tid (D1.8).
+//$plugins->add_hook('newthread_do_newthread_end', 'ope_rol_save_thread_meta');
+//$plugins->add_hook('editpost_do_editpost_end', 'ope_rol_save_thread_meta_edit');
 
 // Spoilers anidables [spoiler]/[spoiler=Título] en todo el foro (antes de nl2br).
 $plugins->add_hook('parse_message', 'ope_rol_parse_spoilers');
 
-// Bloques del RPG System ([combate], [accion], [tecnica], [estado], [dado]).
-$plugins->add_hook('parse_message', 'ope_rol_parse_rpg');
+// D6.3: parse del RPG System legacy DESACTIVADO (leía rol_tecnicas/rol_cartas/
+// ope_npcs_secundarios, retiradas; sin posts con esos tags). El 7 Seas usa
+// [ope7-zonab] (Zona B) y sus propios bloques.
+//$plugins->add_hook('parse_message', 'ope_rol_parse_rpg');
 
 // Zona B 7 Seas (F2.2): [ope7-zonab]{json}[/ope7-zonab] → cartas del turno.
 $plugins->add_hook('parse_message', 'ope7_zonab_parse');
@@ -76,22 +80,19 @@ $plugins->add_hook('parse_message', 'ope7_zonab_parse');
 $plugins->add_hook('datahandler_post_insert_thread_end', 'ope7_zonab_on_post');
 $plugins->add_hook('datahandler_post_insert_post_end', 'ope7_zonab_on_post');
 
-// Oráculo de Viaje: [viaje=ID] y [viaje-cierre=ID] → HTML visual OPE Eternal.
-$plugins->add_hook('parse_message', 'ope_rol_parse_viaje');
+// D6.3: parse de viaje legacy DESACTIVADO (leía rol_personajes/viajes, retiradas).
+//$plugins->add_hook('parse_message', 'ope_rol_parse_viaje');
 
-// Mision: [mision=TOMA_ID] → HTML visual del oraculo de mision.
-$plugins->add_hook('parse_message', 'ope_rol_parse_mision');
-
-// Panel de mision activo en showthread (como viaje, oculta primer post de Narrador).
-$plugins->add_hook('showthread_end', 'ope_rol_mision_showthread_end');
-
-// Panel de viaje activo en showthread (cierre manual).
-$plugins->add_hook('showthread_end', 'ope_rol_viaje_showthread_end');
-
-// Insertador de plantillas de post del personaje activo en newthread/newreply.
-$plugins->add_hook('newthread_end', 'ope_rol_tpl_inserter_newthread');
-$plugins->add_hook('newreply_end', 'ope_rol_tpl_inserter_newreply');
-$plugins->add_hook('editpost_end', 'ope_rol_tpl_inserter_newreply');
+// D6.3: hooks de misión/viaje legacy y plantillas de post DESACTIVADOS — leían
+// rol_mision_tomas / rol_viajes / ope_post_templates (retiradas, sin datos). El
+// motor 7 Seas gestiona misiones con ope_misiones (trámites 52–55) y travesías
+// con ope_travesias (trámite 38).
+//$plugins->add_hook('parse_message', 'ope_rol_parse_mision');
+//$plugins->add_hook('showthread_end', 'ope_rol_mision_showthread_end');
+//$plugins->add_hook('showthread_end', 'ope_rol_viaje_showthread_end');
+//$plugins->add_hook('newthread_end', 'ope_rol_tpl_inserter_newthread');
+//$plugins->add_hook('newreply_end', 'ope_rol_tpl_inserter_newreply');
+//$plugins->add_hook('editpost_end', 'ope_rol_tpl_inserter_newreply');
 
 // Muestra el personaje (no la cuenta) como autor visible del mensaje.
 $plugins->add_hook('postbit', 'ope_rol_postbit');
@@ -231,7 +232,24 @@ function ope_rol_active_staff($uid)
     if ($uid < 1) {
         return $out;
     }
-    if ($db->table_exists('rol_cuentas')) {
+    // D6.3: fuente canónica mybb_ope_cuentas (staff_level/staff_rol/staff_narrador).
+    if (function_exists('ope7_permisos')) {
+        $p = ope7_permisos($uid);
+        $out['rank']     = (int) ($p['rank'] ?? 0);
+        $out['rol']      = (string) ($p['rol'] ?? '');
+        $out['narrador'] = (int) ($p['narrador'] ?? 0);
+        $out['is_staff'] = (bool) ($p['is_staff'] ?? false);
+        if ($out['is_staff'] || $out['narrador'] === 1) {
+            $a = ope7_pj_activo($uid);
+            if ($a && $a['tabla'] === 'ope') {
+                $out['pid'] = $a['id'];
+                $pq = $db->simple_select(ope7_tabla('personajes'), 'nombre', "id = " . $a['id'], array('limit' => 1));
+                if ($db->num_rows($pq)) {
+                    $out['nombre'] = (string) $db->fetch_field($pq, 'nombre');
+                }
+            }
+        }
+    } elseif ($db->table_exists('rol_cuentas')) {
         $q = $db->simple_select('rol_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
         $pid = $db->num_rows($q) ? (int) $db->fetch_field($q, 'personaje_activo') : 0;
         if ($pid > 0 && $db->table_exists('rol_personajes')) {
@@ -281,8 +299,10 @@ function ope_rol_global()
         return;
     }
 
-    // Fail-safe: sin tablas de rol, solo bypass Admin MyBB.
-    if (!$db->table_exists('rol_cuentas')) {
+    // D6.3: fuente canónica mybb_ope_cuentas + mybb_ope_personajes.
+    // Fail-safe: sin motor 7 Seas, solo bypass Admin MyBB.
+    $canonico = function_exists('ope7_tabla_existe') && ope7_tabla_existe('cuentas') && ope7_tabla_existe('personajes');
+    if (!$canonico && !$db->table_exists('rol_cuentas')) {
         if (ope_rol_is_board_admin($uid)) {
             $mybb->user['ope_staff_rol']   = 'webmaster';
             $mybb->user['ope_staff_rank']  = 4;
@@ -295,9 +315,14 @@ function ope_rol_global()
     }
 
     $activo = 0;
-    $query  = $db->simple_select('rol_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
-    if ($db->num_rows($query)) {
-        $activo = (int) $db->fetch_field($query, 'personaje_activo');
+    if ($canonico) {
+        $a = ope7_pj_activo($uid);
+        $activo = ($a && $a['tabla'] === 'ope') ? $a['id'] : 0;
+    } else {
+        $query  = $db->simple_select('rol_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
+        if ($db->num_rows($query)) {
+            $activo = (int) $db->fetch_field($query, 'personaje_activo');
+        }
     }
 
     $mybb->user['ope_active_pid'] = $activo;
@@ -306,24 +331,42 @@ function ope_rol_global()
     // Datos del personaje activo: nombre + STAFF (el staff es por personaje, así
     // que si tienes activo un personaje sin rol, NO eres staff aunque otro de tus
     // personajes lo sea).
-    if ($activo > 0 && $db->table_exists('rol_personajes')) {
-        $pq = $db->simple_select(
-            'rol_personajes',
-            'nombre, staff_rol, staff_narrador',
-            "pid = {$activo} AND uid = {$uid}",
-            array('limit' => 1)
-        );
+    if ($activo > 0) {
+        $staff_rol      = '';
+        $staff_narrador = 0;
+        if ($canonico) {
+            $p = ope7_permisos($uid);
+            $staff_rol      = (string) ($p['rol'] ?? '');
+            $staff_narrador = (int) ($p['narrador'] ?? 0);
+            $pq = $db->simple_select(
+                ope7_tabla('personajes'),
+                'nombre',
+                "id = {$activo} AND uid = {$uid}",
+                array('limit' => 1)
+            );
+        } else {
+            $pq = $db->simple_select(
+                'rol_personajes',
+                'nombre, staff_rol, staff_narrador',
+                "pid = {$activo} AND uid = {$uid}",
+                array('limit' => 1)
+            );
+        }
         if ($db->num_rows($pq)) {
             $row = $db->fetch_array($pq);
-            $ope_active_nombre               = (string) $row['nombre'];
+            $ope_active_nombre               = (string) ($row['nombre'] ?? '');
             $mybb->user['ope_active_nombre'] = $ope_active_nombre;
             if ($ope_active_nombre !== '') {
                 $mybb->user['ope_display_name'] = $ope_active_nombre;
             }
+            if (!$canonico) {
+                $staff_rol      = (string) ($row['staff_rol'] ?? '');
+                $staff_narrador = (int) ($row['staff_narrador'] ?? 0);
+            }
 
-            $rank     = ope_rol_staff_rank((string) $row['staff_rol']);
-            $narrador = (int) $row['staff_narrador'];
-            $mybb->user['ope_staff_rol']      = (string) $row['staff_rol'];
+            $rank     = ope_rol_staff_rank($staff_rol);
+            $narrador = (int) $staff_narrador;
+            $mybb->user['ope_staff_rol']      = (string) $staff_rol;
             $mybb->user['ope_staff_narrador'] = $narrador;
             $mybb->user['ope_staff_rank']     = $rank;
             $mybb->user['ope_staff_level']    = $rank;
@@ -358,18 +401,18 @@ function ope_rol_global()
 function ope_rol_alertas_no_leidas(int $pid): int
 {
     global $db;
-    if ($pid <= 0 || !$db->table_exists('rol_alertas')) return 0;
-    $q = $db->simple_select('rol_alertas', 'COUNT(*) as cnt', "pid = {$pid} AND leido = 0");
+    if ($pid <= 0 || !$db->table_exists('ope_alertas')) return 0;
+    $q = $db->simple_select('ope_alertas', 'COUNT(*) as cnt', "pid = {$pid} AND leido = 0");
     return (int)$db->fetch_field($q, 'cnt');
 }
 
 function ope_rol_mensajes_no_leidos(int $pid): int
 {
     global $db;
-    if (!$db->table_exists('rol_mensajes') || $pid <= 0) return 0;
+    if (!$db->table_exists('ope_mensajes') || $pid <= 0) return 0;
     $q = $db->query("
         SELECT COUNT(DISTINCT thread_id) as cnt
-        FROM " . TABLE_PREFIX . "rol_mensajes
+        FROM " . TABLE_PREFIX . "ope_mensajes
         WHERE destino_pid = {$pid} AND leido = 0
     ");
     return (int)$db->fetch_field($q, 'cnt');
@@ -844,8 +887,14 @@ function ope_rol_active_pid_for($uid)
         return $cache[$uid];
     }
 
+    // D6.3: fuente canónica mybb_ope_cuentas → mybb_ope_personajes.
     $pid = 0;
-    if ($db->table_exists('rol_cuentas')) {
+    if (function_exists('ope7_pj_activo')) {
+        $a = ope7_pj_activo($uid);
+        if ($a && $a['tabla'] === 'ope' && $a['id'] > 0) {
+            $pid = $a['id'];
+        }
+    } elseif ($db->table_exists('rol_cuentas')) {
         $q = $db->simple_select('rol_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
         if ($db->num_rows($q)) {
             $pid = (int) $db->fetch_field($q, 'personaje_activo');
@@ -854,8 +903,8 @@ function ope_rol_active_pid_for($uid)
 
     // Sólo cuenta si sigue siendo un personaje propio y no descartado
     // (aprobado o en revisión). Rechazados/borradores/eliminados no se firman.
-    if ($pid > 0 && $db->table_exists('rol_personajes')) {
-        $vq = $db->simple_select('rol_personajes', 'pid', "pid = {$pid} AND uid = {$uid} AND estado IN ('aprobado','revision')", array('limit' => 1));
+    if ($pid > 0 && function_exists('ope7_tabla_existe') && ope7_tabla_existe('personajes')) {
+        $vq = $db->simple_select(ope7_tabla('personajes'), 'id', "id = {$pid} AND uid = {$uid} AND estado IN ('aprobado','revision')", array('limit' => 1));
         if (!$db->num_rows($vq)) {
             $pid = 0;
         }
@@ -873,14 +922,28 @@ function ope_rol_active_char_estado($uid)
 {
     global $db;
     $uid = (int) $uid;
-    if ($uid < 1 || !$db->table_exists('rol_cuentas')) {
+    if ($uid < 1) {
         return '';
     }
     $pid = 0;
-    $q = $db->simple_select('rol_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
-    if ($db->num_rows($q)) {
-        $pid = (int) $db->fetch_field($q, 'personaje_activo');
+    $canonico = function_exists('ope7_pj_activo') && ope7_tabla_existe('cuentas') && ope7_tabla_existe('personajes');
+    if ($canonico) {
+        $a = ope7_pj_activo($uid);
+        $pid = ($a && $a['tabla'] === 'ope') ? $a['id'] : 0;
+        if ($pid <= 0) {
+            return '';
+        }
+        $vq = $db->simple_select(ope7_tabla('personajes'), 'estado', "id = {$pid} AND uid = {$uid}", array('limit' => 1));
+        if (!$db->num_rows($vq)) {
+            return '';
+        }
+        return (string) $db->fetch_field($vq, 'estado');
     }
+    if (!$db->table_exists('rol_cuentas')) {
+        return '';
+    }
+    $q = $db->simple_select('rol_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
+    $pid = $db->num_rows($q) ? (int) $db->fetch_field($q, 'personaje_activo') : 0;
     if ($pid <= 0 || !$db->table_exists('rol_personajes')) {
         return '';
     }
@@ -1018,7 +1081,29 @@ function ope_rol_char($pid)
     }
 
     $row = null;
-    if ($db->table_exists('rol_personajes')) {
+    // D6.3: fuente canónica mybb_ope_personajes (columnas mapeadas a la antigua).
+    $canonico = function_exists('ope7_tabla_existe') && ope7_tabla_existe('personajes');
+    if ($canonico) {
+        $q = $db->simple_select(ope7_tabla('personajes'), 'id AS pid, uid, nombre, slug, faccion_id, nivel, avatar, icono, bio AS firma, estado, datos, desc_fisica', "id = {$pid}", array('limit' => 1));
+        if ($db->num_rows($q)) {
+            $row = $db->fetch_array($q);
+            // Facción: en el esquema nuevo es faccion_id → nombre; el postbit
+            // legacy lee 'faccion' (nombre) + 'rango'/'rango_faccion'.
+            $datos = json_decode((string) ($row['datos'] ?? ''), true) ?: array();
+            $fid = (int) ($row['faccion_id'] ?? 0);
+            $faccion_nombre = '';
+            if ($fid > 0 && ope7_tabla_existe('facciones')) {
+                $fq = $db->simple_select(ope7_tabla('facciones'), 'nombre', "id = {$fid}", array('limit' => 1));
+                if ($db->num_rows($fq)) {
+                    $faccion_nombre = (string) $db->fetch_field($fq, 'nombre');
+                }
+            }
+            $row['faccion']      = $faccion_nombre !== '' ? $faccion_nombre : (string) ($datos['faccion'] ?? '');
+            $row['faccion_slug'] = ope_rol_faccion_slug($row['faccion']);
+            $row['rango']        = (string) ($datos['rango'] ?? '');
+            $row['rango_faccion'] = $faccion_nombre;
+        }
+    } elseif ($db->table_exists('rol_personajes')) {
         $q = $db->simple_select('rol_personajes', 'pid, uid, nombre, slug, rango, nivel, avatar, icono, firma, estado, datos, rango_faccion', "pid = {$pid}", array('limit' => 1));
         if ($db->num_rows($q)) {
             $row = $db->fetch_array($q);
@@ -1125,6 +1210,14 @@ function ope_rol_after_thread(&$dh)
     }
     if ($fid > 0 && $visible === 1) {
         $db->update_query('forums', array('ope_lastpid' => $pid), "fid = {$fid}");
+    }
+    // D1.8: el hilo real recién creado se vincula al presente abierto del
+    // personaje que aún no tenía hilo (apertura de tema, misión o tripulación).
+    // Se salta Off Topic: esos hilos no son temas de rol.
+    if ($tid > 0 && $pid > 0
+        && function_exists('ope7_tema_vincular_mybb_por_pj')
+        && !ope_rol_is_offtopic_fid($fid)) {
+        ope7_tema_vincular_mybb_por_pj($pid, $tid);
     }
     return $dh;
 }
@@ -1499,16 +1592,44 @@ function ope_rol_char_row($pid)
 {
     global $db;
     $pid = (int) $pid;
-    if ($pid < 1 || !$db->table_exists('rol_personajes')) {
+    if ($pid < 1) {
         return null;
     }
-    $q = $db->simple_select('rol_personajes', '*', "pid = {$pid}", array('limit' => 1));
+    // D6.3: fuente canónica mybb_ope_personajes (columna id = pid legacy).
+    $canonico = function_exists('ope7_tabla_existe') && ope7_tabla_existe('personajes');
+    if (!$canonico && !$db->table_exists('rol_personajes')) {
+        return null;
+    }
+    $q = $canonico
+        ? $db->simple_select(ope7_tabla('personajes'), '*', "id = {$pid}", array('limit' => 1))
+        : $db->simple_select('rol_personajes', '*', "pid = {$pid}", array('limit' => 1));
     if (!$db->num_rows($q)) {
         return null;
     }
     $row = $db->fetch_array($q);
+    if ($canonico) {
+        // Mapeo de columnas al esquema viejo que el postbit legacy consume.
+        $row['pid'] = (int) $row['id'];
+        unset($row['id']);
+        if (!isset($row['firma'])) {
+            $row['firma'] = (string) ($row['bio'] ?? '');
+        }
+        if (!isset($row['rango'])) {
+            $row['rango'] = (string) ($row['rango_faccion'] ?? '');
+        }
+        if (!isset($row['rango_faccion'])) {
+            $row['rango_faccion'] = (string) ($row['faccion_id'] ?? '');
+        }
+    }
     $datos = json_decode((string) ($row['datos'] ?? ''), true) ?: array();
-    $row['faccion']      = (string) ($datos['faccion'] ?? '');
+    $faccion_nombre = (string) ($datos['faccion'] ?? '');
+    if ($canonico && empty($faccion_nombre) && (int) ($row['faccion_id'] ?? 0) > 0 && ope7_tabla_existe('facciones')) {
+        $fq = $db->simple_select(ope7_tabla('facciones'), 'nombre', "id = " . (int) $row['faccion_id'], array('limit' => 1));
+        if ($db->num_rows($fq)) {
+            $faccion_nombre = (string) $db->fetch_field($fq, 'nombre');
+        }
+    }
+    $row['faccion']      = $faccion_nombre;
     $row['faccion_slug'] = ope_rol_faccion_slug($row['faccion']);
     return $row;
 }
@@ -2050,10 +2171,25 @@ function ope_rol_char_tripulacion($pid)
 {
     global $db;
     $pid = (int) $pid;
-    if ($pid < 1 || !$db->table_exists('rol_relaciones')) {
+    if ($pid < 1) {
         return null;
     }
-    $q = $db->simple_select('rol_relaciones', 'pid, destino_pid', "tipo = 'tripulacion' AND (pid = {$pid} OR destino_pid = {$pid})", array('limit' => 1));
+    // D6.3: fuente canónica mybb_ope_tripulantes (relación por tripulación);
+    // fallback al legado ope_relaciones (tipo = 'tripulacion').
+    if (function_exists('ope7_tabla_existe') && ope7_tabla_existe('tripulantes') && ope7_tabla_existe('tripulaciones')) {
+        $q = $db->query('SELECT p.id, p.nombre FROM ' . ope7_tabla_full('tripulantes') . ' tr '
+            . 'JOIN ' . ope7_tabla_full('personajes') . ' p ON p.id = tr.personaje_id '
+            . "WHERE tr.tripulacion_id IN (SELECT tripulacion_id FROM " . ope7_tabla_full('tripulantes') . " WHERE personaje_id = {$pid}) AND tr.personaje_id <> {$pid} LIMIT 1");
+        if ($db->num_rows($q)) {
+            $r = $db->fetch_array($q);
+            return array('pid' => (int) $r['id'], 'nombre' => (string) $r['nombre']);
+        }
+        return null;
+    }
+    if (!$db->table_exists('ope_relaciones')) {
+        return null;
+    }
+    $q = $db->simple_select('ope_relaciones', 'pid, destino_pid', "tipo = 'tripulacion' AND (pid = {$pid} OR destino_pid = {$pid})", array('limit' => 1));
     if (!$db->num_rows($q)) {
         return null;
     }
@@ -2226,7 +2362,7 @@ function ope_rol_thread_tags()
 }
 
 /**
- * Guarda/actualiza rol_thread_meta para un tema. Reglas:
+ * Guarda/actualiza ope_thread_meta para un tema. Reglas:
  *  - presente  => fecha_rol = año gregoriano del epoch; día (1–65) y estación = calendario on-rol actual
  *  - pasado    => fecha_rol, día y estación los indica el jugador (día 1–65)
  *  - tag       => una de las válidas o '' (sin etiqueta)
@@ -2237,7 +2373,7 @@ function ope_rol_store_thread_meta($tid, $fid, $era_in, $fecha_in, $tag_in, $dia
     global $db;
     $tid = (int) $tid;
     $fid = (int) $fid;
-    if ($tid < 1 || !$db->table_exists('rol_thread_meta')) {
+    if ($tid < 1 || !$db->table_exists('ope_thread_meta')) {
         return;
     }
     // En Off Topic no se guarda metadata de época.
@@ -2276,12 +2412,12 @@ function ope_rol_store_thread_meta($tid, $fid, $era_in, $fecha_in, $tag_in, $dia
         'dateline'  => TIME_NOW,
     );
 
-    $ex = $db->simple_select('rol_thread_meta', 'tid', "tid = {$tid}", array('limit' => 1));
+    $ex = $db->simple_select('ope_thread_meta', 'tid', "tid = {$tid}", array('limit' => 1));
     if ($db->num_rows($ex)) {
         unset($data['tid']);
-        $db->update_query('rol_thread_meta', $data, "tid = {$tid}");
+        $db->update_query('ope_thread_meta', $data, "tid = {$tid}");
     } else {
-        $db->insert_query('rol_thread_meta', $data);
+        $db->insert_query('ope_thread_meta', $data);
     }
 }
 
@@ -3129,10 +3265,10 @@ function ope_rol_char_templates($pid)
     global $db;
     $pid = (int) $pid;
     $out = array();
-    if ($pid < 1 || !$db->table_exists('rol_post_templates')) {
+    if ($pid < 1 || !$db->table_exists('ope_post_templates')) {
         return $out;
     }
-    $q = $db->simple_select('rol_post_templates', 'tpl_id, nombre, cuerpo',
+    $q = $db->simple_select('ope_post_templates', 'tpl_id, nombre, cuerpo',
         "pid = {$pid}", array('order_by' => 'disporder, tpl_id', 'order_dir' => 'asc'));
     while ($r = $db->fetch_array($q)) {
         $out[] = array(
@@ -4077,7 +4213,7 @@ function ope_rol_npc_sec_forge_css()
 }
 
 /**
- * Biblioteca de NPCs secundarios de mybb_rol_npcs_secundarios.
+ * Biblioteca de NPCs secundarios de mybb_ope_npcs_secundarios.
  * Devuelve filas con `tecnicas` ya decodificado y normalizado.
  * Busca por nombre del NPC y/o por nombre de tecnica (en el JSON).
  */
@@ -4085,7 +4221,7 @@ function ope_rol_npc_sec_lib($buscar = '', $tec_buscar = '')
 {
     global $db;
     $out = array();
-    if (!$db->table_exists('rol_npcs_secundarios')) return $out;
+    if (!$db->table_exists('ope_npcs_secundarios')) return $out;
     $where = '1=1';
     $buscar = trim((string) $buscar);
     $tec_buscar = trim((string) $tec_buscar);
@@ -4095,7 +4231,7 @@ function ope_rol_npc_sec_lib($buscar = '', $tec_buscar = '')
     if ($tec_buscar !== '') {
         $where .= " AND tecnicas LIKE '%" . $db->escape_string_like($tec_buscar) . "%'";
     }
-    $q = $db->simple_select('rol_npcs_secundarios', '*', $where, array('order_by' => 'nombre ASC', 'limit' => 500));
+    $q = $db->simple_select('ope_npcs_secundarios', '*', $where, array('order_by' => 'nombre ASC', 'limit' => 500));
     while ($r = $db->fetch_array($q)) {
         $r['tecnicas'] = ope_rol_npc_sec_norm_tecnicas($r['tecnicas'] ?? '');
         $out[] = $r;
@@ -4110,10 +4246,10 @@ function ope_rol_npc_sec_by_id($npc_id)
 {
     global $db;
     $npc_id = (int) $npc_id;
-    if ($npc_id < 1 || !$db->table_exists('rol_npcs_secundarios')) {
+    if ($npc_id < 1 || !$db->table_exists('ope_npcs_secundarios')) {
         return null;
     }
-    $q = $db->simple_select('rol_npcs_secundarios', '*', "id = {$npc_id}", array('limit' => 1));
+    $q = $db->simple_select('ope_npcs_secundarios', '*', "id = {$npc_id}", array('limit' => 1));
     if (!$db->num_rows($q)) {
         return null;
     }
@@ -4136,10 +4272,10 @@ function ope_rol_char_acompanantes($pid)
     global $db;
     $pid = (int) $pid;
     $out = array();
-    if ($pid < 1 || !$db->table_exists('rol_acompanantes') || !$db->table_exists('rol_npcs_secundarios')) {
+    if ($pid < 1 || !$db->table_exists('ope_acompanantes') || !$db->table_exists('ope_npcs_secundarios')) {
         return $out;
     }
-    $q = $db->simple_select('rol_acompanantes', '*', "pid = {$pid}", array('order_by' => 'slot ASC'));
+    $q = $db->simple_select('ope_acompanantes', '*', "pid = {$pid}", array('order_by' => 'slot ASC'));
     while ($row = $db->fetch_array($q)) {
         $npc = ope_rol_npc_sec_by_id((int) $row['npc_id']);
         if (!$npc) {
@@ -4169,30 +4305,30 @@ function ope_rol_acompanante_asignar($pid, $npc_id, $slot)
     if ($slot < 1 || $slot > $max) {
         return array('ok' => false, 'msg' => 'El slot debe ser 1 o 2.');
     }
-    if (!$db->table_exists('rol_acompanantes') || !$db->table_exists('rol_npcs_secundarios')) {
+    if (!$db->table_exists('ope_acompanantes') || !$db->table_exists('ope_npcs_secundarios')) {
         return array('ok' => false, 'msg' => 'Falta la tabla de acompañantes. Ejecuta scripts/migrate-acompanantes.php');
     }
-    if (!$db->num_rows($db->simple_select('rol_npcs_secundarios', 'id', "id = {$npc_id}", array('limit' => 1)))) {
+    if (!$db->num_rows($db->simple_select('ope_npcs_secundarios', 'id', "id = {$npc_id}", array('limit' => 1)))) {
         return array('ok' => false, 'msg' => 'Ese NPC no existe en la biblioteca.');
     }
 
     // Mismo NPC en otro slot → mover.
-    $dup = $db->simple_select('rol_acompanantes', 'id, slot', "pid = {$pid} AND npc_id = {$npc_id}", array('limit' => 1));
+    $dup = $db->simple_select('ope_acompanantes', 'id, slot', "pid = {$pid} AND npc_id = {$npc_id}", array('limit' => 1));
     if ($db->num_rows($dup)) {
         $ex = $db->fetch_array($dup);
         if ((int) $ex['slot'] === $slot) {
             return array('ok' => true, 'msg' => 'Ese acompañante ya está en ese slot.');
         }
-        $db->delete_query('rol_acompanantes', 'id = ' . (int) $ex['id']);
+        $db->delete_query('ope_acompanantes', 'id = ' . (int) $ex['id']);
     }
 
     // Slot ocupado por otro NPC → reemplazar.
-    $occ = $db->simple_select('rol_acompanantes', 'id', "pid = {$pid} AND slot = {$slot}", array('limit' => 1));
+    $occ = $db->simple_select('ope_acompanantes', 'id', "pid = {$pid} AND slot = {$slot}", array('limit' => 1));
     if ($db->num_rows($occ)) {
-        $db->delete_query('rol_acompanantes', 'id = ' . (int) $db->fetch_field($occ, 'id'));
+        $db->delete_query('ope_acompanantes', 'id = ' . (int) $db->fetch_field($occ, 'id'));
     }
 
-    $db->insert_query('rol_acompanantes', array(
+    $db->insert_query('ope_acompanantes', array(
         'pid'      => $pid,
         'npc_id'   => $npc_id,
         'slot'     => $slot,
@@ -4211,13 +4347,13 @@ function ope_rol_acompanante_quitar($pid, $slot = 0, $npc_id = 0)
     $pid = (int) $pid;
     $slot = (int) $slot;
     $npc_id = (int) $npc_id;
-    if ($pid < 1 || !$db->table_exists('rol_acompanantes')) {
+    if ($pid < 1 || !$db->table_exists('ope_acompanantes')) {
         return array('ok' => false, 'msg' => 'No se pudo quitar el acompañante.');
     }
     if ($slot > 0) {
-        $db->delete_query('rol_acompanantes', "pid = {$pid} AND slot = {$slot}");
+        $db->delete_query('ope_acompanantes', "pid = {$pid} AND slot = {$slot}");
     } elseif ($npc_id > 0) {
-        $db->delete_query('rol_acompanantes', "pid = {$pid} AND npc_id = {$npc_id}");
+        $db->delete_query('ope_acompanantes', "pid = {$pid} AND npc_id = {$npc_id}");
     } else {
         return array('ok' => false, 'msg' => 'Indica slot o NPC.');
     }
@@ -4232,11 +4368,11 @@ function ope_rol_acompanante_slot_libre($pid)
     global $db;
     $pid = (int) $pid;
     $max = ope_rol_acompanantes_max();
-    if ($pid < 1 || !$db->table_exists('rol_acompanantes')) {
+    if ($pid < 1 || !$db->table_exists('ope_acompanantes')) {
         return 1;
     }
     $ocupados = array();
-    $q = $db->simple_select('rol_acompanantes', 'slot', "pid = {$pid}");
+    $q = $db->simple_select('ope_acompanantes', 'slot', "pid = {$pid}");
     while ($r = $db->fetch_array($q)) {
         $ocupados[(int) $r['slot']] = true;
     }
@@ -4268,35 +4404,35 @@ function ope_rol_acompanante_solicitar($pid, $uid, $npc_id, $motivo = '')
     if ($pid < 1 || $npc_id < 1) {
         return array('ok' => false, 'msg' => 'Elige un NPC de la biblioteca.');
     }
-    if (!$db->table_exists('rol_acompanante_solicitudes') || !$db->table_exists('rol_npcs_secundarios')) {
+    if (!$db->table_exists('ope_acompanante_solicitudes') || !$db->table_exists('ope_npcs_secundarios')) {
         return array('ok' => false, 'msg' => 'Falta la tabla de solicitudes. Ejecuta scripts/migrate-acompanantes.php');
     }
-    if (!$db->num_rows($db->simple_select('rol_npcs_secundarios', 'id', "id = {$npc_id}", array('limit' => 1)))) {
+    if (!$db->num_rows($db->simple_select('ope_npcs_secundarios', 'id', "id = {$npc_id}", array('limit' => 1)))) {
         return array('ok' => false, 'msg' => 'Ese NPC no existe en la biblioteca.');
     }
     // ¿Ya lo tiene asignado?
-    if ($db->table_exists('rol_acompanantes')
-        && $db->num_rows($db->simple_select('rol_acompanantes', 'id', "pid = {$pid} AND npc_id = {$npc_id}", array('limit' => 1)))) {
+    if ($db->table_exists('ope_acompanantes')
+        && $db->num_rows($db->simple_select('ope_acompanantes', 'id', "pid = {$pid} AND npc_id = {$npc_id}", array('limit' => 1)))) {
         return array('ok' => false, 'msg' => 'Ya tienes ese acompañante asignado.');
     }
     // ¿Slots llenos?
-    $asignados = $db->table_exists('rol_acompanantes')
-        ? (int) $db->fetch_field($db->simple_select('rol_acompanantes', 'COUNT(*) c', "pid = {$pid}"), 'c')
+    $asignados = $db->table_exists('ope_acompanantes')
+        ? (int) $db->fetch_field($db->simple_select('ope_acompanantes', 'COUNT(*) c', "pid = {$pid}"), 'c')
         : 0;
     // Solicitudes pendientes de este personaje.
     $pend = (int) $db->fetch_field(
-        $db->simple_select('rol_acompanante_solicitudes', 'COUNT(*) c', "pid = {$pid} AND estado = 'pendiente'"),
+        $db->simple_select('ope_acompanante_solicitudes', 'COUNT(*) c', "pid = {$pid} AND estado = 'pendiente'"),
         'c'
     );
     if ($asignados + $pend >= $max) {
         return array('ok' => false, 'msg' => 'Has alcanzado el máximo de acompañantes (contando solicitudes pendientes). Retira uno o espera la resolución.');
     }
     // ¿Ya hay una solicitud pendiente para el mismo NPC?
-    if ($db->num_rows($db->simple_select('rol_acompanante_solicitudes', 'id', "pid = {$pid} AND npc_id = {$npc_id} AND estado = 'pendiente'", array('limit' => 1)))) {
+    if ($db->num_rows($db->simple_select('ope_acompanante_solicitudes', 'id', "pid = {$pid} AND npc_id = {$npc_id} AND estado = 'pendiente'", array('limit' => 1)))) {
         return array('ok' => false, 'msg' => 'Ya tienes una solicitud pendiente para ese NPC.');
     }
 
-    $db->insert_query('rol_acompanante_solicitudes', array(
+    $db->insert_query('ope_acompanante_solicitudes', array(
         'pid'      => $pid,
         'uid'      => $uid,
         'npc_id'   => $npc_id,
@@ -4316,10 +4452,10 @@ function ope_rol_acompanante_solicitud_cancelar($sid, $pid)
     global $db;
     $sid = (int) $sid;
     $pid = (int) $pid;
-    if ($sid < 1 || $pid < 1 || !$db->table_exists('rol_acompanante_solicitudes')) {
+    if ($sid < 1 || $pid < 1 || !$db->table_exists('ope_acompanante_solicitudes')) {
         return array('ok' => false, 'msg' => 'No se pudo cancelar.');
     }
-    $db->delete_query('rol_acompanante_solicitudes', "id = {$sid} AND pid = {$pid} AND estado = 'pendiente'");
+    $db->delete_query('ope_acompanante_solicitudes', "id = {$sid} AND pid = {$pid} AND estado = 'pendiente'");
     return array('ok' => true, 'msg' => 'Solicitud cancelada.');
 }
 
@@ -4331,10 +4467,10 @@ function ope_rol_char_solicitudes_acompanante($pid)
     global $db;
     $pid = (int) $pid;
     $out = array();
-    if ($pid < 1 || !$db->table_exists('rol_acompanante_solicitudes')) {
+    if ($pid < 1 || !$db->table_exists('ope_acompanante_solicitudes')) {
         return $out;
     }
-    $q = $db->simple_select('rol_acompanante_solicitudes', '*', "pid = {$pid}", array('order_by' => 'dateline', 'order_dir' => 'DESC', 'limit' => 50));
+    $q = $db->simple_select('ope_acompanante_solicitudes', '*', "pid = {$pid}", array('order_by' => 'dateline', 'order_dir' => 'DESC', 'limit' => 50));
     while ($r = $db->fetch_array($q)) {
         $npc = ope_rol_npc_sec_by_id((int) $r['npc_id']);
         $r['npc_nombre'] = $npc ? (string) ($npc['nombre'] ?? '') : 'NPC eliminado';
@@ -4350,10 +4486,10 @@ function ope_rol_acompanante_solicitudes_pendientes()
 {
     global $db;
     $out = array();
-    if (!$db->table_exists('rol_acompanante_solicitudes')) {
+    if (!$db->table_exists('ope_acompanante_solicitudes')) {
         return $out;
     }
-    $q = $db->simple_select('rol_acompanante_solicitudes', '*', "estado = 'pendiente'", array('order_by' => 'dateline', 'order_dir' => 'ASC'));
+    $q = $db->simple_select('ope_acompanante_solicitudes', '*', "estado = 'pendiente'", array('order_by' => 'dateline', 'order_dir' => 'ASC'));
     while ($r = $db->fetch_array($q)) {
         $r['npc'] = ope_rol_npc_sec_by_id((int) $r['npc_id']);
         $r['pj_nombre'] = function_exists('ope_rol_cat_nombre_pid')
@@ -4366,8 +4502,8 @@ function ope_rol_acompanante_solicitudes_pendientes()
                 $r['owner'] = (string) $db->fetch_field($uq, 'username');
             }
         }
-        $r['asignados'] = $db->table_exists('rol_acompanantes')
-            ? (int) $db->fetch_field($db->simple_select('rol_acompanantes', 'COUNT(*) c', 'pid = ' . (int) $r['pid']), 'c')
+        $r['asignados'] = $db->table_exists('ope_acompanantes')
+            ? (int) $db->fetch_field($db->simple_select('ope_acompanantes', 'COUNT(*) c', 'pid = ' . (int) $r['pid']), 'c')
             : 0;
         $out[] = $r;
     }
@@ -4378,11 +4514,11 @@ function ope_rol_acompanante_solicitudes_pendientes()
 function ope_rol_acompanante_solicitudes_pend_count()
 {
     global $db;
-    if (!$db->table_exists('rol_acompanante_solicitudes')) {
+    if (!$db->table_exists('ope_acompanante_solicitudes')) {
         return 0;
     }
     return (int) $db->fetch_field(
-        $db->simple_select('rol_acompanante_solicitudes', 'COUNT(*) c', "estado = 'pendiente'"),
+        $db->simple_select('ope_acompanante_solicitudes', 'COUNT(*) c', "estado = 'pendiente'"),
         'c'
     );
 }
@@ -4396,10 +4532,10 @@ function ope_rol_acompanante_solicitud_aprobar($sid, $staff_uid, $nota = '')
     $sid = (int) $sid;
     $staff_uid = (int) $staff_uid;
     $nota = trim((string) $nota);
-    if ($sid < 1 || !$db->table_exists('rol_acompanante_solicitudes')) {
+    if ($sid < 1 || !$db->table_exists('ope_acompanante_solicitudes')) {
         return array('ok' => false, 'msg' => 'Solicitud no encontrada.');
     }
-    $q = $db->simple_select('rol_acompanante_solicitudes', '*', "id = {$sid}", array('limit' => 1));
+    $q = $db->simple_select('ope_acompanante_solicitudes', '*', "id = {$sid}", array('limit' => 1));
     if (!$db->num_rows($q)) {
         return array('ok' => false, 'msg' => 'Solicitud no encontrada.');
     }
@@ -4418,7 +4554,7 @@ function ope_rol_acompanante_solicitud_aprobar($sid, $staff_uid, $nota = '')
     if (!$res['ok']) {
         return $res;
     }
-    $db->update_query('rol_acompanante_solicitudes', array(
+    $db->update_query('ope_acompanante_solicitudes', array(
         'estado'     => 'aprobada',
         'slot'       => $slot,
         'staff_uid'  => $staff_uid,
@@ -4438,17 +4574,17 @@ function ope_rol_acompanante_solicitud_rechazar($sid, $staff_uid, $nota = '')
     $sid = (int) $sid;
     $staff_uid = (int) $staff_uid;
     $nota = trim((string) $nota);
-    if ($sid < 1 || !$db->table_exists('rol_acompanante_solicitudes')) {
+    if ($sid < 1 || !$db->table_exists('ope_acompanante_solicitudes')) {
         return array('ok' => false, 'msg' => 'Solicitud no encontrada.');
     }
-    $q = $db->simple_select('rol_acompanante_solicitudes', 'estado', "id = {$sid}", array('limit' => 1));
+    $q = $db->simple_select('ope_acompanante_solicitudes', 'estado', "id = {$sid}", array('limit' => 1));
     if (!$db->num_rows($q)) {
         return array('ok' => false, 'msg' => 'Solicitud no encontrada.');
     }
     if ((string) $db->fetch_field($q, 'estado') !== 'pendiente') {
         return array('ok' => false, 'msg' => 'Esa solicitud ya está resuelta.');
     }
-    $db->update_query('rol_acompanante_solicitudes', array(
+    $db->update_query('ope_acompanante_solicitudes', array(
         'estado'     => 'rechazada',
         'staff_uid'  => $staff_uid,
         'staff_nota' => $db->escape_string(mb_substr($nota, 0, 500)),

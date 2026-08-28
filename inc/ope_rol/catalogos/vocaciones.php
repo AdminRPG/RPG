@@ -691,11 +691,11 @@ function ope_rol_pj_vocaciones($pid)
 {
     global $db;
     $pid = (int)$pid;
-    if ($pid <= 0 || !$db->table_exists('rol_pj_vocaciones')) {
+    if ($pid <= 0 || !$db->table_exists('ope_pj_vocaciones')) {
         return array('clase' => '', 'oficios' => array(), 'arma' => '', 'elecciones' => array(), 'arquetipo_clase' => '');
     }
 
-    $q = $db->simple_select('rol_pj_vocaciones', '*', "pid = {$pid}", array('limit' => 1));
+    $q = $db->simple_select('ope_pj_vocaciones', '*', "pid = {$pid}", array('limit' => 1));
     if ($db->num_rows($q) > 0) {
         $row = $db->fetch_array($q);
         $oficios = @json_decode($row['oficios'] ?? '[]', true);
@@ -721,7 +721,7 @@ function ope_rol_vocacion_guardar_eleccion($pid, $nivel, $opcion)
     $pid = (int)$pid;
     $nivel = (int)$nivel;
     $opcion = trim((string)$opcion);
-    if ($pid <= 0 || !$db->table_exists('rol_pj_vocaciones')) {
+    if ($pid <= 0 || !$db->table_exists('ope_pj_vocaciones')) {
         return array('ok' => false, 'msg' => 'Personaje o tabla no encontrada.');
     }
 
@@ -729,7 +729,7 @@ function ope_rol_vocacion_guardar_eleccion($pid, $nivel, $opcion)
     $elecciones = $data['elecciones'];
     $elecciones[(string)$nivel] = $opcion;
 
-    $db->update_query('rol_pj_vocaciones', array(
+    $db->update_query('ope_pj_vocaciones', array(
         'elecciones' => $db->escape_string(json_encode($elecciones, JSON_UNESCAPED_UNICODE))
     ), "pid = {$pid}");
 
@@ -747,7 +747,7 @@ function ope_rol_vocacion_guardar_eleccion_oficio($pid, $oficio, $nivel, $opcion
     $nivel = (int)$nivel;
     $oficio = trim((string)$oficio);
     $opcion = trim((string)$opcion);
-    if ($pid <= 0 || $oficio === '' || !$db->table_exists('rol_pj_vocaciones')) {
+    if ($pid <= 0 || $oficio === '' || !$db->table_exists('ope_pj_vocaciones')) {
         return array('ok' => false, 'msg' => 'Personaje u oficio no encontrado.');
     }
 
@@ -764,7 +764,7 @@ function ope_rol_vocacion_guardar_eleccion_oficio($pid, $oficio, $nivel, $opcion
     }
     $elecciones['_oficios'][$oficio][(string)$nivel] = $opcion;
 
-    $db->update_query('rol_pj_vocaciones', array(
+    $db->update_query('ope_pj_vocaciones', array(
         'elecciones' => $db->escape_string(json_encode($elecciones, JSON_UNESCAPED_UNICODE))
     ), "pid = {$pid}");
 
@@ -790,7 +790,7 @@ function ope_rol_vocacion_guardar_arquetipo($pid, $segunda_clase)
         return array('ok' => false, 'msg' => 'No puedes elegir tu clase primaria como segunda clase.');
     }
 
-    $db->update_query('rol_pj_vocaciones', array(
+    $db->update_query('ope_pj_vocaciones', array(
         'arquetipo_clase' => $db->escape_string($segunda_clase)
     ), "pid = {$pid}");
 

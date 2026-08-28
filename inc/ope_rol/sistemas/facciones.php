@@ -567,6 +567,32 @@ function ope7_facciones_panel_html()
     }
     $html .= '</div></div>';
 
+    // ── Sueldos y nóminas (A.3: «sueldos y nóminas») ──
+    $html .= '<div class="plate"><div class="plate-h"><span class="t">Sueldos y nóminas</span><span class="c">por ronda · pendiente/pagado</span></div><div class="plate-b">';
+    $nom = array();
+    if (ope7_tabla_existe('sueldos') && ope7_tabla_existe('personajes')) {
+        $q = $db->query('SELECT s.*, p.nombre AS pj_nombre FROM ' . ope7_tabla_full('sueldos') . ' s '
+            . 'JOIN ' . ope7_tabla_full('personajes') . ' p ON p.id = s.personaje_id '
+            . 'ORDER BY s.ronda DESC, p.nombre LIMIT 20');
+        while ($r = $db->fetch_array($q)) {
+            $nom[] = $r;
+        }
+    }
+    if (!$nom) {
+        $html .= '<p class="fc-empty">Sin nóminas todavía (el cron de sueldos por ronda genera las filas pendientes).</p>';
+    } else {
+        $html .= '<table class="zs-tab"><thead><tr><th>Ronda</th><th>Personaje</th><th>Posts</th><th>Monto</th><th>Estado</th></tr></thead><tbody>';
+        foreach ($nom as $n) {
+            $html .= '<tr><td>' . (int) $n['ronda'] . '</td>'
+                . '<td>' . $e((string) $n['pj_nombre']) . '</td>'
+                . '<td>' . (int) $n['posts_del_mes'] . '</td>'
+                . '<td>' . number_format((int) $n['monto'], 0, ',', '.') . ' ฿</td>'
+                . '<td>' . $e((string) $n['estado']) . '</td></tr>';
+        }
+        $html .= '</tbody></table>';
+    }
+    $html .= '</div></div>';
+
     // ── Histórico de cambios (13.8, inmutable) ──
     $html .= '<div class="plate"><div class="plate-h"><span class="t">Histórico de cambios de facción</span><span class="c">cambios_faccion · inmutable</span></div><div class="plate-b">';
     $hist = array();

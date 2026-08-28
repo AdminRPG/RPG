@@ -58,7 +58,7 @@ if ($tid > 0) {
 // 6) Posteo de prueba del bot «OPE Eternal» (hito F0) en Dudas de sistema (fid 109)
 $mensaje = "[center][b]News Coo · Aviso del sistema[/b][/center]\n\n"
     . "El periódico del mundo abre sus puertas: este es un mensaje de prueba del bot del sistema (OPE Eternal).\n\n"
-    . "El motor de trámites está operativo con su catálogo de 67 trámites y la zona staff dispone de la bandeja transversal (la IA propone, el staff decide).\n\n"
+    . "El motor de trámites está operativo con su catálogo de 67 trámites y la zona staff dispone de la bandeja transversal (el foro estudia, el staff decide).\n\n"
     . "— La redacción";
 $sys_tid = ope7_bot_post_thread(109, 'News Coo — Aviso del sistema (prueba)', $mensaje, 'aviso');
 echo "[7] Bot: thread de prueba tid=" . $sys_tid . " (esperado > 0)\n";

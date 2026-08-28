@@ -98,13 +98,40 @@ if (!function_exists('ope_rol_cat_akuma')) {
     {
         global $db;
         $out = array();
-        if (!$db->table_exists('rol_akuma')) {
-            return $out;
+        // F6.4: fuente canónica mybb_ope_akumas (7 Seas, F5.1). El catálogo
+        // viejo rol_akuma se retiró; el espejo mantiene el esquema histórico
+        // si la corrida aún no creó ope_akumas (entorno en transición).
+        $tabla = 'ope_akumas';
+        if (!$db->table_exists($tabla)) {
+            if ($db->table_exists('ope_akuma')) {
+                $tabla = 'ope_akuma';
+            } else {
+                return $out;
+            }
         }
-        $where = $solo_activos ? 'activo = 1' : '';
-        $q = $db->simple_select('rol_akuma', '*', $where, array('order_by' => 'orden, id', 'order_dir' => 'ASC'));
+        $where = $solo_activos ? "estado IN ('libre','ocupada')" : '';
+        $q = $db->simple_select($tabla, '*', $where, array('order_by' => 'tier, nombre_propio', 'order_dir' => 'ASC'));
         while ($r = $db->fetch_array($q)) {
-            $out[] = $r;
+            // Mapeo a la forma histórica (lo consume ope_fruta_norm/biblioteca).
+            $out[] = array(
+                'id'                => (int) $r['id'],
+                'nombre'            => (string) ($r['nombre_propio'] ?? $r['nombre'] ?? ''),
+                'tipo'              => (string) ($r['familia'] ?? $r['tipo'] ?? ''),
+                'rareza'            => (string) ($r['rareza'] ?? ''),
+                'tier'              => (int) ($r['tier'] ?? 0),
+                'secundario'        => (string) ($r['tier_roman'] ?? ''),
+                'descripcion'       => (string) ($r['aspecto'] ?? ''),
+                'descripcion_breve' => (string) ($r['aspecto'] ?? ''),
+                'efecto_general'    => (string) ($r['mecanica_base'] ?? ''),
+                'debilidad'         => (string) ($r['debilidades'] ?? ''),
+                'despertar'         => (string) ($r['despertar'] ?? ''),
+                'potencia_formula'  => '',
+                'caps_json'         => '',
+                'usuario'           => '',
+                'ocupada_pid'       => (int) ($r['portador_id'] ?? 0),
+                'imagen'            => '',
+                'origen'            => (string) ($r['origen'] ?? ''),
+            );
         }
         return $out;
     }
@@ -132,11 +159,11 @@ if (!function_exists('ope_rol_cat_estilos')) {
     {
         global $db;
         $out = array();
-        if (!$db->table_exists('rol_estilos')) {
+        if (!$db->table_exists('ope_estilos')) {
             return $out;
         }
         $where = $solo_activos ? 'activo = 1' : '';
-        $q = $db->simple_select('rol_estilos', '*', $where, array('order_by' => 'orden, id', 'order_dir' => 'ASC'));
+        $q = $db->simple_select('ope_estilos', '*', $where, array('order_by' => 'orden, id', 'order_dir' => 'ASC'));
         while ($r = $db->fetch_array($q)) {
             $out[] = $r;
         }
@@ -166,10 +193,46 @@ if (!function_exists('ope_rol_cat_personajes_publicos')) {
     {
         global $db;
         $out = array();
-        if (!$db->table_exists('rol_personajes')) {
+        // F6.3: fuente canónica mybb_ope_personajes; el legado rol_personajes
+        // solo se usa si el esquema nuevo no existe todavía (transición).
+        $canonico = function_exists('ope7_tabla_existe') && ope7_tabla_existe('personajes') && $db->table_exists('personajes');
+        if (!$canonico && !$db->table_exists('rol_personajes')) {
             return $out;
         }
         $razas = function_exists('ope_rol_razas') ? ope_rol_razas() : array();
+        if ($canonico) {
+            // ope_personajes: raza_id → razas.nombre; facción/rango por id.
+            $q = $db->query('SELECT p.id AS pid, p.nombre, p.slug, \'\' AS rango, p.nivel, '
+                . 'p.avatar, p.icono, \'\' AS rango_faccion, p.personalidad, p.datos, p.es_NPC, '
+                . 'r.nombre AS raza_nombre, f.nombre AS faccion_nombre, fa.nombre AS rango_faccion_nombre '
+                . 'FROM ' . ope7_tabla_full('personajes') . ' p '
+                . 'LEFT JOIN ' . ope7_tabla_full('razas') . ' r ON r.id = p.raza_id '
+                . 'LEFT JOIN ' . ope7_tabla_full('facciones') . ' f ON f.id = p.faccion_id '
+                . 'LEFT JOIN ' . ope7_tabla_full('facciones_rangos') . ' fa ON fa.id = p.rango_id '
+                . 'WHERE ' . ($where === 'es_npc = 1' ? 'p.es_NPC = 1' : "p.es_NPC = 0 AND p.estado = 'aprobado'") . ' ORDER BY p.nombre ASC');
+            while ($r = $db->fetch_array($q)) {
+                $datos = json_decode((string) ($r['datos'] ?? ''), true) ?: array();
+                $out[] = array(
+                    'pid'          => (int) $r['pid'],
+                    'nombre'       => (string) $r['nombre'],
+                    'slug'         => (string) $r['slug'],
+                    'rango'        => (string) ($r['rango'] ?? ''),
+                    'nivel'        => (int) $r['nivel'],
+                    'imagen'       => trim((string) ($r['icono'] ?: $r['avatar'])),
+                    'faccion'      => (string) ($r['faccion_nombre'] ?? ''),
+                    'faccion_slug' => function_exists('ope_rol_faccion_slug') ? ope_rol_faccion_slug((string) ($r['faccion_nombre'] ?? '')) : strtolower((string) ($r['faccion_nombre'] ?? '')),
+                    'rango_faccion' => (string) ($r['rango_faccion_nombre'] ?? ''),
+                    'raza'         => (string) ($r['raza_nombre'] ?? ''),
+                    'concepto'     => (string) ($datos['concepto'] ?? ''),
+                    'apodo'        => (string) ($datos['apodo'] ?? ''),
+                    'edad'         => (string) ($datos['edad'] ?? ''),
+                    'genero'       => (string) ($datos['genero'] ?? ''),
+                    'personalidad' => (string) ($r['personalidad'] ?? ''),
+                    'apariencia'   => '',
+                );
+            }
+            return $out;
+        }
         $q = $db->simple_select(
             'rol_personajes',
             'pid, nombre, slug, rango, nivel, avatar, icono, rango_faccion, desc_fisica, personalidad, datos, es_npc',
@@ -242,10 +305,10 @@ if (!function_exists('ope_rol_mv_mision_asignacion')) {
     {
         global $db;
         $mid = (int) $mid;
-        if ($mid < 1 || !$db->table_exists('rol_mv_mision_asignaciones')) {
+        if ($mid < 1 || !$db->table_exists('ope_mv_mision_asignaciones')) {
             return null;
         }
-        $q = $db->simple_select('rol_mv_mision_asignaciones', '*', "mision_id = {$mid}", array('limit' => 1));
+        $q = $db->simple_select('ope_mv_mision_asignaciones', '*', "mision_id = {$mid}", array('limit' => 1));
         if (!$db->num_rows($q)) {
             return null;
         }
@@ -259,10 +322,10 @@ if (!function_exists('ope_rol_mv_mision_asignacion')) {
     {
         global $db;
         $out = array();
-        if (!$db->table_exists('rol_mv_mision_asignaciones')) {
+        if (!$db->table_exists('ope_mv_mision_asignaciones')) {
             return $out;
         }
-        $q = $db->simple_select('rol_mv_mision_asignaciones', '*');
+        $q = $db->simple_select('ope_mv_mision_asignaciones', '*');
         while ($r = $db->fetch_array($q)) {
             $r['companeros_arr'] = ope_rol_cat_json_list($r['companeros'] ?? '');
             $out[(int) $r['mision_id']] = $r;
@@ -523,16 +586,16 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
     }
 
 if (!function_exists('ope_rol_cat_lore')) {
-    /** Biblioteca de Lore: devuelve todos los artículos activos de rol_lore. */
+    /** Biblioteca de Lore: devuelve todos los artículos activos de ope_lore. */
     function ope_rol_cat_lore($solo_activos = true)
     {
         global $db;
         $out = array();
-        if (!$db->table_exists('rol_lore')) {
+        if (!$db->table_exists('ope_lore')) {
             return $out;
         }
         $where = $solo_activos ? 'activo = 1' : '';
-        $q = $db->simple_select('rol_lore', '*', $where, array('order_by' => 'orden, id', 'order_dir' => 'ASC'));
+        $q = $db->simple_select('ope_lore', '*', $where, array('order_by' => 'orden, id', 'order_dir' => 'ASC'));
         while ($r = $db->fetch_array($q)) {
             $out[] = $r;
         }

@@ -891,6 +891,10 @@ function ope7_travesias_vencidas()
         if (ope7_tabla_existe('temas_participantes')) {
             $db->update_query('ope_temas_participantes', array('salio_en' => $now), 'tema_id = ' . (int) $f['tema_id']);
         }
+        // D1.8: cierra también el hilo real del foro si estaba vinculado.
+        if (function_exists('ope7_tema_cerrar_mybb')) {
+            ope7_tema_cerrar_mybb((int) $f['tema_id']);
+        }
         $n++;
     }
     return $n;

@@ -2147,7 +2147,7 @@ function ope_rol_mv_publicar($ciclo_id, $parsed, $raw = '', $imgUrls = array())
     if ($titulo === '') {
         $titulo = 'El mundo ha cambiado — ' . $ciclo['periodo'];
     }
-    $db->insert_query('rol_mv_noticias', array(
+    $db->insert_query('ope_mv_noticias', array(
         'titulo'      => $db->escape_string($titulo),
         'resumen'     => $db->escape_string((string) $parsed['noticia']['resumen']),
         'cuerpo_html' => $db->escape_string((string) $parsed['noticia']['cuerpo']),
@@ -2337,10 +2337,10 @@ function ope_rol_mv_noticias_activas($limit = 8)
 {
     global $db;
     $out = array();
-    if (!$db->table_exists('rol_mv_noticias')) {
+    if (!$db->table_exists('ope_mv_noticias')) {
         return $out;
     }
-    $q = $db->simple_select('rol_mv_noticias', '*', 'activa = 1', array('order_by' => 'orden ASC, dateline', 'order_dir' => 'DESC', 'limit' => (int) $limit));
+    $q = $db->simple_select('ope_mv_noticias', '*', 'activa = 1', array('order_by' => 'orden ASC, dateline', 'order_dir' => 'DESC', 'limit' => (int) $limit));
     while ($r = $db->fetch_array($q)) {
         $out[] = $r;
     }

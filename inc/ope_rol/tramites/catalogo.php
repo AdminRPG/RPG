@@ -46,6 +46,77 @@ function ope7_prompt_especifica($numero, array $ctx)
                  . "Computa PP = Base(T) × 7 factores (fidelidad, peso, calidad, extensión ≥350 palabras, presente/pasado F_tiempo, riesgo, perfil), "
                  . "informe de rasgos por participante (jugado/no jugado/contradicho), fama propuesta y peso en la matriz 5.14. "
                  . "Base(T) por tramo: 50/75/125/200/300 PP. Techo 2×, suelo 0,5×. Redondeo al entero más cercano (mitades a favor del jugador).";
+        case 25: // Solicitar rumor a la red (5.13/14.2.3)
+            return "Trámite 25 · Solicitar rumor a la red (5.13, cap. 14.2.3).\n"
+                 . "Personaje {$j('personaje_id')}; espía {$j('espia_id')}.\n"
+                 . "La red investiga un rumor concreto según la CAPACIDAD del espía (Novato: Suspiro/Murmullo local · "
+                 . "Avanzado: hasta Susurro regional · Experimentado: hasta Alto Susurro · Supremo: todas, mundial) y su tiempo "
+                 . "(1 ronda Suspiro/Murmullo, 2 Susurro, 3 Alto Susurro — un Experimentado en Alto Susurro tarda 4). "
+                 . "Devuelve la ficha del rumor: contenido (frase jugable), tipo (suceso/tesoro/persona/facción), alcance, "
+                 . "categoría (suspiro/murmullo/susurro/alto_susurro), fiabilidad publicada (rumoroso/plausible/sólido), "
+                 . "veracidad interna (verdadero/dudoso/falso según el origen: suceso real = verdadero; especulación = dudoso) "
+                 . "y precio_base sugerido (14.2.2). Nunca tiradas: la capacidad decide qué puede y cuánto tarda.";
+        case 27: // Contrastar rumor (5.13/14.4)
+            return "Trámite 27 · Contrastar rumor (5.13, cap. 14.4).\n"
+                 . "Rumor {$j('rumor_id')}; sensibilidad {$j('sensibilidad')}.\n"
+                 . "Coste por alcance (Local 1.000–5.000 · Regional 5.000–25.000 · Mundial 50.000–250.000 ฿) × sensibilidad "
+                 . "(común ×1 · figura pública ×2 · criminal ×3 · identidad oculta ×5 · entidad ×10). Tiempo: 1 ronda "
+                 . "Local/Regional · 2 Mundial. Efecto: la fiabilidad afina un grado; en Sólido se revela la veracidad interna. "
+                 . "Límites: lo que nadie sabe no se verifica (sin pistas no llega a Sólido); contrastar a ciegas un falso bien "
+                 . "sembrado puede confirmarlo. Devuelve el veredicto editable para la firma.";
+        case 30: // Publicar cartel (5.13/14.6, staff)
+            return "Trámite 30 · Publicar cartel de recompensa (5.13, cap. 14.6).\n"
+                 . "Personaje buscado {$j('personaje_id')}.\n"
+                 . "Fija la cifra (escala 5.9: cientos de miles → 3.000M), el paradero publicado con su fiabilidad "
+                 . "(rumoroso/plausible/sólido) y el nivel aproximado. El paradero caduca a las 3 rondas sin avistamiento "
+                 . "actualizado (14.6). Devuelve el texto del cartel editable para la firma.";
+        case 31: // Cobrar recompensa (5.13/14.6)
+            return "Trámite 31 · Cobrar recompensa (5.13, cap. 14.6).\n"
+                 . "Cazador {$j('personaje_id')}; cartel {$j('cartel_id')}.\n"
+                 . "Verifica: cartel vigente, paradero no frío (menos de 3 rondas), entrega real (tema presente resuelto con "
+                 . "veredicto de 5.10 — vivo o muerto según el cartel) y anti-abuso (sin entrega no hay cobro; autocaza es abuso). "
+                 . "Devuelve el resumen de entrega para la firma y el cobro.";
+        case 32: // Crear rumor falso (propaganda, 5.13/14.8)
+            return "Trámite 32 · Crear rumor falso (propaganda, 5.13, cap. 14.8).\n"
+                 . "Personaje {$j('personaje_id')}; isla {$j('isla_id')}.\n"
+                 . "El jugador siembra un rumor FALSO (veracidad interna = falso, nunca se reescribe). Tú decides la fiabilidad "
+                 . "publicada (cómo circula: un chisme de taberna nace rumoroso; bien sembrado puede parecer sólido) y el alcance. "
+                 . "Reglas: un falso de gran alcance puede generar Wanted injusto o suceso — eso es trama y tú decides cómo se "
+                 . "procesa (14.8). Devuelve la ficha del rumor editable para la firma.";
+        case 33: // Ataque a una red (5.13/14.5)
+            return "Trámite 33 · Ataque a una red (5.13, cap. 14.5).\n"
+                 . "Atacante {$j('personaje_id')}; red objetivo {$j('red_id')}.\n"
+                 . "El atacante declara su método (sabotaje, infiltración, delación…); tú decides con veredicto qué descubre o "
+                 . "estropea según la capacidad de los espías y la narrativa. NUNCA tiradas. Devuelve: espías descubiertos "
+                 . "(ids), si la red se desactiva y la trama resultante (un espía descubierto es delación/contrainformación/chantaje).";
+        case 48: // Despertar de akuma (5.18/19.6)
+            return "Trámite 48 · Despertar de akuma (5.18, cap. 19.6).\n"
+                 . "Personaje {$j('personaje_id')}; fruta {$j('akuma_id')}.\n"
+                 . "Requisitos (19.4/19.6): nivel alto por banda de tier/familia — T1–T2 desde nv25, T3–T4 desde nv32, "
+                 . "Logia/mitológica desde nv40 —, antigüedad real como portador (meses on-roll, calendario 5.6), "
+                 . "temas cerrados usándola (histórico) y Voluntad como moneda (VOL). "
+                 . "Propón el despertar DE ESTA fruta según su ficha (bloque «despertar» de 5.18): qué cambia, qué sostiene "
+                 . "(técnicas sin PE extra con mantenimiento de PE por turno, reposos/puertas intactos, 19.6) y si es un "
+                 . "suceso de ronda (5.14) — la Logia siempre lo es. Devuelve el resumen para la firma.";
+        case 49: // Adaptación de fruta bajo demanda (staff, skill-adaptacion-akumas)
+            return "Trámite 49 · Adaptación de fruta bajo demanda (5.18, skill-adaptacion-akumas + guía maestra).\n"
+                 . "Concepto del staff: {$j('concepto')}.\n"
+                 . "Construye la ficha de 8 bloques desde el nombre+concepto canon: 1) identidad (nombre propio, familia, "
+                 . "rareza, tier 1–5, aspecto), 2) mecánica base (pasivas, límites, rupturas con condición), 3) puertas "
+                 . "(efectos del catálogo 5.7 + no registrados con calibración), 4) debilidades (enemigo natural), "
+                 . "5) requisitos del portador, 6) influencia en la ficha (dotes/defectos — balanza a 0, con la dote "
+                 . "exclusiva inventada), 7) despertar, 8) precio y vías (coste_pp matriz 19.7). "
+                 . "Reglas: sin dados, sin personajes/eventos canon como contenido, cupo mundial (fruto único, 19.7), "
+                 . "coherencia con lo cerrado (3.8) y anti-abuso. Devuelve la ficha completa en JSON para que el staff la revise y firme.";
+        case 51: // Subida de nivel de Haki (5.19)
+            return "Trámite 51 · Subida de nivel de Haki (5.19).\n"
+                 . "Personaje {$j('personaje_id')}; tipo {$j('tipo')}.\n"
+                 . "Valida contra la ficha: (a) el tipo está despierto (Armadura/Mantra automáticas a nv10; Conquistador solo por la tirada 50), "
+                 . "(b) usos_acumulados — 1 por tipo y por tema, usos SATISFACTORIOS (nada decorativo, 20.2) —, "
+                 . "(c) PP disponibles y (d) VOL efectiva (base + bonus de raza/dote por encima del techo, 20.3). "
+                 . "Escalera N1→N5 (números cerrados): 6 usos+200 PP+VOL 55 · 8+300+70 · 10+400+85 · 12+500+95. "
+                 . "La escalera se paga entera: la adaptabilidad humana NO aplica al Haki (20.2). "
+                 . "Propón el escalón, confirma el requisito de Voluntad y devuelve el resumen para la firma (PP a descontar, nivel resultante).";
         case 3: // Validación de ficha
             return "Skill: skill-validacion-personajes.\n"
                  . "Ficha: personaje {$j('personaje_id')}.\n"
@@ -86,11 +157,6 @@ function ope7_prompt_especifica($numero, array $ctx)
         case 43: // Reparación
             return "Astillero: reparar {$j('barco')} ({$j('grado')}) — 18.7.\n"
                  . "Verifica el oficio Carpintero (rama Astillero) y el coste en materiales (madera 5.8 por grado). Log en reparaciones con materiales, coste y veredicto. La IA propone, el staff firma.";
-        case 49: // Adaptación de fruta bajo demanda
-            return "Skill: skill-adaptacion-akumas (guía maestra: docs/sistema/diseno/5.18_guia_adaptacion_frutas.md).\n"
-                 . "Concepto canon: «{$j('concepto')}» (nombre + familia/rareza/tier propuestos).\n"
-                 . "Genera la ficha de 8 bloques: identidad · mecánica base con límites · puertas del catálogo 5.7 + efectos no registrados con calibración y condición · debilidades (enemigo natural) · "
-                 . "requisitos del portador · influencia en la ficha (dotes/defectos, balanza a 0) · despertar · fruto en el mundo (tier, precio 5.9, vías, cupo).";
         case 52: // Solicitud de auto-narrada
         case 53: // Posteo de tramo
             return "Skill: skill-narracion-automatica.\n"
@@ -100,13 +166,34 @@ function ope7_prompt_especifica($numero, array $ctx)
                  . "(o verificas las condiciones si es el acto final). Resultado editable y firmado antes de publicarse.";
         case 54: // Apertura de misión
             return "Ficha de misión de 6 bloques (condiciones de victoria/fracaso explícitas y secretos solo-staff) para publicar en el tablón: {$j('concepto')}.\n"
-                 . "La validación dura la hace el hook (requisitos); aquí revisa coherencia con el estado del mundo (5.14) y categoría del catálogo (5.20).";
+                 . "Salida JSON: identidad (nombre, categoria faccion/reino_isla/profesional/bajo_mundo/especial, origen, dificultad, duracion) · condiciones (victoria Y fracaso explícitas) · "
+                 . "escenas (acto1/acto2/acto3 con NPCs) · recompensas (berries/pp/fama/objetos/tasa) · requisitos (nivel_min/faccion/oficios/grupo_min) · secretos_json (texto). "
+                 . "La validación dura la hace el hook; aquí revisa coherencia con el estado del mundo (5.14) y la categoría del catálogo (5.20).";
+        case 55: // Cierre de misión
+            return "Skill: skill-narracion-automatica + skill-cierre-temas.\n"
+                 . "Misión {$j('mision_id')} ({$j('mision')}) — verifica las CONDICIONES del acto final contra lo roleado (21.3, sin dados): condiciones de victoria/fracaso de la ficha, posts de la ronda y oráculos usados.\n"
+                 . "Salida: resultado (cumplida/fracasada/abandonada) · condiciones (qué se verificó) · recompensas aplicadas (berries/pp/fama/objetos con motivo) · resultado_txt.\n"
+                 . "La IA propone, el staff firma con motivo; el cierre alimenta la ronda de Mundo Vivo (5.14) con un suceso en borrador.";
         case 56: // Instalación de implante
         case 59: // Diseño de mejora a medida
             return "Skill: skill-adaptacion-cibernetica (guía maestra: docs/sistema/diseno/5.22_guia_adaptacion_implantes.md).\n"
                  . "Concepto: {$j('concepto')} (zona, nivel N1–N3, ranuras, justificación).\n"
                  . "Genera la ficha calibrada: requisitos acumulativos (suma de todos los implantes), ranuras del catálogo + efectos 5.7, defectos exigidos con balanza a 0, "
                  . "precios (instalación 100.000/500.000/2.500.000 ฿ · PP 200/400/600 · mantenimiento 2.500/10.000/40.000 ฿/ronda) e incompatibilidades (frutas, kairoseki máx O).";
+        case 57: // Retirada de implante
+            return "Retirada de implante (5.22/23.2): modificación #{$j('modificacion_id')} — libera el cupo de la zona y la balanza; las mejoras se pierden.\n"
+                 . "Confirma que el personaje tiene el implante activo y propone el motivo narrativo de la retirada (queda en el histórico).";
+        case 58: // Mantenimiento/reparación
+            return "Mantenimiento de implante (5.22/23.3): modificación #{$j('modificacion_id')}.\n"
+                 . "Pago del mantenimiento por ronda (2.500/10.000/40.000 ฿ según nivel; ×2 si el defecto «Mantenimiento oneroso») o reparación con Ingeniero si está averiado.\n"
+                 . "Confirma el saldo de la cartera y el estado del implante; el hook de ronda lo descuenta automáticamente.";
+        case 60: // Concesión de linaje
+            return "Concesión de linaje (5.22 §B/23.7): familia #{$j('familia_id')} para el personaje #{$j('personaje_id')}.\n"
+                 . "Cruza el expediente de fidelidad (ponderado por skill-cierre-temas) con el cupo mundial (3–5) y propone la concesión con motivo.\n"
+                 . "Salida: familia_id · personaje_id · motivo · dote/defecto aplicados (La sangre llama −1). La IA propone, el staff firma; suceso de ronda en borrador (5.14).";
+        case 61: // Revocación de linaje
+            return "Revocación de linaje (5.22 §B/23.7): linaje #{$j('linaje_id')}.\n"
+                 . "Confirma la traición al nombre o las contradicciones de 5.5 y propone la revocación con motivo: se retira la dote/defecto, se libera el cupo y hay suceso de ronda en borrador.";
         case 62: // Muerte de personaje
             return "Skill: skill-cierre-temas (calidad del desenlace).\n"
                  . "Personaje {$j('personaje_id')}; causa: {$j('causa')}; tema {$j('tema_id')}.\n"
@@ -234,13 +321,14 @@ function ope7_tramites_lista()
     return $cat;
 }
 
-/** Etiqueta humana de una naturaleza. */
+/** Etiqueta humana de una naturaleza (D6.1: sin jerga operativa — el jugador
+ * nunca ve «IA»; el trabajo se atribuye al staff/foro). */
 function ope7_naturaleza_label($nat)
 {
     $labels = array(
-        'ia'     => 'IA + firma',
-        'ligero' => 'Ligero (automático)',
-        'staff'  => 'Staff',
+        'ia'     => 'Revisión del staff (firma)',
+        'ligero' => 'Automático',
+        'staff'  => 'Solo staff',
         'hito'   => 'Hito (firma)',
     );
     return isset($labels[$nat]) ? $labels[$nat] : $nat;

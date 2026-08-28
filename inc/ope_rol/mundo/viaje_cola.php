@@ -5,7 +5,7 @@
  * El usuario pulsa "Zarpar" → se ENCOLA el viaje y vuelve al índice al instante.
  * Una tarea programada de MyBB procesa la cola en segundo plano: calcula el
  * oráculo + intro IA, crea el hilo en Alta Mar y notifica por la campana
- * (rol_alertas) al capitán y a cada tripulante acompañante.
+ * (ope_alertas) al capitán y a cada tripulante acompañante.
  */
 
 if (!defined('IN_MYBB')) {
@@ -152,9 +152,9 @@ function ope_viaje_procesar_cola()
         'procesado_dateline' => TIME_NOW,
     ), "id = {$cola_id}");
 
-    if ($uid > 0 && $db->table_exists('rol_alertas')) {
+    if ($uid > 0 && $db->table_exists('ope_alertas')) {
         $bburl = rtrim((string) $GLOBALS['mybb']->settings['bburl'] ?? '', '/');
-        $db->insert_query('rol_alertas', array(
+        $db->insert_query('ope_alertas', array(
             'pid' => (int) $item['pid_capitan'],
             'uid' => $uid,
             'tipo' => 'viaje_publicado',
@@ -179,7 +179,7 @@ function ope_viaje_alertar_publicar(array $viaje, int $uid_capitan)
 {
     global $db;
 
-    if (!$db->table_exists('rol_alertas')) return;
+    if (!$db->table_exists('ope_alertas')) return;
 
     $viaje_id = (int) ($viaje['viaje_id'] ?? 0);
     $tid      = (int) ($viaje['tid'] ?? 0);
@@ -224,7 +224,7 @@ function ope_viaje_alertar_publicar(array $viaje, int $uid_capitan)
 
     foreach ($receptores as $pid => $ruid) {
         if ($ruid < 1) continue;
-        $db->insert_query('rol_alertas', array(
+        $db->insert_query('ope_alertas', array(
             'pid'       => $pid,
             'uid'       => $ruid,
             'tipo'      => 'viaje_publicado',

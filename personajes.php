@@ -77,10 +77,10 @@ if ($vista !== 'npcs') {
     $vista = 'personajes';
 }
 
-// ¿Cuenta narrador? (tiene algún personaje con staff_narrador=1)
+// ¿Cuenta narrador? (F6.3+: ope_cuentas.staff_narrador es la fuente canónica)
 $es_narrador_cuenta = false;
-if ($loggedin && $db->table_exists('rol_personajes')) {
-    $nrq = $db->simple_select('rol_personajes', 'pid', "uid = {$uid} AND staff_narrador = 1", array('limit' => 1));
+if ($loggedin && $db->table_exists('ope_cuentas')) {
+    $nrq = $db->simple_select('ope_cuentas', 'uid', "uid = {$uid} AND staff_narrador = 1", array('limit' => 1));
     $es_narrador_cuenta = $db->num_rows($nrq) > 0;
 }
 
@@ -89,45 +89,27 @@ if ($loggedin && $db->table_exists('rol_personajes')) {
 // ─────────────────────────────────────────────────────────────
 $flash = '';
 $flash_kind = 'ok';
-if ($loggedin && $mybb->request_method === 'post' && $db->table_exists('rol_personajes')) {
+if ($loggedin && $mybb->request_method === 'post' && $db->table_exists('ope_personajes')) {
     $action  = $mybb->get_input('action');
     $set_pid = $mybb->get_input('pid', MyBB::INPUT_INT);
 
     if ($action === 'set_active' && verify_post_check($mybb->get_input('my_post_key'), true) && $set_pid > 0) {
         // Verifica que el personaje pertenece al usuario (jugador o NPC asignado).
-        $npc_clause = $db->field_exists('es_npc', 'rol_personajes') ? ', es_npc' : '';
         $vq = $db->simple_select(
-            'rol_personajes',
-            'pid, estado, nombre' . $npc_clause,
-            "pid = {$set_pid} AND uid = {$uid}",
+            'ope_personajes',
+            'id, estado, nombre, es_NPC',
+            "id = {$set_pid} AND uid = {$uid}",
             array('limit' => 1)
         );
         if ($db->num_rows($vq)) {
             $prow = $db->fetch_array($vq);
-            $es_npc_row = (int) ($prow['es_npc'] ?? 0) === 1;
+            $es_npc_row = (int) ($prow['es_NPC'] ?? 0) === 1;
             // Se puede activar un personaje aprobado o EN REVISIÓN (con este
             // último solo se podrá postear en Off Topic hasta la aprobación).
             // NPCs asignados siempre están aprobados.
             if ($prow['estado'] !== 'eliminado' && $prow['estado'] !== 'rechazado') {
-                // Solo un activo por cuenta: desactiva el resto y activa el elegido.
-                $db->update_query('rol_personajes', array('activo' => 0), "uid = {$uid}");
-                $db->update_query('rol_personajes', array('activo' => 1), "pid = {$set_pid} AND uid = {$uid}");
-
-                // Sincroniza mybb_rol_cuentas.personaje_activo (upsert).
-                if ($db->table_exists('rol_cuentas')) {
-                    $exists = $db->simple_select('rol_cuentas', 'uid', "uid = {$uid}", array('limit' => 1));
-                    if ($db->num_rows($exists)) {
-                        $db->update_query('rol_cuentas', array('personaje_activo' => $set_pid), "uid = {$uid}");
-                    } else {
-                        $db->insert_query('rol_cuentas', array(
-                            'uid'              => $uid,
-                            'staff_level'      => 0,
-                            'slots'            => 1,
-                            'personaje_activo' => $set_pid,
-                            'dateline'         => TIME_NOW,
-                        ));
-                    }
-                }
+                // Activo canónico (mybb_ope_cuentas.personaje_activo).
+                ope7_pj_set_activo($uid, 'ope', $set_pid);
                 $mybb->user['ope_active_pid'] = $set_pid;
                 $flash = 'Personaje activo actualizado: ' . htmlspecialchars_uni($prow['nombre']) . '.';
                 if ($es_npc_row) {
@@ -155,23 +137,25 @@ if ($loggedin && $mybb->request_method === 'post' && $db->table_exists('rol_pers
 // ─────────────────────────────────────────────────────────────
 $personajes = array();
 $npcs = array();
-if ($loggedin && $db->table_exists('rol_personajes')) {
-    $npc_col = $db->field_exists('es_npc', 'rol_personajes') ? ', es_npc' : '';
-    $extra = '';
-    if ($db->field_exists('datos', 'rol_personajes')) $extra .= ', datos';
-    if ($db->field_exists('stats_json', 'rol_personajes')) $extra .= ', stats_json';
-    if ($db->field_exists('stats_ganados', 'rol_personajes')) $extra .= ', stats_ganados';
-    if ($db->field_exists('pv_max', 'rol_personajes')) $extra .= ', pv_max';
-    if ($db->field_exists('en_max', 'rol_personajes')) $extra .= ', en_max';
-    if ($db->field_exists('pa_por_turno', 'rol_personajes')) $extra .= ', pa_por_turno';
+if ($loggedin && $db->table_exists('ope_personajes')) {
     $q = $db->simple_select(
-        'rol_personajes',
-        'pid, nombre, slug, estado, activo, rango, nivel, avatar, icono' . $npc_col . $extra,
+        'ope_personajes',
+        'id, nombre, slug, estado, nivel, avatar, icono, retrato, es_NPC, pp_saldo, puntos_comprados, fue, des, agi, res, per, inte, car, vol',
         "uid = {$uid} AND estado <> 'eliminado'",
-        array('order_by' => 'activo', 'order_dir' => 'DESC')
+        array('order_by' => 'id', 'order_dir' => 'ASC')
     );
     while ($row = $db->fetch_array($q)) {
-        if ((int) ($row['es_npc'] ?? 0) === 1) {
+        $row['pid']      = (int) $row['id'];   // alias legacy para el HTML
+        $row['es_npc']   = (int) ($row['es_NPC'] ?? 0);
+        $row['activo']   = 0;
+        $row['rango']    = '';
+        $row['datos']    = '';
+        $row['stats_json'] = '';
+        $row['stats_ganados'] = (int) $row['puntos_comprados'];
+        $row['pv_max']   = 0;
+        $row['en_max']   = 0;
+        $row['pa_por_turno'] = 0;
+        if ((int) $row['es_npc'] === 1) {
             $npcs[] = $row;
         } else {
             $personajes[] = $row;
@@ -183,12 +167,12 @@ $tiene_npcs = count($npcs) > 0;
 
 $personajes_moderados = array();
 $unread_map = array();
-if ($loggedin && $db->table_exists('rol_mensajes')) {
+if ($loggedin && $db->table_exists('ope_mensajes')) {
     $pids = array_column($personajes, 'pid');
     if ($pids) {
         $pid_list = implode(',', array_map('intval', $pids));
         $msgs = $db->query("
-            SELECT destino_pid, COUNT(*) as cnt FROM " . TABLE_PREFIX . "rol_mensajes
+            SELECT destino_pid, COUNT(*) as cnt FROM " . TABLE_PREFIX . "ope_mensajes
             WHERE destino_pid IN ({$pid_list}) AND leido = 0
             AND asunto LIKE 'Moderación:%'
             GROUP BY destino_pid
@@ -206,10 +190,10 @@ if ($loggedin && $db->table_exists('rol_mensajes')) {
     }
 }
 
-// Huecos de personaje disponibles (mybb_rol_cuentas.slots, por defecto 1)
+// Huecos de personaje disponibles (mybb_ope_cuentas.slots, por defecto 1)
 $slots = 1;
-if ($loggedin && $db->table_exists('rol_cuentas')) {
-    $scq = $db->simple_select('rol_cuentas', 'slots', "uid = {$uid}", array('limit' => 1));
+if ($loggedin && $db->table_exists('ope_cuentas')) {
+    $scq = $db->simple_select('ope_cuentas', 'slots', "uid = {$uid}", array('limit' => 1));
     if ($db->num_rows($scq)) {
         $slots = (int) $db->fetch_field($scq, 'slots');
     }
@@ -285,8 +269,8 @@ header('Content-Type: text/html; charset=utf-8');
 
 <?php if ($tiene_visible):
     $active_pid = (int) ($mybb->user['ope_active_pid'] ?? 0);
-    if ($active_pid < 1 && $loggedin && $db->table_exists('rol_cuentas')) {
-        $acq = $db->simple_select('rol_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
+    if ($active_pid < 1 && $loggedin && $db->table_exists('ope_cuentas')) {
+        $acq = $db->simple_select('ope_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
         if ($db->num_rows($acq)) {
             $active_pid = (int) $db->fetch_field($acq, 'personaje_activo');
         }
@@ -307,9 +291,8 @@ header('Content-Type: text/html; charset=utf-8');
 <?php foreach ($lista_visible as $pj):
         $es_activo   = ($active_pid > 0 && (int) $pj['pid'] === $active_pid);
         $stats_ganados = (int) ($pj['stats_ganados'] ?? 0);
-        $nivel       = function_exists('ope_rol_nivel_from_stats_comprados')
-            ? (int) ope_rol_nivel_from_stats_comprados($stats_ganados)
-            : max(1, (int) $pj['nivel']);
+        // F6.4: canon → nivel guardado en ope_personajes (la columna es la verdad).
+        $nivel       = max(1, (int) $pj['nivel']);
         $rango_code  = ($nivel >= 50)
             ? 'P'
             : (function_exists('ope_rol_tramo_romano') ? ope_rol_tramo_romano(ope_rol_tramo($nivel)) : (string) $pj['rango']);
@@ -323,20 +306,19 @@ header('Content-Type: text/html; charset=utf-8');
         $es_npc_card = ($vista === 'npcs');
         $av_initial  = function_exists('mb_substr') ? mb_strtoupper(mb_substr($pj['nombre'], 0, 1, 'UTF-8'), 'UTF-8') : strtoupper(substr($pj['nombre'], 0, 1));
 
-        $datos = json_decode((string) ($pj['datos'] ?? ''), true);
-        if (!is_array($datos)) $datos = array();
-        $stats = json_decode((string) ($pj['stats_json'] ?? ''), true);
-        if (!is_array($stats) || empty($stats)) {
-            $stats = is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array();
-        }
+        $datos = array();
+        $stats = array();
 
-        $img_art = trim((string) ($datos['retrato'] ?? ''));
+        // F6.4: canon → secundarios vivos (ope7_pj_secundarios) y retrato propio.
+        $sec = function_exists('ope7_pj_secundarios') ? ope7_pj_secundarios($pj) : array();
+
+        $img_art = trim((string) ($pj['retrato'] ?? ''));
         if ($img_art === '') $img_art = trim((string) ($pj['avatar'] ?? ''));
         if ($img_art === '') $img_art = trim((string) ($pj['icono'] ?? ''));
 
-        $pv = (int) ($pj['pv_max'] ?? 0);
-        $en = (int) ($pj['en_max'] ?? 0);
-        $pa = (int) ($pj['pa_por_turno'] ?? 0);
+        $pv = (int) ($sec['pv'] ?? 0);
+        $en = (int) ($sec['pe'] ?? 0);
+        $pa = (int) ($sec['pa'] ?? 0);
         if ($pv < 1 && function_exists('ope_combat_calc_pv') && !empty($stats)) {
             $pv = (int) ope_combat_calc_pv($stats, $nivel);
         }

@@ -24,6 +24,18 @@ if (!function_exists('ope7_es_staff') || !ope7_es_staff($uid)) {
     error('No tienes permisos para acceder al panel del Mundo Vivo.');
 }
 
+// Publicar una edición del periódico en borrador (visibilidad manual 15.2).
+$flash = '';
+if (($mybb->get_input('gaccion') === 'publicar_periodico') && verify_post_check($mybb->get_input('my_post_key'))) {
+    $pid = (int) $mybb->get_input('periodico_id', 1);
+    if ($pid > 0 && ope7_tabla_existe('historico_periodicos')) {
+        $db->update_query('ope_historico_periodicos', array('estado' => 'publicado', 'publicado_por' => $uid), "id = {$pid}");
+        $flash = 'Edición publicada: el News Coo ya forma parte del mundo.';
+    } else {
+        $flash = 'No se pudo publicar la edición.';
+    }
+}
+
 header('Content-Type: text/html; charset=utf-8');
 ?>
 <!DOCTYPE html>
@@ -42,6 +54,7 @@ header('Content-Type: text/html; charset=utf-8');
   <b>Mundo Vivo</b>
 </div></div>
 <div class="wrap">
+<?php if ($flash !== '') { ?><div class="flash"><?php echo htmlspecialchars_uni($flash); ?></div><?php } ?>
 <?php echo ope7_mundo_vivo_panel_html(); ?>
 </div>
 <?php include __DIR__ . '/inc/footer_custom.php'; ?>

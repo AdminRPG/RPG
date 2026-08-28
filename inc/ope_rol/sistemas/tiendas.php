@@ -463,3 +463,98 @@ function ope7_tienda_venta_npc($vendedor_pid, $objeto_id, $cantidad = 1)
     ));
     return array('ok' => true, 'msg' => 'Venta: ' . $cantidad . ' × «' . ope7_objeto_nombre($objeto_id) . '» por ' . $precio . ' ฿ (50 % del mercado).');
 }
+
+// ─────────────────────────────────────────────────────────────
+// Panel staff «Mercado / Economía» (A.3, 5.9): fluctuación por zona
+// y ronda con motivo, carteras y transacciones. Vista honesta: muestra
+// lo que hay; el cron y el cierre de ronda alimentan las tablas.
+// ─────────────────────────────────────────────────────────────
+
+/** HTML del panel: precios con motivo, carteras, transacciones. */
+function ope7_mercado_panel_html()
+{
+    global $db;
+    $out = '';
+
+    // ── Fluctuación por zona y ronda ──
+    $out .= '<div class="plate"><div class="plate-h">Fluctuación por zona y ronda (5.9)</div><div class="plate-b">';
+    if (ope7_tabla_existe('precios_mercado') && ope7_tabla_existe('objetos')) {
+        $q = $db->query('SELECT pm.*, o.nombre AS objeto_nombre, z.nombre AS zona_nombre, z.isla_id, i.nombre AS isla_nombre '
+            . 'FROM ' . ope7_tabla_full('precios_mercado') . ' pm '
+            . 'JOIN ' . ope7_tabla_full('objetos') . ' o ON o.id = pm.objeto_id '
+            . 'LEFT JOIN ' . ope7_tabla_full('zonas') . ' z ON z.id = pm.zona_id '
+            . 'LEFT JOIN ' . ope7_tabla_full('islas') . ' i ON i.id = z.isla_id '
+            . 'ORDER BY pm.ronda DESC, pm.zona_id, pm.objeto_id LIMIT 40');
+        if ($db->num_rows($q) === 0) {
+            $out .= '<p class="zs-mut">Sin fluctuaciones registradas (el cierre de ronda 15.2 las archiva aquí con su motivo y ronda).</p>';
+        } else {
+            $out .= '<table class="zs-tab"><thead><tr><th>Zona</th><th>Objeto</th><th>Precio</th><th>Ronda</th><th>Motivo</th></tr></thead><tbody>';
+            while ($r = $db->fetch_array($q)) {
+                $zona = (string) ($r['isla_nombre'] ?? '') . ((string) ($r['zona_nombre'] ?? '') !== '' ? ' · ' . $r['zona_nombre'] : '');
+                $out .= '<tr><td>' . htmlspecialchars($zona !== '' ? $zona : 'zona #' . (int) $r['zona_id']) . '</td>'
+                    . '<td>' . htmlspecialchars((string) $r['objeto_nombre']) . '</td>'
+                    . '<td>' . number_format((int) $r['precio_actual'], 0, ',', '.') . ' ฿</td>'
+                    . '<td>' . (int) $r['ronda'] . '</td>'
+                    . '<td>' . htmlspecialchars((string) $r['motivo']) . '</td></tr>';
+            }
+            $out .= '</tbody></table>';
+        }
+    } else {
+        $out .= '<p class="zs-mut">Tablas no migradas (precios_mercado).</p>';
+    }
+    $out .= '</div></div>';
+
+    // ── Carteras (top por saldo total) ──
+    $out .= '<div class="plate"><div class="plate-h">Carteras (5.9: cartera robable / bóveda segura)</div><div class="plate-b">';
+    if (ope7_tabla_existe('carteras') && ope7_tabla_existe('personajes')) {
+        $q = $db->query('SELECT c.*, p.nombre AS pj_nombre FROM ' . ope7_tabla_full('carteras') . ' c '
+            . 'JOIN ' . ope7_tabla_full('personajes') . ' p ON p.id = c.personaje_id '
+            . 'ORDER BY (c.cartera + c.boveda) DESC LIMIT 15');
+        if ($db->num_rows($q) === 0) {
+            $out .= '<p class="zs-mut">Sin carteras todavía (se crean al crear el personaje).</p>';
+        } else {
+            $out .= '<table class="zs-tab"><thead><tr><th>Personaje</th><th>Cartera</th><th>Bóveda</th><th>Total</th></tr></thead><tbody>';
+            while ($r = $db->fetch_array($q)) {
+                $out .= '<tr><td>' . htmlspecialchars((string) $r['pj_nombre']) . '</td>'
+                    . '<td>' . number_format((int) $r['cartera'], 0, ',', '.') . ' ฿</td>'
+                    . '<td>' . number_format((int) $r['boveda'], 0, ',', '.') . ' ฿</td>'
+                    . '<td><b>' . number_format((int) $r['cartera'] + (int) $r['boveda'], 0, ',', '.') . ' ฿</b></td></tr>';
+            }
+            $out .= '</tbody></table>';
+        }
+    } else {
+        $out .= '<p class="zs-mut">Tablas no migradas (carteras).</p>';
+    }
+    $out .= '</div></div>';
+
+    // ── Transacciones recientes ──
+    $out .= '<div class="plate"><div class="plate-h">Transacciones recientes (compra/venta)</div><div class="plate-b">';
+    if (ope7_tabla_existe('transacciones') && ope7_tabla_existe('objetos')) {
+        $q = $db->query('SELECT t.*, o.nombre AS objeto_nombre, v.nombre AS vendedor_nombre, c.nombre AS comprador_nombre '
+            . 'FROM ' . ope7_tabla_full('transacciones') . ' t '
+            . 'JOIN ' . ope7_tabla_full('objetos') . ' o ON o.id = t.objeto_id '
+            . 'LEFT JOIN ' . ope7_tabla_full('personajes') . ' v ON v.id = t.vendedor_id '
+            . 'LEFT JOIN ' . ope7_tabla_full('personajes') . ' c ON c.id = t.comprador_id '
+            . 'ORDER BY t.id DESC LIMIT 25');
+        if ($db->num_rows($q) === 0) {
+            $out .= '<p class="zs-mut">Sin transacciones todavía.</p>';
+        } else {
+            $out .= '<table class="zs-tab"><thead><tr><th>Fecha</th><th>Objeto</th><th>Qty</th><th>P. unit.</th><th>Vendedor</th><th>Comprador</th></tr></thead><tbody>';
+            while ($r = $db->fetch_array($q)) {
+                $out .= '<tr><td>' . date('d/m/y', (int) $r['fecha']) . '</td>'
+                    . '<td>' . htmlspecialchars((string) $r['objeto_nombre']) . '</td>'
+                    . '<td>×' . (int) $r['cantidad'] . '</td>'
+                    . '<td>' . number_format((int) $r['precio_unitario'], 0, ',', '.') . '</td>'
+                    . '<td>' . htmlspecialchars((string) ($r['vendedor_nombre'] ?? ($r['vendedor_id'] > 0 ? '#' . $r['vendedor_id'] : 'NPC'))) . '</td>'
+                    . '<td>' . htmlspecialchars((string) ($r['comprador_nombre'] ?? ($r['comprador_id'] > 0 ? '#' . $r['comprador_id'] : 'NPC'))) . '</td></tr>';
+            }
+            $out .= '</tbody></table>';
+        }
+    } else {
+        $out .= '<p class="zs-mut">Tablas no migradas (transacciones).</p>';
+    }
+    $out .= '</div></div>';
+
+    $out .= '</div>';
+    return $out;
+}

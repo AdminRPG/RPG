@@ -319,6 +319,10 @@ function ope7_tramite_firmar($tid, $staff_uid, $accion, $motivo = '')
 
     if ($estado_final === 'publicado') {
         // Aplicar efectos al publicar (por fase de implementación; transversal en F0).
+        // El staff que firma y su motivo viajan en _staff_uid/_firma_motivo para
+        // los efectos que lo necesitan (firma de tramos de misión 52/53, cierre 55).
+        $tr['_staff_uid'] = $staff_uid;
+        $tr['_firma_motivo'] = (string) $motivo;
         $aplicado = ope7_tramite_aplicar_efectos($tr);
         $nota = isset($aplicado['msg']) ? (string) $aplicado['msg'] : '';
         // Regla de oro (D1.6, extendida a la firma F3): si el efecto bloquea
@@ -422,6 +426,10 @@ function ope7_tramite_aplicar_efectos($tr)
         case 18: // Boletín de precios (F3.3, staff): precios_mercado con motivo
             $msg = ope7_efecto_boletin_precios($pid, $res);
             break;
+        case 19: // Reclutamiento de NPC (F6, 5.11/12.5, ligero/firma): uso de una
+                 // ficha existente del catálogo, marcada «reclutado» (sin combate)
+            $msg = ope7_efecto_reclutar_npc($tr, $pid, $res, $ids);
+            break;
         case 20: // Ascenso de facción (F4.3, 5.12/13.4): termómetro (skill) +
                  // duros (rango siguiente, cupo, rep_min) + firma
             $msg = ope7_efecto_ascenso_faccion($tr, $pid, $res);
@@ -437,6 +445,40 @@ function ope7_tramite_aplicar_efectos($tr)
             break;
         case 24: // Infiltración (F4.3, 13.7/13.8, staff): capa oculta solo-staff
             $msg = ope7_efecto_infiltracion($tr, $pid, $res);
+            break;
+        case 25: // Solicitar rumor a la red (F6, 5.13/14.2.3, ia+firma): capacidad
+                 // del espía + mantenimiento; la IA propone la ficha, el staff firma
+            $msg = ope7_efecto_rumor_red($tr, $pid, $res, $ids);
+            break;
+        case 26: // Comprar rumor (F6, 5.13/14.2.2, ligero): multiplicadores de
+                 // fiabilidad×frescura con techo global; ficha transferida
+            $msg = ope7_efecto_comprar_rumor($pid, $ids, $tr);
+            break;
+        case 27: // Contrastar rumor (F6, 5.13/14.4, ia+firma): coste por alcance×
+                 // sensibilidad; afina fiabilidad y revela veracidad en Sólido
+            $msg = ope7_efecto_contrastar_rumor($tr, $pid, $res, $ids);
+            break;
+        case 28: // Vender rumor (F6, 5.13/14.2.4, ligero): transferencia + copia
+            $msg = ope7_efecto_vender_rumor($pid, $ids, $tr);
+            break;
+        case 29: // Montar/ampliar la red (F6, 5.13/14.2.3, ligero): contrato +
+                 // mantenimiento, límite 4 espías
+            $msg = ope7_efecto_montar_red($pid, $ids, $tr);
+            break;
+        case 30: // Publicar cartel (F6, 5.13/14.6, staff+firma): cifra, paradero,
+                 // caducidad 3 rondas + recompensas_historico
+            $msg = ope7_efecto_publicar_cartel($tr, $pid, $res, $ids);
+            break;
+        case 31: // Cobrar recompensa (F6, 5.13/14.6, ia+firma): entrega verificada
+                 // (5.10), anti-abuso autocaza, paradero frío, histórico
+            $msg = ope7_efecto_cobrar_cartel($tr, $pid, $res, $ids);
+            break;
+        case 32: // Crear rumor falso (F6, 5.13/14.8, ia+firma): propaganda con
+                 // veracidad interna falsa y fiabilidad publicada del staff
+            $msg = ope7_efecto_rumor_falso($tr, $pid, $res, $ids);
+            break;
+        case 33: // Ataque a una red (F6, 5.13/14.5, ia+firma): veredicto sin dados
+            $msg = ope7_efecto_ataque_red($tr, $pid, $res, $ids);
             break;
         case 34: // Anuncio de conquista (F4.3, 5.15/16.2-3): control previo,
                  // fases, rondas de asedio, suceso público e invitación
@@ -475,10 +517,84 @@ function ope7_tramite_aplicar_efectos($tr)
             $msg = ope7_efecto_muerte($tr, $pid, $res);
             break;
         case 45:
-            $msg = '[PENDIENTE] Tirada de akuma sin implementar todavía (F5).';
+            $msg = ope7_efecto_tirada_akuma($pid, $ids, $tr);
+            break;
+        case 46:
+            $msg = ope7_efecto_compra_akuma($pid, $ids, $tr);
+            break;
+        case 47:
+            $msg = ope7_efecto_comer_akuma($pid, $ids, $tr);
+            break;
+        case 48: // Despertar de akuma (F5, 5.18/19.6): banda de nivel por
+                 // tier/familia + antigüedad + temas + VOL; registra en `despertares`
+                 // y genera suceso de Mundo Vivo en borrador (la Logia es periódico)
+            $msg = ope7_efecto_despertar_akuma($pid, $ids, $tr);
+            break;
+        case 49: // Adaptación de fruta bajo demanda (F5, staff, skill-adaptacion-akumas):
+                 // da de alta la ficha de 8 bloques en el catálogo + su objeto
+            $msg = ope7_efecto_adaptar_akuma($tr, $pid, $res, $ids);
             break;
         case 50:
-            $msg = '[PENDIENTE] Tirada del Conquistador sin implementar todavía (F5).';
+            $msg = ope7_efecto_tirada_conquistador($pid, $ids, $tr);
+            break;
+        case 51: // Subida de nivel de Haki (5.19): usos + PP + VOL; la firma aplica
+            $msg = ope7_efecto_subida_haki($pid, $ids, $tr);
+            break;
+        case 52: // Solicitud de auto-narrada (F5.2, 5.20): valida ficha + requisitos
+                 // + tasa + un-presente, oráculos del acto 1, tema presente + tramo 1
+            $msg = ope7_efecto_apertura_mision($tr, $pid, $res, $ids);
+            break;
+        case 53: // Posteo de tramo (F5.2, 5.20): recoge posts, oráculo siguiente,
+                 // crea el tramo pendiente de firma (anti-abuso: nunca sin posts)
+            $msg = ope7_efecto_tramo_mision($tr, $pid, $res, $ids);
+            break;
+        case 54: // Apertura de misión (F5.2, staff): publica la ficha de 6 bloques
+            $msg = ope7_efecto_publicar_mision($tr, $pid, $res, $ids);
+            break;
+        case 55: // Cierre de misión (F5.2, staff): verifica condiciones, aplica
+                 // recompensas con motivo, cierra el tema y alimenta la ronda (5.14)
+            $msg = ope7_efecto_cierre_mision($tr, $pid, $res, $ids);
+            break;
+        case 56: // Instalación de implante (F5.4, 5.22/23.2–23.3): valida
+                 // zona única + puerta + requisitos acumulativos + balanza a 0
+                 // + cupo + pago berries/PP + vara Cirujano+Ingeniero
+            $msg = ope7_efecto_instalar_implante($tr, $pid, $res, $ids);
+            break;
+        case 57: // Retirada de implante (F5.4, 23.2): libera cupo y balanza
+            $msg = ope7_efecto_retirar_implante($tr, $pid, $res, $ids);
+            break;
+        case 58: // Mantenimiento/reparación (F5.4, 23.3): pago por ronda o
+                 // reparación con Ingeniero
+            $msg = ope7_efecto_mantenimiento_implante($tr, $pid, $res, $ids);
+            break;
+        case 59: // Diseño de mejora a medida (F5.4, 23.6): ranura de habilidad
+                 // especial calibrada por la skill
+            $msg = ope7_efecto_diseno_implante($tr, $pid, $res, $ids);
+            break;
+        case 60: // Concesión de linaje (F5.4, 23.7): expediente × cupo; dote +
+                 // defecto + suceso de ronda
+            $msg = ope7_efecto_conceder_linaje($tr, $pid, $res, $ids);
+            break;
+        case 61: // Revocación de linaje (F5.4, 23.7): retira dote/defecto,
+                 // libera cupo, suceso de ronda
+            $msg = ope7_efecto_revocar_linaje($tr, $pid, $res, $ids);
+            break;
+        case 63: // Fundación de tripulación (F5.3, 5.21-ter): mínimo 2, ficha,
+                 // plazas del barco (5.17), cofre común (5.9), tema de fundación
+            $msg = ope7_efecto_fundar_tripulacion($tr, $pid, $res, $ids);
+            break;
+        case 64: // Ingreso (F5.3, ligero/firma): espacio del barco + un PJ por usuario
+            $msg = ope7_efecto_ingreso_tripulacion($tr, $pid, $res, $ids);
+            break;
+        case 65: // Baja/expulsión (F5.3, ligero/firma): libera plaza + reparto del cofre
+            $msg = ope7_efecto_baja_tripulacion($tr, $pid, $res, $ids);
+            break;
+        case 66: // Cambio de capitán (F5.3, staff + firma): cesión o motín con veredicto
+            $msg = ope7_efecto_cambio_capitan($tr, $pid, $res, $ids);
+            break;
+        case 67: // Disolución (F5.3, staff + firma): reparto del cofre, barco al
+                 // último capitán, cierre de la entidad (automática <2 activos)
+            $msg = ope7_efecto_disolver_tripulacion($tr, $pid, $res, $ids);
             break;
         default:
             $msg = '[PENDIENTE] Efectos del sistema sin implementar: el trámite queda para revisión del staff.';
@@ -553,6 +669,79 @@ function ope7_pj_tiene_presente_abierto($pid)
     return (int) ($r['c'] ?? 0) > 0;
 }
 
+/** Devuelve el tid MyBB real vinculado a un tema (0 si aún no tiene hilo). D1.8. */
+function ope7_tema_mybb_tid($tema_id)
+{
+    global $db;
+    $tema_id = (int) $tema_id;
+    if ($tema_id < 1 || !ope7_tabla_existe('temas')) {
+        return 0;
+    }
+    $q = $db->simple_select('ope_temas', 'mybb_tid', "tid = {$tema_id}", array('limit' => 1));
+    return (int) $db->fetch_field($q, 'mybb_tid');
+}
+
+/** Vincula el thread MyBB real al tema (D1.8). Idempotente: si el tema ya tiene
+ * hilo y el nuevo tid difiere, no lo pisa (evita que un posteo reasigne).
+ * Devuelve el mybb_tid resultante (0 si no se vinculó). */
+function ope7_tema_vincular_mybb($tema_id, $mybb_tid)
+{
+    global $db;
+    $tema_id = (int) $tema_id;
+    $mybb_tid = (int) $mybb_tid;
+    if ($tema_id < 1 || $mybb_tid < 1 || !ope7_tabla_existe('temas')) {
+        return 0;
+    }
+    $actual = ope7_tema_mybb_tid($tema_id);
+    if ($actual === $mybb_tid) {
+        return $actual;
+    }
+    if ($actual > 0) {
+        return $actual; // ya vinculado a otro hilo: no se reasigna
+    }
+    $db->update_query('ope_temas', array('mybb_tid' => $mybb_tid), "tid = {$tema_id}");
+    return $mybb_tid;
+}
+
+/** Vincula el thread MyBB real al tema presente abierto del personaje que aún
+ * no tiene hilo (D1.8, hook de posteo): el primer post de un presente recién
+ * creado (o de una misión/tripulación) es el hilo real del tema. Devuelve el
+ * tema_id vinculado (0 si no había candidato). */
+function ope7_tema_vincular_mybb_por_pj($pid, $mybb_tid)
+{
+    global $db;
+    $pid = (int) $pid;
+    $mybb_tid = (int) $mybb_tid;
+    if ($pid < 1 || $mybb_tid < 1 || !ope7_tabla_existe('temas') || !ope7_tabla_existe('temas_participantes')) {
+        return 0;
+    }
+    $q = $db->query("SELECT t.tid FROM " . ope7_tabla_full('temas') . " t "
+        . "JOIN " . ope7_tabla_full('temas_participantes') . " tp ON tp.tema_id = t.tid "
+        . "WHERE tp.personaje_id = {$pid} AND t.tipo = 'presente' AND t.estado = 'abierto' AND t.mybb_tid = 0 "
+        . "ORDER BY t.tid DESC LIMIT 1");
+    if (!$db->num_rows($q)) {
+        return 0;
+    }
+    $tema_id = (int) $db->fetch_field($q, 'tid');
+    return ope7_tema_vincular_mybb($tema_id, $mybb_tid) > 0 ? $tema_id : 0;
+}
+
+/** Cierra el thread MyBB real cuando se cierra el tema (D1.8). MyBB marca los
+ * hilos cerrados con closed != ''. No hace nada si el tema no tiene hilo. */
+function ope7_tema_cerrar_mybb($tema_id)
+{
+    global $db;
+    $tema_id = (int) $tema_id;
+    $mybb_tid = ope7_tema_mybb_tid($tema_id);
+    if ($mybb_tid < 1) {
+        return 0;
+    }
+    if ($db->table_exists('threads')) {
+        $db->update_query('threads', array('closed' => 1), "tid = {$mybb_tid}");
+    }
+    return $mybb_tid;
+}
+
 /** Efecto 1 · Apertura de tema (presente/pasado). */
 function ope7_efecto_apertura_tema($tr, $pid, $res, $ids)
 {
@@ -589,8 +778,11 @@ function ope7_efecto_apertura_tema($tr, $pid, $res, $ids)
         // insert_query devuelve el id (insert_id es método, no propiedad).
         $tid_tema = (int) $db->insert_query('ope_temas', array(
             'tipo' => $tipo, 'fecha_foro' => $ancla, 'fecha_real_apertura' => TIME_NOW,
-            'estado' => 'abierto', 'invadible' => $tipo === 'pasado' ? 1 : 0,
+            // 5.6: los presentes son invadibles; los pasados no afectan al presente.
+            'estado' => 'abierto', 'invadible' => $tipo === 'presente' ? 1 : 0,
             'zona' => $zona, 'tema_tipo' => $tema_tipo,
+            // D1.8: si el jugador ya posteó el hilo, se vincula aquí mismo.
+            'mybb_tid' => (int) ($res['mybb_tid'] ?? $ids['mybb_tid'] ?? 0),
         ));
     }
     if (ope7_tabla_existe('temas_participantes')) {
@@ -600,7 +792,12 @@ function ope7_efecto_apertura_tema($tr, $pid, $res, $ids)
             'ficha_instantanea' => json_encode(ope7_pj_instantanea($pid), JSON_UNESCAPED_UNICODE),
         ));
     }
-    return "Tema {$tipo} anclado al {$ancla} (instantánea de ficha tomada)." . ($tipo === 'presente' ? ' Bloqueo un-presente activo.' : '');
+    $vin = ope7_tema_mybb_tid($tid_tema);
+    $msg = "Tema {$tipo} anclado al {$ancla} (instantánea de ficha tomada).";
+    if ($vin > 0) {
+        $msg .= " Hilo del foro vinculado (tid {$vin}).";
+    }
+    return $msg . ($tipo === 'presente' ? ' Bloqueo un-presente activo.' : '');
 }
 
 /** Efecto 2 · Cierre de temas: skill-cierre-temas (7.2), referencia al
@@ -662,7 +859,8 @@ function ope7_efecto_cierre_tema($tr, $pid, $res)
                 'factores' => $factores_json,
                 'pp_otorgado' => $pp,
                 // F4.2: el libro general también registra cantidad/concepto (A.3 «Progresión»).
-                'cantidad' => $pp, 'concepto' => 'Cierre de tema (skill-cierre-temas)',
+                // D6.1: el concepto es visible al jugador — sin jerga operativa (skill/IA).
+                'cantidad' => $pp, 'concepto' => 'Cierre de tema',
                 'tramite_id' => (int) ($tr['id'] ?? 0),
                 'firmado_por' => (int) ($tr['firma_staff'] ?? 0),
                 'motivo' => (string) ($res['motivo'] ?? $veredicto_ref), 'fecha' => TIME_NOW,
@@ -699,6 +897,15 @@ function ope7_efecto_cierre_tema($tr, $pid, $res)
             }
         }
     }
+    // 5.19 (20.2): usos de Haki verificados al cierre — +1 por tipo despierto y por tema.
+    // El staff los declara al firmar (la IA detecta en el prompt; solo usos satisfactorios).
+    if (!empty($res['haki_usos']) && function_exists('ope7_haki_contar_usos_cierre')) {
+        $tipos = (array) $res['haki_usos'];
+        $n = ope7_haki_contar_usos_cierre($pid, $tipos, $tema_id);
+        if ($n > 0) {
+            $notas[] = 'Haki: +' . $n . ' uso(s) contado(s) (' . implode(', ', array_map('ucfirst', $tipos)) . ') — 1 por tipo y por tema.';
+        }
+    }
     // Libera la congelación del participante (7.5: `salio_en`).
     if (ope7_tabla_existe('temas_participantes') && $tema_id > 0) {
         $db->update_query('ope_temas_participantes', array('salio_en' => TIME_NOW), "tema_id = {$tema_id} AND personaje_id = {$pid}");
@@ -714,6 +921,11 @@ function ope7_efecto_cierre_tema($tr, $pid, $res)
     if (ope7_tabla_existe('temas') && $tema_id > 0) {
         $db->update_query('ope_temas', array('estado' => 'cerrado'), "tid = {$tema_id}");
         $notas[] = "Tema {$tema_id} cerrado y congelación liberada.";
+        // D1.8: si el tema tenía un hilo real vinculado, se cierra también en el foro.
+        $mtid = ope7_tema_cerrar_mybb($tema_id);
+        if ($mtid > 0) {
+            $notas[] = "Hilo del foro (tid {$mtid}) cerrado.";
+        }
     }
     return implode(' · ', $notas) !== '' ? implode(' · ', $notas) : 'Cierre registrado (sin efectos pendientes de su sistema).';
 }
@@ -1172,13 +1384,57 @@ function ope7_efecto_muerte($tr, $pid, $res)
         'calidad' => $calidad, 'mult' => $mult[$calidad],
     );
 
-    // Efectos de mundo (esquema F2, aplicación en F4): cartel retirado · baja de
-    // facción · suceso de ronda · fruta renacida.
+    // Efectos de mundo (5.21-bis): cartel retirado · baja de facción · suceso de
+    // ronda · fruta renacida. Cada uno aplica si el personaje tiene el vínculo.
     $efectos_mundo = array(
-        'cartel_retirado' => array('aplicado' => false, 'nota' => 'F4 (5.13): si wanted_base > 0, retirar el cartel.'),
-        'baja_faccion'    => array('aplicado' => false, 'nota' => 'F4 (5.12): si faccion_id > 0, registrar la baja.'),
-        'suceso_ronda'    => array('aplicado' => false, 'nota' => 'F4 (5.14): el desenlace alimenta la ronda mensual.'),
+        'cartel_retirado' => array('aplicado' => false, 'nota' => ''),
+        'baja_faccion'    => array('aplicado' => false, 'nota' => ''),
+        'suceso_ronda'    => array('aplicado' => false, 'nota' => ''),
     );
+
+    // Cartel retirado (5.13): un muerto no se caza; si tenía cartel vigente, se
+    // archiva como retirado y se limpia el paradero caliente.
+    if (ope7_tabla_existe('carteles_recompensa') && (int) $f['wanted_base'] > 0) {
+        $cq = $db->simple_select('ope_carteles_recompensa', 'id', "personaje_id = {$pid} AND estado IN ('vigente','frio')", array('limit' => 1));
+        $cid = (int) $db->fetch_field($cq, 'id');
+        if ($cid > 0) {
+            $db->update_query('ope_carteles_recompensa', array('estado' => 'retirado'), "id = {$cid}");
+            $efectos_mundo['cartel_retirado'] = array('aplicado' => true, 'cartel_id' => $cid);
+        }
+    }
+
+    // Baja de facción (5.12): el muerto deja la facción; histórico con motivo.
+    if ((int) $f['faccion_id'] > 0) {
+        $db->update_query('ope_personajes', array('faccion_id' => 0, 'rango_id' => 0), "id = {$pid}");
+        if (function_exists('ope7_faccion_registrar')) {
+            ope7_faccion_registrar($pid, 'baja', (int) $f['faccion_id'], 0, 'Muerte del personaje (5.21-bis).', (int) ($tr['firma_staff'] ?? 0));
+        }
+        $efectos_mundo['baja_faccion'] = array('aplicado' => true, 'faccion_id' => (int) $f['faccion_id']);
+    }
+
+    // Suceso de ronda (5.14): el desenlace alimenta la ronda mensual (borrador
+    // público; visibilidad manual, como el Conquistador).
+    if (ope7_tabla_existe('sucesos')) {
+        $ronda = 0;
+        if (function_exists('ope7_ronda_activa')) {
+            $ra = ope7_ronda_activa();
+            $ronda = (int) ($ra['numero'] ?? 0);
+        }
+        // MyBB convierte null → '' en INT (bug conocido): sin isla, se omite la clave.
+        $suceso_row = array(
+            'ronda'       => $ronda,
+            'tipo'        => 'muerte',
+            'titulo'      => 'Muere ' . $f['nombre'],
+            'descripcion' => $db->escape_string('Reliquia registrada con calidad ' . $calidad . ' (5.21-bis). ' . $causa),
+            'impacto'     => json_encode(array('calidad' => $calidad), JSON_UNESCAPED_UNICODE),
+            'activo'      => 1,
+        );
+        if ((int) ($f['ubicacion_isla_id'] ?? 0) > 0) {
+            $suceso_row['isla_id'] = (int) $f['ubicacion_isla_id'];
+        }
+        $db->insert_query('ope_sucesos', $suceso_row);
+        $efectos_mundo['suceso_ronda'] = array('aplicado' => true, 'calidad' => $calidad);
+    }
 
     // Fruta renace (5.18): la akuma del muerto vuelve al mundo (estado renacida).
     // portador_id se libera con NULL real (SQL crudo: MyBB convierte null en ''
@@ -1201,13 +1457,13 @@ function ope7_efecto_muerte($tr, $pid, $res)
         'firmado_por'      => (int) ($tr['firma_staff'] ?? 0),
         'fecha'            => TIME_NOW,
     ));
-    return "Muerte registrada ({$calidad}): ficha → reliquia · herencia " . number_format($herencia['pp']) . " PP y " . number_format($herencia['berries']) . " ฿ · " . ($efectos_mundo['fruta_renacida']['aplicado'] ?? false ? 'fruta renacida' : 'sin fruta') . '. Efectos de mundo pendientes de F4.';
+    return "Muerte registrada ({$calidad}): ficha → reliquia · herencia " . number_format($herencia['pp']) . " PP y " . number_format($herencia['berries']) . " ฿ · " . ($efectos_mundo['fruta_renacida']['aplicado'] ?? false ? 'fruta renacida' : 'sin fruta') . " · cartel " . ($efectos_mundo['cartel_retirado']['aplicado'] ? 'retirado' : 'sin cartel') . " · facción " . ($efectos_mundo['baja_faccion']['aplicado'] ? 'dada de baja' : 'sin vínculo') . " · suceso de ronda " . ($efectos_mundo['suceso_ronda']['aplicado'] ? 'enviado' : 'no disponible') . '.';
 }
 
 /** Notificación (stub F0: registra en el histórico; alertas reales por fase). */
 function ope7_notificar($pid, $mensaje)
 {
-    // TODO(F1): escribir en mybb_rol_alertas (o el canal de alertas canónico).
+    // TODO(F1): escribir en mybb_ope_alertas (o el canal de alertas canónico).
     return true;
 }
 
