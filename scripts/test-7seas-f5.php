@@ -68,18 +68,52 @@ $db->query('UPDATE ' . TABLE_PREFIX . 'ope_akumas a LEFT JOIN ' . TABLE_PREFIX .
     . "SET a.portador_id = NULL, a.origen = NULL, a.estado = 'sin_portador' WHERE p.slug LIKE 'prueba-f5-%' OR a.portador_id NOT IN (SELECT id FROM " . TABLE_PREFIX . 'ope_personajes)');
 
 // ── [1] Semilla de frutas ──
-$q = $db->simple_select('ope_akumas', 'COUNT(*) AS n', '1=1');
-$G['chk']('Semilla: 18 frutas (6 canon + 12 pool T1/T2, D5.1)', (int) $db->fetch_field($q, 'n') === 18);
-$q = $db->simple_select('ope_objetos', 'COUNT(*) AS n', "categoria = 'akuma'");
-$G['chk']('Semilla: 18 objetos «Fruta: X» (categoria akuma, 1 ranura)', (int) $db->fetch_field($q, 'n') === 18);
+// Robustecido (limitación conocida del AGENTS §11-bis): en una BD de desarrollo
+// puede haber frutas adicionales acumuladas de corridas previas o del trámite 49
+// (adaptación bajo demanda), así que NO exigimos COUNT total == 18. En su lugar
+// verificamos que las 18 frutas canónicas de la semilla están presentes por
+// nombre (6 canon + 12 pool T1/T2, D5.1) y que no hay duplicados de nombre — la
+// idempotencia del seed (upsert por `nombre_propio`) se refleja en que cada una
+// de las canónicas aparece EXACTAMENTE una vez.
+$FRUTAS_CANON = array(
+    'Gomu Gomu no Mi', 'Hana Hana no Mi', 'Neko Neko no Mi: Modelo Leopardo',
+    'Ryu Ryu no Mi: Modelo Espinosaurio', 'Tori Tori no Mi: Modelo Fénix', 'Mera Mera no Mi',
+    'Inu Inu no Mi: Modelo Dachshund', 'Ushi Ushi no Mi: Modelo Bisonte',
+    'Tori Tori no Mi: Modelo Cuervo', 'Uma Uma no Mi: Modelo Cebra',
+    'Bara Bara no Mi', 'Kilo Kilo no Mi', 'Sube Sube no Mi', 'Bomu Bomu no Mi',
+    'Supa Supa no Mi', 'Baku Baku no Mi', 'Doru Doru no Mi', 'Buki Buki no Mi',
+);
+$presentes = 0;
+$nombres_bd = array();
+$qr = $db->simple_select('ope_akumas', 'nombre_propio', "nombre_propio IN ('" . implode("','", array_map(array($db, 'escape_string'), $FRUTAS_CANON)) . "')");
+while ($row = $db->fetch_array($qr)) {
+    $nombres_bd[$row['nombre_propio']] = true;
+}
+foreach ($FRUTAS_CANON as $n) {
+    if (!empty($nombres_bd[$n])) {
+        $presentes++;
+    }
+}
+$G['chk']('Semilla: las 18 frutas canónicas presentes (6 canon + 12 pool T1/T2, D5.1)', $presentes === 18);
+// Idempotencia: sin duplicados de nombre propio (el seed hace upsert por nombre).
+$q = $db->query('SELECT SUM(d) AS dup FROM (SELECT COUNT(*) - 1 d FROM ' . TABLE_PREFIX . 'ope_akumas GROUP BY nombre_propio HAVING COUNT(*) > 1) x');
+$G['chk']('Semilla: sin duplicados de fruta por nombre (idempotencia del seed)', (int) $db->fetch_field($q, 'dup') === 0);
+// Objetos «Fruta: X»: las 18 canónicas presentes, sin exigir COUNT total == 18
+// (una fruta bajo demanda también crea su objeto).
+$obj_presentes = 0;
+$qr = $db->simple_select('ope_objetos', 'nombre', "categoria = 'akuma' AND nombre IN ('" . implode("','", array_map(function ($n) use ($db) { return $db->escape_string('Fruta: ' . $n); }, $FRUTAS_CANON)) . "')");
+while ($row = $db->fetch_array($qr)) {
+    $obj_presentes++;
+}
+$G['chk']('Semilla: los 18 objetos «Fruta: X» canónicos presentes (categoria akuma, 1 ranura)', $obj_presentes === 18);
 $q = $db->simple_select('ope_akuma_pool_tirada', 'COUNT(*) AS n', 'activo = 1');
 $G['chk']('Semilla: 3 bandas del pool (nv3+/15+/30+, T5 nunca)', (int) $db->fetch_field($q, 'n') === 3);
 
 $gomu = ope7_akuma_info((int) $db->fetch_field($db->simple_select('ope_akumas', 'id', "nombre_propio = 'Gomu Gomu no Mi'", array('limit' => 1)), 'id'));
 $G['chk']('Canon: Gomu T2 paramecia con matriz de especificidad', $gomu !== null && (int) $gomu['tier'] === 2 && $gomu['familia'] === 'paramecia' && (int) ($gomu['coste_pp']['concreta'] ?? 0) === 900);
 $G['chk']('Canon: ficha con puertas y despertar (8 bloques)', $gomu !== null && is_array($gomu['puertas']) && count($gomu['puertas']) >= 4 && is_array($gomu['despertar']));
-$q = $db->simple_select('ope_akumas', 'COUNT(*) AS n', "tier = 5 AND (portador_id IS NULL)");
-$G['chk']('Canon: T5 presentes (Mera/Tori Tori) pero nunca por tirada', (int) $db->fetch_field($q, 'n') === 2);
+$q = $db->simple_select('ope_akumas', 'COUNT(*) AS n', "nombre_propio IN ('Tori Tori no Mi: Modelo Fénix','Mera Mera no Mi') AND tier = 5 AND portador_id IS NULL");
+$G['chk']('Canon: T5 canónicas presentes (Mera/Tori Tori) y sin portador — nunca por tirada', (int) $db->fetch_field($q, 'n') === 2);
 
 // ── [2] Tirada 45 ──
 $pid_tir = $mk_pj('tirada', 3);
