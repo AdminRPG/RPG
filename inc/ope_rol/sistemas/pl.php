@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * One Piece: Eternal · Sistema de Puntos de Leyenda (PL).
  *
