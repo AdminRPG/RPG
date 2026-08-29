@@ -4,7 +4,7 @@
  * -----------------------------------------------------------------
  * Fuente única para leer de BD lo que antes eran arrays mockup en los .php
  * públicos (tienda, tripulaciones, bibliotecas de akuma/bestiario/estilos) y
- * las bibliotecas de personajes/NPC (que reutilizan rol_personajes).
+ * las bibliotecas de personajes/NPC (fuente canónica mybb_ope_personajes).
  *
  * Todas las funciones devuelven arrays PHP planos, listos para volcar a JSON
  * y pintar en el cliente. Requiere el $db global de MyBB.
@@ -108,9 +108,8 @@ if (!function_exists('ope_rol_cat_akuma')) {
     {
         global $db;
         $out = array();
-        // F6.4: fuente canónica mybb_ope_akumas (7 Seas, F5.1). El catálogo
-        // viejo rol_akuma se retiró; el espejo mantiene el esquema histórico
-        // si la corrida aún no creó ope_akumas (entorno en transición).
+        // Fuente canónica: mybb_ope_akumas (7 Seas, F5.1); si la corrida aún
+        // no creó ope_akumas se usa el espejo ope_akuma (entorno en transición).
         $tabla = 'ope_akumas';
         if (!$db->table_exists($tabla)) {
             if ($db->table_exists('ope_akuma')) {
@@ -186,7 +185,7 @@ if (!function_exists('ope_rol_cat_estilos')) {
 
 if (!function_exists('ope_rol_cat_personajes_publicos')) {
     /**
-     * Biblioteca de personajes jugadores: reutiliza rol_personajes.
+     * Biblioteca de personajes jugadores (fuente canónica mybb_ope_personajes).
      * Solo PJs aprobados y no NPC. Resuelve facción, raza y concepto del JSON
      * `datos`. No inventa nada: si un campo no existe queda vacío.
      */
@@ -195,7 +194,7 @@ if (!function_exists('ope_rol_cat_personajes_publicos')) {
         return ope_rol_cat_fichas_query('es_npc = 0 AND estado = \'aprobado\'');
     }
 
-    /** Biblioteca de NPCs: rol_personajes con es_npc=1 (auto-aprobados). */
+    /** Biblioteca de NPCs: mybb_ope_personajes con es_NPC=1 (auto-aprobados). */
     function ope_rol_cat_npcs_publicos()
     {
         return ope_rol_cat_fichas_query('es_npc = 1');
@@ -206,14 +205,12 @@ if (!function_exists('ope_rol_cat_personajes_publicos')) {
     {
         global $db;
         $out = array();
-        // F6.3: fuente canónica mybb_ope_personajes; el legado rol_personajes
-        // solo se usa si el esquema nuevo no existe todavía (transición).
+        // Fuente canónica: mybb_ope_personajes (es_NPC, estado, nivel…).
         $canonico = function_exists('ope7_tabla_existe') && ope7_tabla_existe('personajes') && $db->table_exists('personajes');
-        if (!$canonico && !$db->table_exists('rol_personajes')) {
+        if (!$canonico) {
             return $out;
         }
         $razas = function_exists('ope_rol_razas') ? ope_rol_razas() : array();
-        if ($canonico) {
             // ope_personajes: raza_id → razas.nombre; facción/rango por id.
             $q = $db->query('SELECT p.id AS pid, p.nombre, p.slug, \'\' AS rango, p.nivel, '
                 . 'p.avatar, p.icono, \'\' AS rango_faccion, p.personalidad, p.datos, p.es_NPC, '
@@ -244,9 +241,6 @@ if (!function_exists('ope_rol_cat_personajes_publicos')) {
                     'apariencia'   => '',
                 );
             }
-            return $out;
-        }
-        // D6.3: rol_personajes está retirada — solo existe la rama canónica.
         return $out;
     }
 }
@@ -444,132 +438,6 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
         );
     }
 
-    /** Recalcula el contador de miembros activos en rol_tripulaciones. */
-    function ope_rol_cat_tripulacion_sync_conteo($tripulacion_id)
-    {
-        global $db;
-        $tripulacion_id = (int) $tripulacion_id;
-        if ($tripulacion_id < 1 || !$db->table_exists('rol_tripulacion_miembros') || !$db->table_exists('rol_tripulaciones')) {
-            return 0;
-        }
-        $c = (int) $db->fetch_field(
-            $db->simple_select('rol_tripulacion_miembros', 'COUNT(*) c', "tripulacion_id = {$tripulacion_id} AND estado = 'activo'"),
-            'c'
-        );
-        $db->update_query('rol_tripulaciones', array('miembros' => $c), "id = {$tripulacion_id}");
-        return $c;
-    }
-
-    /** ¿Tiene un trámite de tripulación pendiente este personaje? */
-    function ope_rol_cat_tripulacion_tramite_pendiente($pid)
-    {
-        global $db;
-        $pid = (int) $pid;
-        if ($pid < 1 || !$db->table_exists('rol_tramites')) {
-            return null;
-        }
-        $q = $db->simple_select(
-            'rol_tramites',
-            '*',
-            "pid = {$pid} AND estado = 'pendiente' AND tipo IN ('fundar_tripulacion','unirse_tripulacion')",
-            array('order_by' => 'tid', 'order_dir' => 'DESC', 'limit' => 1)
-        );
-        return $db->num_rows($q) ? $db->fetch_array($q) : null;
-    }
-
-    /**
-     * Aprueba un trámite de tripulación (fundar o unirse).
-     * Devuelve array('ok'=>bool, 'msg'=>string).
-     */
-    function ope_rol_cat_tripulacion_aprobar_tramite($tid)
-    {
-        global $db;
-        $tid = (int) $tid;
-        if ($tid < 1 || !$db->table_exists('rol_tramites')) {
-            return array('ok' => false, 'msg' => 'Trámite no encontrado.');
-        }
-        $q = $db->simple_select('rol_tramites', '*', "tid = {$tid}", array('limit' => 1));
-        if (!$db->num_rows($q)) {
-            return array('ok' => false, 'msg' => 'Trámite no encontrado.');
-        }
-        $t = $db->fetch_array($q);
-        if ($t['estado'] !== 'pendiente') {
-            return array('ok' => false, 'msg' => 'Ese trámite ya fue gestionado.');
-        }
-        $pid = (int) $t['pid'];
-        $uid = (int) $t['uid'];
-        if ($pid < 1) {
-            return array('ok' => false, 'msg' => 'Trámite sin personaje asociado.');
-        }
-        if (ope_rol_cat_tripulacion_miembro($pid)) {
-            return array('ok' => false, 'msg' => 'Ese personaje ya pertenece a una tripulación.');
-        }
-        $datos = json_decode((string) ($t['datos'] ?? ''), true);
-        if (!is_array($datos)) {
-            $datos = array();
-        }
-        $now = (int) TIME_NOW;
-        $nombre_pj = ope_rol_cat_nombre_pid($pid);
-
-        if ($t['tipo'] === 'fundar_tripulacion') {
-            $nombre = trim((string) ($datos['nombre'] ?? ''));
-            if ($nombre === '') {
-                return array('ok' => false, 'msg' => 'Falta el nombre de la tripulación.');
-            }
-            if (!$db->table_exists('rol_tripulaciones')) {
-                return array('ok' => false, 'msg' => 'Tabla de tripulaciones no disponible.');
-            }
-            $db->insert_query('rol_tripulaciones', array(
-                'nombre'      => $db->escape_string($nombre),
-                'faccion'     => $db->escape_string((string) ($datos['faccion'] ?? 'pirata')),
-                'capitan'     => $db->escape_string($nombre_pj !== '' ? $nombre_pj : '—'),
-                'lema'        => $db->escape_string((string) ($datos['lema'] ?? '')),
-                'descripcion' => $db->escape_string((string) ($datos['descripcion'] ?? '')),
-                'nivel'       => 1,
-                'miembros'    => 1,
-                'imagen'      => $db->escape_string((string) ($datos['imagen'] ?? '')),
-                'activo'      => 1,
-                'orden'       => 0,
-                'dateline'    => $now,
-            ));
-            $trip_id = (int) $db->insert_id();
-            if ($trip_id < 1) {
-                return array('ok' => false, 'msg' => 'No se pudo crear la tripulación.');
-            }
-            $db->insert_query('rol_tripulacion_miembros', array(
-                'tripulacion_id' => $trip_id,
-                'pid'            => $pid,
-                'uid'            => $uid,
-                'rol'            => 'capitan',
-                'estado'         => 'activo',
-                'dateline'       => $now,
-            ));
-        } elseif ($t['tipo'] === 'unirse_tripulacion') {
-            $trip_id = (int) ($datos['tripulacion_id'] ?? 0);
-            if ($trip_id < 1) {
-                return array('ok' => false, 'msg' => 'Tripulación destino no válida.');
-            }
-            $tq = $db->simple_select('rol_tripulaciones', 'id', "id = {$trip_id} AND activo = 1", array('limit' => 1));
-            if (!$db->num_rows($tq)) {
-                return array('ok' => false, 'msg' => 'La tripulación ya no existe o está oculta.');
-            }
-            $db->insert_query('rol_tripulacion_miembros', array(
-                'tripulacion_id' => $trip_id,
-                'pid'            => $pid,
-                'uid'            => $uid,
-                'rol'            => 'tripulante',
-                'estado'         => 'activo',
-                'dateline'       => $now,
-            ));
-            ope_rol_cat_tripulacion_sync_conteo($trip_id);
-        } else {
-            return array('ok' => false, 'msg' => 'Tipo de trámite no soportado.');
-        }
-
-        $db->update_query('rol_tramites', array('estado' => 'aprobado', 'lastedit' => $now), "tid = {$tid}");
-        return array('ok' => true, 'msg' => 'Trámite aprobado.');
-    }
-
 if (!function_exists('ope_rol_cat_lore')) {
     /** Biblioteca de Lore: devuelve todos los artículos activos de ope_lore. */
     function ope_rol_cat_lore($solo_activos = true)
@@ -616,21 +484,6 @@ if (!function_exists('ope_rol_cat_lore')) {
         return $map[$cat] ?? 'var(--ember)';
     }
 }
-
-    /** Rechaza un trámite de tripulación. */
-    function ope_rol_cat_tripulacion_rechazar_tramite($tid)
-    {
-        global $db;
-        $tid = (int) $tid;
-        if ($tid < 1 || !$db->table_exists('rol_tramites')) {
-            return array('ok' => false, 'msg' => 'Trámite no encontrado.');
-        }
-        $db->update_query('rol_tramites', array(
-            'estado'   => 'rechazado',
-            'lastedit' => (int) TIME_NOW,
-        ), "tid = {$tid} AND estado = 'pendiente'");
-        return array('ok' => true, 'msg' => 'Trámite rechazado.');
-    }
 }
 
 if (!function_exists('ope_rol_cat_slugify')) {
@@ -653,309 +506,16 @@ if (!function_exists('ope_rol_cat_slugify')) {
     }
 }
 
-if (!function_exists('ope_rol_cat_cards_setup')) {
-    /** Crea las tablas rol_cards y rol_pj_cards si no existen. */
-    function ope_rol_cat_cards_setup()
-    {
-        global $db;
-        $pref = TABLE_PREFIX;
 
-        if (!$db->table_exists('rol_cards')) {
-            $db->write_query("CREATE TABLE {$pref}rol_cards (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                nombre VARCHAR(200) NOT NULL,
-                slug VARCHAR(200) NOT NULL,
-                tipo VARCHAR(50) NOT NULL DEFAULT 'tecnica',
-                descripcion TEXT,
-                contenido TEXT,
-                icono VARCHAR(255) DEFAULT '',
-                estadisticas TEXT,
-                activo TINYINT(1) NOT NULL DEFAULT 1,
-                orden INT NOT NULL DEFAULT 0,
-                dateline INT NOT NULL DEFAULT 0,
-                lastedit INT NOT NULL DEFAULT 0,
-                UNIQUE KEY slug_idx (slug)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-        }
 
-        if (!$db->table_exists('rol_pj_cards')) {
-            $db->write_query("CREATE TABLE {$pref}rol_pj_cards (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                pid INT NOT NULL,
-                card_id INT NOT NULL,
-                slot VARCHAR(50) NOT NULL DEFAULT 'misc',
-                datos TEXT,
-                orden INT NOT NULL DEFAULT 0,
-                dateline INT NOT NULL DEFAULT 0,
-                KEY pid_idx (pid),
-                KEY card_idx (card_id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-        }
-    }
-}
 
-if (!function_exists('ope_rol_cat_card_tipos')) {
-    /** Etiquetas para tipos de card. */
-    function ope_rol_cat_card_tipos()
-    {
-        return array(
-            'tecnica' => 'Técnica custom',
-            'haki'    => 'Haki',
-            'fruta'   => 'Akuma no Mi',
-            'arma'    => 'Técnica de arma',
-            'eternal' => 'Activo Eternal',
-            'item'    => 'Objeto / Ítem',
-            'lore'    => 'Lore / Conocimiento',
-            'npc'     => 'PNJ / Aliado',
-            'misc'    => 'Otro / Miscelánea',
-        );
-    }
-}
 
-if (!function_exists('ope_rol_cat_pj_card_slots')) {
-    /** Etiquetas para slots de asignación a personaje. */
-    function ope_rol_cat_pj_card_slots()
-    {
-        return array(
-            'descripcion' => 'Descripción',
-            'inventario'  => 'Inventario',
-            'tecnicas'    => 'Técnicas',
-            'poderes'     => 'Poderes',
-            'historia'    => 'Historia / Trasfondo',
-            'relaciones'  => 'Relaciones',
-            'misc'        => 'General / Otro',
-        );
-    }
-}
 
-if (!function_exists('ope_rol_cat_cards')) {
-    /** Lista todas las cards del catálogo. */
-    function ope_rol_cat_cards($solo_activos = true)
-    {
-        global $db;
-        $out = array();
-        if (!$db->table_exists('rol_cards')) {
-            return $out;
-        }
-        $where = $solo_activos ? 'activo = 1' : '';
-        $q = $db->simple_select('rol_cards', '*', $where, array('order_by' => 'orden, id', 'order_dir' => 'ASC'));
-        while ($r = $db->fetch_array($q)) {
-            $r['estadisticas_arr'] = ope_rol_cat_json_list($r['estadisticas'] ?? '');
-            $out[] = $r;
-        }
-        return $out;
-    }
 
-    /** Devuelve una card por ID. */
-    function ope_rol_cat_card_por_id($id)
-    {
-        global $db;
-        $id = (int) $id;
-        if ($id < 1 || !$db->table_exists('rol_cards')) {
-            return null;
-        }
-        $q = $db->simple_select('rol_cards', '*', "id = {$id}", array('limit' => 1));
-        if (!$db->num_rows($q)) {
-            return null;
-        }
-        $r = $db->fetch_array($q);
-        $r['estadisticas_arr'] = ope_rol_cat_json_list($r['estadisticas'] ?? '');
-        return $r;
-    }
 
-    /** Crea una nueva card. Devuelve array('ok'=>bool, 'msg'=>string, 'id'=>int). */
-    function ope_rol_cat_card_crear(array $data)
-    {
-        global $db;
-        $now = (int) TIME_NOW;
-
-        if (empty($data['nombre'])) {
-            return array('ok' => false, 'msg' => 'El nombre es obligatorio.', 'id' => 0);
-        }
-
-        // Slug auto-generado
-        $slug = !empty($data['slug']) ? ope_rol_cat_slugify($data['slug']) : ope_rol_cat_slugify($data['nombre']);
-
-        // Evitar slugs duplicados
-        $base_slug = $slug;
-        $counter = 1;
-        while ($db->table_exists('rol_cards') && $db->fetch_field($db->simple_select('rol_cards', 'COUNT(*) AS c', "slug = '{$db->escape_string($slug)}'"), 'c') > 0) {
-            $slug = $base_slug . '-' . $counter;
-            $counter++;
-        }
-
-        $id = $db->insert_query('rol_cards', array(
-            'nombre'       => $db->escape_string($data['nombre']),
-            'slug'         => $db->escape_string($slug),
-            'tipo'         => $db->escape_string($data['tipo'] ?? 'tecnica'),
-            'descripcion'  => $db->escape_string($data['descripcion'] ?? ''),
-            'contenido'    => $db->escape_string($data['contenido'] ?? ''),
-            'icono'        => $db->escape_string($data['icono'] ?? ''),
-            'estadisticas' => $db->escape_string($data['estadisticas'] ?? ''),
-            'activo'       => isset($data['activo']) ? (int) $data['activo'] : 1,
-            'orden'        => (int) ($data['orden'] ?? 0),
-            'dateline'     => $now,
-            'lastedit'     => $now,
-        ));
-
-        return array('ok' => true, 'msg' => "Card \"{$data['nombre']}\" creada.", 'id' => (int) $id);
-    }
-
-    /** Edita una card existente. Devuelve array('ok'=>bool, 'msg'=>string). */
-    function ope_rol_cat_card_editar($id, array $data)
-    {
-        global $db;
-        $id = (int) $id;
-        if ($id < 1 || !$db->table_exists('rol_cards')) {
-            return array('ok' => false, 'msg' => 'Card no encontrada.');
-        }
-
-        $q = $db->simple_select('rol_cards', 'id', "id = {$id}", array('limit' => 1));
-        if (!$db->num_rows($q)) {
-            return array('ok' => false, 'msg' => 'Card no encontrada.');
-        }
-
-        $update = array('lastedit' => (int) TIME_NOW);
-
-        if (isset($data['nombre'])) {
-            $update['nombre'] = $db->escape_string($data['nombre']);
-        }
-        if (isset($data['tipo'])) {
-            $update['tipo'] = $db->escape_string($data['tipo']);
-        }
-        if (isset($data['descripcion'])) {
-            $update['descripcion'] = $db->escape_string($data['descripcion']);
-        }
-        if (isset($data['contenido'])) {
-            $update['contenido'] = $db->escape_string($data['contenido']);
-        }
-        if (isset($data['icono'])) {
-            $update['icono'] = $db->escape_string($data['icono']);
-        }
-        if (isset($data['estadisticas'])) {
-            $update['estadisticas'] = $db->escape_string($data['estadisticas']);
-        }
-        if (isset($data['activo'])) {
-            $update['activo'] = (int) $data['activo'];
-        }
-        if (isset($data['orden'])) {
-            $update['orden'] = (int) $data['orden'];
-        }
-        // Slug regenerado si cambia nombre
-        if (isset($data['nombre'])) {
-            $slug = ope_rol_cat_slugify($data['nombre']);
-            $base_slug = $slug;
-            $counter = 1;
-            while ($db->fetch_field($db->simple_select('rol_cards', 'COUNT(*) AS c', "slug = '{$db->escape_string($slug)}' AND id != {$id}"), 'c') > 0) {
-                $slug = $base_slug . '-' . $counter;
-                $counter++;
-            }
-            $update['slug'] = $db->escape_string($slug);
-        }
-
-        $db->update_query('rol_cards', $update, "id = {$id}");
-        return array('ok' => true, 'msg' => 'Card actualizada.');
-    }
-
-    /** Borrado lógico (activo = 0) o físico si se fuerza. Devuelve array('ok'=>bool, 'msg'=>string). */
-    function ope_rol_cat_card_borrar($id, $force = false)
-    {
-        global $db;
-        $id = (int) $id;
-        if ($id < 1 || !$db->table_exists('rol_cards')) {
-            return array('ok' => false, 'msg' => 'Card no encontrada.');
-        }
-
-        if ($force) {
-            // Quitar asignaciones primero
-            if ($db->table_exists('rol_pj_cards')) {
-                $db->delete_query('rol_pj_cards', "card_id = {$id}");
-            }
-            $db->delete_query('rol_cards', "id = {$id}");
-            return array('ok' => true, 'msg' => 'Card eliminada permanentemente.');
-        }
-
-        $db->update_query('rol_cards', array('activo' => 0, 'lastedit' => (int) TIME_NOW), "id = {$id}");
-        return array('ok' => true, 'msg' => 'Card desactivada.');
-    }
-}
 
 if (!function_exists('ope_rol_cat_pj_cards')) {
-    /** Cards asignadas a un personaje. */
-    function ope_rol_cat_pj_cards($pid)
-    {
-        global $db;
-        $pid = (int) $pid;
-        $out = array();
-        if ($pid < 1 || !$db->table_exists('rol_pj_cards') || !$db->table_exists('rol_cards')) {
-            return $out;
-        }
-
-        $pref = TABLE_PREFIX;
-        $q = $db->query("SELECT pc.*, c.nombre AS card_nombre, c.tipo AS card_tipo, c.slug AS card_slug, c.icono AS card_icono, c.descripcion AS card_desc, c.contenido AS card_contenido
-            FROM {$pref}rol_pj_cards pc
-            JOIN {$pref}rol_cards c ON c.id = pc.card_id AND c.activo = 1
-            WHERE pc.pid = {$pid}
-            ORDER BY pc.orden, pc.id ASC");
-
-        while ($r = $db->fetch_array($q)) {
-            $out[] = $r;
-        }
-        return $out;
-    }
-
-    /** Asigna una card a un personaje. Devuelve array('ok'=>bool, 'msg'=>string, 'id'=>int). */
-    function ope_rol_cat_pj_card_asignar($pid, $card_id, $slot = 'misc', $datos = '')
-    {
-        global $db;
-        $pid = (int) $pid;
-        $card_id = (int) $card_id;
-        $slot = $db->escape_string(trim((string) $slot) !== '' ? $slot : 'misc');
-
-        if ($pid < 1 || $card_id < 1) {
-            return array('ok' => false, 'msg' => 'Personaje o card inválidos.', 'id' => 0);
-        }
-
-        if (!$db->table_exists('rol_pj_cards') || !$db->table_exists('rol_cards')) {
-            return array('ok' => false, 'msg' => 'Tablas no disponibles.', 'id' => 0);
-        }
-
-        // Verificar que la card existe
-        $cq = $db->simple_select('rol_cards', 'id, nombre', "id = {$card_id} AND activo = 1", array('limit' => 1));
-        if (!$db->num_rows($cq)) {
-            return array('ok' => false, 'msg' => 'Card no encontrada o inactiva.', 'id' => 0);
-        }
-        $card_nombre = $db->fetch_field($cq, 'nombre');
-
-        // Verificar duplicado
-        $dup = $db->simple_select('rol_pj_cards', 'COUNT(*) AS c', "pid = {$pid} AND card_id = {$card_id}", array('limit' => 1));
-        if ($db->num_rows($dup) && (int) $db->fetch_field($dup, 'c') > 0) {
-            return array('ok' => false, 'msg' => 'Esa card ya está asignada a este personaje.', 'id' => 0);
-        }
-
-        $id = $db->insert_query('rol_pj_cards', array(
-            'pid'       => $pid,
-            'card_id'   => $card_id,
-            'slot'      => $slot,
-            'datos'     => $db->escape_string((string) $datos),
-            'orden'     => 0,
-            'dateline'  => (int) TIME_NOW,
-        ));
-
-        return array('ok' => true, 'msg' => "Card \"{$card_nombre}\" asignada al personaje.", 'id' => (int) $id);
-    }
-
-    /** Desasigna una card de un personaje. */
-    function ope_rol_cat_pj_card_desasignar($id)
-    {
-        global $db;
-        $id = (int) $id;
-        if ($id < 1 || !$db->table_exists('rol_pj_cards')) {
-            return array('ok' => false, 'msg' => 'Asignación no encontrada.');
-        }
-        $db->delete_query('rol_pj_cards', "id = {$id}");
-        return array('ok' => true, 'msg' => 'Card desasignada del personaje.');
-    }
+    
 
     /** Lista de personajes (pid + nombre) para selects. */
     function ope_rol_cat_personajes_lista()

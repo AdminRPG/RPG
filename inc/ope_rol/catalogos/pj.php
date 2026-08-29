@@ -1,21 +1,6 @@
 <?php
 if (!defined('IN_MYBB')) { die('Direct initialization of this file is not allowed.'); }
 
-/**
- * Catálogos de creación de PJ — One Piece: Eternal.
- * Fuente: ARMAS.md, FACCIONES.md, FACTOR-LINAJE.md (Eternal-Sistema).
- * Catálogo canónico de creación de PJ; se carga desde ope_rol_data.php.
- */
-
-/**
- * @deprecated Armas legacy — Sustituida por ope_rol_armas_vocacionales() en vocaciones.php.
- * Se mantiene un stub vacío por si algún caller legacy no migrado la invoca.
- */
-function ope_rol_armas()
-{
-    return ope_rol_armas_vocacionales();
-}
-
 function ope_rol_facciones()
 {
     return array(
@@ -50,56 +35,6 @@ function ope_rol_facciones()
             'ventaja' => 'Sin enemigos declarados al inicio; con RF, créditos, precios reducidos y acceso a gremios de oficio.',
         ),
     );
-}
-
-/**
- * @deprecated Sustituida por ope_rol_rasgos_generales() (Factor Linaje).
- * Shim de compatibilidad: aplana el catálogo nuevo a la forma legacy
- * (nombre/valor/categoria/efecto/spec). El wizard y la ficha ya usan
- * directamente el catálogo del Factor Linaje (inc/ope_rol/catalogos/linaje.php).
- */
-function ope_rol_virtudes()
-{
-    $out = array();
-    if (!function_exists('ope_rol_rasgos_generales')) {
-        return $out;
-    }
-    foreach (ope_rol_rasgos_generales() as $categoria => $items) {
-        foreach ($items as $id => $r) {
-            $out[$id] = array(
-                'nombre'    => $r['nombre'],
-                'valor'     => (int) $r['pl'],
-                'categoria' => $categoria,
-                'requiere'  => 'Nada',
-                'efecto'    => $r['efecto'],
-                'spec'      => !empty($r['spec']),
-            );
-        }
-    }
-    return $out;
-}
-
-/**
- * @deprecated Sustituida por ope_rol_fl_defectos() (Factor Linaje).
- * Shim de compatibilidad: mapea el catálogo nuevo a la forma legacy.
- */
-function ope_rol_defectos()
-{
-    $out = array();
-    if (!function_exists('ope_rol_fl_defectos')) {
-        return $out;
-    }
-    foreach (ope_rol_fl_defectos() as $id => $d) {
-        $out[$id] = array(
-            'nombre'    => $d['nombre'],
-            'valor'     => (int) $d['pl'],
-            'categoria' => $d['categoria'] ?? 'General',
-            'requiere'  => 'Nada',
-            'efecto'    => $d['efecto'],
-            'spec'      => !empty($d['spec']),
-        );
-    }
-    return $out;
 }
 
 function ope_rol_packs_equipo()

@@ -13,8 +13,8 @@ require_once './global.php';
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 
-// D6.3: fuente canónica — NPCs mayores son ope_personajes con tipo_npc (el
-// bestiario menor vive en ope_bestiario). rol_personajes está retirada.
+// Fuente canónica: los NPCs mayores son ope_personajes con tipo_npc (el
+// bestiario menor vive en ope_bestiario).
 $all_npcs_db = array();
 if ($db->table_exists('ope_personajes')) {
     $nq = $db->simple_select('ope_personajes', '*', "tipo_npc IS NOT NULL AND tipo_npc != '' AND estado = 'aprobado'", array('order_by' => 'nivel', 'order_dir' => 'desc'));

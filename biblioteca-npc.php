@@ -1,7 +1,7 @@
 <?php
 /**
  * One Piece: Eternal · Biblioteca de NPCs
- * Catálogo poblado desde BD (rol_personajes, es_npc=1). Sin datos mockup.
+ * Catálogo poblado desde BD (mybb_ope_personajes, es_NPC=1). Sin datos mockup.
  * Estilos en docs/themes/ope.css (scope: ope-pg-biblioteca).
  */
 define('IN_MYBB', 1);

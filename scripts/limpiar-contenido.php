@@ -16,8 +16,7 @@
  *     rasgos, estados, acciones, matices, islas, mares, zonas, facciones,
  *     akumas, implantes, objetos, economía, estilos, cuentas…)
  *   · Usuarios MyBB admin + «OPE Eternal» y su personaje (#2024)
- *   · Esquema completo F0–F6 (las 54 tablas mybb_rol_retirada_* del legado
- *     D6.3 ya fueron DROPEADAS en el drop físico — no hay nada que vaciar)
+ *   · Esquema completo F0–F6 (drop físico D6.6: sin tablas mybb_rol_*)
  *
  * Idempotente: se puede re-ejecutar. No toca el esquema.
  */
@@ -95,26 +94,6 @@ foreach ($core as $t) {
     $core_total += $n;
 }
 echo "  [mybb] {$core_total} filas de contenido de foro borradas\n\n";
-
-// ── 3b. Legado D6.3: las mybb_rol_retirada_* ya fueron DROPEADAS (drop
-//    físico); el bloque se mantiene como no-op por idempotencia ───────────
-$q = $db->query("SHOW TABLES LIKE 'mybb_rol_retirada_%'");
-$ret_tables = array();
-if ($q) {
-    while ($r = $q->fetch_row()) {
-        $ret_tables[] = $r[0];
-    }
-}
-if ($ret_tables) {
-    $ret_total = 0;
-    foreach ($ret_tables as $t) {
-        $db->query("DELETE FROM `{$t}`");
-        $ret_total += $db->affected_rows;
-    }
-    echo "  [retirada] {$ret_total} filas de contenido legacy vaciadas (" . count($ret_tables) . " tablas)\n\n";
-} else {
-    echo "  [retirada] sin tablas legacy (drop físico D6.6 ya aplicado)\n\n";
-}
 
 // ── 4. Contadores, punteros y cachés ────────────────────────────────────────
 $db->query("UPDATE mybb_forums SET threads=0, posts=0, lastpost=0, lastposter='', lastposteruid=0, lastposttid=0, lastpostsubject='', unapprovedthreads=0, unapprovedposts=0, deletedthreads=0, deletedposts=0, ope_lastpid=0");

@@ -7,7 +7,7 @@
  * (tipo, madera, nivel, casco, maniobra, módulos, tripulación vinculada).
  * La gestión (compra, construcción, mejora, módulos, reparación, venta) se
  * hace desde el Astillero (astillero.php) y los trámites 39–44.
- * D6.3: fuente canónica mybb_ope_barcos — sin tablas legacy.
+ * Fuente canónica: mybb_ope_barcos.
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'barco.php');

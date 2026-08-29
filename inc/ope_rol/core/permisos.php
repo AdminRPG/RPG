@@ -2,7 +2,7 @@
 /**
  * One Piece: 7 Seas · Capa de permisos (decisión D0.5)
  * -----------------------------------------------------------------------------
- * Base: mybb_rol_cuentas (staff_level 0-3, staff_rol por personaje, staff_narrador)
+ * Base: mybb_ope_cuentas (staff_level, staff_rol, staff_narrador)
  * + bypass admin MyBB (uid=1 / usergroup 4). Envoltorios `ope7_*` para que el
  * motor 7 Seas nunca dependa del código viejo directamente.
  *
@@ -34,8 +34,7 @@ function ope7_permisos($uid = 0)
         return $out;
     }
 
-    // F6.3: fuente canónica mybb_ope_cuentas (staff_level/staff_rol/
-    // staff_narrador) con fallback al legado rol_cuentas + rol_personajes.
+    // Fuente canónica: mybb_ope_cuentas (staff_level/staff_rol/staff_narrador).
     if (ope7_tabla_existe('cuentas')) {
         $q = $db->simple_select(ope7_tabla('cuentas'), 'staff_level, staff_rol, staff_narrador', "uid = {$uid}", array('limit' => 1));
         $cu = $db->fetch_array($q);

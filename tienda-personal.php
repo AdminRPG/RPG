@@ -4,8 +4,6 @@
  * ----------------------------------------------------------------
  * Inventario completo: agregar, editar, eliminar, poner/quitar de venta,
  * gestión de precios, cantidades y categorías.
- *
- * Fallback demo cuando rol_inventario no existe.
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'tienda-personal.php');

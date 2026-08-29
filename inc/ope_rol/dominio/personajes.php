@@ -3,7 +3,7 @@
  * One Piece: 7 Seas · Dominio — Personajes (F1)
  * ----------------------------------------------------------------------------------
  * Capa de entidad sobre `mybb_ope_personajes` (esquema Anexo A.1):
- *   · Resolución del personaje activo (rol_cuentas.personaje_activo + personaje_tabla).
+ *   · Resolución del personaje activo (mybb_ope_cuentas.personaje_activo + personaje_tabla).
  *   · Carga de ficha + secundarios calculados (fórmulas confirmadas, Manual del
  *     Jugador §3.6 / Manual del Staff §3.2 — números sagrados, no se tocan).
  *   · Validación de ficha de creación: presupuesto 120, techos por nivel, balanzas
@@ -140,7 +140,7 @@ function ope7_pj_recalcular_secundarios($personaje_id, $ficha = null)
 
 /**
  * Resolución del personaje activo de un usuario (decisión D1.1).
- * Lee rol_cuentas.personaje_activo + personaje_tabla; devuelve array
+ * Lee mybb_ope_cuentas.personaje_activo + personaje_tabla; devuelve array
  * ['tabla' => 'rol'|'ope', 'id' => int] o null si no hay activo.
  */
 function ope7_pj_activo($uid = 0)
@@ -153,7 +153,7 @@ function ope7_pj_activo($uid = 0)
     if ($uid < 1) {
         return null;
     }
-    // D6.3: fuente canónica mybb_ope_cuentas (rol_cuentas está retirada).
+    // Fuente canónica: mybb_ope_cuentas.
     if (!ope7_tabla_existe('cuentas')) {
         return null;
     }
@@ -178,9 +178,7 @@ function ope7_pj_set_activo($uid, $tabla, $id)
     }
     $tabla = $tabla === 'ope' ? 'ope' : 'rol';
     $id    = (int) $id;
-    // D6.3: escribe solo en la fuente canónica (mybb_ope_cuentas). El espejo
-    // en rol_cuentas se eliminó: esa tabla está retirada y el plugin ya lee
-    // la fuente canónica.
+    // Escribe solo en la fuente canónica (mybb_ope_cuentas).
     if (!ope7_tabla_existe('cuentas')) {
         return false;
     }

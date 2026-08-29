@@ -5,9 +5,7 @@
  * El bot es el usuario del sistema para posteos automáticos: periódico
  * «News Coo», sucesos de ronda, rumores, renacimiento de frutas, avisos.
  * Necesita un personaje-sistema (es_NPC) para firmar los posts como personaje
- * (el postbit muestra el personaje, no la cuenta). F6.3: vive en
- * mybb_ope_personajes (canónico); si aún existe el legado rol_personajes,
- * también se mantiene en espejo para los hooks viejos del plugin.
+ * (el postbit muestra el personaje, no la cuenta). Vive en mybb_ope_personajes.
  */
 
 if (!defined('IN_MYBB')) {
@@ -34,8 +32,7 @@ function ope7_bot_uid()
 
 /**
  * Asegura (idempotente) el personaje-sistema del bot en mybb_ope_personajes
- * (es_NPC=1). F6.3: fuente canónica; el legado rol_personajes solo se usa si
- * el esquema nuevo no existe todavía (transición) o como espejo.
+ * (es_NPC=1). Fuente canónica: mybb_ope_personajes.
  * @return int id del personaje del bot (0 si falla).
  */
 function ope7_bot_personaje()
@@ -66,7 +63,7 @@ function ope7_bot_personaje()
         ));
         return (int) $pid;
     }
-    // D6.3: rol_personajes está retirada — el bot solo existe en ope_personajes.
+    // Sin esquema canónico no hay bot.
     return 0;
 }
 

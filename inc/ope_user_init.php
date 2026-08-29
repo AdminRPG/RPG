@@ -16,7 +16,7 @@
  * Devuelve el nivel de staff (0 = usuario normal, 1+ = staff).
  *
  * @param int $uid         ID del usuario MyBB.
- * @param int $active_pid  Si > 0, además se requiere que rol_personajes exista.
+ * @param int $active_pid  Personaje activo (sin uso en esta función).
  * @return int
  */
 function ope_get_staff_level($uid, $active_pid = 0) {
@@ -27,7 +27,7 @@ function ope_get_staff_level($uid, $active_pid = 0) {
     if (isset($mybb->user['ope_staff_level'])) {
         return (int) $mybb->user['ope_staff_level'];
     }
-    // D6.3: fuente canónica mybb_ope_cuentas (rol_cuentas está retirada).
+    // Fuente canónica: mybb_ope_cuentas.
     if ($db->table_exists('ope_cuentas')) {
         $cq = $db->simple_select('ope_cuentas', 'staff_level', 'uid = ' . (int)$uid, array('limit' => 1));
         if ($db->num_rows($cq)) {

@@ -205,47 +205,6 @@ function ope_fruta_asignar($pid, $fruta_id, $origen = 'roll')
     );
 }
 
-/** Tirada aleatoria entre frutas libres (cualquier tier). */
-function ope_fruta_roll_aleatoria($pid)
-{
-    $libres = ope_fruta_libres(0);
-    if (empty($libres)) {
-        return array('ok' => false, 'msg' => 'No hay frutas libres en el catálogo.');
-    }
-    $pick = $libres[array_rand($libres)];
-    return ope_fruta_asignar($pid, (int) $pick['id'], 'roll');
-}
-
-function ope_fruta_liberar($pid)
-{
-    global $db;
-    $pid = (int) $pid;
-    $row = ope_fruta_pj($pid);
-    if (!$row) {
-        return false;
-    }
-    $fid = (int) $row['fruta_id'];
-    $db->delete_query('rol_pj_fruta', "pid = {$pid}");
-    if ($fid > 0 && $db->table_exists('rol_akuma') && $db->field_exists('ocupada_pid', 'rol_akuma')) {
-        $db->update_query('rol_akuma', array('ocupada_pid' => 0), "id = {$fid} AND ocupada_pid = {$pid}");
-    }
-    return true;
-}
-
-function ope_fruta_add_cu($pid, $n = 1)
-{
-    global $db;
-    $pid = (int) $pid;
-    $n = max(1, (int) $n);
-    $row = ope_fruta_pj($pid);
-    if (!$row) {
-        return false;
-    }
-    $cu = (int) $row['cu'] + $n;
-    $db->update_query('rol_pj_fruta', array('cu' => $cu, 'lastedit' => TIME_NOW), "pid = {$pid}");
-    return true;
-}
-
 /**
  * Autoservicio Nv.0→1 y Nv.1→2. Nv.3 = trámite.
  */
@@ -258,67 +217,6 @@ function ope_fruta_can_level($pid)
     // D6.3: la progresión de la fruta (niveles, despertar) vive en los trámites
     // 45–51 del motor 7 Seas; este autoservicio del motor anterior se desactiva.
     return array('ok' => false, 'msg' => 'La progresión de la fruta se gestiona por trámite (45–51).');
-}
-
-function ope_fruta_buy_level($pid)
-{
-    global $db;
-    $check = ope_fruta_can_level($pid);
-    if (empty($check['ok'])) {
-        return $check;
-    }
-    $pid = (int) $pid;
-    $pp = (int) $check['pp'];
-    $siguiente = (int) $check['siguiente'];
-    if (!ope_pp_spend($pid, $pp, 'gasto_fruta', "Fruta Nv.{$siguiente}")) {
-        return array('ok' => false, 'msg' => 'No se pudo gastar PP.');
-    }
-    $row = ope_fruta_pj($pid);
-    $db->update_query('rol_pj_fruta', array(
-        'nivel' => $siguiente,
-        'pp_gastado' => (int) $row['pp_gastado'] + $pp,
-        'lastedit' => TIME_NOW,
-    ), "pid = {$pid}");
-    return array('ok' => true, 'msg' => "Fruta → Nv.{$siguiente} (−{$pp} PP).", 'nivel' => $siguiente);
-}
-
-/**
- * Staff aprueba despertar Nv.3 (tras hito). Cobra PP del tramo actual.
- */
-function ope_fruta_despertar($pid)
-{
-    global $db;
-    $pid = (int) $pid;
-    $row = ope_fruta_pj($pid);
-    if (!$row || (int) $row['nivel'] !== 2) {
-        return array('ok' => false, 'msg' => 'Requiere fruta en Nv.2.');
-    }
-    $pq = $db->simple_select('rol_personajes', 'nivel, estado', "pid = {$pid}", array('limit' => 1));
-    $pj = $db->fetch_array($pq);
-    if (!$pj || (string) ($pj['estado'] ?? '') !== 'aprobado') {
-        return array('ok' => false, 'msg' => 'PJ no válido.');
-    }
-    $fruta = ope_fruta_by_id((int) $row['fruta_id']);
-    $tier = (int) ($fruta['tier'] ?? 1);
-    $nivel_pj = max(1, (int) ($pj['nivel'] ?? 1));
-    $tramo = ope_rol_tramo($nivel_pj);
-    if ($tramo < ope_fruta_tramo_min_despertar($tier)) {
-        return array('ok' => false, 'msg' => 'Tramo insuficiente para despertar este Tier.');
-    }
-    if ((int) $row['cu'] < ope_fruta_cu_req(3)) {
-        return array('ok' => false, 'msg' => 'CU insuficiente para despertar.');
-    }
-    $pp = ope_fruta_pp_nivel($tramo, true);
-    if (!ope_pp_spend($pid, $pp, 'gasto_fruta', 'Fruta Despertar Nv.3')) {
-        return array('ok' => false, 'msg' => "Necesitas {$pp} PP.");
-    }
-    $db->update_query('rol_pj_fruta', array(
-        'nivel' => 3,
-        'pp_gastado' => (int) $row['pp_gastado'] + $pp,
-        'fecha_despertar' => TIME_NOW,
-        'lastedit' => TIME_NOW,
-    ), "pid = {$pid}");
-    return array('ok' => true, 'msg' => "¡Despertar! Fruta Nv.3 (−{$pp} PP).");
 }
 
 function ope_fruta_ficha_block($pid, $stats)
@@ -392,33 +290,7 @@ function ope_fruta_tipo_base($tipo)
 }
 
 /**
- * Selecciona aleatoriamente una fruta disponible (libre y activa) de rol_akuma.
- * @return int ID de la fruta sorteada, o 0 si no hay stock disponible.
- */
-function ope_fruta_sortear_aleatoria()
-{
-    global $db;
-    if (!$db->table_exists('rol_akuma')) {
-        return 0;
-    }
-    $where = 'activo = 1';
-    if ($db->field_exists('ocupada_pid', 'rol_akuma')) {
-        $where .= ' AND (ocupada_pid = 0 OR ocupada_pid IS NULL)';
-    }
-    $q = $db->simple_select('rol_akuma', 'id', $where);
-    $libres = array();
-    while ($r = $db->fetch_array($q)) {
-        $libres[] = (int) $r['id'];
-    }
-    if (empty($libres)) {
-        return 0;
-    }
-    $idx = array_rand($libres);
-    return $libres[$idx];
-}
-
-/**
- * Normaliza una fila de rol_akuma al shape que consumen la tarjeta y el modal.
+ * Normaliza una fila de akuma (fuente canónica mybb_ope_akumas) al shape que consumen la tarjeta y el modal.
  * Privacy-gate: $can_see_details ($is_owner || $is_staff) controla la visibilidad de $caps.
  * Las notas de staff y notas de diseño quedan siempre purgadas.
  */

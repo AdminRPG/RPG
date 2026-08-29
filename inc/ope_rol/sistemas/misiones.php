@@ -765,8 +765,7 @@ function ope7_misiones_panel_html()
     $h[] = '<div class="plate"><div class="plate-h"><span class="t">Narradores</span><span class="c">rol de foro · cupo 2 simultáneas (21.2)</span></div><div class="plate-b">';
     $narr = array();
     // El rol de narrador es por PERSONAJE (staff_narrador, independiente del
-    // staff_level — 21.2). F6.3: fuente canónica mybb_ope_cuentas; si aún
-    // existe el legado rol_cuentas, se consulta como complemento.
+    // staff_level — 21.2). Fuente canónica: mybb_ope_cuentas.
     if (ope7_tabla_existe('misiones') && ope7_tabla_existe('cuentas') && ope7_tabla_existe('personajes')) {
         $q = $db->query('SELECT c.uid, c.personaje_activo, p.nombre AS pj_nombre, u.username '
             . 'FROM ' . ope7_tabla_full('cuentas') . ' c '
@@ -778,7 +777,7 @@ function ope7_misiones_panel_html()
         }
     }
     if (!$narr) {
-        $h[] = '<p class="pj-empty">Sin narradores habilitados (staff_narrador en rol_personajes, 21.2) ni staff con personaje activo.</p>';
+        $h[] = '<p class="pj-empty">Sin narradores habilitados ni staff con personaje activo.</p>';
     } else {
         $h[] = '<table class="zs-tab"><thead><tr><th>Narrador</th><th>Personaje</th><th>Aventuras activas</th><th>Cupo</th></tr></thead><tbody>';
         foreach ($narr as $r) {

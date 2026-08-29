@@ -3,7 +3,7 @@
  * One Piece: Eternal · Personajes ("Mi expediente" / roster)
  * Página de front-end MyBB (dirección "One Piece: Eternal").
  *
- * El usuario autenticado ve sus personajes (mybb_rol_personajes) en tarjetas
+ * El usuario autenticado ve sus personajes (mybb_ope_personajes) en tarjetas
  * y puede marcar cuál es el personaje ACTIVO (con el que publica). La selección
  * hace un POST a esta misma página, validando la post key de MyBB.
  * Sin fichas de ejemplo: si no hay personajes, estado vacío honesto.
@@ -145,7 +145,7 @@ if ($loggedin && $db->table_exists('ope_personajes')) {
         array('order_by' => 'id', 'order_dir' => 'ASC')
     );
     while ($row = $db->fetch_array($q)) {
-        $row['pid']      = (int) $row['id'];   // alias legacy para el HTML
+        $row['pid']      = (int) $row['id'];   // alias pid para el HTML
         $row['es_npc']   = (int) ($row['es_NPC'] ?? 0);
         $row['activo']   = 0;
         $row['rango']    = '';

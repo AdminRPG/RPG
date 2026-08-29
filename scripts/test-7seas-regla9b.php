@@ -125,12 +125,11 @@ echo "=== Test regla 9b: IA/skill/prompt nunca visibles al jugador ===\n";
 $RAIZ = dirname(__DIR__);
 $archivos_jugables = array_merge(
     // Páginas públicas de la raíz (excluye toda la zona staff y paneles).
-    // Además de *-staff.php y bandeja.php, hay páginas legacy de staff que no
-    // siguen ese patrón de nombre pero están blindadas en bloque con un guard
+    // Además de *-staff.php y bandeja.php, hay páginas de staff que no siguen
+    // ese patrón de nombre pero están blindadas en bloque con un guard
     // ope7_es_staff / ope_rol_active_staff (no llegan al jugador y conservan
-    // jerga legítima según D6.1): resolucion-combate y mundo-vivo (legacy de
-    // cierre de combate previos a los paneles A.3; revision-viaje fue eliminada
-    // en el drop físico del legado). ficha.php y biblioteca-akuma.php NO se
+    // jerga operativa según D6.1): resolucion-combate y mundo-vivo (paneles de
+    // cierre previos a los A.3). ficha.php y biblioteca-akuma.php NO se
     // excluyen: son páginas jugables que solo añaden un extra al staff, y su
     // texto visible debe seguir la regla 9b.
     array_filter(glob($RAIZ . '/*.php'), function ($f) use ($RAIZ) {

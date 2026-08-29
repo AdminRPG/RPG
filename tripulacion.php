@@ -4,10 +4,8 @@
  * - Si el personaje activo tiene membresía → vista "Mi tripulación"
  * - Si no → listado de tripulaciones disponibles para aplicar
  *
- * Esquema real:
- *   rol_tripulaciones       : id, nombre, faccion, capitan, lema, descripcion, nivel, miembros, imagen, activo, orden
- *   rol_tripulacion_miembros: id, tripulacion_id, pid, uid, rol, estado, dateline
- *   rol_personajes          : pid, uid, nombre, avatar, nivel, estado, ...
+ * Esquema canónico (motor 7 Seas, F5.3 / cap. 22.9): ope_tripulaciones,
+ * ope_tripulantes y ope_personajes.
  */
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'tripulacion.php');

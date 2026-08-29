@@ -6,7 +6,7 @@
  * recreando desde cero el esquema que los manuales definen por sistema.
  *
  * - Idempotente: CREATE TABLE IF NOT EXISTS; se puede re-ejecutar sin efectos.
- * - No toca las tablas `mybb_rol_*` de la era anterior (se conservan intactas).
+ * - Esquema exclusivamente canónico: no se crea ni referencia ninguna tabla `mybb_rol_*`.
  * - Sin dados (principio 1): no existe ninguna tabla de tiradas; las únicas
  *   excepciones (Conquistador 5.19, fruta aleatoria 5.18) registran resultados,
  *   no resuelven acciones.
@@ -23,17 +23,6 @@ ini_set('display_errors', '1');
 require __DIR__ . '/_db-config.php';
 
 $P = 'mybb_ope_'; // prefijo canónico del esquema 7 Seas (D0.3-bis)
-
-/** ¿Existe una tabla del motor viejo (mybb_rol_<nombre>)? */
-function ope7_tabla_existe_legacy(string $nombre): bool
-{
-    global $db;
-    $res = $db->query('SHOW TABLES LIKE \'mybb_rol_' . $nombre . '\'');
-    if ($res === false) {
-        return false;
-    }
-    return $res->num_rows > 0;
-}
 
 /** Ejecuta una sentencia y aborta con mensaje claro si falla. */
 function ope7_run(mysqli $db, string $label, string $sql): void
@@ -115,14 +104,12 @@ CREATE TABLE IF NOT EXISTS {$P}tribus (
 // ─────────────────────────────────────────────────────────────
 // 5.2 / 5.6 / 5.11 / 5.12 / 5.18 / 5.21-bis — Personajes (ficha)
 // ─────────────────────────────────────────────────────────────
-// Cuentas de rol (F6.3, sustituye mybb_rol_cuentas): puntero de personaje
-// activo por usuario + rol staff/narrador. La retirada de mybb_rol_* migra
-// aquí los datos vivos (uid 1 admin, uid 2 bot) desde la tabla vieja.
+// Cuentas de rol: puntero de personaje activo por usuario + rol staff/narrador.
 ope7_run($db, 'cuentas', "
 CREATE TABLE IF NOT EXISTS {$P}cuentas (
     uid INT UNSIGNED NOT NULL,
-    personaje_activo INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'id en personajes (ope) o rol_personajes (legado)',
-    personaje_tabla ENUM('ope','rol') NOT NULL DEFAULT 'ope' COMMENT 'ope = esquema canónico 7 Seas; rol = legado del motor viejo',
+    personaje_activo INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'id en mybb_ope_personajes',
+    personaje_tabla ENUM('ope','rol') NOT NULL DEFAULT 'ope' COMMENT 'ope = esquema canónico 7 Seas (único valor en uso)',
     staff_level TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0-3 (5.12): 0 jugador · 1 colaborador · 2 moderador · 3 admin',
     staff_rol VARCHAR(40) NOT NULL DEFAULT '' COMMENT 'webmaster/moderador/colaborador (legado del plugin)',
     staff_narrador TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'narrador habilitado por personaje (21.2, independiente del staff_level)',
@@ -1830,50 +1817,6 @@ WHERE NOT EXISTS (SELECT 1 FROM {$P}calendario_foro WHERE id = 1);
 ");
 
 // ─────────────────────────────────────────────────────────────
-// F6.3 — Migración de datos desde mybb_rol_* (retirada por capas)
-// ─────────────────────────────────────────────────────────────
-// Copia (idempotente) los datos VIVOS del motor viejo al esquema canónico
-// mybb_ope_*: el puntero de personaje activo + roles staff/narrador viven en
-// mybb_rol_cuentas (lo escribe el motor 7 Seas en cada cambio de personaje)
-// y el bot «OPE Eternal» vive en mybb_rol_personajes.
-// Tablas viejas del motor anterior (prefijo mybb_rol_): la copia de datos
-// solo se ejecuta si la tabla legada existe todavía (retirada por capas).
-if (ope7_tabla_existe_legacy('cuentas')) {
-    ope7_run($db, 'F6.3 cuentas <- rol_cuentas', "
-INSERT INTO {$P}cuentas (uid, personaje_activo, personaje_tabla, staff_level, staff_rol, staff_narrador, slots, datos, dateline)
-SELECT c.uid,
-       IF(c.personaje_tabla = 'ope', c.personaje_activo, 0),
-       'ope',
-       c.staff_level,
-       COALESCE(p.staff_rol, ''),
-       COALESCE(p.staff_narrador, 0),
-       c.slots,
-       c.datos,
-       c.dateline
-FROM mybb_rol_cuentas c
-LEFT JOIN mybb_rol_personajes p ON p.uid = c.uid AND p.pid = c.personaje_activo AND c.personaje_tabla = 'rol'
-ON DUPLICATE KEY UPDATE
-    personaje_activo = VALUES(personaje_activo),
-    personaje_tabla  = VALUES(personaje_tabla),
-    staff_level      = VALUES(staff_level),
-    staff_rol        = VALUES(staff_rol),
-    staff_narrador   = VALUES(staff_narrador);
-");
-}
-
-// ─────────────────────────────────────────────────────────────
-// F6.4 — Retirada TOTAL de mybb_rol_* (decisión D6.3 ampliada: "retirar las
-// 34 todas migrando también el front"). Estrategia por capas:
-//   1. MIRRORS: las tablas que el FRONT VIVO aún lee con el esquema viejo
-//      (sin equivalente real en mybb_ope_*) se copian a mybb_ope_* con el
-//      MISMO esquema + datos (idempotente). El front se flipea a ope_*.
-//   2. Las que tienen equivalente real mybb_ope_* (personajes, cuentas,
-//      tramites, tripulaciones, tripulantes, bestiario, tienda_items,
-//      estados, akumas) se retiran y el front pasa a leer las reales.
-//   3. Las que solo usa código muerto legacy se archivan directamente.
-// Retirada por capas (F6.3): las tablas mybb_rol_* que SOLO usa el código
-// muerto del motor viejo (inc/ope_rol/mundo/* y funciones legacy sin hooks)
-// se archivan (RENAME a mybb_rol_retirada_* — reversible, sin DROP).
 
 // ─────────────────────────────────────────────────────────────
 // F6.5 — Registro de ejecución de crones (vista del panel «Progresión»)
@@ -1890,82 +1833,6 @@ CREATE TABLE IF NOT EXISTS {$P}cron_log (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ");
 
-// ── 1) Espejos front-vivos (mismo esquema + datos, idempotente) ──
-// ATENCIÓN: $P ya es 'mybb_ope_', así que el destino es el NOMBRE CORTO
-// ('alertas', no 'ope_alertas') — {$P}{$dest} = mybb_ope_alertas.
-$mirror_front = array(
-    'alertas'                  => 'alertas',
-    'mensajes'                 => 'mensajes',
-    'cronologia'               => 'cronologia',
-    'relaciones'               => 'relaciones',
-    'post_templates'           => 'post_templates',
-    'thread_meta'              => 'thread_meta',
-    'estilos'                  => 'estilos',
-    'lore'                     => 'lore',
-    'npcs_secundarios'         => 'npcs_secundarios',
-    'acompanantes'             => 'acompanantes',
-    'acompanante_solicitudes'  => 'acompanante_solicitudes',
-    'mv_noticias'              => 'mv_noticias',
-    'mv_mision_asignaciones'   => 'mv_mision_asignaciones',
-    'pp_saldo'                 => 'pp_saldo',
-    'pp_log'                   => 'pp_log',
-    'pj_vocaciones'            => 'pj_vocaciones',
-    'forum_meta'               => 'forum_meta',
-);
-foreach ($mirror_front as $lt => $dest) {
-    if (!ope7_tabla_existe_legacy($lt)) {
-        continue;
-    }
-    $res = $db->query("SHOW TABLES LIKE '{$P}{$dest}'");
-    if ($res && $res->num_rows > 0) {
-        // Ya migrado en una corrida anterior: solo asegura datos.
-        ope7_run($db, 'F6.4 espejo datos ' . $dest, "
-INSERT IGNORE INTO {$P}{$dest} SELECT * FROM mybb_rol_{$lt}
-");
-        continue;
-    }
-    ope7_run($db, 'F6.4 espejo ' . $dest, "CREATE TABLE {$P}{$dest} LIKE mybb_rol_{$lt}");
-    ope7_run($db, 'F6.4 espejo datos ' . $dest, "INSERT IGNORE INTO {$P}{$dest} SELECT * FROM mybb_rol_{$lt}");
-}
-
-// D6.3-bis: espejos cuyo origen ya fue RENOMBRADO a mybb_rol_retirada_* en una
-// corrida anterior (la lista mirror de arriba solo copia si la tabla legada
-// sigue existiendo). Se crean desde la retirada, idempotente.
-$mirror_desde_retirada = array(
-    'forum_meta' => 'forum_meta',
-);
-foreach ($mirror_desde_retirada as $lt => $dest) {
-    $retirada = "mybb_rol_retirada_{$lt}";
-    $res = $db->query("SHOW TABLES LIKE '{$retirada}'");
-    if (!$res || $res->num_rows < 1) {
-        continue;
-    }
-    $res = $db->query("SHOW TABLES LIKE '{$P}{$dest}'");
-    if ($res && $res->num_rows > 0) {
-        ope7_run($db, 'D6.3-bis espejo datos ' . $dest, "INSERT IGNORE INTO {$P}{$dest} SELECT * FROM {$retirada}");
-        continue;
-    }
-    ope7_run($db, 'D6.3-bis espejo ' . $dest, "CREATE TABLE {$P}{$dest} LIKE {$retirada}");
-    ope7_run($db, 'D6.3-bis espejo datos ' . $dest, "INSERT IGNORE INTO {$P}{$dest} SELECT * FROM {$retirada}");
-}
-
-// ── 2+3) Retirar TODAS las 34 tablas restantes (archivo reversible) ──
-$legacy_retirar = array(
-    // (F6.3 ya archivó 20 tablas de código muerto)
-    'acompanante_solicitudes', 'acompanantes', 'akuma', 'alertas', 'bestiario',
-    'cronologia', 'cuentas', 'enlace', 'estados', 'estilos', 'forum_meta',
-    'lore', 'mensajes', 'mision_tomas', 'mv_mision_asignaciones', 'mv_noticias',
-    'npcs_secundarios', 'personajes', 'pj_fruta', 'pj_vocaciones', 'pl', 'pl_log',
-    'post_snapshot', 'post_templates', 'pp_log', 'pp_saldo', 'relaciones',
-    'renombre', 'thread_meta', 'thread_snapshots', 'tienda_items', 'tramites',
-    'tripulacion_miembros', 'tripulaciones',
-);
-foreach ($legacy_retirar as $lt) {
-    if (!ope7_tabla_existe_legacy($lt)) {
-        continue;
-    }
-    ope7_run($db, 'F6.4 retirar rol_' . $lt, "RENAME TABLE mybb_rol_{$lt} TO mybb_rol_retirada_{$lt}");
-}
 
 // Verificación
 // ─────────────────────────────────────────────────────────────

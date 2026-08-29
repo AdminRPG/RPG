@@ -3,7 +3,7 @@
  * One Piece: Eternal · Rol (plugin de integración)
  * -------------------------------------
  * Expone a las plantillas MyBB el nivel de staff y el personaje activo del
- * sistema de rol, leídos de mybb_rol_cuentas / mybb_rol_personajes.
+ * sistema de rol, leídos de mybb_ope_cuentas / mybb_ope_personajes.
  *
  * - $mybb->user['ope_staff_level']  (int 0..3, acumulativo)
  * - $mybb->user['ope_active_pid']   (int pid del personaje activo)
@@ -19,9 +19,8 @@ if (!defined('IN_MYBB')) {
     die('Direct initialization of this file is not allowed.');
 }
 
-// Backend de rol: catálogos, Eternal, Haki, Frutas, Mundo Vivo, Viajes…
-// Fuente canónica: inc/ope_rol/ (ver README). Stubs en inc/ope_rol_*.php
-// siguen válidos para páginas que cargan módulos sueltos.
+// Backend 7 Seas: motor completo (catálogos, sistemas, trámites).
+// Fuente canónica: inc/ope_rol/ (ver README).
 require_once MYBB_ROOT . 'inc/ope_rol/bootstrap.php';
 
 // Zona B 7 Seas (F2.2): panel del editor, parser y persistencia de turnos.
@@ -41,37 +40,22 @@ $plugins->add_hook('datahandler_post_insert_post', 'ope_rol_stamp_post');
 $plugins->add_hook('datahandler_post_insert_thread_end', 'ope_rol_after_thread');
 $plugins->add_hook('datahandler_post_insert_post_end', 'ope_rol_after_post');
 
-// D6.3: hooks legacy de posteo DESACTIVADOS — escriben en tablas mybb_rol_*
-// retiradas (rol_post_snapshot, ope_pp_saldo, rol_haki/rol_tecnicas). El motor
-// 7 Seas hace el conteo de usos de Haki al CIERRE de tema (5.19, D5.3) y el
-// PP por cierre (trámite 2), no por post. El postbit degrada al estado actual
-// del personaje (mybb_ope_personajes). Las funciones se conservan en el plugin
-// (código legacy con guards) por si se quieren restaurar tras migrar los datos.
-//$plugins->add_hook('datahandler_post_insert_thread_end', 'ope_rol_snapshot_post');
-//$plugins->add_hook('datahandler_post_insert_post_end', 'ope_rol_snapshot_post');
-//$plugins->add_hook('datahandler_post_insert_thread_end', 'ope_pp_on_post');
-//$plugins->add_hook('datahandler_post_insert_post_end', 'ope_pp_on_post');
-//$plugins->add_hook('datahandler_post_insert_thread_end', 'ope_rol_cu_on_post');
-//$plugins->add_hook('datahandler_post_insert_post_end', 'ope_rol_cu_on_post');
+// El motor 7 Seas cuenta usos de Haki al CIERRE de tema (5.19, D5.3) y el PP
+// por cierre (trámite 2), no por post. El postbit usa el estado actual del
+// personaje (mybb_ope_personajes) — sin snapshots por post.
 
 // Restricción de posteo: un personaje EN REVISIÓN solo puede publicar en la
 // zona Off Topic (crear tema o responder). Los aprobados, en cualquier foro.
 $plugins->add_hook('newthread_do_newthread_start', 'ope_rol_guard_newthread');
 $plugins->add_hook('newreply_do_newreply_start', 'ope_rol_guard_newreply');
 
-// D6.3: metadata de época legacy DESACTIVADA (escribe en ope_thread_meta,
-// retirada). El motor 7 Seas ancla la época en ope_temas (fecha_foro/tipo) y
-// vincula el hilo real con mybb_tid (D1.8).
-//$plugins->add_hook('newthread_do_newthread_end', 'ope_rol_save_thread_meta');
-//$plugins->add_hook('editpost_do_editpost_end', 'ope_rol_save_thread_meta_edit');
+// El motor 7 Seas ancla la época en ope_temas (fecha_foro/tipo) y vincula el
+// hilo real con mybb_tid (D1.8).
 
 // Spoilers anidables [spoiler]/[spoiler=Título] en todo el foro (antes de nl2br).
 $plugins->add_hook('parse_message', 'ope_rol_parse_spoilers');
 
-// D6.3: parse del RPG System legacy DESACTIVADO (leía rol_tecnicas/rol_cartas/
-// ope_npcs_secundarios, retiradas; sin posts con esos tags). El 7 Seas usa
-// [ope7-zonab] (Zona B) y sus propios bloques.
-//$plugins->add_hook('parse_message', 'ope_rol_parse_rpg');
+// El 7 Seas usa [ope7-zonab] (Zona B) y sus propios bloques de post.
 
 // Zona B 7 Seas (F2.2): [ope7-zonab]{json}[/ope7-zonab] → cartas del turno.
 $plugins->add_hook('parse_message', 'ope7_zonab_parse');
@@ -80,19 +64,8 @@ $plugins->add_hook('parse_message', 'ope7_zonab_parse');
 $plugins->add_hook('datahandler_post_insert_thread_end', 'ope7_zonab_on_post');
 $plugins->add_hook('datahandler_post_insert_post_end', 'ope7_zonab_on_post');
 
-// D6.3: parse de viaje legacy DESACTIVADO (leía rol_personajes/viajes, retiradas).
-//$plugins->add_hook('parse_message', 'ope_rol_parse_viaje');
-
-// D6.3: hooks de misión/viaje legacy y plantillas de post DESACTIVADOS — leían
-// rol_mision_tomas / rol_viajes / ope_post_templates (retiradas, sin datos). El
-// motor 7 Seas gestiona misiones con ope_misiones (trámites 52–55) y travesías
-// con ope_travesias (trámite 38).
-//$plugins->add_hook('parse_message', 'ope_rol_parse_mision');
-//$plugins->add_hook('showthread_end', 'ope_rol_mision_showthread_end');
-//$plugins->add_hook('showthread_end', 'ope_rol_viaje_showthread_end');
-//$plugins->add_hook('newthread_end', 'ope_rol_tpl_inserter_newthread');
-//$plugins->add_hook('newreply_end', 'ope_rol_tpl_inserter_newreply');
-//$plugins->add_hook('editpost_end', 'ope_rol_tpl_inserter_newreply');
+// El motor 7 Seas gestiona misiones con ope_misiones (trámites 52–55) y
+// travesías con ope_travesias (trámite 38).
 
 // Muestra el personaje (no la cuenta) como autor visible del mensaje.
 $plugins->add_hook('postbit', 'ope_rol_postbit');
@@ -147,7 +120,7 @@ function ope_rol_install()
 function ope_rol_is_installed()
 {
     global $db;
-    // D6.3: el puntero canónico vive en mybb_ope_cuentas (rol_cuentas está retirada).
+    // El puntero canónico vive en mybb_ope_cuentas.
     return $db->table_exists('ope_cuentas');
 }
 
@@ -1034,7 +1007,7 @@ function ope_rol_char($pid)
     }
 
     $row = null;
-    // D6.3: fuente canónica mybb_ope_personajes (columna id = pid legacy).
+    // Fuente canónica: mybb_ope_personajes (columna id = pid histórico).
     if (!function_exists('ope7_tabla_existe') || !ope7_tabla_existe('personajes')) {
         $cache[$pid] = null;
         return null;
@@ -1043,7 +1016,7 @@ function ope_rol_char($pid)
     if ($db->num_rows($q)) {
         $row = $db->fetch_array($q);
         // Facción: en el esquema nuevo es faccion_id → nombre; el postbit
-        // legacy lee 'faccion' (nombre) + 'rango'/'rango_faccion'.
+        // lee 'faccion' (nombre) + 'rango'/'rango_faccion'.
         $datos = json_decode((string) ($row['datos'] ?? ''), true) ?: array();
         $fid = (int) ($row['faccion_id'] ?? 0);
         $faccion_nombre = '';
@@ -1363,7 +1336,7 @@ function ope_rol_char_row($pid)
     if ($pid < 1) {
         return null;
     }
-    // D6.3: fuente canónica mybb_ope_personajes (columna id = pid legacy).
+    // Fuente canónica: mybb_ope_personajes (columna id = pid histórico).
     if (!function_exists('ope7_tabla_existe') || !ope7_tabla_existe('personajes')) {
         return null;
     }
@@ -1372,7 +1345,7 @@ function ope_rol_char_row($pid)
         return null;
     }
     $row = $db->fetch_array($q);
-    // Mapeo de columnas al esquema viejo que el postbit legacy consume.
+    // Mapeo de columnas al esquema que consume el postbit.
     $row['pid'] = (int) $row['id'];
     unset($row['id']);
     if (!isset($row['firma'])) {
@@ -1461,7 +1434,7 @@ function ope_rol_post_combat_overlay($post_pid)
         'meta'    => '',
     );
 
-    // D6.3: rol_post_snapshot retirada — los mods/estados/pv se reparsean del
+    // Los mods/estados/pv se reparsean del
     // bloque [rpgsys] del mensaje crudo del post (o se dejan vacíos).
 
     // Si faltan mods/estados/pv, reparsea el mensaje crudo del post.
@@ -1625,7 +1598,7 @@ function ope_rol_build_post_back_html(array $char, array $post)
             . ' · Pot ' . (int) ($fruta_block['potencia'] ?? 1);
     }
 
-    // D6.3: rol_post_snapshot retirada — la fruta del HUD sale del bloque
+    // La fruta del HUD sale del bloque
     // canónico (ope_fruta_ficha_block → ope_akumas) y los NPCs del post ya no
     // se congelan (el motor 7 Seas no escribe snapshots).
     $npcs_txt = '';
@@ -1842,19 +1815,16 @@ function ope_rol_build_post_back_html(array $char, array $post)
 // ─────────────────────────────────────────────────────────────
 
 /**
- * Snapshot de un post ya publicado: array('stats'=>.., 'items'=>.., 'approx'=>bool).
- * 'approx' = true cuando todavía no existe fila en rol_post_snapshot (post
- * anterior a esta funcionalidad y aún no procesado por el backfill de
- * scripts/migrate-post-snapshot.php): se recurre al estado ACTUAL del
- * personaje como mejor aproximación disponible, nunca se inventa histórico.
+ * Snapshot de un post ya publicado: array('stats'=>.., 'items'=>.., 'approx'=>bool). * 'approx' = true cuando no hay snapshot histórico del post: se recurre al
+ * estado ACTUAL del personaje como mejor aproximación disponible, nunca se
+ * inventa histórico.
  */
 function ope_rol_post_snapshot($post_pid, array $char)
 {
     global $db;
-
     $post_pid = (int) $post_pid;
-    // D6.3: la tabla rol_post_snapshot está retirada — el HUD usa el estado
-    // ACTUAL del personaje como mejor aproximación (nunca se inventa histórico).
+    // El HUD usa el estado ACTUAL del personaje como mejor aproximación
+    // (nunca se inventa histórico).
 
     $datos = json_decode((string) ($char['datos'] ?? ''), true);
     $stats_json_d = json_decode((string) ($char['stats_json'] ?? ''), true);
@@ -2181,7 +2151,7 @@ function ope_rol_threadreview_post()
 /**
  * Parsea el contenido de un bloque [rpgsys]…[/rpgsys].
  * Soporta:
- *   - Legacy: "1,2,3" o "haki.buso.imbuir,haki.ken.mantener"
+ *   - Formato simple: "1,2,3" o "haki.buso.imbuir,haki.ken.mantener"
  *   - Combate: "c:1,haki.buso.imbuir|pv:120|en:45|est:veneno|mod:FUE=5"
  * Devuelve cards como lista mixta int|string.
  */
@@ -2976,752 +2946,6 @@ function ope_rol_showthread_tags()
         . '<span class="ope-tag-badge ' . $temp_badge_class . '">' . $temp_label . ' &middot; ' . $temp_fecha . '</span>'
         . '<span class="ope-tag-badge ope-tag-tipo">' . $tema_tipo . '</span>'
         . '</div>';
-}
-
-// ==== Funciones hooked restauradas (F6.3-código) ====
-
-
-/**
- * Captura un snapshot INMUTABLE (stats efectivas + objetos "encima") del
- * personaje activo justo después de insertarse el post real en BD. Se
- * registra en los hooks `datahandler_post_insert_thread_end` (hilo nuevo) y
- * `datahandler_post_insert_post_end` (respuesta): en ambos casos el
- * datahandler ya expone `$dh->pid` con el pid REAL del post insertado.
- * Los posts anteriores a esta funcionalidad se rellenan (aproximados, con el
- * estado actual del personaje) por scripts/migrate-post-snapshot.php.
- */
-function ope_rol_snapshot_post(&$dh)
-{
-    global $db;
-
-    if (!$db->table_exists('rol_post_snapshot') || !$db->table_exists('rol_personajes')) {
-        return $dh;
-    }
-
-    $visible = (int) ($dh->post_insert_data['visible'] ?? 1);
-    if ($visible !== 1) {
-        return $dh;
-    }
-
-    $post_pid = (int) ($dh->pid ?? 0);
-    if ($post_pid < 1) {
-        return $dh;
-    }
-
-    $uid      = (int) ($dh->data['uid'] ?? 0);
-    $char_pid = ope_rol_active_pid_for($uid);
-    if ($char_pid < 1) {
-        return $dh;
-    }
-
-    $tid = (int) ($dh->data['tid'] ?? ($dh->tid ?? 0));
-
-    $q = $db->simple_select('rol_personajes', '*', "pid = {$char_pid}", array('limit' => 1));
-    if (!$db->num_rows($q)) {
-        return $dh;
-    }
-    $char = $db->fetch_array($q);
-    $datos = json_decode((string) ($char['datos'] ?? ''), true) ?: array();
-
-    // 1. LOCK CONGELACIÓN DE FICHA EN EL HILO (mybb_rol_thread_snapshots)
-    $thread_snap = null;
-    if ($tid > 0 && $db->table_exists('rol_thread_snapshots')) {
-        $ts_q = $db->simple_select('rol_thread_snapshots', '*', "tid = {$tid} AND pid = {$char_pid}", array('limit' => 1));
-        if ($db->num_rows($ts_q)) {
-            $thread_snap = $db->fetch_array($ts_q);
-        } else {
-            // Crear congelación inicial para este hilo (misma verdad que ficha.php)
-            $stats_json_d = json_decode((string) ($char['stats_json'] ?? ''), true);
-            $stats_base = (is_array($stats_json_d) && !empty($stats_json_d))
-                ? $stats_json_d
-                : (is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array());
-            $inv        = json_decode((string) ($char['inventario'] ?? ''), true) ?: array();
-            $items      = is_array($inv['encima'] ?? null) ? $inv['encima'] : array();
-            $stats_ganados = (int) ($char['stats_ganados'] ?? ($datos['stats_ganados'] ?? 0));
-            $nivel_truth = function_exists('ope_rol_nivel_from_stats_comprados')
-                ? (int) ope_rol_nivel_from_stats_comprados($stats_ganados)
-                : max(1, (int) ($char['nivel'] ?? 1));
-            $fruta = ope_rol_fruta_snapshot_payload($char_pid, $stats_base);
-            $npcs  = $char['npcs'] ?? '';
-            $fac_raw = (string) ($datos['faccion'] ?? ($char['faccion'] ?? ''));
-
-            $now = defined('TIME_NOW') ? TIME_NOW : time();
-            $db->insert_query('rol_thread_snapshots', array(
-                'tid'             => $tid,
-                'pid'             => $char_pid,
-                'nivel'           => $nivel_truth,
-                'rango'           => $db->escape_string((string)($char['rango'] ?? 'Rango E')),
-                'faccion'         => $db->escape_string($fac_raw !== '' ? $fac_raw : 'Pirata'),
-                'stats_base_json' => $db->escape_string(json_encode($stats_base, JSON_UNESCAPED_UNICODE)),
-                'mochila_json'    => $db->escape_string(json_encode($items, JSON_UNESCAPED_UNICODE)),
-                'fruta_json'      => $db->escape_string(json_encode($fruta, JSON_UNESCAPED_UNICODE)),
-                'npcs_json'       => $db->escape_string(json_encode($npcs, JSON_UNESCAPED_UNICODE)),
-                'dateline'        => $now,
-            ));
-
-            $ts_q2 = $db->simple_select('rol_thread_snapshots', '*', "tid = {$tid} AND pid = {$char_pid}", array('limit' => 1));
-            if ($db->num_rows($ts_q2)) {
-                $thread_snap = $db->fetch_array($ts_q2);
-            }
-        }
-    }
-
-    // 2. STATS & VITALES DEL POST (stats_json = fuente de verdad OPE)
-    $stats_json_d = json_decode((string) ($char['stats_json'] ?? ''), true);
-    $stats = (is_array($stats_json_d) && !empty($stats_json_d))
-        ? $stats_json_d
-        : (is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array());
-    if ($thread_snap && !empty($thread_snap['stats_base_json'])) {
-        $ts_s = json_decode((string)$thread_snap['stats_base_json'], true);
-        if (is_array($ts_s) && !empty($ts_s)) {
-            $stats = $ts_s;
-        }
-    }
-
-    $pv_max = function_exists('ope_combat_calc_pv') ? ope_combat_calc_pv($stats) : 100;
-    $en_max = function_exists('ope_combat_calc_en') ? ope_combat_calc_en($stats) : 100;
-
-    $pv_actual = $pv_max;
-    $en_actual = $en_max;
-
-    // Arrastre entre posts del mismo combate
-    if ($tid > 0 && $db->table_exists('posts') && $db->table_exists('rol_post_snapshot')) {
-        $prev = $db->query("
-            SELECT s.pv_actual, s.en_actual
-            FROM {$db->table_prefix}rol_post_snapshot s
-            INNER JOIN {$db->table_prefix}posts p ON (p.pid = s.pid)
-            WHERE s.personaje_pid = {$char_pid} AND p.tid = {$tid} AND p.pid != {$post_pid}
-            ORDER BY s.dateline DESC LIMIT 1
-        ");
-        if ($prev && $db->num_rows($prev) > 0) {
-            $prev_row = $db->fetch_array($prev);
-            if (isset($prev_row['pv_actual']) && $prev_row['pv_actual'] !== null) {
-                $pv_actual = (int) $prev_row['pv_actual'];
-            }
-            if (isset($prev_row['en_actual']) && $prev_row['en_actual'] !== null) {
-                $en_actual = (int) $prev_row['en_actual'];
-            }
-        }
-    }
-
-    $estados_json = null;
-    $stats_mod_json = null;
-    $msg = (string) ($dh->data['message'] ?? '');
-    if ($msg !== '' && stripos($msg, '[rpgsys') !== false
-        && preg_match('#\[rpgsys\]([^\[]*)\[/rpgsys\]#i', $msg, $mm)) {
-        $pl = ope_rol_parse_cbt_payload($mm[1]);
-        if ($pl['pv'] !== null) {
-            $pv_actual = (int) $pl['pv'];
-        }
-        if ($pl['en'] !== null) {
-            $en_actual = (int) $pl['en'];
-        }
-        if (!empty($pl['estados'])) {
-            $estados_json = $db->escape_string(json_encode(array_values($pl['estados']), JSON_UNESCAPED_UNICODE));
-        }
-        if (!empty($pl['mods'])) {
-            $stats_mod_json = $db->escape_string(json_encode($pl['mods'], JSON_UNESCAPED_UNICODE));
-        }
-    }
-
-    $mochila_items = json_decode((string)($thread_snap['mochila_json'] ?? ''), true);
-    if (!is_array($mochila_items)) {
-        $inv = json_decode((string) ($char['inventario'] ?? ''), true) ?: array();
-        $mochila_items = is_array($inv['encima'] ?? null) ? $inv['encima'] : array();
-    }
-
-    $fruta_val = json_decode((string)($thread_snap['fruta_json'] ?? ''), true);
-    if (!is_array($fruta_val) || empty($fruta_val['nombre'])) {
-        $fruta_val = ope_rol_fruta_snapshot_payload($char_pid, $stats);
-    }
-    $npcs_val = json_decode((string)($thread_snap['npcs_json'] ?? ''), true);
-
-    $now = defined('TIME_NOW') ? TIME_NOW : time();
-    $snap_data = array(
-        'pid'            => $post_pid,
-        'personaje_pid'  => $char_pid,
-        'atributos'      => $db->escape_string(json_encode($stats, JSON_UNESCAPED_UNICODE)),
-        'objetos'        => $db->escape_string(json_encode($mochila_items, JSON_UNESCAPED_UNICODE)),
-        'pv_actual'      => $pv_actual,
-        'en_actual'      => $en_actual,
-        'pa_actual'      => 2,
-        'estados_json'   => $estados_json,
-        'stats_mod_json' => $stats_mod_json,
-        'dateline'       => $now,
-    );
-
-    if ($db->field_exists('stats_json', 'rol_post_snapshot')) {
-        $snap_data['stats_json']   = $db->escape_string(json_encode($stats, JSON_UNESCAPED_UNICODE));
-        $snap_data['mochila_json'] = $db->escape_string(json_encode($mochila_items, JSON_UNESCAPED_UNICODE));
-        $snap_data['fruta_json']   = $db->escape_string(json_encode($fruta_val, JSON_UNESCAPED_UNICODE));
-        $snap_data['npcs_json']    = $db->escape_string(json_encode($npcs_val, JSON_UNESCAPED_UNICODE));
-        $snap_data['mods_json']    = $stats_mod_json;
-    }
-
-    $exists = $db->simple_select('rol_post_snapshot', 'pid', "pid = {$post_pid}", array('limit' => 1));
-    if ($db->num_rows($exists)) {
-        $db->update_query('rol_post_snapshot', $snap_data, "pid = {$post_pid}");
-    } else {
-        $db->insert_query('rol_post_snapshot', $snap_data);
-    }
-
-    return $dh;
-}
-
-/** Hook newthread: lee los inputs de época/etiqueta y persiste la metadata. */
-function ope_rol_save_thread_meta()
-{
-    global $mybb, $tid, $fid;
-    ope_rol_store_thread_meta(
-        (int) $tid,
-        (int) $fid,
-        (string) $mybb->get_input('ope_era'),
-        $mybb->get_input('ope_fecha_rol', MyBB::INPUT_INT),
-        (string) $mybb->get_input('ope_tag'),
-        $mybb->get_input('ope_fecha_dia', MyBB::INPUT_INT),
-        (string) $mybb->get_input('ope_estacion')
-    );
-}
-
-/** Hook editpost: permite corregir época/etiqueta si el formulario los envía. */
-function ope_rol_save_thread_meta_edit()
-{
-    global $mybb, $db;
-    // Solo actúa sobre el primer post (tema) y si vienen los campos.
-    if ($mybb->get_input('ope_era') === '' && $mybb->get_input('ope_tag') === '') {
-        return;
-    }
-    $pid = $mybb->get_input('pid', MyBB::INPUT_INT);
-    if ($pid < 1) return;
-    $q = $db->simple_select('posts', 'tid, fid', "pid = {$pid}", array('limit' => 1));
-    if (!$db->num_rows($q)) return;
-    $row = $db->fetch_array($q);
-    ope_rol_store_thread_meta(
-        (int) $row['tid'],
-        (int) $row['fid'],
-        (string) $mybb->get_input('ope_era'),
-        $mybb->get_input('ope_fecha_rol', MyBB::INPUT_INT),
-        (string) $mybb->get_input('ope_tag'),
-        $mybb->get_input('ope_fecha_dia', MyBB::INPUT_INT),
-        (string) $mybb->get_input('ope_estacion')
-    );
-}
-
-/**
- * Parser de bloques de rol (RPG System) en los mensajes.
- * Lo mecánico se envuelve en <!--OPERPGSYS-->…<!--/OPERPGSYS-->; el postbit
- * lo embebe en el reverso HUD. En thread review el pie se omite.
- */
-function ope_rol_parse_rpg($message)
-{
-    if (stripos($message, '[combate') === false
-        && stripos($message, '[accion') === false
-        && stripos($message, '[tecnica') === false
-        && stripos($message, '[estado') === false
-        && stripos($message, '[dado') === false
-        && stripos($message, '[carta') === false
-        && stripos($message, '[rpgsys') === false) {
-        return $message;
-    }
-
-    $extra_sections = '';
-    $extra_meta = array();
-    $orphan_cards = '';
-
-    // [carta=haki.buso.imbuir] o [carta]haki.buso.imbuir[/carta]
-    $message = preg_replace_callback('#\[carta=([^\]]+)\]#i', function ($m) use (&$orphan_cards) {
-        $tok = ope_rol_parse_card_token($m[1]);
-        if ($tok !== null) {
-            $orphan_cards .= ope_rol_render_card_token($tok);
-        }
-        return '';
-    }, $message);
-    $message = preg_replace_callback('#\[carta\]([^\[]*)\[/carta\]#is', function ($m) use (&$orphan_cards) {
-        $tok = ope_rol_parse_card_token($m[1]);
-        if ($tok !== null) {
-            $orphan_cards .= ope_rol_render_card_token($tok);
-        }
-        return '';
-    }, $message);
-
-    // Bloques combate / accion / tecnica → secciones del pie (no inline).
-    $blocks = array(
-        'combate' => array('cls' => 'ope-cbt', 'def' => 'Estado de combate', 'label' => 'combate'),
-        'accion'  => array('cls' => 'ope-accion', 'def' => 'Acción', 'label' => 'acción'),
-        'tecnica' => array('cls' => 'ope-cbt-tk', 'def' => 'Técnica', 'label' => 'técnica'),
-    );
-    foreach ($blocks as $tag => $cfg) {
-        $pattern = '#\[' . $tag . '(?:=([^\]]*))?\]((?:(?!\[/?' . $tag . ').)*?)\[/' . $tag . '\]#is';
-        $guard = 0;
-        while ($guard < 40 && preg_match($pattern, $message)) {
-            $message = preg_replace_callback($pattern, function ($m) use ($cfg, &$extra_sections, &$extra_meta) {
-                $title = isset($m[1]) ? trim(trim($m[1]), "\"'") : '';
-                if ($title === '') {
-                    $title = $cfg['def'];
-                }
-                $body = trim($m[2]);
-                $extra_sections .= '<div class="' . $cfg['cls'] . '">'
-                    . '<div class="' . $cfg['cls'] . '-h">' . htmlspecialchars_uni($title) . '</div>'
-                    . '<div class="' . $cfg['cls'] . '-b">' . $body . '</div>'
-                    . '</div>';
-                $extra_meta[] = $cfg['label'];
-                return '';
-            }, $message);
-            $guard++;
-        }
-    }
-
-    // Chips estado / dado → pie.
-    $chips = '';
-    $message = preg_replace_callback('#\[estado(?:=(positivo|negativo|neutral))?\]((?:(?!\[/?estado).)*?)\[/estado\]#is', function ($m) use (&$chips, &$extra_meta) {
-        $tipo = isset($m[1]) && $m[1] !== '' ? strtolower($m[1]) : 'negativo';
-        $chips .= '<span class="ope-estado ope-estado--' . $tipo . '">' . trim($m[2]) . '</span>';
-        $extra_meta[] = 'estado';
-        return '';
-    }, $message);
-    $message = preg_replace_callback('#\[dado\]((?:(?!\[/?dado).)*?)\[/dado\]#is', function ($m) use (&$chips, &$extra_meta) {
-        $chips .= '<span class="ope-dado">&#9860; ' . trim($m[1]) . '</span>';
-        $extra_meta[] = 'dado';
-        return '';
-    }, $message);
-    if ($chips !== '') {
-        $extra_sections .= '<div class="ope-rpgsys-sec"><div class="ope-rpgsys-sec-h">Marcas</div>'
-            . '<div class="ope-rpgsys-estados">' . $chips . '</div></div>';
-    }
-    if ($orphan_cards !== '') {
-        $extra_sections .= '<div class="ope-rpgsys-sec"><div class="ope-rpgsys-sec-h">Cartas</div>'
-            . '<div class="ope-tk-deck ope-tk-deck--mix">' . $orphan_cards . '</div></div>';
-        $extra_meta[] = 'cartas';
-    }
-
-    // [rpgsys] principal
-    if (stripos($message, '[rpgsys') !== false) {
-        $message = preg_replace_callback('#\[rpgsys\]([^\[]*)\[/rpgsys\]#is', function ($m) use ($extra_sections, $extra_meta) {
-            $pl = ope_rol_parse_cbt_payload($m[1]);
-            $ids = array_slice(array_values(array_unique($pl['cards'], SORT_REGULAR)), 0, 24);
-            $cards = '';
-            foreach ($ids as $cid) {
-                $cards .= ope_rol_render_card_token($cid);
-            }
-            $ncards = $cards !== '' ? count($ids) : 0;
-
-            $nons = 0;
-            if (!empty($pl['ons']) && is_array($pl['ons'])) {
-                $ons_npc = function_exists('ope_rol_npc_sec_by_id') ? ope_rol_npc_sec_by_id((int) ($pl['ons']['npc_id'] ?? 0)) : null;
-                if ($ons_npc) {
-                    $tec_idx = (int) ($pl['ons']['tec_idx'] ?? -1);
-                    $cards .= ope_rol_npc_sec_used_html($ons_npc, $tec_idx);
-                    $nons = 1;
-                }
-            }
-
-            $estados_html = '';
-            $nest = 0;
-            if (!empty($pl['estados'])) {
-                $cat = function_exists('ope_combat_estados') ? ope_combat_estados() : array();
-                $chiprow = '';
-                foreach ($pl['estados'] as $ek) {
-                    $info = $cat[$ek] ?? null;
-                    $nom  = htmlspecialchars_uni((string) ($info['nombre'] ?? $ek));
-                    $tipo = htmlspecialchars_uni((string) ($info['tipo'] ?? 'negativo'));
-                    $chiprow .= '<span class="ope-estado ope-estado--' . $tipo . '">' . $nom . '</span>';
-                    $nest++;
-                }
-                if ($chiprow !== '') {
-                    $estados_html = '<div class="ope-rpgsys-sec"><div class="ope-rpgsys-sec-h">Estados alterados</div>'
-                                  . '<div class="ope-rpgsys-estados">' . $chiprow . '</div></div>';
-                }
-            }
-
-            $mods_html = '';
-            $nmod = 0;
-            if (!empty($pl['mods'])) {
-                $rows = '';
-                foreach ($pl['mods'] as $stat => $mv) {
-                    $val = (int) $mv['val'];
-                    $sign = $val > 0 ? '+' : '';
-                    $suf  = !empty($mv['pct']) ? '%' : '';
-                    $dir  = $val >= 0 ? 'up' : 'down';
-                    $rows .= '<span class="ope-rpgsys-mod ope-rpgsys-mod--' . $dir . '">'
-                           . '<b>' . htmlspecialchars_uni($stat) . '</b> ' . $sign . $val . $suf . '</span>';
-                    $nmod++;
-                }
-                if ($rows !== '') {
-                    $mods_html = '<div class="ope-rpgsys-sec"><div class="ope-rpgsys-sec-h">Modificadores</div>'
-                               . '<div class="ope-rpgsys-mods">' . $rows . '</div></div>';
-                }
-            }
-
-            $vitals_html = '';
-            if ($pl['pv'] !== null || $pl['en'] !== null) {
-                $vparts = '';
-                if ($pl['pv'] !== null) {
-                    $vparts .= '<span class="ope-rpgsys-vital ope-rpgsys-vital--pv">PV <b>' . (int) $pl['pv'] . '</b></span>';
-                }
-                if ($pl['en'] !== null) {
-                    $vparts .= '<span class="ope-rpgsys-vital ope-rpgsys-vital--en">EN <b>' . (int) $pl['en'] . '</b></span>';
-                }
-                $vitals_html = '<div class="ope-rpgsys-vitals">' . $vparts . '</div>';
-            }
-
-            $sec_title = ($ncards && $nons) ? 'Cartas y acompañante'
-                : ($nons ? 'Acompañante' : 'Cartas usadas');
-            $cards_html = $cards !== ''
-                ? '<div class="ope-rpgsys-sec"><div class="ope-rpgsys-sec-h">' . $sec_title . '</div><div class="ope-tk-deck ope-tk-deck--mix">' . $cards . '</div></div>'
-                : '';
-
-            $inner = $vitals_html . $estados_html . $cards_html . $mods_html . $extra_sections;
-            if (trim($inner) === '') {
-                return '';
-            }
-
-            $meta = array();
-            if ($nest) {
-                $meta[] = $nest . ' estado' . ($nest === 1 ? '' : 's');
-            }
-            if ($ncards) {
-                $meta[] = $ncards . ' carta' . ($ncards === 1 ? '' : 's');
-            }
-            if ($nons) {
-                $meta[] = '1 acompañante';
-            }
-            if ($nmod) {
-                $meta[] = $nmod . ' mod' . ($nmod === 1 ? '' : 's');
-            }
-            foreach ($extra_meta as $em) {
-                $meta[] = $em;
-            }
-            $meta_txt = $meta ? implode(' · ', array_unique($meta)) : 'Sistema de rol';
-
-            return ope_rol_wrap_rpgsys_footer($inner, $meta_txt);
-        }, $message);
-    } elseif ($extra_sections !== '') {
-        // Sin [rpgsys] pero hay bloques mecánicos sueltos → pie igualmente.
-        $meta_txt = $extra_meta ? implode(' · ', array_unique($extra_meta)) : 'Sistema de rol';
-        $message .= ope_rol_wrap_rpgsys_footer($extra_sections, $meta_txt);
-    }
-
-    return $message;
-}
-
-/**
- * Al publicar un post: suma CU de Haki/Fruta por cartas jugadas en [rpgsys]/[carta].
- */
-function ope_rol_cu_on_post(&$dh)
-{
-    global $db;
-
-    $visible = (int) ($dh->post_insert_data['visible'] ?? 1);
-    if ($visible !== 1) {
-        return $dh;
-    }
-
-    $uid = (int) ($dh->data['uid'] ?? 0);
-    $char_pid = function_exists('ope_rol_active_pid_for') ? ope_rol_active_pid_for($uid) : 0;
-    if ($char_pid < 1) {
-        return $dh;
-    }
-
-    $msg = (string) ($dh->data['message'] ?? '');
-    if ($msg === '') {
-        return $dh;
-    }
-
-    $tokens = array();
-    if (preg_match_all('#\[rpgsys\]([^\[]*)\[/rpgsys\]#is', $msg, $mm)) {
-        foreach ($mm[1] as $raw) {
-            $pl = ope_rol_parse_cbt_payload($raw);
-            foreach ($pl['cards'] as $c) {
-                $tokens[] = $c;
-            }
-        }
-    }
-    if (preg_match_all('#\[carta=([^\]]+)\]#i', $msg, $mm2)) {
-        foreach ($mm2[1] as $raw) {
-            $t = ope_rol_parse_card_token($raw);
-            if ($t !== null) {
-                $tokens[] = $t;
-            }
-        }
-    }
-    if (preg_match_all('#\[carta\]([^\[]*)\[/carta\]#is', $msg, $mm3)) {
-        foreach ($mm3[1] as $raw) {
-            $t = ope_rol_parse_card_token($raw);
-            if ($t !== null) {
-                $tokens[] = $t;
-            }
-        }
-    }
-
-    if (empty($tokens)) {
-        return $dh;
-    }
-
-    $tokens = array_values($tokens);
-    foreach ($tokens as $tok) {
-        if (is_string($tok) && strpos($tok, 'haki.') === 0 && function_exists('ope_haki_add_cu')) {
-            $parts = explode('.', $tok);
-            $tipo = $parts[1] ?? '';
-            if (in_array($tipo, array('ken', 'buso', 'hao'), true)) {
-                // CU cuenta si tiene al menos Nv.1 de ese tipo
-                $row = function_exists('ope_haki_row') ? ope_haki_row($char_pid, $tipo) : null;
-                if ($row && (int) ($row['nivel'] ?? 0) >= 1) {
-                    ope_haki_add_cu($char_pid, $tipo, 1);
-                }
-            }
-        } elseif (is_string($tok) && strpos($tok, 'fruta.') === 0 && function_exists('ope_fruta_add_cu')) {
-            ope_fruta_add_cu($char_pid, 1);
-        } elseif (is_int($tok) || (is_numeric($tok) && (int) $tok > 0)) {
-            // Técnica del deck: si tags.fuente = haki|fruta
-            if (function_exists('ope_rol_tecnica_by_id')) {
-                $carta = ope_rol_tecnica_by_id((int) $tok);
-                if ($carta) {
-                    $fuente = '';
-                    $tags = is_array($carta['tags'] ?? null) ? $carta['tags'] : array();
-                    if (is_string($carta['tags'] ?? null)) {
-                        $tags = json_decode($carta['tags'], true) ?: array();
-                    }
-                    $fuente = strtolower((string) ($tags['fuente'] ?? ($carta['fuente'] ?? '')));
-                    if ($fuente === 'fruta' && function_exists('ope_fruta_add_cu')) {
-                        ope_fruta_add_cu($char_pid, 1);
-                    } elseif (in_array($fuente, array('haki', 'ken', 'buso', 'hao'), true) && function_exists('ope_haki_add_cu')) {
-                        $tipo = ($fuente === 'haki') ? (string) ($tags['haki_tipo'] ?? 'buso') : $fuente;
-                        if (in_array($tipo, array('ken', 'buso', 'hao'), true)) {
-                            ope_haki_add_cu($char_pid, $tipo, 1);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return $dh;
-}
-
-/**
- * Renderiza shortcodes del Oraculo de Viaje al mostrar posts.
- *   [viaje=123]                    → bloque completo del oraculo (primer post)
- *   [viaje-cierre=123]             → post de llegada solicitada por el jugador (aprobado)
- *   [viaje-solicitud-cierre=123]   → aviso de que el cierre esta pendiente de revision
- *   [viaje-rechazo=123]            → cierre rechazado (1er intento, vuelve a activo)
- *   [viaje-rechazo-cancelado=123]  → cierre rechazado (2do intento, viaje cancelado)
- */
-function ope_rol_parse_viaje($message)
-{
-    if (stripos($message, '[viaje') === false) {
-        return $message;
-    }
-
-    $message = preg_replace_callback('#\[viaje=(\d+)\]#i', function ($m) {
-        // En showthread, la tarjeta del Oráculo YA se muestra arriba en $ope_viaje_panel
-        if (defined('THIS_SCRIPT') && THIS_SCRIPT === 'showthread.php') {
-            return '';
-        }
-        $vid = (int) $m[1];
-        if ($vid < 1 || !function_exists('ope_viaje_por_id')) {
-            return '';
-        }
-        $v = ope_viaje_por_id($vid);
-        if (!$v) {
-            return '';
-        }
-        $oracle = json_decode((string) ($v['resultado_json'] ?? ''), true);
-        if (!is_array($oracle)) {
-            $oracle = array('tramos' => array(), 'mods' => array());
-        }
-        return ope_oraculo_post_html($v, $oracle);
-    }, $message);
-
-    $message = preg_replace_callback('#\[viaje-cierre=(\d+)\]#i', function ($m) {
-        $vid = (int) $m[1];
-        if ($vid < 1 || !function_exists('ope_viaje_por_id')) {
-            return '';
-        }
-        $v = ope_viaje_por_id($vid);
-        if (!$v) {
-            return '';
-        }
-        $cap = 'Capitán';
-        global $db;
-        if ($db->table_exists('rol_personajes')) {
-            $pq = $db->simple_select('rol_personajes', 'nombre', 'pid = ' . (int) ($v['pid_capitan'] ?? 0), array('limit' => 1));
-            if ($db->num_rows($pq)) {
-                $cap = (string) $db->fetch_field($pq, 'nombre');
-            }
-        }
-        return ope_oraculo_cierre_post_html($v, $cap);
-    }, $message);
-
-    // Solicitud de cierre pendiente
-    $message = preg_replace_callback('#\[viaje-solicitud-cierre=(\d+)\]#i', function ($m) {
-        $vid = (int) $m[1];
-        if ($vid < 1 || !function_exists('ope_viaje_por_id')) return '';
-        $v = ope_viaje_por_id($vid);
-        if (!$v) return '';
-        return ope_viaje_revision_solicitud_post_html($v);
-    }, $message);
-
-    // Rechazo primer intento
-    $message = preg_replace_callback('#\[viaje-rechazo=(\d+)\]#i', function ($m) {
-        $vid = (int) $m[1];
-        if ($vid < 1 || !function_exists('ope_viaje_por_id')) return '';
-        $v = ope_viaje_por_id($vid);
-        if (!$v) return '';
-        return ope_viaje_revision_rechazo_post_html($v, false);
-    }, $message);
-
-    // Rechazo definitivo (cancelado)
-    $message = preg_replace_callback('#\[viaje-rechazo-cancelado=(\d+)\]#i', function ($m) {
-        $vid = (int) $m[1];
-        if ($vid < 1 || !function_exists('ope_viaje_por_id')) return '';
-        $v = ope_viaje_por_id($vid);
-        if (!$v) return '';
-        return ope_viaje_revision_rechazo_post_html($v, true);
-    }, $message);
-
-    return $message;
-}
-
-/** Renderiza [mision=TOMA_ID] en posts. */
-function ope_rol_parse_mision($message)
-{
-    if (stripos($message, '[mision') === false) {
-        return $message;
-    }
-    $message = preg_replace_callback('#\[mision=(\d+)\]#i', function ($m) {
-        if (defined('THIS_SCRIPT') && THIS_SCRIPT === 'showthread.php') {
-            return '';
-        }
-        $toma_id = (int)$m[1];
-        if ($toma_id < 1 || !function_exists('ope_mision_post_html')) return (string)$m[0];
-
-        global $db;
-        $q = $db->simple_select('rol_mision_tomas', '*', "toma_id = {$toma_id}", array('limit' => 1));
-        if (!$db->num_rows($q)) return (string)$m[0];
-        $toma = $db->fetch_array($q);
-
-        // Enriquecer con datos de mision y PJ
-        $pid = (int)($toma['pid'] ?? 0);
-        $toma['pj_nombre'] = function_exists('ope_rol_cat_nombre_pid') ? ope_rol_cat_nombre_pid($pid) : '';
-        $mid = (int)($toma['mision_id'] ?? 0);
-        if ($mid > 0 && function_exists('ope_mision_por_id')) {
-            $mision = ope_mision_por_id($mid);
-            if ($mision) {
-                $toma['mision_titulo'] = (string)($mision['titulo'] ?? '');
-                $toma['rango'] = (string)($mision['rango'] ?? 'D');
-                $toma['peligrosidad'] = (int)($mision['peligrosidad'] ?? 1);
-                $zslug = (string)($mision['zona_slug'] ?? '');
-                $toma['mision_zona'] = $zslug !== '' && function_exists('ope_isla_nombre')
-                                       ? ope_isla_nombre($zslug) : $zslug;
-            }
-        }
-
-        $oraculo = json_decode((string)($toma['oraculo_json'] ?? ''), true);
-        if (!is_array($oraculo)) {
-            $oraculo = array('cartas' => array(), 'narrativa' => '');
-        }
-        return ope_mision_post_html($toma, $oraculo);
-    }, $message);
-    return $message;
-}
-
-/** Inyecta panel de viaje activo en plantilla showthread. */
-function ope_rol_viaje_showthread_end()
-{
-    global $tid, $mybb, $thread, $posts;
-    $uid = (int) ($mybb->user['uid'] ?? 0);
-    $active_pid = (int) ($mybb->user['ope_active_pid'] ?? 0);
-    if ($active_pid < 1 && $uid > 0 && function_exists('ope_rol_active_pid_for')) {
-        $active_pid = ope_rol_active_pid_for($uid);
-    }
-
-    $GLOBALS['ope_viaje_panel'] = '';
-    $GLOBALS['ope_viaje_scripts'] = '';
-
-    $v = function_exists('ope_viaje_por_tid') ? ope_viaje_por_tid((int) $tid) : null;
-    if (!$v) {
-        return;
-    }
-
-    // Tarjeta del Oráculo como cabecera del tema (no como post).
-    $card = '';
-    if (function_exists('ope_oraculo_post_html')) {
-        $oracle = json_decode((string) ($v['resultado_json'] ?? ''), true);
-        if (!is_array($oracle)) {
-            $oracle = array('tramos' => array(), 'mods' => array());
-        }
-        $card = '<div class="ope-viaje-header">' . ope_oraculo_post_html($v, $oracle) . '</div>';
-    }
-
-    $GLOBALS['ope_viaje_panel'] = $card;
-
-    // Oculta el primer post (OPE Eternal) para que el oráculo no se vea como post.
-    $first_pid = (int) ($thread['firstpost'] ?? 0);
-    if ($first_pid > 0 && !empty($posts) && is_string($posts)) {
-        // Eliminar el primer post de la lista (Narrador) en hilos de viaje
-        $pattern1 = '#<a\s+name="pid' . $first_pid . '"[^>]*></a>\s*<div\s+class="ope-postbit-container"\s+id="post-container-' . $first_pid . '">[\s\S]*?<!-- LADO TRASERO: FICHA CONGELADA DEL POST \(3D CARD FLIP\) -->[\s\S]*?</div>\s*</div>\s*</div>#i';
-        $pattern2 = '#<a\s+name="pid' . $first_pid . '"[^>]*></a>\s*<div\s+class="ope-postbit-container"\s+id="post-container-' . $first_pid . '">[\s\S]*?</div>\s*</div>#i';
-        $pattern3 = '#<a\s+name="pid' . $first_pid . '"[^>]*></a>\s*<article\b[^>]*id="post_' . $first_pid . '"[\s\S]*?</article>#i';
-        
-        $posts_new = preg_replace($pattern1, '', $posts, 1);
-        if ($posts_new === $posts) {
-            $posts_new = preg_replace($pattern2, '', $posts, 1);
-        }
-        if ($posts_new === $posts) {
-            $posts_new = preg_replace($pattern3, '', $posts, 1);
-        }
-        $posts = $posts_new;
-    }
-
-    if (function_exists('ope_oraculo_showthread_scripts')) {
-        $GLOBALS['ope_viaje_scripts'] = ope_oraculo_showthread_scripts();
-    }
-}
-
-/** Panel de mision activo en showthread: cabecera + ocultar post Narrador. */
-function ope_rol_mision_showthread_end()
-{
-    global $tid, $mybb, $thread, $posts;
-
-    $GLOBALS['ope_mision_panel'] = '';
-
-    $toma = function_exists('ope_mision_por_tid') ? ope_mision_por_tid((int) $tid) : null;
-    if (!$toma) {
-        return;
-    }
-
-    // Enriquecer con datos de mision y PJ
-    $pid = (int)($toma['pid'] ?? 0);
-    $toma['pj_nombre'] = function_exists('ope_rol_cat_nombre_pid') ? ope_rol_cat_nombre_pid($pid) : '';
-    $mid = (int)($toma['mision_id'] ?? 0);
-    if ($mid > 0 && function_exists('ope_mision_por_id')) {
-        $mision_data = ope_mision_por_id($mid);
-        if ($mision_data) {
-            $toma['mision_titulo']  = (string)($mision_data['titulo'] ?? '');
-            $toma['rango']          = (string)($mision_data['rango'] ?? 'D');
-            $toma['peligrosidad']   = (int)($mision_data['peligrosidad'] ?? 1);
-            $zslug = (string)($mision_data['zona_slug'] ?? '');
-            $toma['mision_zona']    = $zslug !== '' && function_exists('ope_isla_nombre')
-                                      ? ope_isla_nombre($zslug) : $zslug;
-        }
-    }
-
-    $panel = '';
-    if (function_exists('ope_mision_post_html')) {
-        $oraculo = json_decode((string)($toma['oraculo_json'] ?? ''), true);
-        if (!is_array($oraculo)) {
-            $oraculo = array('cartas' => array(), 'narrativa' => '');
-        }
-        $panel = '<div class="ope-viaje-header ope-mision-header">' . ope_mision_post_html($toma, $oraculo) . '</div>';
-    }
-    $GLOBALS['ope_mision_panel'] = $panel;
-
-    // Ocultar el primer post del Narrador
-    $first_pid = (int)($thread['firstpost'] ?? 0);
-    if ($first_pid > 0 && !empty($posts) && is_string($posts)) {
-        $pattern = '#<a\s+name="pid' . $first_pid . '"[^>]*></a>\s*<div\s+class="ope-postbit-container"\s+id="post-container-' . $first_pid . '">[\s\S]*?</div>\s*</div>\s*</div>#i';
-        $posts = preg_replace($pattern, '', $posts, 1);
-    }
 }
 
 function ope_rol_inject_zonab_editor($contents)

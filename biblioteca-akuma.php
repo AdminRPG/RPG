@@ -1,7 +1,7 @@
 <?php
 /**
  * One Piece: Eternal · Biblioteca de Akuma no Mi (Frutas del Diablo)
- * Catálogo poblado desde BD (rol_akuma). Sin datos mockup.
+ * Catálogo poblado desde BD (mybb_ope_akumas). Sin datos mockup.
  * Estilos en docs/themes/ope.css (scope: ope-pg-biblioteca).
  */
 define('IN_MYBB', 1);
