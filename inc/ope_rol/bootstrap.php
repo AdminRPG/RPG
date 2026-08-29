@@ -28,13 +28,9 @@ require_once $dir . '/dominio/ficha.php';
 // Catálogos de gestión staff (tienda, tripulaciones, bibliotecas…)
 require_once $dir . '/catalogos/gestion.php';
 
-// Sistemas de progresión / fama
+// Sistemas 7 Seas (F5): Haki y akumas
 require_once $dir . '/sistemas/haki.php';
 require_once $dir . '/sistemas/frutas.php';
-require_once $dir . '/sistemas/enlace.php';
-require_once $dir . '/sistemas/renombre.php';
-require_once $dir . '/sistemas/pl.php';
-require_once $dir . '/sistemas/rachas.php';
 
 // Progresión y calendario on-roll (F3.0, 5.6/7.3/7.7): avance perezoso ×2,
 // finalización de entrenamientos, colocación de reserva
@@ -88,30 +84,6 @@ require_once $dir . '/sistemas/combate.php';
 
 // Zona B (F2.2): panel del editor, parser del bloque y persistencia de turnos
 require_once $dir . '/sistemas/combate_ui.php';
-
-// Mundo vivo + viajes
-require_once $dir . '/mundo/mundo.php';
-require_once $dir . '/mundo/oraculo.php';
-require_once $dir . '/mundo/oraculo_post.php';
-require_once $dir . '/mundo/viajes.php';
-
-// Navegacion: catalogo de islas, matriz de rutas, barcos, items, oraculo v2
-require_once $dir . '/mundo/islas_cat.php';
-require_once $dir . '/mundo/matriz_rutas.php';
-require_once $dir . '/mundo/barcos.php';
-require_once $dir . '/mundo/nav_items.php';
-require_once $dir . '/mundo/oraculo_v2.php';
-require_once $dir . '/mundo/viaje_ai.php';
-require_once $dir . '/mundo/viaje_cola.php';
-require_once $dir . '/mundo/viaje_revision.php';
-require_once $dir . '/mundo/misiones.php';
-require_once $dir . '/mundo/mision_oraculo.php';
-require_once $dir . '/mundo/mision_ai.php';
-require_once $dir . '/mundo/mision_post.php';
-require_once $dir . '/mundo/viaje_revision_ai.php';
-
-// Trámites
-require_once $dir . '/tramites/tramites.php';
 
 // Motor 7 Seas (5.21): catálogo de 67, motor transversal, bandeja y permisos
 require_once $dir . '/tramites/catalogo.php';

@@ -557,12 +557,12 @@ function ope_rol_navbar_html()
         if ($resume_pj && function_exists('ope_eco_berries')) {
             $resume_berries = (int) ope_eco_berries($resume_pid);
         }
-        // Ubicación insular
+        // Ubicación insular (D6.3: fuente canónica ope7_ — medio viejo retirado)
         $resume_isla = '';
-        if ($resume_pj && function_exists('ope_isla_por_slug')) {
+        if ($resume_pj && function_exists('ope7_isla_por_slug')) {
             $isla_slug = (string) ($resume_pj['isla_actual'] ?? '');
             if ($isla_slug !== '') {
-                $isla_data = ope_isla_por_slug($isla_slug);
+                $isla_data = ope7_isla_por_slug($isla_slug);
                 if ($isla_data) $resume_isla = htmlspecialchars_uni($isla_data['nombre'] ?? '');
             }
         }
@@ -1197,6 +1197,7 @@ function ope_rol_after_post(&$dh)
  * datahandler ya expone `$dh->pid` con el pid REAL del post insertado.
  * Los posts anteriores a esta funcionalidad se rellenan (aproximados, con el
  * estado actual del personaje) por scripts/migrate-post-snapshot.php.
+ */
 
 // ─────────────────────────────────────────────────────────────
 // Postbit: el autor visible del mensaje es el personaje, no la cuenta.
@@ -2975,6 +2976,7 @@ function ope_rol_showthread_tags()
         . '<span class="ope-tag-badge ' . $temp_badge_class . '">' . $temp_label . ' &middot; ' . $temp_fecha . '</span>'
         . '<span class="ope-tag-badge ope-tag-tipo">' . $tema_tipo . '</span>'
         . '</div>';
+}
 
 // ==== Funciones hooked restauradas (F6.3-código) ====
 
@@ -3752,5 +3754,4 @@ function ope_rol_inject_zonab_editor($contents)
     }
     $after = $tail + strlen('</textarea>');
     return substr($contents, 0, $after) . "\n" . $html . "\n" . substr($contents, $after);
-}
 }

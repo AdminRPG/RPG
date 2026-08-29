@@ -30,7 +30,11 @@ if ($viaje_id < 1) {
 }
 
 if (!function_exists('ope_viaje_por_id')) {
-    die('Motor de viajes no cargado.');
+    // D6.3: bootstrap ya no carga el módulo viejo de viajes; esta página legacy
+    // se autoabastece del trío de viaje para seguir funcionando de forma aislada.
+    require_once MYBB_ROOT . 'inc/ope_rol/mundo/viajes.php';
+    require_once MYBB_ROOT . 'inc/ope_rol/mundo/viaje_revision.php';
+    require_once MYBB_ROOT . 'inc/ope_rol/mundo/viaje_revision_ai.php';
 }
 require_once MYBB_ROOT . 'inc/ope_rol/mundo/viaje_revision.php';
 
