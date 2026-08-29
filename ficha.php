@@ -19,8 +19,8 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'ficha.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
-require_once MYBB_ROOT . 'inc/ope_rol_system.php';
+require_once MYBB_ROOT . 'inc/ope_rol/core/data.php';
+require_once MYBB_ROOT . 'inc/ope_rol/core/system.php';
 
 // Capacidad del inventario que se lleva "encima" (nº de slots de la mochila).
 define('OPE_INV_CAP', 12);
@@ -1100,10 +1100,6 @@ header('Content-Type: text/html; charset=utf-8');
     $stat_cap_now  = function_exists('ope_rol_stat_cap_tramo') ? (int) ope_rol_stat_cap_tramo($nivel) : 6;
     $stat_cost_now = function_exists('ope_rol_pp_cost_tramo') ? (int) ope_rol_pp_cost_tramo($nivel) : 0;
     $stat_buy_lock = ($nivel >= 50); // Nivel 50 · Prestigio (STATS.md): los PP ya no suben stats.
-
-    require_once MYBB_ROOT . 'inc/ope_rol_renombre.php';
-    $renombre_pts = ope_renombre_get($pj['pid']);
-    $renombre_rango = ope_renombre_rango($renombre_pts);
 ?>
 
 <div class="wrap ope-ficha-wrap">
@@ -1155,7 +1151,6 @@ header('Content-Type: text/html; charset=utf-8');
             <div><dt>Edad</dt><dd><?php echo htmlspecialchars_uni($edad !== '' ? $edad : '—'); ?></dd></div>
 <?php if ($genero !== ''): ?>            <div><dt>Género</dt><dd><?php echo htmlspecialchars_uni($genero); ?></dd></div>
 <?php endif; ?>            <div><dt>Facción</dt><dd><?php echo htmlspecialchars_uni($faccion_lbl !== '' ? $faccion_lbl : '—'); ?></dd></div>
-            <div><dt>Renombre</dt><dd><?php echo htmlspecialchars_uni($renombre_rango); ?> · <?php echo ope_renombre_formatear($renombre_pts); ?></dd></div>
           </dl>
         </div>
       </div>

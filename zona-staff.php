@@ -6,7 +6,7 @@
 define('IN_MYBB', 1);
 define('THIS_SCRIPT', 'zona-staff.php');
 require_once './global.php';
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
+require_once MYBB_ROOT . 'inc/ope_rol/core/data.php';
 
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);

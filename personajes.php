@@ -20,9 +20,9 @@ $uid       = (int) ($mybb->user['uid'] ?? 0);
 $username  = htmlspecialchars_uni($mybb->user['username'] ?? '');
 
 require_once MYBB_ROOT . 'inc/ope_user_init.php';
-require_once MYBB_ROOT . 'inc/ope_rol_data.php';
-if (is_file(MYBB_ROOT . 'inc/ope_rol_system.php')) {
-    require_once MYBB_ROOT . 'inc/ope_rol_system.php';
+require_once MYBB_ROOT . 'inc/ope_rol/core/data.php';
+if (is_file(MYBB_ROOT . 'inc/ope_rol/core/system.php')) {
+    require_once MYBB_ROOT . 'inc/ope_rol/core/system.php';
 }
 
 // ── Nivel de staff (lo expone el plugin ope_rol; con respaldo directo) ──

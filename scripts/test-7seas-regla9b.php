@@ -128,14 +128,15 @@ $archivos_jugables = array_merge(
     // Además de *-staff.php y bandeja.php, hay páginas legacy de staff que no
     // siguen ese patrón de nombre pero están blindadas en bloque con un guard
     // ope7_es_staff / ope_rol_active_staff (no llegan al jugador y conservan
-    // jerga legítima según D6.1): revision-viaje, resolucion-combate y
-    // mundo-vivo (legacy de cierre de viaje/combate previos a los paneles A.3).
-    // ficha.php y biblioteca-akuma.php NO se excluyen: son páginas jugables que
-    // solo añaden un extra al staff, y su texto visible debe seguir la regla 9b.
+    // jerga legítima según D6.1): resolucion-combate y mundo-vivo (legacy de
+    // cierre de combate previos a los paneles A.3; revision-viaje fue eliminada
+    // en el drop físico del legado). ficha.php y biblioteca-akuma.php NO se
+    // excluyen: son páginas jugables que solo añaden un extra al staff, y su
+    // texto visible debe seguir la regla 9b.
     array_filter(glob($RAIZ . '/*.php'), function ($f) use ($RAIZ) {
         $base = basename($f);
         return !preg_match('/\-staff\.php$|bandeja\.php$/', $base)
-            && !in_array($base, array('revision-viaje.php', 'resolucion-combate.php', 'mundo-vivo.php'), true);
+            && !in_array($base, array('resolucion-combate.php', 'mundo-vivo.php'), true);
     }),
     // Ficha 7 Seas (bloques con texto visible al jugador)
     array($RAIZ . '/inc/ope_rol/dominio/ficha.php')

@@ -56,7 +56,7 @@ function ope_rol_facciones()
  * @deprecated Sustituida por ope_rol_rasgos_generales() (Factor Linaje).
  * Shim de compatibilidad: aplana el catálogo nuevo a la forma legacy
  * (nombre/valor/categoria/efecto/spec). El wizard y la ficha ya usan
- * directamente el catálogo del Factor Linaje (inc/ope_rol_catalogo_linaje.php).
+ * directamente el catálogo del Factor Linaje (inc/ope_rol/catalogos/linaje.php).
  */
 function ope_rol_virtudes()
 {
