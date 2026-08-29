@@ -16,7 +16,9 @@
  *     rasgos, estados, acciones, matices, islas, mares, zonas, facciones,
  *     akumas, implantes, objetos, economía, estilos, cuentas…)
  *   · Usuarios MyBB admin + «OPE Eternal» y su personaje (#2024)
- *   · Esquema completo F0–F6 y las 54 tablas mybb_rol_retirada_* (respaldo D6.3)
+ *   · Esquema completo F0–F6 (incluida la estructura de las 54 tablas
+ *     mybb_rol_retirada_*, cuyo CONTENIDO también se vacía: son el respaldo
+ *     reversible del legado D6.3, no datos que deban sobrevivir)
  *
  * Idempotente: se puede re-ejecutar. No toca el esquema.
  */
@@ -58,8 +60,10 @@ foreach ($tables as $t) {
 }
 echo "  [ope] {$total} filas de contenido borradas (" . count($tables) . " tablas ope revisadas)\n\n";
 
-// ── 2. Personajes: se conserva solo el del bot; si no existe se recrea ──────
-$db->query("DELETE FROM mybb_ope_personajes WHERE uid <> {$bot_uid}");
+// ── 2. Personajes: se conserva solo el del bot (uid 2 + es_NPC 1); si no ──
+//    existe se recrea. Ojo: los tests crean personajes de prueba CON el uid
+//    del bot (es_NPC = 0), así que el filtro es por es_NPC, no por uid.
+$db->query("DELETE FROM mybb_ope_personajes WHERE NOT (uid = {$bot_uid} AND es_NPC = 1)");
 echo "  [ope] personajes: borrados " . $db->affected_rows . " de prueba\n";
 $chk = $db->query("SELECT id FROM mybb_ope_personajes WHERE uid = {$bot_uid} AND es_NPC = 1 ORDER BY id LIMIT 1");
 if ($chk && $chk->num_rows) {
@@ -93,6 +97,23 @@ foreach ($core as $t) {
 }
 echo "  [mybb] {$core_total} filas de contenido de foro borradas\n\n";
 
+// ── 3b. Tablas mybb_rol_retirada_*: se vacía su CONTENIDO (respaldo D6.3) ───
+$ret_total = 0;
+$q = $db->query("SHOW TABLES LIKE 'mybb_rol_retirada_%'");
+$ret_tables = array();
+while ($r = $q->fetch_row()) {
+    $ret_tables[] = $r[0];
+}
+foreach ($ret_tables as $t) {
+    $db->query("DELETE FROM `{$t}`");
+    $n = $db->affected_rows;
+    if ($n > 0) {
+        echo "  [retirada] " . substr($t, strlen('mybb_rol_retirada_')) . ": vaciadas {$n} filas\n";
+    }
+    $ret_total += $n;
+}
+echo "  [retirada] {$ret_total} filas de contenido legacy vaciadas (" . count($ret_tables) . " tablas)\n\n";
+
 // ── 4. Contadores, punteros y cachés ────────────────────────────────────────
 $db->query("UPDATE mybb_forums SET threads=0, posts=0, lastpost=0, lastposter='', lastposteruid=0, lastposttid=0, lastpostsubject='', unapprovedthreads=0, unapprovedposts=0, deletedthreads=0, deletedposts=0, ope_lastpid=0");
 echo "  [mybb] foros: contadores reiniciados (" . $db->affected_rows . " foros)\n";
@@ -103,5 +124,5 @@ echo "  [ope] cuentas: personaje_activo reiniciado (" . $db->affected_rows . ")\
 $db->query("DELETE FROM mybb_datacache WHERE title IN ('stats','forums','latest_activity','ope_home')");
 echo "  [mybb] datacache: stats/forums/latest_activity/ope_home purgados\n";
 
-echo "\n== Limpieza completada. Catálogos, usuarios, bot (#{$bot_pid}) y esquema intactos. ==\n";
+echo "\n== Limpieza completada. Catálogos, usuarios, bot y esquema intactos. ==\n";
 $db->close();
