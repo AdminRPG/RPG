@@ -57,7 +57,6 @@ existir en el workspace (no van en git):
 
 - `inc/config.php` — conexión a MySQL (la genera el instalador de MyBB)
 - `inc/settings.php` — ajustes compilados del ACP (se regenera desde `mybb_settings` al guardar en el ACP; si falta, el foro no arranca)
-- `inc/ope_rol/config/viaje_ai.php` — claves locales de la IA de viajes
 
 Si falta `inc/settings.php`, entra al ACP (`http://rpg.test/admin/`) y guarda cualquier
 ajuste para regenerarlo, o repite la instalación de MyBB.

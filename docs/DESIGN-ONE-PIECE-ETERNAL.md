@@ -75,11 +75,11 @@ Tema emocional: de *Libertad* (mar, OP) → **Horizonte** (cielo, OPE). La escen
 | Pilar | Sistema en código | Reskin OPE |
 |---|---|---|
 | **Personalización** | `crear-personaje.php`, ficha, stats 12×3 | Razas OPE, clase, elemento, arma, cuádrupla visual |
-| **Combate** | `inc/ope_rol_system.php` (PV/EN/PA, heridas, estados) | Esencia, ventaja elemental, técnicas por arma |
-| **Tramas** | `rol_mv_*`, tags `--tag-trama/mision/viaje/fic` | "El Equilibrio del Cielo", Ancestrales/Primordiales |
+| **Combate** | `inc/ope_rol/core/system.php` + `sistemas/combate.php` (PV/EN/PA, heridas, estados) | Esencia, ventaja elemental, técnicas por arma |
+| **Tramas** | `ope_sucesos`/`ope_rumores` (Mundo Vivo), tags `--tag-trama/mision/viaje/fic` | Sucesos de ronda, rumores y carteles (5.13/5.14) |
 | **Misiones** | `tablon-misiones.php` | Órdenes del Cielo, tiers por Cielo |
-| **Social** | `rol_tripulaciones`, acompañantes, relaciones | Crews, aeronave, summons, renombre |
-| **Aventuras** | Cielos/islas, `inc/ope_rol_viajes.php` | Rutas de aeronave, progresión geográfica |
+| **Social** | `ope_tripulaciones`/`ope_tripulantes`, acompañantes, relaciones | Crews, barcos, renombre (5.12/5.17/22.9) |
+| **Aventuras** | Islas del Mundo Vivo (`ope_islas`/`ope_mares`), `sistemas/navegacion.php` | Travesías, oráculos y progresión geográfica (5.16) |
 
 **Regla de oro:** el motor se conserva, el skin cambia.
 
@@ -525,10 +525,10 @@ Cada Aventurero tiene **cuatro assets propios**. Configurables por el dueño en 
 
 | Asset | Campo BD | Uso | Ratio |
 |---|---|---|---|
-| **Banner** | `datos.banner` (JSON en `rol_personajes.datos`) | Cabecera full-bleed de la ficha | **16:9** (1920×1080 recomendado) |
+| **Banner** | `datos.banner` (JSON en `ope_personajes.datos`) | Cabecera full-bleed de la ficha | **16:9** (1920×1080 recomendado) |
 | **Retrato** | `datos.retrato` (JSON) | Columna izquierda ficha Referencia Visual + grid formación | PNG alto transparente (~280×450) |
-| **Avatar** | `rol_personajes.avatar` | **Postbit del foro** (cajetilla en cada post) | **280×450** |
-| **Icono** | `rol_personajes.icono` | Mini icono en postbit, feed portada, relaciones | 1:1 (64×64) |
+| **Avatar** | `ope_personajes.avatar` | **Postbit del foro** (cajetilla en cada post) | **280×450** |
+| **Icono** | `ope_personajes.icono` | Mini icono en postbit, feed portada, relaciones | 1:1 (64×64) |
 
 **Implementación actual:** modal Gestionar en `ficha.php` (banner, retrato, avatar, icono, firma); `$ficha_art = retrato ?: avatar` para compatibilidad con datos antiguos.
 
@@ -551,7 +551,7 @@ bc (breadcrumb, debajo nav 66px)
 │     ├── char-banner-veil (gradiente inferior)
 │     └── char-banner-edge (línea --aura / --gold)
 ├── char-id (margin-top: -48px — tarjeta superpuesta)
-│     ├── avatar 72×72 (rol_personajes.avatar)
+│     ├── avatar 72×72 (ope_personajes.avatar)
 │     ├── identidad: nombre, alias, chips (elemento, clase, arma, crew, estado, nivel)
 │     └── lateral: renombre + vitales PV/EN/PA
 ├── tabs-wrap (sticky top: 66px)

@@ -3362,23 +3362,6 @@ body.ope-pg-zona-staff .zs-badge.borrador{background:rgba(139,148,158,.2);color:
 body.ope-pg-zona-staff .zs-pj-meta{display:flex;gap:12px;font-size:.8rem;color:var(--paper-dim);border-top:1px solid var(--rivet);border-bottom:1px solid var(--rivet);padding:8px 0}
 body.ope-pg-zona-staff .zs-pj-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 
-/* ---- revision-viaje.php — utilidades de layout (sin inline styles) ---- */
-body.ope-pg-zona-staff .zs-ut-mt8{margin-top:8px}
-body.ope-pg-zona-staff .zs-ut-mt12{margin-top:12px}
-body.ope-pg-zona-staff .zs-ut-mt16{margin-top:16px}
-body.ope-pg-zona-staff .zs-ut-mb16{margin-bottom:16px}
-body.ope-pg-zona-staff .zs-ut-stack{flex-direction:column;align-items:flex-start}
-body.ope-pg-zona-staff .zs-ut-inline{display:inline}
-body.ope-pg-zona-staff .zs-ut-row-form{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap;flex:1}
-body.ope-pg-zona-staff .zs-ut-txt-xs{font-size:.78rem;line-height:1.5;color:var(--ope-ink-soft)}
-body.ope-pg-zona-staff .zs-ut-txt-xm{font-size:.82rem}
-body.ope-pg-zona-staff .zs-ut-txt-sm{font-size:.8rem}
-body.ope-pg-zona-staff .zs-ut-danger{color:var(--crack)}
-body.ope-pg-zona-staff .zs-ut-danger-row{border-color:var(--crack)}
-body.ope-pg-zona-staff .zs-ut-badge-lg{font-size:.9rem;padding:6px 14px}
-body.ope-pg-zona-staff .zs-ut-title{margin:14px 0 8px;font-size:.85rem;color:var(--ope-gold-deep)}
-body.ope-pg-zona-staff .zs-ut-input{flex:1;min-width:280px;padding:8px 12px;border-radius:8px;background:var(--iron);border:1px solid var(--rivet);color:var(--paper)}
-
 /* ---- crear-personaje.php — Referencia Visual / ficha / formacion ---- */
 body.ope-pg-crear-personaje .wrap{max-width:1280px;margin:0 auto;padding:0 18px 48px}
 

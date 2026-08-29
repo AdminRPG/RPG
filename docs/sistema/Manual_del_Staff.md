@@ -1954,8 +1954,8 @@ Ficha de implante **bajo demanda** (trámites 56/59): entrada = concepto (zona, 
 
 > Tabla de control que cierra la brecha diseño → código: **cada hook/cron del motor 7 Seas**
 > con su archivo y cuándo se dispara. Auditoría hecha contra el código real (plugin + `inc/ope_rol/`)
-> en F6. Los hooks del motor viejo desactivados (snapshot, CU, PP por post, parses legacy) están
-> **comentados** en el plugin y no aparecen aquí: son código muerto retirado en D6.3/F6.4.
+> en F6. Los hooks del motor viejo (snapshot, CU, PP por post, parses legacy) fueron
+> **eliminados** del plugin en la purga D6.7 y no existen en el código: no hay rastro del motor anterior.
 
 #### Hooks del plugin (`inc/plugins/ope_rol.php`)
 
