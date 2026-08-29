@@ -1979,6 +1979,7 @@ Ficha de implante **bajo demanda** (trámites 56/59): entrada = concepto (zona, 
 | `showthread_end` | `ope_rol_hide_modtools_showthread` | Vista de un hilo | Oculta herramientas de moderación no aplicables |
 | `showthread_end` | `ope_rol_showthread_tags` | Vista de un hilo | Etiquetas/estados visibles del tema |
 | `pre_output_page` | `ope_rol_inject_navbar` | Antes de servir la página | Inyecta la navbar 7 Seas (fallback JS para páginas propias) |
+| `pre_output_page` | `ope_rol_inject_zonab_editor` | Antes de servir la página (solo newthread/newreply/editpost) | **Zona B (F2.2)**: incrusta `ope7_zonab_editor_html()` justo bajo el editor si hay PJ 7 Seas activo con vida |
 
 #### Subcrones encadenados desde `ope7_progresion_cron` (`inc/ope_rol/sistemas/progresion.php`)
 
