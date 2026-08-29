@@ -63,13 +63,19 @@ if (!function_exists('ope_rol_cat_tienda_items')) {
     {
         global $db;
         $out = array();
-        if (!$db->table_exists('rol_tienda_items')) {
+        // D6.3: el catálogo de productos canónico es mybb_ope_objetos (F3);
+        // rol_tienda_items está retirada.
+        if (!$db->table_exists('ope_objetos')) {
             return $out;
         }
         $where = $solo_activos ? 'activo = 1' : '';
-        $q = $db->simple_select('rol_tienda_items', '*', $where, array('order_by' => 'orden, id', 'order_dir' => 'ASC'));
+        $q = $db->simple_select('ope_objetos', '*', $where, array('order_by' => 'nombre', 'order_dir' => 'ASC'));
         while ($r = $db->fetch_array($q)) {
-            $r['detalles_arr'] = ope_rol_cat_json_list($r['detalles'] ?? '');
+            $r['detalles_arr'] = array();
+            $r['detalles'] = (string) ($r['efecto_json'] ?? '');
+            $r['precio'] = (int) ($r['precio_base'] ?? 0);
+            $r['categoria'] = (string) ($r['categoria'] ?? '');
+            $r['rareza'] = (string) ($r['rareza'] ?? '');
             $out[] = $r;
         }
         return $out;
@@ -81,12 +87,16 @@ if (!function_exists('ope_rol_cat_tripulaciones')) {
     {
         global $db;
         $out = array();
-        if (!$db->table_exists('rol_tripulaciones')) {
+        // D6.3: fuente canónica mybb_ope_tripulaciones (F5.3).
+        if (!$db->table_exists('ope_tripulaciones')) {
             return $out;
         }
-        $where = $solo_activos ? 'activo = 1' : '';
-        $q = $db->simple_select('rol_tripulaciones', '*', $where, array('order_by' => 'orden, id', 'order_dir' => 'ASC'));
+        $where = $solo_activos ? "estado = 'activa'" : '';
+        $q = $db->simple_select('ope_tripulaciones', '*', $where, array('order_by' => 'nombre', 'order_dir' => 'ASC'));
         while ($r = $db->fetch_array($q)) {
+            $r['lema'] = (string) ($r['proposito'] ?? '');
+            $r['imagen'] = (string) ($r['bandera'] ?? '');
+            $r['activo'] = ((string) ($r['estado'] ?? '') === 'activa') ? 1 : 0;
             $out[] = $r;
         }
         return $out;
@@ -142,12 +152,15 @@ if (!function_exists('ope_rol_cat_bestiario')) {
     {
         global $db;
         $out = array();
-        if (!$db->table_exists('rol_bestiario')) {
+        // D6.3: fuente canónica mybb_ope_bestiario (F6.2).
+        if (!$db->table_exists('ope_bestiario')) {
             return $out;
         }
-        $where = $solo_activos ? 'activo = 1' : '';
-        $q = $db->simple_select('rol_bestiario', '*', $where, array('order_by' => 'orden, id', 'order_dir' => 'ASC'));
+        $where = '';
+        $q = $db->simple_select('ope_bestiario', '*', $where, array('order_by' => 'nombre', 'order_dir' => 'ASC'));
         while ($r = $db->fetch_array($q)) {
+            $r['activo'] = 1;
+            $r['orden'] = 0;
             $out[] = $r;
         }
         return $out;
@@ -208,7 +221,7 @@ if (!function_exists('ope_rol_cat_personajes_publicos')) {
                 . 'FROM ' . ope7_tabla_full('personajes') . ' p '
                 . 'LEFT JOIN ' . ope7_tabla_full('razas') . ' r ON r.id = p.raza_id '
                 . 'LEFT JOIN ' . ope7_tabla_full('facciones') . ' f ON f.id = p.faccion_id '
-                . 'LEFT JOIN ' . ope7_tabla_full('facciones_rangos') . ' fa ON fa.id = p.rango_id '
+                . 'LEFT JOIN ' . ope7_tabla_full('rangos_faccion') . ' fa ON fa.id = p.rango_id '
                 . 'WHERE ' . ($where === 'es_npc = 1' ? 'p.es_NPC = 1' : "p.es_NPC = 0 AND p.estado = 'aprobado'") . ' ORDER BY p.nombre ASC');
             while ($r = $db->fetch_array($q)) {
                 $datos = json_decode((string) ($r['datos'] ?? ''), true) ?: array();
@@ -233,39 +246,7 @@ if (!function_exists('ope_rol_cat_personajes_publicos')) {
             }
             return $out;
         }
-        $q = $db->simple_select(
-            'rol_personajes',
-            'pid, nombre, slug, rango, nivel, avatar, icono, rango_faccion, desc_fisica, personalidad, datos, es_npc',
-            $where,
-            array('order_by' => 'nombre', 'order_dir' => 'ASC')
-        );
-        while ($r = $db->fetch_array($q)) {
-            $datos = json_decode((string) ($r['datos'] ?? ''), true) ?: array();
-            $fac   = (string) ($datos['faccion'] ?? '');
-            $raza1 = (string) ($datos['raza_principal'] ?? '');
-            $raza2 = (string) ($datos['raza_secundaria'] ?? '');
-            $hib   = !empty($datos['hibrido']);
-            $raza1_lbl = isset($razas[$raza1]) ? $razas[$raza1]['nombre'] : ucfirst($raza1);
-            $raza2_lbl = ($raza2 && isset($razas[$raza2])) ? $razas[$raza2]['nombre'] : '';
-            $out[] = array(
-                'pid'          => (int) $r['pid'],
-                'nombre'       => (string) $r['nombre'],
-                'slug'         => (string) $r['slug'],
-                'rango'        => (string) $r['rango'],
-                'nivel'        => (int) $r['nivel'],
-                'imagen'       => trim((string) ($r['icono'] ?: $r['avatar'])),
-                'faccion'      => $fac,
-                'faccion_slug' => function_exists('ope_rol_faccion_slug') ? ope_rol_faccion_slug($fac) : strtolower($fac),
-                'rango_faccion' => (string) $r['rango_faccion'],
-                'raza'         => $hib && $raza2_lbl !== '' ? ($raza1_lbl . ' / ' . $raza2_lbl) : $raza1_lbl,
-                'concepto'     => (string) ($datos['concepto'] ?? ''),
-                'apodo'        => (string) ($datos['apodo'] ?? ''),
-                'edad'         => (string) ($datos['edad'] ?? ''),
-                'genero'       => (string) ($datos['genero'] ?? ''),
-                'personalidad' => (string) ($r['personalidad'] ?? ''),
-                'apariencia'   => (string) ($r['desc_fisica'] ?? ''),
-            );
-        }
+        // D6.3: rol_personajes está retirada — solo existe la rama canónica.
         return $out;
     }
 }
@@ -346,8 +327,8 @@ if (!function_exists('ope_rol_mv_mision_asignacion')) {
             return $cache[$pid];
         }
         $nombre = '';
-        if ($db->table_exists('rol_personajes')) {
-            $q = $db->simple_select('rol_personajes', 'nombre', "pid = {$pid}", array('limit' => 1));
+        if (ope7_tabla_existe('personajes')) {
+            $q = $db->simple_select(ope7_tabla('personajes'), 'nombre', "id = {$pid}", array('limit' => 1));
             if ($db->num_rows($q)) {
                 $nombre = (string) $db->fetch_field($q, 'nombre');
             }
@@ -372,10 +353,11 @@ if (!function_exists('ope_rol_pid_activo')) {
                 return $ap;
             }
         }
-        if (!$db->table_exists('rol_cuentas')) {
+        // D6.3: fuente canónica mybb_ope_cuentas.
+        if (!$db->table_exists('ope_cuentas')) {
             return 0;
         }
-        $q = $db->simple_select('rol_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
+        $q = $db->simple_select('ope_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
         return $db->num_rows($q) ? (int) $db->fetch_field($q, 'personaje_activo') : 0;
     }
 }
@@ -390,10 +372,11 @@ if (!function_exists('ope_rol_cat_tripulacion_miembros')) {
         global $db;
         $pid = (int) $pid;
         $out = array();
-        if ($pid < 1 || !$db->table_exists('rol_tripulacion_miembros') || !$db->table_exists('rol_personajes')) {
+        // D6.3: fuente canónica ope_tripulantes → ope_personajes.
+        if ($pid < 1 || !$db->table_exists('ope_tripulantes') || !$db->table_exists('ope_personajes')) {
             return $out;
         }
-        $q = $db->simple_select('rol_tripulacion_miembros', 'tripulacion_id', "pid = {$pid} AND estado = 'activo'", array('limit' => 1));
+        $q = $db->simple_select('ope_tripulantes', 'tripulacion_id', "personaje_id = {$pid} AND estado = 'activo'", array('limit' => 1));
         if (!$db->num_rows($q)) {
             return $out;
         }
@@ -403,12 +386,12 @@ if (!function_exists('ope_rol_cat_tripulacion_miembros')) {
         }
         $pref = TABLE_PREFIX;
         $q2 = $db->query("
-            SELECT rp.pid, rp.nombre, rp.avatar, rp.nivel, rp.isla_actual
-            FROM {$pref}rol_tripulacion_miembros tm
-            INNER JOIN {$pref}rol_personajes rp ON (rp.pid = tm.pid)
+            SELECT rp.id AS pid, rp.nombre, rp.avatar, rp.nivel, '' AS isla_actual
+            FROM {$pref}ope_tripulantes tm
+            INNER JOIN {$pref}ope_personajes rp ON (rp.id = tm.personaje_id)
             WHERE tm.tripulacion_id = {$tid}
-              AND tm.pid != {$pid}
-              AND tm.estado = 'aprobado'
+              AND tm.personaje_id != {$pid}
+              AND tm.estado = 'activo'
               AND rp.estado = 'aprobado'
             ORDER BY rp.nivel DESC, rp.nombre ASC
         ");
@@ -431,10 +414,10 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
     {
         global $db;
         $pid = (int) $pid;
-        if ($pid < 1 || !$db->table_exists('rol_tripulacion_miembros')) {
+        if ($pid < 1 || !$db->table_exists('ope_tripulantes')) {
             return null;
         }
-        $q = $db->simple_select('rol_tripulacion_miembros', '*', "pid = {$pid} AND estado = 'activo'", array('limit' => 1));
+        $q = $db->simple_select('ope_tripulantes', '*', "personaje_id = {$pid} AND estado = 'activo'", array('limit' => 1));
         return $db->num_rows($q) ? $db->fetch_array($q) : null;
     }
 
@@ -443,15 +426,17 @@ if (!function_exists('ope_rol_cat_tripulacion_miembro')) {
     {
         global $db;
         $m = ope_rol_cat_tripulacion_miembro($pid);
-        if (!$m || !$db->table_exists('rol_tripulaciones')) {
+        if (!$m || !$db->table_exists('ope_tripulaciones')) {
             return null;
         }
         $tid = (int) $m['tripulacion_id'];
-        $q = $db->simple_select('rol_tripulaciones', '*', "id = {$tid} AND activo = 1", array('limit' => 1));
+        $q = $db->simple_select('ope_tripulaciones', '*', "id = {$tid} AND estado = 'activa'", array('limit' => 1));
         if (!$db->num_rows($q)) {
             return null;
         }
         $trip = $db->fetch_array($q);
+        $trip['lema'] = (string) ($trip['proposito'] ?? '');
+        $trip['imagen'] = (string) ($trip['bandera'] ?? '');
         return array(
             'miembro'     => $m,
             'tripulacion' => $trip,
@@ -977,10 +962,10 @@ if (!function_exists('ope_rol_cat_pj_cards')) {
     {
         global $db;
         $out = array();
-        if (!$db->table_exists('rol_personajes')) {
+        if (!$db->table_exists('ope_personajes')) {
             return $out;
         }
-        $q = $db->simple_select('rol_personajes', 'pid, nombre', "estado = 'aprobado' OR es_npc = 1", array('order_by' => 'nombre', 'order_dir' => 'ASC'));
+        $q = $db->simple_select('ope_personajes', 'id AS pid, nombre', "estado = 'aprobado'", array('order_by' => 'nombre', 'order_dir' => 'ASC'));
         while ($r = $db->fetch_array($q)) {
             $out[] = $r;
         }

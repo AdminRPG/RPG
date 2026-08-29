@@ -23,10 +23,10 @@ $pid = (int) $mybb->get_input('pid', MyBB::INPUT_INT);
 if ($pid < 1) {
     $pid = (int) ($mybb->user['ope_active_pid'] ?? 0);
 }
-if ($pid < 1 && $db->table_exists('rol_personajes')) {
-    $aq = $db->simple_select('rol_personajes', 'pid', "uid = {$uid} AND activo = 1", array('limit' => 1));
-    if ($db->num_rows($aq)) {
-        $pid = (int) $db->fetch_field($aq, 'pid');
+if ($pid < 1 && function_exists('ope7_pj_activo')) {
+    $act = ope7_pj_activo($uid);
+    if ($act && $act['tabla'] === 'ope') {
+        $pid = (int) $act['id'];
     }
 }
 

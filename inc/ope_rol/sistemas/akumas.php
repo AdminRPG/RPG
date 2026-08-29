@@ -392,18 +392,12 @@ function ope7_efecto_tirada_conquistador($pid, $ids, $tr)
     }
 
     // Éxito: nivel 1 + histórico + suceso de Mundo Vivo en borrador (D5.4).
+    // INSERT IGNORE (uq_pj_tipo): idempotente ante doble envío — mismo patrón
+    // que el cron de auto-despertar (duplicate entry en concurrencia).
     if (ope7_tabla_existe('haki')) {
-        $hq = $db->simple_select('ope_haki', 'id', "personaje_id = {$pid} AND tipo = 'conquistador'", array('limit' => 1));
-        if (!$db->num_rows($hq)) {
-            $db->insert_query('ope_haki', array(
-                'personaje_id' => (int) $pid,
-                'tipo'         => 'conquistador',
-                'nivel'        => 1,
-                'usos_acumulados' => 0,
-                'pp_invertidos'   => 0,
-                'activo'       => 1,
-            ));
-        }
+        $db->write_query("INSERT IGNORE INTO " . ope7_tabla_full('haki')
+            . " (personaje_id, tipo, nivel, usos_acumulados, pp_invertidos, activo)"
+            . " VALUES (" . (int) $pid . ", 'conquistador', 1, 0, 0, 1)");
     }
     if (ope7_tabla_existe('haki_historico')) {
         $db->insert_query('ope_haki_historico', array(
@@ -470,12 +464,14 @@ function ope7_haki_auto_despertar($f)
     }
     $n = 0;
     foreach (array('armadura', 'mantra') as $tipo) {
-        $q = $db->simple_select('ope_haki', 'id', "personaje_id = {$pid} AND tipo = '{$tipo}'", array('limit' => 1));
-        if (!$db->num_rows($q)) {
-            $db->insert_query('ope_haki', array(
-                'personaje_id' => $pid, 'tipo' => $tipo, 'nivel' => 1,
-                'usos_acumulados' => 0, 'pp_invertidos' => 0, 'activo' => 1,
-            ));
+        // Carrera real corregida: el cron corre en cada global_start y dos
+        // peticiones concurrentes podían COMPROBAR la fila y luego INSERTARLA a
+        // la vez → duplicate entry en uq_pj_tipo (17881-mantra). INSERT IGNORE
+        // absorbe el duplicado y affected_rows() distingue el insert real.
+        $db->write_query("INSERT IGNORE INTO " . ope7_tabla_full('haki')
+            . " (personaje_id, tipo, nivel, usos_acumulados, pp_invertidos, activo)"
+            . " VALUES ({$pid}, '{$tipo}', 1, 0, 0, 1)");
+        if ($db->affected_rows() > 0) {
             $n++;
         }
     }

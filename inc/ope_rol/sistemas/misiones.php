@@ -776,16 +776,6 @@ function ope7_misiones_panel_html()
         while ($r = $db->fetch_array($q)) {
             $narr[] = $r;
         }
-    } elseif (ope7_tabla_existe('misiones') && $db->table_exists('rol_cuentas') && $db->table_exists('rol_personajes')) {
-        $q = $db->query('SELECT rc.uid, rc.personaje_activo, COALESCE(p.nombre, rp.nombre) AS pj_nombre, u.username '
-            . 'FROM ' . TABLE_PREFIX . 'rol_cuentas rc '
-            . 'LEFT JOIN ' . TABLE_PREFIX . 'users u ON u.uid = rc.uid '
-            . 'LEFT JOIN ' . TABLE_PREFIX . 'rol_personajes rp ON rp.uid = rc.uid AND rp.activo = 1 '
-            . 'LEFT JOIN ' . ope7_tabla_full('personajes') . ' p ON p.id = rc.personaje_activo '
-            . "WHERE rp.staff_narrador = 1 OR rc.staff_level >= 1 ORDER BY u.username");
-        while ($r = $db->fetch_array($q)) {
-            $narr[] = $r;
-        }
     }
     if (!$narr) {
         $h[] = '<p class="pj-empty">Sin narradores habilitados (staff_narrador en rol_personajes, 21.2) ni staff con personaje activo.</p>';

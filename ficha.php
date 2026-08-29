@@ -43,22 +43,18 @@ $display_name_e = htmlspecialchars_uni($display_name);
 // ── Resolver el personaje a mostrar ──
 $pid = $mybb->get_input('pid', MyBB::INPUT_INT);
 if ($pid < 1 && $loggedin) {
-    // Personaje activo del usuario.
-    if ($db->table_exists('rol_cuentas')) {
-        $cq = $db->simple_select('rol_cuentas', 'personaje_activo', "uid = {$uid}", array('limit' => 1));
-        if ($db->num_rows($cq)) {
-            $pid = (int) $db->fetch_field($cq, 'personaje_activo');
+    // Personaje activo del usuario (D6.3: fuente canónica ope_cuentas).
+    if (function_exists('ope7_pj_activo')) {
+        $act = ope7_pj_activo($uid);
+        if ($act && $act['tabla'] === 'ope') {
+            $pid = $act['id'];
         }
     }
 }
 
+// D6.3: rol_personajes está retirada — el expediente legacy solo se renderiza
+// para PJs del esquema viejo (ya inexistente); el nuevo lo resuelve la rama 7 Seas.
 $pj = null;
-if ($pid > 0 && $db->table_exists('rol_personajes')) {
-    $q = $db->simple_select('rol_personajes', '*', "pid = {$pid}", array('limit' => 1));
-    if ($db->num_rows($q)) {
-        $pj = $db->fetch_array($q);
-    }
-}
 
 // ── Control de acceso ──
 $puede_ver = false;
@@ -1665,7 +1661,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php echo ope_rol_tecnica_card_css(); ?>
           <div class="ope-tk-deck" id="deck-grid">
 <?php foreach ($deck_tecnicas as $carta): ?>
-            <?php echo ope_rol_tecnica_card_html($carta); ?>
+            <?php echo function_exists('ope_rol_tecnica_card_html') ? ope_rol_tecnica_card_html($carta) : ''; ?>
 <?php endforeach; ?>
           </div>
           <div class="ope-deck-pag" id="deck-pagination"></div>

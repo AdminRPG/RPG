@@ -202,10 +202,12 @@ if (!function_exists('ope_forum_meta')) {
         if (isset($cache[$fid])) return $cache[$fid];
 
         $empty = ['dueno' => '', 'clima' => '', 'zonas' => [], 'anotaciones' => ''];
-        if (!$db->table_exists('rol_forum_meta')) {
+        // D6.3: fuente canónica mybb_ope_forum_meta (espejo idempotente de la
+        // retirada mybb_rol_forum_meta creado por migrate-7seas-esquema.php).
+        if (!$db->table_exists('ope_forum_meta')) {
             return $cache[$fid] = $empty;
         }
-        $row = $db->fetch_array($db->simple_select('rol_forum_meta', '*', "fid='{$fid}'"));
+        $row = $db->fetch_array($db->simple_select('ope_forum_meta', '*', "fid='{$fid}'"));
         if (!$row) {
             return $cache[$fid] = $empty;
         }

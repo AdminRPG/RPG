@@ -24,10 +24,10 @@ if ($pid < 1 && function_exists('ope_rol_active_pid_for')) {
     $pid = ope_rol_active_pid_for($uid);
 }
 
-// ── Cargar personaje completo ──
+// ── Cargar personaje completo (D6.3: fuente canónica mybb_ope_personajes) ──
 $pj = null;
-if ($pid > 0 && $db->table_exists('rol_personajes')) {
-    $q = $db->simple_select('rol_personajes', '*', "pid = {$pid}", array('limit' => 1));
+if ($pid > 0 && $db->table_exists('ope_personajes')) {
+    $q = $db->simple_select('ope_personajes', '*', "id = {$pid}", array('limit' => 1));
     if ($db->num_rows($q)) {
         $pj = $db->fetch_array($q);
     }
@@ -49,8 +49,8 @@ if (!$pj) {
 
 // ── Decodificar JSONs ──
 $datos      = json_decode((string) ($pj['datos'] ?? ''), true) ?: array();
-$inventario = json_decode((string) ($pj['inventario'] ?? ''), true) ?: array();
-$economia   = json_decode((string) ($pj['economia'] ?? ''), true) ?: array();
+$inventario = array();
+$economia   = array();
 $bio        = json_decode((string) ($pj['bio'] ?? ''), true) ?: array();
 
 // ── Derivar datos ──
@@ -60,18 +60,21 @@ if ($avatar_src === '') $avatar_src = trim((string) ($pj['avatar'] ?? ''));
 if ($avatar_src === '') $avatar_src = trim((string) ($pj['icono'] ?? ''));
 $av_initial = function_exists('mb_substr') ? mb_strtoupper(mb_substr($pj['nombre'], 0, 1, 'UTF-8'), 'UTF-8') : strtoupper(substr($pj['nombre'], 0, 1));
 
-$stats_json_d = json_decode((string) ($pj['stats_json'] ?? ''), true);
-$stats = (is_array($stats_json_d) && !empty($stats_json_d))
-    ? $stats_json_d
-    : (is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array());
+// D6.3: atributos base = columnas canónicas de ope_personajes.
+$stats = array();
+foreach (array('FUE' => 'fue', 'DES' => 'des', 'AGI' => 'agi', 'RES' => 'res', 'PER' => 'per', 'INT' => 'inte', 'CAR' => 'car', 'VOL' => 'vol') as $k => $col) {
+    $stats[$k] = (int) ($pj[$col] ?? 0);
+}
+$stats_json_d = json_decode((string) ($pj['datos'] ?? ''), true);
+if (is_array($stats_json_d) && !empty($stats_json_d['stats_efectivas'] ?? null)) {
+    $stats = array_merge($stats, $stats_json_d['stats_efectivas']);
+}
 
-$nivel = function_exists('ope_rol_nivel_from_stats_comprados')
-    ? (int) ope_rol_nivel_from_stats_comprados((int) ($pj['stats_ganados'] ?? 0))
-    : max(1, (int) $pj['nivel']);
-$rango_lbl = function_exists('ope_rol_nivel_label') ? ope_rol_nivel_label($nivel) : (string) $pj['rango'];
+$nivel = max(1, (int) ($pj['nivel'] ?? 1));
+$rango_lbl = function_exists('ope_rol_nivel_label') ? ope_rol_nivel_label($nivel) : ('Nivel ' . $nivel);
 
-// XP progress
-$stats_ganados = (int) ($pj['stats_ganados'] ?? 0);
+// XP progress (el motor 7 Seas no guarda stats_ganados: barra por nivel).
+$stats_ganados = max(0, ($nivel - 1) * 10);
 $floor_fn = function_exists('ope_rol_stats_para_nivel') ? (int) ope_rol_stats_para_nivel($nivel) : ($nivel - 1) * 20;
 $ceil_fn  = function_exists('ope_rol_stats_para_nivel') ? (int) ope_rol_stats_para_nivel($nivel + 1) : $nivel * 20;
 $span  = max(1, $ceil_fn - $floor_fn);
@@ -87,26 +90,64 @@ if ($pv < 1 && function_exists('ope_combat_calc_pv') && !empty($stats)) $pv = (i
 if ($en < 1 && function_exists('ope_combat_calc_en') && !empty($stats)) $en = (int) ope_combat_calc_en($stats, $nivel);
 if ($pa < 1 && function_exists('ope_combat_calc_pa') && !empty($stats)) $pa = (int) ope_combat_calc_pa($stats, $nivel);
 
-// Facción
-$faccion_key = $datos['faccion'] ?? '';
-$facciones_catalogo = function_exists('ope_rol_facciones') ? ope_rol_facciones() : array();
-$faccion_lbl = isset($facciones_catalogo[$faccion_key]) ? $facciones_catalogo[$faccion_key]['nombre'] : ucfirst($faccion_key);
-$faccion_slug = function_exists('ope_rol_faccion_slug') ? ope_rol_faccion_slug($faccion_key) : $faccion_key;
-$rango_faccion = trim((string) ($pj['rango_faccion'] ?? ''));
+// Facción (canónica: faccion_id → ope_facciones, o fallback datos['faccion'])
+$faccion_key = (string) ($datos['faccion'] ?? '');
+$faccion_lbl = '';
+$faccion_slug = '';
+if ((int) ($pj['faccion_id'] ?? 0) > 0 && $db->table_exists('ope_facciones')) {
+    $fq = $db->simple_select('ope_facciones', 'nombre, slug', "id = " . (int) $pj['faccion_id'], array('limit' => 1));
+    if ($db->num_rows($fq)) {
+        $ff = $db->fetch_array($fq);
+        $faccion_lbl  = (string) $ff['nombre'];
+        $faccion_slug = (string) $ff['slug'];
+    }
+}
+if ($faccion_lbl === '' && $faccion_key !== '') {
+    $facciones_catalogo = function_exists('ope_rol_facciones') ? ope_rol_facciones() : array();
+    $faccion_lbl  = isset($facciones_catalogo[$faccion_key]) ? $facciones_catalogo[$faccion_key]['nombre'] : ucfirst($faccion_key);
+    $faccion_slug = function_exists('ope_rol_faccion_slug') ? ope_rol_faccion_slug($faccion_key) : $faccion_key;
+}
+$rango_faccion = '';
+if ((int) ($pj['rango_id'] ?? 0) > 0 && $db->table_exists('ope_rangos_faccion')) {
+    $rq = $db->simple_select('ope_rangos_faccion', 'nombre', "id = " . (int) $pj['rango_id'], array('limit' => 1));
+    if ($db->num_rows($rq)) {
+        $rango_faccion = trim((string) $db->fetch_field($rq, 'nombre'));
+    }
+}
+if ($rango_faccion === '') {
+    $rango_faccion = trim((string) ($datos['rango'] ?? ''));
+}
 
-// Raza
-$RAZAS = function_exists('ope_rol_razas') ? ope_rol_razas() : array();
-$raza1_key = $datos['raza_principal'] ?? ($datos['raza'] ?? '');
-$raza1_lbl = isset($RAZAS[$raza1_key]) ? $RAZAS[$raza1_key]['nombre'] : ucfirst((string) $raza1_key);
+// Raza (canónica: raza_id → ope_razas)
+$raza1_lbl = '';
+if ((int) ($pj['raza_id'] ?? 0) > 0 && $db->table_exists('ope_razas')) {
+    $rz = $db->simple_select('ope_razas', 'nombre', "id = " . (int) $pj['raza_id'], array('limit' => 1));
+    if ($db->num_rows($rz)) {
+        $raza1_lbl = (string) $db->fetch_field($rz, 'nombre');
+    }
+}
+if ($raza1_lbl === '') {
+    $raza1_key = $datos['raza_principal'] ?? ($datos['raza'] ?? '');
+    $raza1_lbl = ucfirst((string) $raza1_key);
+}
 
-// Ubicación
-$isla_slug = trim((string) ($pj['isla_actual'] ?? ''));
-$isla_data = ($isla_slug !== '' && function_exists('ope_isla_por_slug')) ? ope_isla_por_slug($isla_slug) : null;
-$isla_nombre = $isla_data ? htmlspecialchars_uni($isla_data['nombre'] ?? '') : '';
-$isla_region = $isla_data ? htmlspecialchars_uni($isla_data['region'] ?? '') : '';
+// Ubicación (canónica: ubicacion_isla_id → ope7_isla_por_id)
+$isla_nombre = '';
+$isla_region = '';
+if ((int) ($pj['ubicacion_isla_id'] ?? 0) > 0 && function_exists('ope7_isla_por_id')) {
+    $isla_data = ope7_isla_por_id((int) $pj['ubicacion_isla_id']);
+    if ($isla_data) {
+        $isla_nombre = htmlspecialchars_uni((string) ($isla_data['nombre'] ?? ''));
+        $isla_region = htmlspecialchars_uni((string) ($isla_data['region'] ?? ''));
+    }
+}
 
-// Economía
-$berries = (int) ($economia['rupies'] ?? $economia['berries'] ?? 0);
+// Economía (canónica: cartera en mybb_ope_carteras)
+$berries = 0;
+if (function_exists('ope7_cartera_get') && $pid > 0) {
+    $car = ope7_cartera_get($pid);
+    $berries = (int) ($car['cartera'] ?? 0) + (int) ($car['boveda'] ?? 0);
+}
 
 // PP (puntos de progreso)
 $pp_disponible = 0;
@@ -115,14 +156,14 @@ if (function_exists('ope_pp_saldo')) {
     $pp_disponible = (int) ($pp_row['pp_disponible'] ?? 0);
 }
 
-// Tripulación
+// Tripulación (canónica: ope_tripulantes → ope_tripulaciones)
 $tripulacion = null;
 $es_capitan = false;
-if ($db->table_exists('rol_tripulacion_miembros') && $db->table_exists('rol_tripulaciones')) {
+if ($db->table_exists('ope_tripulantes') && $db->table_exists('ope_tripulaciones')) {
     $tq = $db->query("SELECT t.*, tm.rol, tm.estado
-        FROM " . TABLE_PREFIX . "rol_tripulacion_miembros tm
-        JOIN " . TABLE_PREFIX . "rol_tripulaciones t ON t.id = tm.tripulacion_id
-        WHERE tm.pid = {$pid} AND tm.estado = 'activo'
+        FROM " . TABLE_PREFIX . "ope_tripulantes tm
+        JOIN " . TABLE_PREFIX . "ope_tripulaciones t ON t.id = tm.tripulacion_id
+        WHERE tm.personaje_id = {$pid} AND tm.estado = 'activo' AND t.estado = 'activa'
         LIMIT 1");
     if ($db->num_rows($tq)) {
         $tripulacion = $db->fetch_array($tq);
@@ -131,9 +172,9 @@ if ($db->table_exists('rol_tripulacion_miembros') && $db->table_exists('rol_trip
 }
 $miembros_trip = array();
 if ($tripulacion) {
-    $mq = $db->query("SELECT p.nombre, p.nivel, p.avatar, p.pid, tm.rol
-        FROM " . TABLE_PREFIX . "rol_tripulacion_miembros tm
-        JOIN " . TABLE_PREFIX . "rol_personajes p ON p.pid = tm.pid
+    $mq = $db->query("SELECT p.nombre, p.nivel, p.avatar, p.id AS pid, tm.rol
+        FROM " . TABLE_PREFIX . "ope_tripulantes tm
+        JOIN " . TABLE_PREFIX . "ope_personajes p ON p.id = tm.personaje_id
         WHERE tm.tripulacion_id = " . (int)$tripulacion['id'] . " AND tm.estado = 'activo'
         ORDER BY tm.rol = 'capitan' DESC, p.nombre ASC");
     while ($mrow = $db->fetch_array($mq)) {
@@ -141,28 +182,29 @@ if ($tripulacion) {
     }
 }
 
-// Barco
+// Barco (canónico: mybb_ope_barcos)
 $barco = null;
-if (function_exists('ope_barco_lista')) {
-    $barcos = ope_barco_lista($pid);
-    foreach ($barcos as $b) {
-        if (!empty($b['activo'])) { $barco = $b; break; }
-    }
-    if (!$barco && !empty($barcos)) $barco = $barcos[0];
+if ($pid > 0 && function_exists('ope7_barco_flota') && ope7_tabla_existe('barcos')) {
+    $barcos = ope7_barco_flota($pid);
+    if (!empty($barcos)) $barco = $barcos[0];
 }
 
-// Inventario (fallback demo)
+// Inventario (canónico: ope_inventario_personaje → ope_objetos)
 $inv_items = array();
 $inv_count = 0;
 $inv_en_venta = 0;
 $inv_legendarias = 0;
 $inv_raras = 0;
-if ($db->table_exists('rol_inventario')) {
-    $iq = $db->simple_select('rol_inventario', '*', "pid = {$pid}", array('order_by' => 'nombre'));
+if ($db->table_exists('ope_inventario_personaje') && $db->table_exists('ope_objetos')) {
+    $iq = $db->query("SELECT o.nombre, o.rareza, o.categoria, i.zona, i.cantidad
+        FROM " . TABLE_PREFIX . "ope_inventario_personaje i
+        JOIN " . TABLE_PREFIX . "ope_objetos o ON o.id = i.objeto_id
+        WHERE i.personaje_id = {$pid}");
     while ($irow = $db->fetch_array($iq)) {
+        $irow['pid'] = $pid;
         $inv_items[] = $irow;
         $inv_count++;
-        if (!empty($irow['en_venta'])) $inv_en_venta++;
+        if ((string) ($irow['zona'] ?? '') === 'venta') $inv_en_venta++;
         $rz = strtolower((string) ($irow['rareza'] ?? ''));
         if ($rz === 'legendaria' || $rz === 'legendary') $inv_legendarias++;
         elseif ($rz === 'rara' || $rz === 'rare') $inv_raras++;
@@ -172,23 +214,21 @@ if ($db->table_exists('rol_inventario')) {
 // Vocaciones
 $vocaciones = function_exists('ope_rol_pj_vocaciones') ? ope_rol_pj_vocaciones($pid) : array();
 
-// Trámites pendientes
+// Trámites pendientes (canónico: ope_tramites del motor 5.21)
 $tramites_pend = 0;
 $tramites_list = array();
-if ($db->table_exists('rol_tramites')) {
-    $tq = $db->simple_select('rol_tramites', 'tid, tipo, estado, dateline', "pid = {$pid} AND estado = 'pendiente'", array('order_by' => 'dateline', 'order_dir' => 'DESC', 'limit' => 5));
+if ($db->table_exists('ope_tramites')) {
+    $tq = $db->simple_select('ope_tramites', 'id AS tid, numero AS tipo, estado, fecha_creacion AS dateline', "personaje_id = {$pid} AND estado = 'pendiente'", array('order_by' => 'fecha_creacion', 'order_dir' => 'DESC', 'limit' => 5));
     while ($trow = $db->fetch_array($tq)) {
+        $trow['tipo'] = '#' . (int) ($trow['tipo'] ?? 0);
         $tramites_list[] = $trow;
         $tramites_pend++;
     }
 }
 
-// Solicitudes de tripulación pendientes
+// D6.3: el motor 7 Seas no tiene solicitudes de tripulación pendientes (el
+// ingreso lo cursa el capitán por trámite 64).
 $sol_trip_pend = 0;
-if ($db->table_exists('rol_tripulacion_miembros')) {
-    $sq = $db->simple_select('rol_tripulacion_miembros', 'COUNT(*) as cnt', "pid = {$pid} AND estado = 'pendiente'");
-    if ($db->num_rows($sq)) $sol_trip_pend = (int) $db->fetch_field($sq, 'cnt');
-}
 
 // Mensajes no leídos
 $msgs_no_leidos = function_exists('ope_rol_mensajes_no_leidos') ? ope_rol_mensajes_no_leidos($pid) : 0;
@@ -475,28 +515,21 @@ header('Content-Type: text/html; charset=utf-8');
     <!-- Barco -->
     <section class="res-section reveal">
       <div class="res-section-head">
-        <h2>Embarcación</h2>
-        <?php if ($barco): ?>
-          <a href="<?php echo $bburl; ?>/barco.php" class="res-section-link">Ver →</a>
-        <?php endif; ?>
-      </div>
+        <h2>Embarcación</h2>          <?php if ($barco): ?>
+            <a href="<?php echo $bburl; ?>/barco.php" class="res-section-link">Ver →</a>
+          <?php endif; ?>
+        </div>
       <?php if ($barco): ?>
         <div class="res-ship-card">
           <div class="res-ship-hero">
-            <?php if (!empty($barco['foto_url'])): ?>
-              <img src="<?php echo htmlspecialchars_uni($barco['foto_url']); ?>" alt="<?php echo htmlspecialchars_uni($barco['nombre']); ?>" class="res-ship-img">
-            <?php else: ?>
-              <div class="res-ship-ph">⛵</div>
-            <?php endif; ?>
+            <div class="res-ship-ph">⛵</div>
           </div>
           <div class="res-ship-info">
             <h3 class="res-ship-name"><?php echo htmlspecialchars_uni($barco['nombre']); ?></h3>
             <div class="res-ship-meta">
-              <span class="res-meta-chip"><?php echo htmlspecialchars_uni($barco['tipo_label'] ?? $barco['tipo'] ?? ''); ?></span>
-              <span class="res-meta-chip">Vel. x<?php echo (int) ($barco['vel'] ?? 1); ?></span>
-              <?php if (!empty($barco['activo'])): ?>
-                <span class="res-meta-chip res-meta-chip--active">Buque Insignia</span>
-              <?php endif; ?>
+              <span class="res-meta-chip"><?php echo htmlspecialchars_uni($barco['tipo']['nombre'] ?? ''); ?></span>
+              <span class="res-meta-chip">Nivel <?php echo htmlspecialchars_uni($barco['nivel'] ?? 'N1'); ?></span>
+              <span class="res-meta-chip"><?php echo (int) ($barco['pv_actual'] ?? 0); ?>/<?php echo (int) ($barco['casco_pv'] ?? 0); ?> PV</span>
             </div>
           </div>
         </div>

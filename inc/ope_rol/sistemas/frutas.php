@@ -65,40 +65,54 @@ function ope_fruta_by_id($fruta_id)
 {
     global $db;
     $fruta_id = (int) $fruta_id;
-    if ($fruta_id < 1 || !$db->table_exists('rol_akuma')) {
+    if ($fruta_id < 1 || !function_exists('ope7_tabla_existe') || !ope7_tabla_existe('akumas')) {
         return null;
     }
-    $q = $db->simple_select('rol_akuma', '*', "id = {$fruta_id}", array('limit' => 1));
+    $q = $db->simple_select('ope_akumas', '*', "id = {$fruta_id}", array('limit' => 1));
     if (!$db->num_rows($q)) {
         return null;
     }
-    $row = $db->fetch_array($q);
-    if (!isset($row['tier']) || (int) $row['tier'] < 1) {
-        $row['tier'] = ope_fruta_rareza_a_tier($row['rareza'] ?? 'Común');
+    $r = $db->fetch_array($q);
+    $tier = (int) ($r['tier'] ?? 0);
+    if ($tier < 1) {
+        $tier = ope_fruta_rareza_a_tier((string) ($r['rareza'] ?? 'Común'));
     }
-    return $row;
+    // D6.3: mapeo del esquema canónico mybb_ope_akumas al que consume el HUD.
+    return array(
+        'id'           => (int) $r['id'],
+        'nombre'       => (string) ($r['nombre_propio'] ?? ''),
+        'modelo'       => '',
+        'tipo'         => (string) ($r['familia'] ?? 'paramecia'),
+        'rareza'       => (string) ($r['rareza'] ?? ''),
+        'tier'         => $tier,
+        'imagen'       => '',
+        'descripcion'  => is_array($r['mecanica_base'] ?? null) ? json_encode($r['mecanica_base'], JSON_UNESCAPED_UNICODE) : (string) ($r['mecanica_base'] ?? ''),
+        'activo'       => 1,
+        'ocupada_pid'  => (int) ($r['portador_id'] ?? 0),
+        'estado'       => (string) ($r['estado'] ?? 'sin_portador'),
+        'slug'         => '',
+        'secundario'   => '',
+    );
 }
 
 function ope_fruta_libres($tier = 0)
 {
     global $db;
     $out = array();
-    if (!$db->table_exists('rol_akuma')) {
+    if (!function_exists('ope7_tabla_existe') || !ope7_tabla_existe('akumas')) {
         return $out;
     }
-    $where = 'activo = 1';
-    if ($db->field_exists('ocupada_pid', 'rol_akuma')) {
-        $where .= ' AND ocupada_pid = 0';
+    $where = "estado = 'sin_portador'";
+    if ((int) $tier >= 1 && (int) $tier <= 5) {
+        $where .= ' AND tier = ' . (int) $tier;
     }
-    $q = $db->simple_select('rol_akuma', '*', $where, array('order_by' => 'orden, id'));
+    $q = $db->simple_select('ope_akumas', '*', $where, array('order_by' => 'tier DESC, nombre_propio ASC'));
     while ($r = $db->fetch_array($q)) {
-        $t = isset($r['tier']) && (int) $r['tier'] > 0
-            ? (int) $r['tier']
-            : ope_fruta_rareza_a_tier($r['rareza'] ?? '');
-        $r['tier'] = $t;
-        if ($tier > 0 && $t !== (int) $tier) {
-            continue;
-        }
+        $r['nombre']      = (string) $r['nombre_propio'];
+        $r['tipo']        = (string) $r['familia'];
+        $r['imagen']      = '';
+        $r['activo']      = 1;
+        $r['ocupada_pid'] = 0;
         $out[] = $r;
     }
     return $out;
@@ -108,14 +122,32 @@ function ope_fruta_pj($pid)
 {
     global $db;
     $pid = (int) $pid;
-    if ($pid < 1 || !$db->table_exists('rol_pj_fruta')) {
+    if ($pid < 1 || !function_exists('ope7_tabla_existe') || !ope7_tabla_existe('personajes') || !ope7_tabla_existe('akumas')) {
         return null;
     }
-    $q = $db->simple_select('rol_pj_fruta', '*', "pid = {$pid}", array('limit' => 1));
-    if (!$db->num_rows($q)) {
+    // D6.3: la fruta canónica vive en ope_personajes.akuma_id (comida, 47) y en
+    // ope_akumas.portador_id (asignada por tirada 45 / compra 46, aún sin comer).
+    $pq = $db->simple_select('ope_personajes', 'akuma_id', "id = {$pid}", array('limit' => 1));
+    $akuma_id = $db->num_rows($pq) ? (int) $db->fetch_field($pq, 'akuma_id') : 0;
+    if ($akuma_id < 1) {
+        $aq = $db->simple_select('ope_akumas', 'id', "portador_id = {$pid} AND estado = 'con_portador'", array('limit' => 1));
+        $akuma_id = $db->num_rows($aq) ? (int) $db->fetch_field($aq, 'id') : 0;
+    }
+    if ($akuma_id < 1) {
         return null;
     }
-    return $db->fetch_array($q);
+    return array(
+        'pid'            => $pid,
+        'fruta_id'       => $akuma_id,
+        'nivel'          => 0,
+        'cu'             => 0,
+        'pp_gastado'     => 0,
+        'origen'         => '',
+        'potencia_sec'   => '',
+        'fecha_despertar'=> 0,
+        'dateline'       => TIME_NOW,
+        'lastedit'       => TIME_NOW,
+    );
 }
 
 function ope_fruta_secundario_default($tipo_fruta)
@@ -148,39 +180,27 @@ function ope_fruta_asignar($pid, $fruta_id, $origen = 'roll')
     if ($pid < 1 || $fruta_id < 1) {
         return array('ok' => false, 'msg' => 'Datos inválidos.');
     }
-    if (!$db->table_exists('rol_pj_fruta') || !$db->table_exists('rol_akuma')) {
+    if (!function_exists('ope7_tabla_existe') || !ope7_tabla_existe('akumas')) {
         return array('ok' => false, 'msg' => 'Sistema de frutas no disponible.');
     }
     if (ope_fruta_pj($pid)) {
         return array('ok' => false, 'msg' => 'Este personaje ya tiene una Akuma no Mi.');
     }
     $fruta = ope_fruta_by_id($fruta_id);
-    if (!$fruta || (int) ($fruta['activo'] ?? 0) !== 1) {
-        return array('ok' => false, 'msg' => 'Fruta no encontrada.');
-    }
-    if ($db->field_exists('ocupada_pid', 'rol_akuma') && (int) ($fruta['ocupada_pid'] ?? 0) > 0) {
-        return array('ok' => false, 'msg' => 'Esa fruta ya tiene dueño activo.');
+    if (!$fruta || (int) ($fruta['ocupada_pid'] ?? 0) > 0) {
+        return array('ok' => false, 'msg' => 'Fruta no disponible.');
     }
 
-    $sec = ope_fruta_secundario_default($fruta['tipo'] ?? 'paramecia');
-    $db->insert_query('rol_pj_fruta', array(
-        'pid' => $pid,
-        'fruta_id' => $fruta_id,
-        'nivel' => 0,
-        'cu' => 0,
-        'pp_gastado' => 0,
-        'origen' => $db->escape_string((string) $origen),
-        'potencia_sec' => $db->escape_string($sec),
-        'fecha_despertar' => 0,
-        'dateline' => TIME_NOW,
-        'lastedit' => TIME_NOW,
-    ));
-    if ($db->field_exists('ocupada_pid', 'rol_akuma')) {
-        $db->update_query('rol_akuma', array('ocupada_pid' => $pid), "id = {$fruta_id}");
-    }
+    // D6.3: el cupo se reserva en ope_akumas (portador_id) — el efecto 47
+    // (comer) fija ope_personajes.akuma_id y consume el objeto del inventario.
+    $db->update_query('ope_akumas', array(
+        'portador_id' => $pid,
+        'estado'      => 'con_portador',
+        'origen'      => $db->escape_string((string) $origen),
+    ), "id = {$fruta_id}");
     return array(
         'ok' => true,
-        'msg' => 'Has comido ' . (string) ($fruta['nombre'] ?? 'la fruta') . ' (Nv.0).',
+        'msg' => 'Akuma asignada: ' . (string) ($fruta['nombre'] ?? 'la fruta') . '.',
         'fruta' => $fruta,
     );
 }
@@ -231,53 +251,13 @@ function ope_fruta_add_cu($pid, $n = 1)
  */
 function ope_fruta_can_level($pid)
 {
-    global $db;
-    $pid = (int) $pid;
-    $row = ope_fruta_pj($pid);
+    $row = ope_fruta_pj((int) $pid);
     if (!$row) {
         return array('ok' => false, 'msg' => 'Sin fruta.');
     }
-    $pq = $db->simple_select('rol_personajes', 'estado, nivel', "pid = {$pid}", array('limit' => 1));
-    if (!$db->num_rows($pq)) {
-        return array('ok' => false, 'msg' => 'PJ no encontrado.');
-    }
-    $pj = $db->fetch_array($pq);
-    if ((string) ($pj['estado'] ?? '') !== 'aprobado') {
-        return array('ok' => false, 'msg' => 'Solo personajes aprobados.');
-    }
-    $nivel = (int) $row['nivel'];
-    $siguiente = $nivel + 1;
-    if ($siguiente > 3) {
-        return array('ok' => false, 'msg' => 'Despertar máximo.');
-    }
-    if ($siguiente === 3) {
-        return array('ok' => false, 'msg' => 'El Despertar (Nv.3) requiere trámite.', 'tramite' => 'fruta_despertar');
-    }
-
-    $nivel_pj = max(1, (int) ($pj['nivel'] ?? 1));
-    $tramo = function_exists('ope_rol_tramo') ? ope_rol_tramo($nivel_pj) : 1;
-    if ($siguiente === 2 && $tramo < 2) {
-        return array('ok' => false, 'msg' => 'Nv.2 requiere Tramo II.');
-    }
-
-    $cu_req = ope_fruta_cu_req($siguiente);
-    $cu = (int) $row['cu'];
-    if ($cu < $cu_req) {
-        return array('ok' => false, 'msg' => "CU insuficiente ({$cu}/{$cu_req}).");
-    }
-    $pp = ope_fruta_pp_nivel($tramo, false);
-    $saldo = function_exists('ope_pp_saldo') ? ope_pp_saldo($pid) : array('pp_disponible' => 0);
-    if ((int) $saldo['pp_disponible'] < $pp) {
-        return array('ok' => false, 'msg' => "Necesitas {$pp} PP.");
-    }
-    return array(
-        'ok' => true,
-        'msg' => 'Dominio de fruta disponible.',
-        'siguiente' => $siguiente,
-        'pp' => $pp,
-        'cu' => $cu,
-        'cu_req' => $cu_req,
-    );
+    // D6.3: la progresión de la fruta (niveles, despertar) vive en los trámites
+    // 45–51 del motor 7 Seas; este autoservicio del motor anterior se desactiva.
+    return array('ok' => false, 'msg' => 'La progresión de la fruta se gestiona por trámite (45–51).');
 }
 
 function ope_fruta_buy_level($pid)
@@ -475,8 +455,8 @@ function ope_fruta_norm(array $r, $can_see_details = false)
     $ocupada_pid = (int) ($r['ocupada_pid'] ?? 0);
     if ($ocupada_pid > 0 && $usuario === '') {
         global $db;
-        if (isset($db) && $db->table_exists('rol_personajes')) {
-            $pq = $db->simple_select('rol_personajes', 'nombre', "pid = {$ocupada_pid}", array('limit' => 1));
+        if (isset($db) && ope7_tabla_existe('personajes')) {
+            $pq = $db->simple_select(ope7_tabla('personajes'), 'nombre', "id = {$ocupada_pid}", array('limit' => 1));
             if ($pq && $db->num_rows($pq)) {
                 $usuario = (string) $db->fetch_field($pq, 'nombre');
             }

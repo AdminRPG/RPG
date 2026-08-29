@@ -24,13 +24,12 @@ function ope_get_staff_level($uid, $active_pid = 0) {
     $loggedin = (int)($mybb->user['uid'] ?? 0) > 0;
     if (!$loggedin) return 0;
 
-    if ($active_pid > 0 && !$db->table_exists('rol_personajes')) return 0;
-
     if (isset($mybb->user['ope_staff_level'])) {
         return (int) $mybb->user['ope_staff_level'];
     }
-    if ($db->table_exists('rol_cuentas')) {
-        $cq = $db->simple_select('rol_cuentas', 'staff_level', 'uid = ' . (int)$uid, array('limit' => 1));
+    // D6.3: fuente canónica mybb_ope_cuentas (rol_cuentas está retirada).
+    if ($db->table_exists('ope_cuentas')) {
+        $cq = $db->simple_select('ope_cuentas', 'staff_level', 'uid = ' . (int)$uid, array('limit' => 1));
         if ($db->num_rows($cq)) {
             return (int) $db->fetch_field($cq, 'staff_level');
         }

@@ -79,15 +79,30 @@ function ope_haki_row($pid, $tipo)
 {
     global $db;
     $pid = (int) $pid;
-    $tipo = $db->escape_string((string) $tipo);
-    if ($pid < 1 || !$db->table_exists('rol_haki')) {
+    $tipo = (string) $tipo;
+    if ($pid < 1 || !function_exists('ope7_tabla_existe') || !ope7_tabla_existe('haki')) {
         return null;
     }
-    $q = $db->simple_select('rol_haki', '*', "pid = {$pid} AND tipo = '{$tipo}'", array('limit' => 1));
+    // D6.3: tipos canónicos mybb_ope_haki (armadura/mantra/conquistador).
+    $tipo_canon = array('ken' => 'mantra', 'buso' => 'armadura', 'hao' => 'conquistador');
+    $tc = isset($tipo_canon[$tipo]) ? $tipo_canon[$tipo] : $tipo;
+    $q = $db->simple_select('ope_haki', '*', "personaje_id = {$pid} AND tipo = '" . $db->escape_string($tc) . "' AND activo = 1", array('limit' => 1));
     if (!$db->num_rows($q)) {
         return null;
     }
-    return $db->fetch_array($q);
+    $r = $db->fetch_array($q);
+    $nivel = (int) ($r['nivel'] ?? 0);
+    return array(
+        'pid'        => $pid,
+        'tipo'       => $tipo,
+        'nivel'      => $nivel,
+        'cu'         => 0,
+        'pp_gastado' => (int) ($r['pp_invertidos'] ?? 0),
+        'despertado' => $nivel >= 1 ? 1 : 0,
+        'origen'     => '',
+        'dateline'   => TIME_NOW,
+        'lastedit'   => TIME_NOW,
+    );
 }
 
 function ope_haki_all($pid)
@@ -153,11 +168,12 @@ function ope_haki_can_level($pid, $tipo, $stats = null, $nivel_pj = null)
     if (!in_array($tipo, ope_haki_tipos(), true)) {
         return array('ok' => false, 'msg' => 'Tipo de Haki no válido.');
     }
-    if (!$db->table_exists('rol_personajes') || !$db->table_exists('rol_haki')) {
+    // D6.3: fuente canónica mybb_ope_personajes.
+    if (!ope7_tabla_existe('personajes')) {
         return array('ok' => false, 'msg' => 'Sistema Haki no disponible.');
     }
 
-    $pq = $db->simple_select('rol_personajes', 'pid, estado, nivel, stats_json, datos', "pid = {$pid}", array('limit' => 1));
+    $pq = $db->simple_select(ope7_tabla('personajes'), 'id, estado, nivel, datos', "id = {$pid}", array('limit' => 1));
     if (!$db->num_rows($pq)) {
         return array('ok' => false, 'msg' => 'Personaje no encontrado.');
     }
@@ -167,11 +183,8 @@ function ope_haki_can_level($pid, $tipo, $stats = null, $nivel_pj = null)
     }
 
     if ($stats === null) {
-        $stats = json_decode((string) ($pj['stats_json'] ?? ''), true);
-        if (!is_array($stats) || empty($stats)) {
-            $datos = json_decode((string) ($pj['datos'] ?? ''), true);
-            $stats = is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array();
-        }
+        $datos = json_decode((string) ($pj['datos'] ?? ''), true);
+        $stats = is_array($datos['stats_efectivas'] ?? null) ? $datos['stats_efectivas'] : array();
     }
     if ($nivel_pj === null) {
         $nivel_pj = max(1, (int) ($pj['nivel'] ?? 1));

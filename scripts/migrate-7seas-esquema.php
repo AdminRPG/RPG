@@ -1910,6 +1910,7 @@ $mirror_front = array(
     'pp_saldo'                 => 'pp_saldo',
     'pp_log'                   => 'pp_log',
     'pj_vocaciones'            => 'pj_vocaciones',
+    'forum_meta'               => 'forum_meta',
 );
 foreach ($mirror_front as $lt => $dest) {
     if (!ope7_tabla_existe_legacy($lt)) {
@@ -1925,6 +1926,27 @@ INSERT IGNORE INTO {$P}{$dest} SELECT * FROM mybb_rol_{$lt}
     }
     ope7_run($db, 'F6.4 espejo ' . $dest, "CREATE TABLE {$P}{$dest} LIKE mybb_rol_{$lt}");
     ope7_run($db, 'F6.4 espejo datos ' . $dest, "INSERT IGNORE INTO {$P}{$dest} SELECT * FROM mybb_rol_{$lt}");
+}
+
+// D6.3-bis: espejos cuyo origen ya fue RENOMBRADO a mybb_rol_retirada_* en una
+// corrida anterior (la lista mirror de arriba solo copia si la tabla legada
+// sigue existiendo). Se crean desde la retirada, idempotente.
+$mirror_desde_retirada = array(
+    'forum_meta' => 'forum_meta',
+);
+foreach ($mirror_desde_retirada as $lt => $dest) {
+    $retirada = "mybb_rol_retirada_{$lt}";
+    $res = $db->query("SHOW TABLES LIKE '{$retirada}'");
+    if (!$res || $res->num_rows < 1) {
+        continue;
+    }
+    $res = $db->query("SHOW TABLES LIKE '{$P}{$dest}'");
+    if ($res && $res->num_rows > 0) {
+        ope7_run($db, 'D6.3-bis espejo datos ' . $dest, "INSERT IGNORE INTO {$P}{$dest} SELECT * FROM {$retirada}");
+        continue;
+    }
+    ope7_run($db, 'D6.3-bis espejo ' . $dest, "CREATE TABLE {$P}{$dest} LIKE {$retirada}");
+    ope7_run($db, 'D6.3-bis espejo datos ' . $dest, "INSERT IGNORE INTO {$P}{$dest} SELECT * FROM {$retirada}");
 }
 
 // ── 2+3) Retirar TODAS las 34 tablas restantes (archivo reversible) ──

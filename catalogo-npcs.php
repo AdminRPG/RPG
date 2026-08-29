@@ -13,10 +13,11 @@ require_once './global.php';
 $bburl  = htmlspecialchars_uni($mybb->settings['bburl']);
 $bbname = htmlspecialchars_uni($mybb->settings['bbname']);
 
-// Consulta dinámica a la base de datos: todos los personajes oficiales con es_npc = 1
+// D6.3: fuente canónica — NPCs mayores son ope_personajes con tipo_npc (el
+// bestiario menor vive en ope_bestiario). rol_personajes está retirada.
 $all_npcs_db = array();
-if ($db->table_exists('rol_personajes')) {
-    $nq = $db->simple_select('rol_personajes', '*', "es_npc = 1 AND estado = 'aprobado'", array('order_by' => 'nivel', 'order_dir' => 'desc'));
+if ($db->table_exists('ope_personajes')) {
+    $nq = $db->simple_select('ope_personajes', '*', "tipo_npc IS NOT NULL AND tipo_npc != '' AND estado = 'aprobado'", array('order_by' => 'nivel', 'order_dir' => 'desc'));
     while ($nr = $db->fetch_array($nq)) {
         $nr['datos_json'] = json_decode((string)$nr['datos'], true) ?: array();
         $nr['bio_json']   = json_decode((string)$nr['bio'], true) ?: array();

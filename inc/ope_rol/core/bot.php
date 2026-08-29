@@ -66,23 +66,7 @@ function ope7_bot_personaje()
         ));
         return (int) $pid;
     }
-    // Transición: el esquema canónico aún no existe → legado rol_personajes.
-    if ($db->table_exists('rol_personajes')) {
-        $q = $db->simple_select('rol_personajes', 'pid', "uid = {$bot_uid} AND es_npc = 1", array('order_by' => 'pid', 'order_dir' => 'ASC', 'limit' => 1));
-        if ($db->num_rows($q)) {
-            return (int) $db->fetch_field($q, 'pid');
-        }
-        $now = TIME_NOW;
-        $pid = $db->insert_query('rol_personajes', array(
-            'uid' => $bot_uid, 'nombre' => 'OPE Eternal', 'slug' => 'ope-eternal',
-            'estado' => 'aprobado', 'activo' => 0, 'rango' => 'P', 'nivel' => 1,
-            'datos' => $db->escape_string(json_encode(array('retrato' => ''), JSON_UNESCAPED_UNICODE)),
-            'inventario' => '{}', 'economia' => '{}',
-            'bio' => $db->escape_string(json_encode('La voz del mundo: el periódico News Coo y los avisos del sistema.', JSON_UNESCAPED_UNICODE)),
-            'dateline' => $now, 'lastedit' => $now, 'es_npc' => 1, 'staff_rol' => 'webmaster',
-        ));
-        return (int) $pid;
-    }
+    // D6.3: rol_personajes está retirada — el bot solo existe en ope_personajes.
     return 0;
 }
 

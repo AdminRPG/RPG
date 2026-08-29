@@ -28,21 +28,21 @@ if ($pid < 1 && function_exists('ope_rol_active_pid_for')) {
     $pid = ope_rol_active_pid_for($uid);
 }
 
-// ── Nombre del personaje activo ──
+// ── Nombre del personaje activo (D6.3: fuente canónica ope_personajes) ──
 $pj_name = 'Sin personaje activo';
-if ($pid > 0 && $db->table_exists('rol_personajes')) {
-    $qp = $db->simple_select('rol_personajes', 'nombre', "pid = {$pid}", array('limit' => 1));
+if ($pid > 0 && $db->table_exists('ope_personajes')) {
+    $qp = $db->simple_select('ope_personajes', 'nombre', "id = {$pid}", array('limit' => 1));
     if ($db->num_rows($qp)) $pj_name = $db->fetch_field($qp, 'nombre');
 }
 
-// ── ¿Tiene tripulación activa? ──
+// ── ¿Tiene tripulación activa? (canónica: ope_tripulantes → ope_tripulaciones) ──
 $mi_trip = null;
 $mi_trip_id = 0;
 $mi_rol = 'tripulante';
 $mi_members = array();
 
-if ($pid > 0 && $db->table_exists('rol_tripulacion_miembros')) {
-    $qm = $db->simple_select('rol_tripulacion_miembros', '*', "pid = {$pid} AND estado = 'activo'", array('limit' => 1));
+if ($pid > 0 && $db->table_exists('ope_tripulantes')) {
+    $qm = $db->simple_select('ope_tripulantes', '*', "personaje_id = {$pid} AND estado = 'activo'", array('limit' => 1));
     if ($db->num_rows($qm)) {
         $miembro = $db->fetch_array($qm);
         $mi_trip_id = (int) $miembro['tripulacion_id'];
@@ -50,18 +50,35 @@ if ($pid > 0 && $db->table_exists('rol_tripulacion_miembros')) {
     }
 }
 
-if ($mi_trip_id > 0 && $db->table_exists('rol_tripulaciones')) {
-    $qt = $db->simple_select('rol_tripulaciones', '*', "id = {$mi_trip_id} AND activo = 1", array('limit' => 1));
+if ($mi_trip_id > 0 && $db->table_exists('ope_tripulaciones')) {
+    $qt = $db->simple_select('ope_tripulaciones', '*', "id = {$mi_trip_id} AND estado = 'activa'", array('limit' => 1));
     if ($db->num_rows($qt)) {
         $mi_trip = $db->fetch_array($qt);
+        // Mapeo de campos del esquema canónico al que consume la plantilla.
+        $mi_trip['lema']        = (string) ($mi_trip['proposito'] ?? '');
+        $mi_trip['imagen']      = (string) ($mi_trip['bandera'] ?? '');
+        $mi_trip['descripcion'] = (string) ($mi_trip['proposito'] ?? '');
+        $mi_trip['faccion']     = '';
+        $mi_trip['nivel']       = 1;
+        $mi_trip['miembros']    = 0;
+        $mi_trip['capitan']     = '';
+        if ((int) ($mi_trip['capitan_id'] ?? 0) > 0 && $db->table_exists('ope_personajes')) {
+            $cp = $db->simple_select('ope_personajes', 'nombre', "id = " . (int) $mi_trip['capitan_id'], array('limit' => 1));
+            if ($db->num_rows($cp)) {
+                $mi_trip['capitan'] = (string) $db->fetch_field($cp, 'nombre');
+            }
+        }
+        if (function_exists('ope7_trip_espacio_usado')) {
+            $mi_trip['miembros'] = (int) ope7_trip_espacio_usado((int) $mi_trip['id']);
+        }
 
         // Cargar miembros via JOIN
         $pref = TABLE_PREFIX;
         $qq = $db->query("
-            SELECT rp.pid, rp.nombre, rp.avatar, rp.nivel, rp.estado,
+            SELECT rp.id AS pid, rp.nombre, rp.avatar, rp.nivel, rp.estado,
                    tm.rol AS rol_trip, tm.estado AS miembro_estado
-            FROM {$pref}rol_tripulacion_miembros tm
-            INNER JOIN {$pref}rol_personajes rp ON (rp.pid = tm.pid)
+            FROM {$pref}ope_tripulantes tm
+            INNER JOIN {$pref}ope_personajes rp ON (rp.id = tm.personaje_id)
             WHERE tm.tripulacion_id = {$mi_trip_id}
               AND tm.estado = 'activo'
               AND rp.estado = 'aprobado'
@@ -73,39 +90,38 @@ if ($mi_trip_id > 0 && $db->table_exists('rol_tripulaciones')) {
 
 // ── Si no tiene tripulación: listar disponibles ──
 $trips_disponibles = array();
-if (!$mi_trip && $db->table_exists('rol_tripulaciones')) {
-    $qall = $db->simple_select('rol_tripulaciones', '*', "activo = 1", array('order_by' => 'nombre', 'order_dir' => 'ASC'));
+if (!$mi_trip && $db->table_exists('ope_tripulaciones')) {
+    $qall = $db->simple_select('ope_tripulaciones', '*', "estado = 'activa'", array('order_by' => 'nombre', 'order_dir' => 'ASC'));
     while ($row = $db->fetch_array($qall)) {
+        $row['lema']    = (string) ($row['proposito'] ?? '');
+        $row['imagen']  = (string) ($row['bandera'] ?? '');
+        $row['faccion'] = '';
+        $row['capitan'] = '';
+        $row['nivel']   = 1;
+        $row['miembros'] = (int) 0;
         $trips_disponibles[] = $row;
     }
 }
 
-// ── POST: aplicar a una tripulación ──
+// ── POST: aplicar a una tripulación (22.9: el ingreso lo cursa el capitán, trámite 64) ──
 $flash_msg = '';
 $flash_type = 'info';
 if ($mybb->request_method === 'post' && $pid > 0 && !$mi_trip) {
     verify_post_check($mybb->get_input('my_post_key'));
     $action = $mybb->get_input('action');
-    if ($action === 'aplicar' && $db->table_exists('rol_tripulacion_miembros')) {
+    if ($action === 'aplicar') {
         $apply_tid = (int) $mybb->get_input('tripulacion_id');
-        if ($apply_tid > 0) {
-            // Verificar solicitud pendiente
-            $cs = $db->simple_select('rol_tripulacion_miembros', 'COUNT(*) AS cnt',
-                "pid = {$pid} AND tripulacion_id = {$apply_tid} AND estado = 'pendiente'");
-            if ((int) $db->fetch_array($cs)['cnt'] > 0) {
-                $flash_msg = 'Ya tienes una solicitud pendiente para esta tripulación.';
+        if ($apply_tid > 0 && $db->table_exists('ope_tripulaciones')) {
+            $cq = $db->simple_select('ope_tripulaciones', 'id', "id = {$apply_tid} AND estado = 'activa'", array('limit' => 1));
+            if ($db->num_rows($cq)) {
+                // D6.3: el motor 7 Seas no tiene tabla de solicitudes — el ingreso
+                // (trámite 64) lo inicia el capitán. Guiamos al aspirante.
+                $flash_msg = 'El ingreso lo cursa el capitán (trámite 64). Contacta con él en el foro para que te incorpore.';
             } else {
-                $db->insert_query('rol_tripulacion_miembros', array(
-                    'tripulacion_id' => $apply_tid,
-                    'pid'            => $pid,
-                    'uid'            => $uid,
-                    'rol'            => 'tripulante',
-                    'estado'         => 'pendiente',
-                    'dateline'       => time(),
-                ));
-                $flash_msg = '¡Solicitud enviada! Espera la respuesta del capitán.';
-                $flash_type = 'ok';
+                $flash_msg = 'Esa tripulación no está activa.';
             }
+        } else {
+            $flash_msg = 'Sistema de tripulaciones no disponible.';
         }
     }
 }

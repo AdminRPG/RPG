@@ -23,10 +23,10 @@ if ($uid < 1) {
     exit;
 }
 
-// ── Cupo de personajes (rol_cuentas.slots vs ope_personajes) ──
+// ── Cupo de personajes (D6.3: fuente canónica mybb_ope_cuentas.slots) ──
 $slots = 1;
-if ($db->table_exists('rol_cuentas')) {
-    $sq = $db->simple_select('rol_cuentas', 'slots', "uid = {$uid}", array('limit' => 1));
+if ($db->table_exists('ope_cuentas')) {
+    $sq = $db->simple_select('ope_cuentas', 'slots', "uid = {$uid}", array('limit' => 1));
     $sr = $db->fetch_array($sq);
     $slots = max(1, (int) ($sr['slots'] ?? 1));
 }

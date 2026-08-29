@@ -329,12 +329,12 @@ function ope_pp_on_post(&$dh)
     }
     if ($char_pid < 1) return $dh;
 
-    // NPCs y personajes sistema no ganan PP
-    if ($db->table_exists('rol_personajes')) {
-        $cq = $db->simple_select('rol_personajes', 'es_npc, uid', "pid = {$char_pid}", array('limit' => 1));
+    // NPCs y personajes sistema no ganan PP (D6.3: fuente canónica mybb_ope_personajes)
+    if (ope7_tabla_existe('personajes')) {
+        $cq = $db->simple_select(ope7_tabla('personajes'), 'es_NPC, uid', "id = {$char_pid}", array('limit' => 1));
         if ($db->num_rows($cq)) {
             $crow = $db->fetch_array($cq);
-            if ((int) ($crow['es_npc'] ?? 0) === 1) return $dh;
+            if ((int) ($crow['es_NPC'] ?? 0) === 1) return $dh;
             if ((int) ($crow['uid'] ?? 0) === ope_system_uid()) return $dh;
         }
     }
@@ -596,6 +596,9 @@ function ope_combat_recalc($pid)
 
 /**
  * Catálogo completo de estados (de BD o fallback estático).
+ * D6.3: fuente canónica mybb_ope_estados (34 estados del Anexo A.1). La clave
+ * se normaliza como en el esquema viejo (estado_key): 'Quemadura I' →
+ * 'quemadura', y se indexa también por id y por nombre literal.
  */
 function ope_combat_estados()
 {
@@ -604,11 +607,20 @@ function ope_combat_estados()
     if ($cache !== null) return $cache;
 
     $cache = array();
-    if ($db->table_exists('rol_estados')) {
-        $q = $db->simple_select('rol_estados', '*', '', array('order_by' => 'estado_key'));
-        while ($r = $db->fetch_array($q)) {
-            $cache[$r['estado_key']] = $r;
+    if (!$db->table_exists('ope_estados')) {
+        return $cache;
+    }
+    $q = $db->simple_select('ope_estados', '*', 'activo = 1', array('order_by' => 'nombre'));
+    while ($r = $db->fetch_array($q)) {
+        $r['tipo'] = (string) ($r['categoria'] ?? 'fisico');
+        $key = mb_strtolower((string) $r['nombre'], 'UTF-8');
+        $key = strtr($key, array('á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ü' => 'u', 'ñ' => 'n'));
+        $key = trim(preg_replace('/\s*(i{1,3}|iv|v)\s*$/', '', $key));
+        if ($key !== '') {
+            $cache[$key] = $r;
         }
+        $cache[(string) $r['id']] = $r;
+        $cache[(string) $r['nombre']] = $r;
     }
     return $cache;
 }

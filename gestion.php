@@ -23,11 +23,11 @@ if ($pid < 1 && function_exists('ope_rol_active_pid_for')) {
     $pid = ope_rol_active_pid_for($uid);
 }
 
-// ── Cargar datos del personaje activo ──
+// ── Cargar datos del personaje activo (fuente canónica mybb_ope_personajes) ──
 $pj = null;
 $isla_actual = null;
-if ($pid > 0 && $db->table_exists('rol_personajes')) {
-    $q = $db->simple_select('rol_personajes', '*', "pid = {$pid}", array('limit' => 1));
+if ($pid > 0 && $db->table_exists('ope_personajes')) {
+    $q = $db->simple_select('ope_personajes', '*', "id = {$pid}", array('limit' => 1));
     if ($db->num_rows($q)) {
         $pj = $db->fetch_array($q);
     }
@@ -36,14 +36,14 @@ if ($pid > 0 && $db->table_exists('rol_personajes')) {
 // Nombre a mostrar
 $display_name = function_exists('ope_get_display_name') ? ope_get_display_name() : htmlspecialchars_uni($mybb->user['username'] ?? '');
 
-// ── Detectar tripulación ──
+// ── Detectar tripulación (canónica: ope_tripulantes → ope_tripulaciones) ──
 $tiene_tripulacion = false;
 $mi_tripulacion = null;
-if ($pid > 0 && $db->table_exists('rol_tripulacion_miembros')) {
-    $tq = $db->query("SELECT t.id, t.nombre, t.lema, tm.rol, tm.estado
-        FROM " . TABLE_PREFIX . "rol_tripulacion_miembros tm
-        JOIN " . TABLE_PREFIX . "rol_tripulaciones t ON t.id = tm.tripulacion_id
-        WHERE tm.pid = {$pid} AND tm.estado = 'activo'
+if ($pid > 0 && $db->table_exists('ope_tripulantes') && $db->table_exists('ope_tripulaciones')) {
+    $tq = $db->query("SELECT t.id, t.nombre, tm.rol, tm.estado
+        FROM " . TABLE_PREFIX . "ope_tripulantes tm
+        JOIN " . TABLE_PREFIX . "ope_tripulaciones t ON t.id = tm.tripulacion_id
+        WHERE tm.personaje_id = {$pid} AND tm.estado = 'activo' AND t.estado = 'activa'
         LIMIT 1");
     if ($db->num_rows($tq)) {
         $mi_tripulacion = $db->fetch_array($tq);
@@ -51,36 +51,30 @@ if ($pid > 0 && $db->table_exists('rol_tripulacion_miembros')) {
     }
 }
 
-// ── Detectar barco activo ──
+// ── Detectar barco activo (canónico: mybb_ope_barcos) ──
 $barco = null;
-if ($pid > 0 && function_exists('ope_barco_lista')) {
-    $barcos = ope_barco_lista($pid);
-    foreach ($barcos as $b) {
-        if (!empty($b['activo'])) {
-            $barco = $b;
-            break;
-        }
-    }
-    if (!$barco && !empty($barcos)) {
+if ($pid > 0 && function_exists('ope7_barco_flota') && ope7_tabla_existe('barcos')) {
+    $barcos = ope7_barco_flota($pid);
+    if (!empty($barcos)) {
         $barco = $barcos[0];
     }
 }
 
-// ── Detectar inventario (tienda personal) ──
+// ── Detectar inventario (canónico: ope_inventario_personaje) ──
 $tiene_inventario = false;
 $inv_count = 0;
-if ($pid > 0 && $db->table_exists('rol_inventario')) {
-    $iq = $db->simple_select('rol_inventario', 'COUNT(*) as cnt', "pid = {$pid}");
+if ($pid > 0 && $db->table_exists('ope_inventario_personaje')) {
+    $iq = $db->simple_select('ope_inventario_personaje', 'COUNT(*) as cnt', "personaje_id = {$pid}");
     if ($db->num_rows($iq)) {
         $inv_count = (int) $db->fetch_field($iq, 'cnt');
         $tiene_inventario = $inv_count > 0;
     }
 }
 
-// ── Trámites pendientes ──
+// ── Trámites pendientes (canónico: ope_tramites del motor 5.21) ──
 $tramites_pendientes = 0;
-if ($pid > 0 && $db->table_exists('rol_tramites')) {
-    $tq2 = $db->simple_select('rol_tramites', 'COUNT(*) as cnt', "pid = {$pid} AND estado = 'pendiente'");
+if ($pid > 0 && $db->table_exists('ope_tramites')) {
+    $tq2 = $db->simple_select('ope_tramites', 'COUNT(*) as cnt', "personaje_id = {$pid} AND estado = 'pendiente'");
     if ($db->num_rows($tq2)) {
         $tramites_pendientes = (int) $db->fetch_field($tq2, 'cnt');
     }
@@ -200,7 +194,7 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="gestion-card-body">
         <h3><?php echo $barco ? 'Mi Barco' : 'Barco'; ?></h3>
         <p><?php echo $barco
-            ? htmlspecialchars_uni($barco['nombre']) . ' · ' . htmlspecialchars_uni($barco['tipo_label'] ?? '')
+            ? htmlspecialchars_uni($barco['nombre']) . ' · ' . htmlspecialchars_uni($barco['tipo']['nombre'] ?? '')
             : 'Solicita o compra una embarcación para navegar el Grand Line.'; ?></p>
       </div>
       <span class="gestion-card-arrow">›</span>

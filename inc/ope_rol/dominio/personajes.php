@@ -153,9 +153,11 @@ function ope7_pj_activo($uid = 0)
     if ($uid < 1) {
         return null;
     }
-    // F6.3: fuente canónica mybb_ope_cuentas (con fallback al legado rol_cuentas).
-    $tabla = ope7_tabla_existe('cuentas') ? ope7_tabla('cuentas') : 'rol_cuentas';
-    $q = $db->simple_select($tabla, 'personaje_activo, personaje_tabla', "uid = {$uid}", array('limit' => 1));
+    // D6.3: fuente canónica mybb_ope_cuentas (rol_cuentas está retirada).
+    if (!ope7_tabla_existe('cuentas')) {
+        return null;
+    }
+    $q = $db->simple_select(ope7_tabla('cuentas'), 'personaje_activo, personaje_tabla', "uid = {$uid}", array('limit' => 1));
     $r = $db->fetch_array($q);
     if (!$r || (int) $r['personaje_activo'] < 1) {
         return null;
@@ -176,14 +178,13 @@ function ope7_pj_set_activo($uid, $tabla, $id)
     }
     $tabla = $tabla === 'ope' ? 'ope' : 'rol';
     $id    = (int) $id;
-    // F6.3: escribe en la fuente canónica (mybb_ope_cuentas) y, si la tabla
-    // vieja sigue existiendo (legado del plugin), la mantiene en espejo para
-    // que los hooks del motor viejo no pierdan el puntero.
-    $dest = ope7_tabla_existe('cuentas') ? ope7_tabla('cuentas') : 'rol_cuentas';
-    $db->update_query($dest, array('personaje_activo' => $id, 'personaje_tabla' => $tabla), "uid = {$uid}");
-    if ($dest !== 'rol_cuentas' && $db->table_exists('rol_cuentas')) {
-        $db->update_query('rol_cuentas', array('personaje_activo' => $id, 'personaje_tabla' => $tabla), "uid = {$uid}");
+    // D6.3: escribe solo en la fuente canónica (mybb_ope_cuentas). El espejo
+    // en rol_cuentas se eliminó: esa tabla está retirada y el plugin ya lee
+    // la fuente canónica.
+    if (!ope7_tabla_existe('cuentas')) {
+        return false;
     }
+    $db->update_query(ope7_tabla('cuentas'), array('personaje_activo' => $id, 'personaje_tabla' => $tabla), "uid = {$uid}");
     // Sesión actual (si el uid es el usuario logueado).
     if ($uid === (int) ($mybb->user['uid'] ?? 0)) {
         $mybb->user['ope_active_pid'] = $id;

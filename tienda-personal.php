@@ -25,18 +25,19 @@ if ($pid < 1 && function_exists('ope_rol_active_pid_for')) {
     $pid = ope_rol_active_pid_for($uid);
 }
 
-// ── Personaje activo ──
+// ── Personaje activo (D6.3: fuente canónica mybb_ope_personajes) ──
 $pj = null;
 $pj_name = 'Sin personaje activo';
 $pj_money = 0;
-if ($pid > 0 && $db->table_exists('rol_personajes')) {
-    $q = $db->simple_select('rol_personajes', '*', "pid = {$pid}", array('limit' => 1));
+if ($pid > 0 && $db->table_exists('ope_personajes')) {
+    $q = $db->simple_select('ope_personajes', '*', "id = {$pid}", array('limit' => 1));
     if ($db->num_rows($q)) {
         $pj = $db->fetch_array($q);
         $pj_name = htmlspecialchars_uni($pj['nombre'] ?? '');
-        // Economía del personaje
-        $econ = json_decode($pj['economia'] ?? '{}', true);
-        $pj_money = (int) ($econ['berries'] ?? 0);
+        // Economía canónica: cartera en mybb_ope_carteras (F3).
+        $pj_money = (function_exists('ope7_cartera_get') && $pid > 0)
+            ? (int) (ope7_cartera_get($pid)['cartera'] ?? 0)
+            : (int) (json_decode((string) ($pj['economia'] ?? '{}'), true)['berries'] ?? 0);
     }
 }
 
@@ -44,8 +45,8 @@ if ($pid > 0 && $db->table_exists('rol_personajes')) {
 $flash_msg  = '';
 $flash_type = 'ok';
 
-// ── Detectar tabla de inventario ──
-$has_inv_table = $db->table_exists('rol_inventario');
+// ── Detectar tablas canónicas de inventario (D6.3: ope_inventario_personaje) ──
+$has_inv_table = $db->table_exists('ope_inventario_personaje') && $db->table_exists('ope_objetos');
 
 // ── POST actions ──
 if ($mybb->request_method === 'post' && $pid > 0) {
@@ -53,54 +54,21 @@ if ($mybb->request_method === 'post' && $pid > 0) {
     $action = $mybb->get_input('action');
 
     if ($action === 'add' && $has_inv_table) {
-        $nombre   = $mybb->get_input('nombre');
-        $cat      = $mybb->get_input('categoria');
-        $rareza   = $mybb->get_input('rareza');
-        $cant     = max(1, (int) $mybb->get_input('cantidad'));
-        $precio   = max(0, (int) $mybb->get_input('precio_venta'));
-        $desc     = $mybb->get_input('descripcion');
-        if ($nombre !== '') {
-            $db->insert_query('rol_inventario', array(
-                'pid'          => $pid,
-                'nombre'       => $nombre,
-                'categoria'    => in_array($cat, ['arma','equipo','consumible','especial']) ? $cat : 'otro',
-                'rareza'       => in_array($rareza, ['comun','poco_comun','rara','epica','legendaria']) ? $rareza : 'comun',
-                'cantidad'     => $cant,
-                'precio_venta' => $precio,
-                'en_venta'     => $precio > 0 ? 1 : 0,
-                'descripcion'  => $desc,
-                'dateline'     => time(),
-            ));
-            $flash_msg = "«{$nombre}» añadido al inventario.";
-        }
+        // D6.3: los objetos se obtienen en tiendas y recompensas (F3) — el
+        // inventario canónico referencia el catálogo ope_objetos, no se crea a mano.
+        $flash_msg = 'Los objetos se obtienen en tiendas y recompensas (sistema de tiendas F3), no se crean a mano.';
+        $flash_type = 'info';
     }
 
     if ($action === 'edit' && $has_inv_table) {
-        $iid    = (int) $mybb->get_input('item_id');
-        $nombre = $mybb->get_input('nombre');
-        $cat    = $mybb->get_input('categoria');
-        $rareza = $mybb->get_input('rareza');
-        $cant   = max(1, (int) $mybb->get_input('cantidad'));
-        $precio = max(0, (int) $mybb->get_input('precio_venta'));
-        $desc   = $mybb->get_input('descripcion');
-        if ($iid > 0 && $nombre !== '') {
-            $db->update_query('rol_inventario', array(
-                'nombre'       => $nombre,
-                'categoria'    => in_array($cat, ['arma','equipo','consumible','especial']) ? $cat : 'otro',
-                'rareza'       => in_array($rareza, ['comun','poco_comun','rara','epica','legendaria']) ? $rareza : 'comun',
-                'cantidad'     => $cant,
-                'precio_venta' => $precio,
-                'en_venta'     => $precio > 0 ? 1 : 0,
-                'descripcion'  => $desc,
-            ), "iid = {$iid} AND pid = {$pid}");
-            $flash_msg = "«{$nombre}» actualizado.";
-        }
+        $flash_msg = 'La gestión del inventario se realiza desde el sistema de tiendas (F3).';
+        $flash_type = 'info';
     }
 
     if ($action === 'delete' && $has_inv_table) {
         $iid = (int) $mybb->get_input('item_id');
         if ($iid > 0) {
-            $db->delete_query('rol_inventario', "iid = {$iid} AND pid = {$pid}");
+            $db->delete_query('ope_inventario_personaje', "id = {$iid} AND personaje_id = {$pid}");
             $flash_msg = 'Objeto eliminado del inventario.';
             $flash_type = 'info';
         }
@@ -109,21 +77,27 @@ if ($mybb->request_method === 'post' && $pid > 0) {
     if ($action === 'toggle_venta' && $has_inv_table) {
         $iid = (int) $mybb->get_input('item_id');
         if ($iid > 0) {
-            $dq = $db->simple_select('rol_inventario', 'en_venta, precio_venta', "iid = {$iid} AND pid = {$pid}", array('limit' => 1));
-            if ($db->num_rows($dq)) {
-                $row = $db->fetch_array($dq);
-                $new_sale = empty($row['en_venta']) ? 1 : 0;
-                $db->update_query('rol_inventario', array('en_venta' => $new_sale), "iid = {$iid}");
-                $flash_msg = $new_sale ? 'Objeto puesto a la venta.' : 'Objeto retirado de la venta.';
+            // D6.3: vender = ope7_tienda_venta_npc (F3, paga con la cartera).
+            $oq = $db->simple_select('ope_inventario_personaje', 'objeto_id, cantidad', "id = {$iid} AND personaje_id = {$pid}", array('limit' => 1));
+            if ($db->num_rows($oq)) {
+                $row = $db->fetch_array($oq);
+                if (function_exists('ope7_tienda_venta_npc')) {
+                    $res = ope7_tienda_venta_npc($pid, (int) $row['objeto_id'], max(1, (int) $row['cantidad']));
+                    $flash_msg = (string) ($res['msg'] ?? 'Venta procesada.');
+                    $flash_type = !empty($res['ok']) ? 'ok' : 'info';
+                } else {
+                    $flash_msg = 'Sistema de venta no disponible.';
+                    $flash_type = 'info';
+                }
             }
         }
     }
 }
 
-// ── Cargar inventario ──
+// ── Cargar inventario (canónico: ope_inventario_personaje → ope_objetos) ──
 $objetos = array();
 if ($pid > 0 && $has_inv_table) {
-    $qi = $db->simple_select('rol_inventario', '*', "pid = {$pid} AND cantidad > 0", array('order_by' => 'categoria, nombre'));
+    $qi = $db->query("SELECT i.id AS iid, o.nombre, o.categoria, o.rareza, o.notas AS descripcion, i.cantidad,\n        COALESCE(o.precio_base, 0) AS precio_venta, 0 AS en_venta\n        FROM " . TABLE_PREFIX . "ope_inventario_personaje i\n        JOIN " . TABLE_PREFIX . "ope_objetos o ON o.id = i.objeto_id\n        WHERE i.personaje_id = {$pid} AND i.cantidad > 0\n        ORDER BY o.categoria, o.nombre");
     while ($row = $db->fetch_array($qi)) $objetos[] = $row;
 }
 
